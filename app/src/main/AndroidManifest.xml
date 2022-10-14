@@ -4,6 +4,7 @@
     package="com.livingtechusa.reflexion">
 
     <application
+        android:name=".util.BaseApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
