@@ -127,18 +127,11 @@ fun ReflexionApp(
 
         NavHost(
             navController = navController,
-            startDestination = ReflexionScreen.Start.name,
+            startDestination = ReflexionScreen.Build.name,
             modifier = modifier.padding(innerPadding)
         ) {
-            composable(route = ReflexionScreen.Start.name) {
-                BuildItemScreen(
-                    viewModel = viewModel,
-                    navHostController = navController
-//                    onNavigateToChildren = { navController.navigate(ReflexionScreen.Children.name) },
-//                    onNavigateToChildren = { navController.navigate(ReflexionScreen.Children.name) },
-//                    onNavigateToSiblings = { navController.navigate(ReflexionScreen.Children.name) },
-//                    onNavigateToParent = { navController.navigate(ReflexionScreen.Children.name) },
-                )
+            composable(route = ReflexionScreen.Build.name) {
+                BuildItemScreen(viewModel = viewModel, navHostController = navController)
             }
             composable(route = ReflexionScreen.Children.name) {
                 ChildrenScreen( viewModel = viewModel, navController)

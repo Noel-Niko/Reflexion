@@ -7,7 +7,6 @@ import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.entities.LinkedList
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.ui.build.BuildEvent
-import com.livingtechusa.reflexion.ui.components.ItemRecyclerView
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -61,12 +60,14 @@ class ItemViewModel @Inject constructor (
         viewModelScope.launch {
             try {
                 when (event) {
-                    is BuildEvent.UpdateReflexionItemFromUI -> {
+                    is BuildEvent.UpdateReflexionItem -> {
                         _reflexionItem.value = event.reflexionItem
+                        localServiceImpl.updateReflexionItem(event.reflexionItem)
                     }
-                    is BuildEvent.SaveChanges -> {
-                        _reflexionItem.value = event.reflexionItem
+                    is BuildEvent.SaveNew -> {
                         localServiceImpl.setItem(event.reflexionItem)
+                        _reflexionItem.value = localServiceImpl.selectReflexionItemByName(event.reflexionItem.name)
+                        println("_")
                     }
                     is BuildEvent.Delete -> {
                         localServiceImpl.deleteReflexionItem(_reflexionItem.value.autogenPK, _reflexionItem.value.name)

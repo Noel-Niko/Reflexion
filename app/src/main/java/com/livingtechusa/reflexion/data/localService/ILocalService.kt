@@ -6,6 +6,7 @@ import com.livingtechusa.reflexion.data.entities.LinkedList
 
 interface ILocalService {
     suspend fun setItem(item: ReflexionItem)
+    suspend fun updateReflexionItem(item: ReflexionItem)
     suspend fun getAllItems(): List<ReflexionItem?>
     suspend fun clearALLReflexionItems()
     suspend fun selectItem(autogenPK: Long, name: String): ReflexionItem?
@@ -29,4 +30,5 @@ interface ILocalService {
     suspend fun setLinkedListIndex(title: String, itemPK: Long, index: Int)
     suspend fun selectChildLinkedLists(parent: Long): List<LinkedList?>
     suspend fun renameLinkedList(title: String, itemPK: Long, newTitle: String)
+    suspend fun selectReflexionItemByName(name: String): ReflexionItem
 }

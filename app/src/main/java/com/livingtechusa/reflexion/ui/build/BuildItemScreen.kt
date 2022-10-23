@@ -25,35 +25,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import androidx.compose.material.TextField
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
-import com.livingtechusa.reflexion.navigation.ReflexionApp
 import com.livingtechusa.reflexion.navigation.ReflexionScreen
 
 @Composable
 fun BuildItemScreen(
-    viewModel:ItemViewModel,
-    navHostController: NavHostController) {
+    viewModel: ItemViewModel,
+    navHostController: NavHostController
+) {
     val configuration = LocalConfiguration.current
     if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-       // BuildItemScreenLandscape(navHostController)
+        // BuildItemScreenLandscape(navHostController)
     } else {
         val itemViewModel: ItemViewModel = viewModel
-        val reflexionItem by itemViewModel.reflexionItem.collectAsState()
+        val savedReflexionItem by itemViewModel.reflexionItem.collectAsState()
         val isParent by itemViewModel.isParent.collectAsState()
         //        val topic by itemViewModel.topic.collectAsState()
         val parentName by itemViewModel.parentName.collectAsState()
@@ -62,14 +58,43 @@ fun BuildItemScreen(
         val siblings by itemViewModel.siblings.collectAsState()
         val children by itemViewModel.children.collectAsState()
         val context = LocalContext.current
-        val tempReflexionItem: ReflexionItem = remember { reflexionItem }
+        val reflexionItem = remember {
+            mutableStateOf(
+                ReflexionItem(
+                    autogenPK = savedReflexionItem.autogenPK,
+                    name = savedReflexionItem.name,
+                    description = savedReflexionItem.description,
+                    detailedDescription = savedReflexionItem.detailedDescription,
+                    image = savedReflexionItem.image,
+                    videoUri = savedReflexionItem.videoUri,
+                    videoUrl = savedReflexionItem.videoUrl,
+                    parent = savedReflexionItem.parent,
+                    hasChildren = savedReflexionItem.hasChildren
+                )
+            )
+        }
+
+        val name = remember { mutableStateOf(savedReflexionItem.name) }
+        val description = remember { mutableStateOf(savedReflexionItem.description) }
+        val detailedDescription = remember { mutableStateOf(savedReflexionItem.detailedDescription) }
+        val image = remember { mutableStateOf(savedReflexionItem.image) }
+        val videoUri = remember { mutableStateOf(savedReflexionItem.videoUri) }
+        val videoUrl = remember { mutableStateOf(savedReflexionItem.videoUrl) }
+        val parent = remember { mutableStateOf(savedReflexionItem.parent) }
+
 
         val scaffoldState = rememberScaffoldState()
         Scaffold(
             floatingActionButton = {
                 FloatingActionButton(onClick = {
                     Toast.makeText(context, "Changes Saved", Toast.LENGTH_SHORT).show()
-                    itemViewModel.onTriggerEvent(BuildEvent.SaveChanges(tempReflexionItem))
+                    if(savedReflexionItem.autogenPK != 0L) {
+                        reflexionItem.value.autogenPK = savedReflexionItem.autogenPK
+                        reflexionItem.value.name = reflexionItem.value.name.trim()
+                        itemViewModel.onTriggerEvent(BuildEvent.UpdateReflexionItem(reflexionItem.value))
+                    } else {
+                        itemViewModel.onTriggerEvent(BuildEvent.SaveNew(reflexionItem.value))
+                    }
                 }) {
                     Icon(
                         painter = painterResource(R.drawable.ic_baseline_save_alt_24),
@@ -85,11 +110,10 @@ fun BuildItemScreen(
             ) {
                 item {
                     Spacer(Modifier.height(16.dp))
-                    if (reflexionItem.parent == null) {
+                    if (savedReflexionItem.parent == null) {
                         Row(
                             modifier = Modifier.padding(12.dp)
                         ) {
-                            var name = ""
                             Column(
                                 Modifier
                                     .weight(1f)
@@ -104,10 +128,10 @@ fun BuildItemScreen(
                             ) {
                                 TextField(
                                     modifier = Modifier.fillMaxWidth(),
-                                    value = reflexionItem.name,
+                                    value = name.value,
                                     onValueChange = {
-                                        tempReflexionItem.name = it
-                                        itemViewModel.onTriggerEvent(BuildEvent.UpdateReflexionItemFromUI(tempReflexionItem))
+                                        name.value = it
+                                        reflexionItem.value.name = it
                                     }
                                 )
                             }
@@ -116,7 +140,6 @@ fun BuildItemScreen(
                         Row(
                             modifier = Modifier.padding(12.dp)
                         ) {
-                            var name = ""
                             Column(
                                 Modifier
                                     .weight(1f)
@@ -131,10 +154,10 @@ fun BuildItemScreen(
                             ) {
                                 TextField(
                                     modifier = Modifier.fillMaxWidth(),
-                                    value = reflexionItem.name,
+                                    value = name.value,
                                     onValueChange = {
-                                        tempReflexionItem.name = it
-                                        itemViewModel.onTriggerEvent(BuildEvent.UpdateReflexionItemFromUI(tempReflexionItem))
+                                        name.value = it
+                                        reflexionItem.value.name = it
                                     }
                                 )
                             }
@@ -158,10 +181,10 @@ fun BuildItemScreen(
                         ) {
                             TextField(
                                 modifier = Modifier.fillMaxWidth(),
-                                value = reflexionItem.description ?: "",
+                                value = description.value ?: "",
                                 onValueChange = {
-                                    tempReflexionItem.description = it
-                                    itemViewModel.onTriggerEvent(BuildEvent.UpdateReflexionItemFromUI(tempReflexionItem))
+                                    description.value = it
+                                    reflexionItem.value.description = it
                                 }
                             )
                         }
@@ -184,10 +207,10 @@ fun BuildItemScreen(
                         ) {
                             TextField(
                                 modifier = Modifier.fillMaxWidth(),
-                                value = reflexionItem.detailedDescription ?: "",
+                                value = detailedDescription.value ?: "",
                                 onValueChange = {
-                                    tempReflexionItem.detailedDescription = it
-                                    itemViewModel.onTriggerEvent(BuildEvent.UpdateReflexionItemFromUI(tempReflexionItem))
+                                    detailedDescription.value = it
+                                    reflexionItem.value.detailedDescription = it
                                 }
                             )
                         }
@@ -224,7 +247,7 @@ fun BuildItemScreen(
                                 onClick = {
                                     Toast.makeText(context, "Button Clicked", Toast.LENGTH_SHORT).show()
                                     //tempReflexionItem.videoUri = TODO - capture URI
-                                    itemViewModel.onTriggerEvent(BuildEvent.UpdateReflexionItemFromUI(tempReflexionItem))
+                                    itemViewModel.onTriggerEvent(BuildEvent.UpdateReflexionItem(savedReflexionItem))
                                 }) {
                                 Icon(
                                     painter = painterResource(R.drawable.ic_baseline_get_app_24),
@@ -260,7 +283,7 @@ fun BuildItemScreen(
                                 onClick = {
                                     Toast.makeText(context, "Button Clicked", Toast.LENGTH_SHORT).show()
                                     // todo capture and pass url
-                                    itemViewModel.onTriggerEvent(BuildEvent.UpdateReflexionItemFromUI(tempReflexionItem))
+                                    itemViewModel.onTriggerEvent(BuildEvent.UpdateReflexionItem(savedReflexionItem))
                                 }) {
                                 Icon(
                                     painter = painterResource(R.drawable.ic_baseline_get_app_24),
@@ -304,14 +327,33 @@ fun BuildItemScreen(
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    if (reflexionItem.hasChildren == false) {
-                        Button(onClick = {
-                            Toast.makeText(context, "Button Clicked", Toast.LENGTH_LONG).show()
-                            itemViewModel.onTriggerEvent(BuildEvent.Delete)
+                    Row(
+                        modifier = Modifier.padding(8.dp)
+                    ) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        if (savedReflexionItem.hasChildren == false) {
+                            Column(
+                                Modifier.weight(1f)
+                            ) {
+                                Button(onClick = {
+                                    Toast.makeText(context, "Button Clicked", Toast.LENGTH_LONG).show()
+                                    itemViewModel.onTriggerEvent(BuildEvent.Delete)
+                                }
+                                ) {
+                                    Text(stringResource(R.string.delete))
+                                }
+                            }
                         }
+                        Column(
+                            Modifier.weight(1f)
                         ) {
-                            Text(stringResource(R.string.delete))
+                            Button(onClick = {
+                                Toast.makeText(context, "Button Clicked", Toast.LENGTH_LONG).show()
+                                itemViewModel.onTriggerEvent(BuildEvent.Delete)
+                            }
+                            ) {
+                                Text(stringResource(R.string.add_child))
+                            }
                         }
                     }
                 }

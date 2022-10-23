@@ -17,6 +17,10 @@ class LocalServiceImpl @Inject constructor(
         reflexionItemDao.setReflexionItem(item)
     }
 
+    override suspend fun updateReflexionItem(item: ReflexionItem) {
+        reflexionItemDao.updateReflexionItem(item.autogenPK, item.name, item.description, item.detailedDescription, item.image, item.videoUri, item.videoUrl, item.parent, item.hasChildren)
+    }
+
     override suspend fun getAllItems(): List<ReflexionItem?> {
         return reflexionItemDao.getAllReflexionItems()
     }
@@ -95,6 +99,10 @@ class LocalServiceImpl @Inject constructor(
 
     override suspend fun renameLinkedList(title: String, itemPK: Long, newTitle: String) {
         linkedListDao.renameLinkedList(title, itemPK, newTitle)
+    }
+
+    override suspend fun selectReflexionItemByName(name: String): ReflexionItem {
+        return reflexionItemDao.selectReflexionItemByName(name)
     }
 
     override suspend fun selectChildLinkedLists(parent: Long): List<LinkedList?> {

@@ -11,6 +11,9 @@ interface ReflexionItemDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun setReflexionItem(item: ReflexionItem)
 
+    @Query("UPDATE ReflexionItem SET name = :name, description = :description, detailedDescription = :detailedDescription, image = :image, videoUri = :videoUri, videoUrl = :videoUrl, parent = :parent, hasChildren = :hasChildren WHERE autogenPK = :autogenPK")
+    suspend fun updateReflexionItem(autogenPK: Long , name: String, description: String?, detailedDescription: String?, image: ByteArray?, videoUri: String?, videoUrl: String?, parent: Long?, hasChildren: Boolean?)
+
     @Query("Select * FROM ReflexionItem")
     suspend fun getAllReflexionItems(): List<ReflexionItem?>
 
@@ -31,4 +34,7 @@ interface ReflexionItemDao {
 
     @Query("UPDATE ReflexionItem SET parent = :newParent WHERE autogenPK = :autogenPK AND name = :name")
     suspend fun setReflexionItemParent(autogenPK: Long, name: String, newParent: Long)
+
+    @Query("Select * FROM ReflexionItem WHERE name =:name")
+    suspend fun selectReflexionItemByName(name: String): ReflexionItem
 }

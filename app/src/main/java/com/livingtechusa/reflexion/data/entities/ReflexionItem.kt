@@ -18,7 +18,7 @@ import androidx.room.PrimaryKey
 )
 data class ReflexionItem(
     @PrimaryKey(autoGenerate = true)
-    val autogenPK: Long = 0,
+    var autogenPK: Long = 0,
     var name: String = "",
     var description: String? = "",
     var detailedDescription: String? = "",
