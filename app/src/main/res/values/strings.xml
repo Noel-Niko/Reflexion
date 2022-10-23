@@ -6,10 +6,12 @@
     <string name="description"><b>Description: </b></string>
     <string name="detailedDescription"><i>Details: </i></string>
     <string name="saved_video">Saved Video</string>
-    <string name="video_link">Video Hyperlink</string>
+    <string name="video_link">Video Link</string>
     <string name="update"><i>Update</i></string>
     <string name="parent">Parent</string>
     <string name="siblings">Siblings</string>
     <string name="children">Children</string>
-    <string name="O">o</string>
+    <string name="BuildScreen">BuildScreen</string>
+    <string name="DisplayScreen">DisplayScreen</string>
+    <string name="back_button">Back</string>
 </resources>

@@ -5,32 +5,24 @@ import com.livingtechusa.reflexion.data.entities.ReflexionItem
 
 sealed class BuildEvent {
 
-    object GetImages : BuildEvent()
-    object GetNewImage : BuildEvent()
-    data class ConvertToYodaSpeak(
-        val text: String
+    data class SaveChanges(
+        val reflexionItem: ReflexionItem
     ) : BuildEvent()
 
-    data class UpdateALLFieldText(
+    data class UpdateReflexionItemFromUI(
         val reflexionItem: ReflexionItem
     ) : BuildEvent()
 
     object Delete : BuildEvent()
 
-    object UpdateColor : BuildEvent()
     object UpdateSavedVideo : BuildEvent() {
-
     }
 
     object UpdateVideoURL : BuildEvent() {
-
     }
 
     object ShowSiblings : BuildEvent() {
-
     }
 
-    object ShowChildren : BuildEvent() {
-
-    }
+    object ShowChildren : BuildEvent()
 }

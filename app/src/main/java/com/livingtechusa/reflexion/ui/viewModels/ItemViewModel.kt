@@ -7,10 +7,12 @@ import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.entities.LinkedList
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.ui.build.BuildEvent
+import com.livingtechusa.reflexion.ui.components.ItemRecyclerView
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 const val STATE_KEY_URL = "com.livingtechusa.reflexion.ui.build.BuildItemScreen.url"
@@ -22,6 +24,9 @@ enum class ApiStatus { PRE_INIT, LOADING, ERROR, DONE }
 class ItemViewModel @Inject constructor (
     private val localServiceImpl: LocalServiceImpl
     ): ViewModel() {
+    private val _displayedItem = MutableStateFlow(ReflexionItem())
+    val displayedItem: StateFlow<ReflexionItem> get() = _displayedItem.asStateFlow()
+
 
     private val TAG = "ItemViewModel"
     private val _reflexionItem = MutableStateFlow(ReflexionItem())
@@ -30,8 +35,8 @@ class ItemViewModel @Inject constructor (
     private val _isParent = MutableStateFlow(false)
     val isParent: StateFlow<Boolean> get() = _isParent
 
-    private val _topic = MutableStateFlow(String())
-    val topic: StateFlow<String?> get() = _topic
+//    private val _topic = MutableStateFlow(String())
+//    val topic: StateFlow<String?> get() = _topic
 
     private val _parentName = MutableStateFlow(String())
     val parentName: StateFlow<String?> get() = _parentName
@@ -56,13 +61,19 @@ class ItemViewModel @Inject constructor (
         viewModelScope.launch {
             try {
                 when (event) {
-                    is BuildEvent.UpdateALLFieldText -> {
+                    is BuildEvent.UpdateReflexionItemFromUI -> {
+                        _reflexionItem.value = event.reflexionItem
+                    }
+                    is BuildEvent.SaveChanges -> {
                         _reflexionItem.value = event.reflexionItem
                         localServiceImpl.setItem(event.reflexionItem)
                     }
                     is BuildEvent.Delete -> {
                         localServiceImpl.deleteReflexionItem(_reflexionItem.value.autogenPK, _reflexionItem.value.name)
                         _reflexionItem.value = ReflexionItem()
+                    }
+                    is BuildEvent.ShowChildren -> {
+                        //ItemRecyclerView()
                     }
                 }
             } catch (e: Exception) {
