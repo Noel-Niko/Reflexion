@@ -22,11 +22,11 @@ data class ReflexionItem(
     var name: String = "",
     var description: String? = "",
     var detailedDescription: String? = "",
-    val image: ByteArray? = null,
-    val videoUri: String? = "",
-    val videoUrl: String? = "",
-    val parent: Long? = null,
-    val hasChildren: Boolean? = true
+    var image: ByteArray? = null,
+    var videoUri: String? = "",
+    var videoUrl: String? = "",
+    var parent: Long? = null,
+    var hasChildren: Boolean? = true
 ) {
     companion object {
         val AUTOGEN_PK = "autogenPK"

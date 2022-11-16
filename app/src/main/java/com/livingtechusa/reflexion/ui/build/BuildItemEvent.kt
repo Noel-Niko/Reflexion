@@ -13,6 +13,11 @@ sealed class BuildEvent {
         val reflexionItem: ReflexionItem
     ) : BuildEvent()
 
+    data class ShowVideo(
+        val uri: String?,
+        val Url: String?
+    ) : BuildEvent()
+
     object Delete : BuildEvent()
 
     object UpdateSavedVideo : BuildEvent() {

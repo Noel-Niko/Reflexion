@@ -11,8 +11,9 @@
     <string name="parent">Parent</string>
     <string name="siblings">Siblings</string>
     <string name="children">Children</string>
-    <string name="BuildScreen">BuildScreen</string>
-    <string name="DisplayScreen">DisplayScreen</string>
+    <string name="BuildScreen">Build Screen</string>
+    <string name="DisplayScreen">Display Screen</string>
     <string name="back_button">Back</string>
     <string name="add_child">Add Child</string>
+    <string name="error_message">There was an error. Please try again.</string>
 </resources>

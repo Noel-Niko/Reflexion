@@ -7,16 +7,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.ui.components.ItemRecyclerView
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 
+const val ChildRoute = "child"
 @Composable
 fun ChildrenScreen(
-    viewModel:ItemViewModel,
-    navController: NavHostController) {
+    viewModel: ItemViewModel = hiltViewModel()
+) {
     val configuration = LocalConfiguration.current
     if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
         // TODO

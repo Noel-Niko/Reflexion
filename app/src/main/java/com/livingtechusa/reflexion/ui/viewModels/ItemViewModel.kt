@@ -7,6 +7,7 @@ import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.entities.LinkedList
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.ui.build.BuildEvent
+import com.livingtechusa.reflexion.ui.components.VideoView
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -73,8 +74,16 @@ class ItemViewModel @Inject constructor (
                         localServiceImpl.deleteReflexionItem(_reflexionItem.value.autogenPK, _reflexionItem.value.name)
                         _reflexionItem.value = ReflexionItem()
                     }
+                    is BuildEvent.ShowVideo -> {
+                        if(event.uri.isNullOrEmpty().not()) {
+                            event.uri?.let {  }
+                        }
+                    }
                     is BuildEvent.ShowChildren -> {
                         //ItemRecyclerView()
+                    }
+                    else -> {
+
                     }
                 }
             } catch (e: Exception) {
