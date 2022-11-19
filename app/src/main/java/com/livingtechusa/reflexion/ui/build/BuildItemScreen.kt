@@ -1,5 +1,6 @@
 package com.livingtechusa.reflexion.ui.build
 
+//import com.livingtechusa.reflexion.ui.components.VideoView
 import android.content.res.Configuration
 import android.net.Uri
 import android.widget.Toast
@@ -38,24 +39,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
-import com.livingtechusa.reflexion.ui.children.ChildRoute
-import com.livingtechusa.reflexion.ui.components.VideoView
+import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.livingtechusa.reflexion.ui.children.ChildrenScreen
-import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.VIDEO
-import dagger.hilt.android.AndroidEntryPoint
-import androidx.hilt.navigation.compose.hiltViewModel
 
 const val BuildRoute = "build"
 @Composable
 fun BuildItemScreen(
-    viewModel: ItemViewModel = hiltViewModel()
+    navHostController: NavHostController,
+    viewModel: ItemViewModel = hiltViewModel(),
 ) {
+    val URI = "/Uri"
+    val URL = "/Url"
     val configuration = LocalConfiguration.current
     if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
         // BuildItemScreenLandscape(navHostController)
@@ -103,6 +103,7 @@ fun BuildItemScreen(
             contract = ActivityResultContracts.GetContent(),
             onResult = { uri ->
                 reflexionItem.value.videoUri = uri.toString()
+                itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedItem(reflexionItem.value))
             }
         )
 
@@ -112,6 +113,7 @@ fun BuildItemScreen(
             targetVideoUri?.let { uri ->
                 targetVideoUri = null
                 reflexionItem.value.videoUri = uri.toString()
+                itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedItem(reflexionItem.value))
             }
 
         }
@@ -126,8 +128,10 @@ fun BuildItemScreen(
                         reflexionItem.value.autogenPK = savedReflexionItem.autogenPK
                         reflexionItem.value.name = reflexionItem.value.name.trim()
                         itemViewModel.onTriggerEvent(BuildEvent.UpdateReflexionItem(reflexionItem.value))
+                        itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedItem(reflexionItem.value))
                     } else {
                         itemViewModel.onTriggerEvent(BuildEvent.SaveNew(reflexionItem.value))
+                        itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedItem(reflexionItem.value))
                     }
                 }) {
                     Icon(
@@ -138,11 +142,6 @@ fun BuildItemScreen(
             }
         ) {
             it // padding values?
-            if (showSavedVideo.value && reflexionItem.value.videoUri.isNullOrEmpty().not()) {
-                VideoView(videoUri = reflexionItem.value.videoUri ?: EMPTY_STRING)
-            } else if (showOnLineVideo.value && reflexionItem.value.videoUrl.isNullOrEmpty().not()) {
-                VideoView(videoUri = reflexionItem.value.videoUrl ?: EMPTY_STRING)
-            }
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -172,6 +171,7 @@ fun BuildItemScreen(
                                     onValueChange = {
                                         name.value = it
                                         reflexionItem.value.name = it
+                                        itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedItem(reflexionItem.value))
                                     }
                                 )
                             }
@@ -199,6 +199,7 @@ fun BuildItemScreen(
                                     onValueChange = {
                                         name.value = it
                                         reflexionItem.value.name = it
+                                        itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedItem(reflexionItem.value))
                                     }
                                 )
                             }
@@ -227,6 +228,7 @@ fun BuildItemScreen(
                                 onValueChange = {
                                     description.value = it
                                     reflexionItem.value.description = it
+                                    itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedItem(reflexionItem.value))
                                 }
                             )
                         }
@@ -254,6 +256,7 @@ fun BuildItemScreen(
                                 onValueChange = {
                                     detailedDescription.value = it
                                     reflexionItem.value.detailedDescription = it
+                                    itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedItem(reflexionItem.value))
                                 }
                             )
                         }
@@ -272,8 +275,8 @@ fun BuildItemScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        showSavedVideo.value = true
-                                        showOnLineVideo.value = false
+                                        val route: String = Screen.VideoView.route + URI
+                                        navHostController.navigate(route)
                                     },
                                 text = AnnotatedString(stringResource(R.string.saved_video)),
                                 color = Color.Blue
@@ -306,7 +309,8 @@ fun BuildItemScreen(
                                     .fillMaxWidth()
                                     .clickable(
                                         onClick = {
-                                            showOnLineVideo.value = true
+                                            val route: String = Screen.VideoView.route + URL
+                                            navHostController.navigate(route)
                                         },
                                     ),
                                 text = AnnotatedString(stringResource(R.string.video_link)),

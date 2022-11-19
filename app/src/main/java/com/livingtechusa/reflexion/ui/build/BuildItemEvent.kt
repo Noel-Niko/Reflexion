@@ -5,6 +5,10 @@ import com.livingtechusa.reflexion.data.entities.ReflexionItem
 
 sealed class BuildEvent {
 
+    data class UpdateDisplayedItem(
+        val reflexionItem: ReflexionItem
+    ) : BuildEvent()
+
     data class SaveNew(
         val reflexionItem: ReflexionItem
     ) : BuildEvent()
