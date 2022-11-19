@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'dagger.hilt.android.plugin'
+    id 'kotlin-parcelize'
 }
 apply plugin: 'kotlin-kapt'
 
@@ -58,6 +59,10 @@ android {
 }
 
 dependencies {
+//    // TODO: REPLACE COMPOSE INDIVIDUAL IMPORTS WITH BOM
+//    // Import the Compose BOM
+//    implementation platform('androidx.compose:compose-bom:2022.11.00')
+
     implementation "androidx.activity:activity-ktx:1.6.1"
     implementation "androidx.fragment:fragment-ktx:1.5.4"
     implementation 'androidx.core:core-ktx:1.9.0'
@@ -149,6 +154,8 @@ dependencies {
 
     def compose_activity = "1.3.1"
     implementation "androidx.activity:activity-compose:1.6.1"
+
+    implementation "com.google.accompanist:accompanist-permissions:0.19.0"
 
     def nav_version = "2.5.3"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"

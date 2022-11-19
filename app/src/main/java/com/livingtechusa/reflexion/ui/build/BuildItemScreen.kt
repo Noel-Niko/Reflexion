@@ -24,10 +24,12 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -49,6 +51,7 @@ import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.Constants.VIDEO
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
+import kotlinx.coroutines.launch
 
 const val BuildRoute = "build"
 @Composable
@@ -63,6 +66,8 @@ fun BuildItemScreen(
         // BuildItemScreenLandscape(navHostController)
     } else {
         val itemViewModel: ItemViewModel = viewModel
+        val scope = rememberCoroutineScope()
+        val error by viewModel.errorFlow.collectAsState(null)
         val savedReflexionItem by itemViewModel.reflexionItem.collectAsState()
         val isParent by itemViewModel.isParent.collectAsState()
         //        val topic by itemViewModel.topic.collectAsState()
@@ -121,6 +126,11 @@ fun BuildItemScreen(
         }
 
         val scaffoldState = rememberScaffoldState()
+
+        LaunchedEffect(error) {
+            error?.let { scaffoldState.snackbarHostState.showSnackbar(it) }
+        }
+
         Scaffold(
             floatingActionButton = {
                 /* SAVE */
@@ -292,7 +302,22 @@ fun BuildItemScreen(
                                     selectVideo.launch(VIDEO)
                                 }) {
                                 Icon(
-                                    painter = painterResource(R.drawable.ic_baseline_get_app_24),
+                                    painter = painterResource(R.drawable.baseline_video_library_24),
+                                    contentDescription = null
+                                )
+                            }
+
+                            IconButton(
+                                onClick = {
+                                    scope.launch {
+                                        viewModel.createVideoUri()?.let { uri ->
+                                            targetVideoUri = uri
+                                            takeVideo.launch(uri)
+                                        }
+                                    }
+                                }) {
+                                Icon(
+                                    painter = painterResource(R.drawable.baseline_videocam_24),
                                     contentDescription = null
                                 )
                             }
@@ -336,7 +361,7 @@ fun BuildItemScreen(
                                     )
                                 }) {
                                 Icon(
-                                    painter = painterResource(R.drawable.ic_baseline_get_app_24),
+                                    painter = painterResource(R.drawable.baseline_youtube_searched_for_24),
                                     contentDescription = null
                                 )
                             }
