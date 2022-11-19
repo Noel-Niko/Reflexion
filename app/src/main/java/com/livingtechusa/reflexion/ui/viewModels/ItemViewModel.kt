@@ -28,8 +28,6 @@ enum class ApiStatus { PRE_INIT, LOADING, ERROR, DONE }
 class ItemViewModel @Inject constructor(
     private val localServiceImpl: LocalServiceImpl
 ) : ViewModel() {
-    private val _displayedReflexionItem = MutableStateFlow(ReflexionItem())
-    val displayedReflexionItem: StateFlow<ReflexionItem> get() = _displayedReflexionItem.asStateFlow()
 
     private val TAG = "ItemViewModel"
 
@@ -67,11 +65,6 @@ class ItemViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 when (event) {
-                    is BuildEvent.UpdateDisplayedItem -> {
-                        withContext(Dispatchers.IO) {
-                            _displayedReflexionItem.value = event.reflexionItem
-                        }
-                    }
 
                     is BuildEvent.UpdateReflexionItem -> {
                         withContext(Dispatchers.IO) {

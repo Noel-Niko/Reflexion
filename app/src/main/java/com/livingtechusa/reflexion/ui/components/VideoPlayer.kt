@@ -1,5 +1,6 @@
 package com.livingtechusa.reflexion.ui.components
 
+import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -21,12 +22,12 @@ fun VideoPlayer(
 ) {
     val context = LocalContext.current
 
-    val displayedReflexionItem by itemViewModel.displayedReflexionItem.collectAsState()
+    val savedflexionItem by itemViewModel.reflexionItem.collectAsState()
 
     val videoSource: String = if (sourceType == URI) {
-        displayedReflexionItem.videoUri ?: EMPTY_STRING
+        savedflexionItem.videoUri ?: EMPTY_STRING
     } else {
-        displayedReflexionItem.videoUrl ?: EMPTY_STRING
+        savedflexionItem.videoUrl ?: EMPTY_STRING
     }
 
     val exoPlayer = com.google.android.exoplayer2.ExoPlayer.Builder(LocalContext.current)
@@ -46,6 +47,8 @@ fun VideoPlayer(
             }
         })
     ) {
-        onDispose { exoPlayer.release() }
+        onDispose {
+            exoPlayer.release()
+        }
     }
 }

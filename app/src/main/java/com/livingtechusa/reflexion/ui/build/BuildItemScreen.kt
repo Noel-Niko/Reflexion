@@ -46,7 +46,9 @@ import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.Constants.VIDEO
+import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 
 const val BuildRoute = "build"
 @Composable
@@ -69,6 +71,8 @@ fun BuildItemScreen(
         val linkedLists by itemViewModel.linkedLists.collectAsState()
         val siblings by itemViewModel.siblings.collectAsState()
         val children by itemViewModel.children.collectAsState()
+        val resource = ResourceProviderSingleton
+
         val context = LocalContext.current
         val reflexionItem = remember {
             mutableStateOf(
@@ -103,7 +107,6 @@ fun BuildItemScreen(
             contract = ActivityResultContracts.GetContent(),
             onResult = { uri ->
                 reflexionItem.value.videoUri = uri.toString()
-                itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedItem(reflexionItem.value))
             }
         )
 
@@ -113,7 +116,6 @@ fun BuildItemScreen(
             targetVideoUri?.let { uri ->
                 targetVideoUri = null
                 reflexionItem.value.videoUri = uri.toString()
-                itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedItem(reflexionItem.value))
             }
 
         }
@@ -128,10 +130,8 @@ fun BuildItemScreen(
                         reflexionItem.value.autogenPK = savedReflexionItem.autogenPK
                         reflexionItem.value.name = reflexionItem.value.name.trim()
                         itemViewModel.onTriggerEvent(BuildEvent.UpdateReflexionItem(reflexionItem.value))
-                        itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedItem(reflexionItem.value))
                     } else {
                         itemViewModel.onTriggerEvent(BuildEvent.SaveNew(reflexionItem.value))
-                        itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedItem(reflexionItem.value))
                     }
                 }) {
                     Icon(
@@ -171,7 +171,6 @@ fun BuildItemScreen(
                                     onValueChange = {
                                         name.value = it
                                         reflexionItem.value.name = it
-                                        itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedItem(reflexionItem.value))
                                     }
                                 )
                             }
@@ -199,7 +198,6 @@ fun BuildItemScreen(
                                     onValueChange = {
                                         name.value = it
                                         reflexionItem.value.name = it
-                                        itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedItem(reflexionItem.value))
                                     }
                                 )
                             }
@@ -228,7 +226,6 @@ fun BuildItemScreen(
                                 onValueChange = {
                                     description.value = it
                                     reflexionItem.value.description = it
-                                    itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedItem(reflexionItem.value))
                                 }
                             )
                         }
@@ -256,7 +253,6 @@ fun BuildItemScreen(
                                 onValueChange = {
                                     detailedDescription.value = it
                                     reflexionItem.value.detailedDescription = it
-                                    itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedItem(reflexionItem.value))
                                 }
                             )
                         }
@@ -275,6 +271,9 @@ fun BuildItemScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
+                                        if (reflexionItem.value.videoUri == Constants.EMPTY_STRING) {
+                                            Toast.makeText(context, resource.getString(R.string.is_saved), Toast.LENGTH_SHORT).show()
+                                        }
                                         val route: String = Screen.VideoView.route + URI
                                         navHostController.navigate(route)
                                     },
@@ -309,6 +308,9 @@ fun BuildItemScreen(
                                     .fillMaxWidth()
                                     .clickable(
                                         onClick = {
+                                            if (reflexionItem.value.videoUrl == Constants.EMPTY_STRING) {
+                                                Toast.makeText(context, resource.getString(R.string.is_saved), Toast.LENGTH_SHORT).show()
+                                            }
                                             val route: String = Screen.VideoView.route + URL
                                             navHostController.navigate(route)
                                         },
@@ -350,7 +352,7 @@ fun BuildItemScreen(
                         ) {
                             Button(
                                 onClick = {
-                                    Toast.makeText(context, "Button Clicked", Toast.LENGTH_LONG)
+                                    Toast.makeText(context, "Button Clicked", Toast.LENGTH_SHORT)
                                         .show()
                                     itemViewModel.onTriggerEvent(BuildEvent.ShowSiblings)
 
@@ -365,7 +367,7 @@ fun BuildItemScreen(
                             Modifier.weight(1f)
                         ) {
                             Button(onClick = {
-                                Toast.makeText(context, "Button Clicked", Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, "Button Clicked", Toast.LENGTH_SHORT).show()
                                 itemViewModel.onTriggerEvent(BuildEvent.ShowChildren)
                             }
                             ) {
@@ -385,7 +387,7 @@ fun BuildItemScreen(
                                 Modifier.weight(1f)
                             ) {
                                 Button(onClick = {
-                                    Toast.makeText(context, "Button Clicked", Toast.LENGTH_LONG)
+                                    Toast.makeText(context, "Button Clicked", Toast.LENGTH_SHORT)
                                         .show()
                                     itemViewModel.onTriggerEvent(BuildEvent.Delete)
                                 }
@@ -398,7 +400,7 @@ fun BuildItemScreen(
                             Modifier.weight(1f)
                         ) {
                             Button(onClick = {
-                                Toast.makeText(context, "Button Clicked", Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, "Button Clicked", Toast.LENGTH_SHORT).show()
                                 itemViewModel.onTriggerEvent(BuildEvent.Delete)
                             }
                             ) {

@@ -14,7 +14,6 @@ import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.Constants
 
 const val SOURCE = "sourceType"
-
 @Composable
 fun NavigationHosting() {
    val navController = rememberNavController()
@@ -27,7 +26,7 @@ fun NavigationHosting() {
         }
 
         composable(
-            route = Screen.VideoView.route +  "/{sourceType}", // "/{required arg}/{req'd arg} ?not_req'd_arg = {xxx}"
+            route = Screen.VideoView.route +  "/{sourceType}", // "/{required arg}/{required arg} ?not_required_arg = {arg}"
             arguments = listOf(
                 navArgument(SOURCE) {
                     type = NavType.StringType
@@ -40,6 +39,5 @@ fun NavigationHosting() {
             val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
             VideoPlayer(navBackStackEntry.arguments?.getString(SOURCE) ?: Constants.URL, parentViewModel)
         }
-
     }
 }
