@@ -1,5 +1,5 @@
 package com.livingtechusa.reflexion.util
-import android.app.Application
+
 import android.content.res.Resources
 import androidx.annotation.DimenRes
 import androidx.annotation.IntegerRes
@@ -21,7 +21,11 @@ object ResourceProviderSingleton : ResourceProviderInterface {
         return app.getString(resId, *formatArgs)
     }
 
-    override fun getQuantityString(@PluralsRes resId: Int, quantity: Int, vararg formatArgs: Any): String {
+    override fun getQuantityString(
+        @PluralsRes resId: Int,
+        quantity: Int,
+        vararg formatArgs: Any
+    ): String {
         return resources.getQuantityString(resId, quantity, *formatArgs)
     }
 

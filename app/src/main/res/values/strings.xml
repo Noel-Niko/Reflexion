@@ -17,4 +17,6 @@
     <string name="add_child">Add Child</string>
     <string name="error_message">There was an error. Please try again.</string>
     <string name="is_saved">Did you save the video before moving to this screen?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.livingtechusa.reflexion.ui.build
 
 //import com.livingtechusa.reflexion.ui.components.VideoView
+import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import android.widget.Toast
@@ -41,21 +42,24 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.Constants
+import com.livingtechusa.reflexion.util.Constants.SEARCH_YOUTUBE
 import com.livingtechusa.reflexion.util.Constants.VIDEO
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import kotlinx.coroutines.launch
 
 const val BuildRoute = "build"
+
 @Composable
 fun BuildItemScreen(
+    urlToSave: String?,
     navHostController: NavHostController,
     viewModel: ItemViewModel = hiltViewModel(),
 ) {
@@ -95,6 +99,10 @@ fun BuildItemScreen(
             )
         }
 
+        fun addUrl(urlString: String) {
+            reflexionItem.value.videoUrl = urlString
+        }
+
         val name = remember { mutableStateOf(savedReflexionItem.name) }
         val description = remember { mutableStateOf(savedReflexionItem.description) }
         val detailedDescription =
@@ -122,7 +130,6 @@ fun BuildItemScreen(
                 targetVideoUri = null
                 reflexionItem.value.videoUri = uri.toString()
             }
-
         }
 
         val scaffoldState = rememberScaffoldState()
@@ -152,6 +159,11 @@ fun BuildItemScreen(
             }
         ) {
             it // padding values?
+            if (urlToSave.isNullOrEmpty().not()) {
+                if (urlToSave != null) {
+                    addUrl(urlToSave)
+                }
+            }
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -282,7 +294,13 @@ fun BuildItemScreen(
                                     .fillMaxWidth()
                                     .clickable {
                                         if (reflexionItem.value.videoUri == Constants.EMPTY_STRING) {
-                                            Toast.makeText(context, resource.getString(R.string.is_saved), Toast.LENGTH_SHORT).show()
+                                            Toast
+                                                .makeText(
+                                                    context,
+                                                    resource.getString(R.string.is_saved),
+                                                    Toast.LENGTH_SHORT
+                                                )
+                                                .show()
                                         }
                                         val route: String = Screen.VideoView.route + URI
                                         navHostController.navigate(route)
@@ -334,7 +352,13 @@ fun BuildItemScreen(
                                     .clickable(
                                         onClick = {
                                             if (reflexionItem.value.videoUrl == Constants.EMPTY_STRING) {
-                                                Toast.makeText(context, resource.getString(R.string.is_saved), Toast.LENGTH_SHORT).show()
+                                                Toast
+                                                    .makeText(
+                                                        context,
+                                                        resource.getString(R.string.is_saved),
+                                                        Toast.LENGTH_SHORT
+                                                    )
+                                                    .show()
                                             }
                                             val route: String = Screen.VideoView.route + URL
                                             navHostController.navigate(route)
@@ -351,14 +375,11 @@ fun BuildItemScreen(
                         ) {
                             IconButton(
                                 onClick = {
-                                    Toast.makeText(context, "Button Clicked", Toast.LENGTH_SHORT)
-                                        .show()
-                                    // todo capture and pass url
-                                    itemViewModel.onTriggerEvent(
-                                        BuildEvent.UpdateReflexionItem(
-                                            savedReflexionItem
-                                        )
+                                    val query = SEARCH_YOUTUBE + reflexionItem.value.name
+                                    val intent = Intent(
+                                        Intent.ACTION_VIEW, Uri.parse(query)
                                     )
+                                    startActivity(context, intent, null)
                                 }) {
                                 Icon(
                                     painter = painterResource(R.drawable.baseline_youtube_searched_for_24),

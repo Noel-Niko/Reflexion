@@ -14,30 +14,40 @@ import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.Constants
 
 const val SOURCE = "sourceType"
+
 @Composable
-fun NavigationHosting() {
-   val navController = rememberNavController()
+fun NavigationHosting(urlText: String?) {
+    val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = Screen.BuildItemScreen.route) {
+        startDestination = Screen.BuildItemScreen.route
+    ) {
 
-        composable(route = Screen.BuildItemScreen.route) {
-                BuildItemScreen(navHostController = navController)
+        composable(
+            route = Screen.BuildItemScreen.route,
+        ) {
+            BuildItemScreen(
+                urlText,
+                navHostController = navController,
+            )
         }
 
         composable(
-            route = Screen.VideoView.route +  "/{sourceType}", // "/{required arg}/{required arg} ?not_required_arg = {arg}"
+            route = Screen.VideoView.route + "/{sourceType}", // "/{required arg}/{required arg} ?not_required_arg = {arg}"
             arguments = listOf(
                 navArgument(SOURCE) {
                     type = NavType.StringType
                 }
             )
-        ) { navBackStackEntry->
+        ) { navBackStackEntry ->
             val parentEntry = remember(navBackStackEntry) {
                 navController.getBackStackEntry(Screen.BuildItemScreen.route)
             }
             val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
-            VideoPlayer(navBackStackEntry.arguments?.getString(SOURCE) ?: Constants.URL, parentViewModel)
+            VideoPlayer(
+                navBackStackEntry.arguments?.getString(SOURCE) ?: Constants.URL,
+                parentViewModel
+            )
         }
     }
 }
