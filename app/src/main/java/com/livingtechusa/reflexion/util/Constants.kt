@@ -1,5 +1,7 @@
 package com.livingtechusa.reflexion.util
 
+import com.livingtechusa.reflexion.data.entities.ReflexionItem
+import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 
 
 object Constants {
@@ -10,4 +12,11 @@ object Constants {
     const val URL = "Url"
     const val SAVE_URL = "Save_Url"
     const val SEARCH_YOUTUBE = "https://www.youtube.com/results?search_query="
+    const val SOURCE = "sourceType"
+    const val REFLEXION_ITEM = "reflexion_item"
+}
+
+object Temporary {
+    var url = EMPTY_STRING
+    var tempReflexionItem: ReflexionItem = ReflexionItem()
 }

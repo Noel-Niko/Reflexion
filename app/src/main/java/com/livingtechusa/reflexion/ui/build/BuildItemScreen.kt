@@ -1,6 +1,5 @@
 package com.livingtechusa.reflexion.ui.build
 
-//import com.livingtechusa.reflexion.ui.components.VideoView
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
@@ -53,16 +52,25 @@ import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.Constants.SEARCH_YOUTUBE
 import com.livingtechusa.reflexion.util.Constants.VIDEO
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
+import com.livingtechusa.reflexion.util.SystemBroadcastReceiver
+import com.livingtechusa.reflexion.util.Temporary
 import kotlinx.coroutines.launch
 
 const val BuildRoute = "build"
 
 @Composable
 fun BuildItemScreen(
-    urlToSave: String?,
     navHostController: NavHostController,
     viewModel: ItemViewModel = hiltViewModel(),
+    useTempItem: String? = null
 ) {
+
+    SystemBroadcastReceiver(Intent.ACTION_SEND) { send ->
+        val isCharging = /* Get from batteryStatus ... */ true
+        /* Do something if the device is charging */
+    }
+
+
     val URI = "/Uri"
     val URL = "/Url"
     val configuration = LocalConfiguration.current
@@ -83,7 +91,7 @@ fun BuildItemScreen(
         val resource = ResourceProviderSingleton
 
         val context = LocalContext.current
-        val reflexionItem = remember {
+        val reflexionItem = rememberSaveable {
             mutableStateOf(
                 ReflexionItem(
                     autogenPK = savedReflexionItem.autogenPK,
@@ -92,7 +100,7 @@ fun BuildItemScreen(
                     detailedDescription = savedReflexionItem.detailedDescription,
                     image = savedReflexionItem.image,
                     videoUri = savedReflexionItem.videoUri,
-                    videoUrl = savedReflexionItem.videoUrl,
+                    videoUrl =  savedReflexionItem.videoUrl,
                     parent = savedReflexionItem.parent,
                     hasChildren = savedReflexionItem.hasChildren
                 )
@@ -159,10 +167,8 @@ fun BuildItemScreen(
             }
         ) {
             it // padding values?
-            if (urlToSave.isNullOrEmpty().not()) {
-                if (urlToSave != null) {
-                    addUrl(urlToSave)
-                }
+            if (useTempItem.equals("true")) {
+                reflexionItem.value = Temporary.tempReflexionItem
             }
             LazyColumn(
                 modifier = Modifier
@@ -375,6 +381,7 @@ fun BuildItemScreen(
                         ) {
                             IconButton(
                                 onClick = {
+                                    Temporary.tempReflexionItem = reflexionItem.value
                                     val query = SEARCH_YOUTUBE + reflexionItem.value.name
                                     val intent = Intent(
                                         Intent.ACTION_VIEW, Uri.parse(query)

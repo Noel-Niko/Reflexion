@@ -13,13 +13,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat.startActivity
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.MainActivity
 import com.livingtechusa.reflexion.R
-import com.livingtechusa.reflexion.util.Constants
+import com.livingtechusa.reflexion.ui.build.BuildEvent
+import com.livingtechusa.reflexion.ui.build.BuildRoute
+import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import com.livingtechusa.reflexion.util.Temporary
 
+const val CONFIRM_SAVE = "ConfirmSaveAlertDialog"
 
 @Composable
-fun ConfirmSaveAlertDialog(saveAbleText: String) {
+fun ConfirmSaveAlertDialog(
+    itemViewModel: ItemViewModel = hiltViewModel(),
+    navController: NavHostController
+) {
+
+    val urlString = Temporary.url
     MaterialTheme {
         val context = LocalContext.current
         Column {
@@ -37,18 +48,16 @@ fun ConfirmSaveAlertDialog(saveAbleText: String) {
                         Text(text = "Confirm to add content link")
                     },
                     text = {
-                        Text("Do you want to add: $saveAbleText")
+                        Text("Do you want to add: $urlString")
                     },
                     confirmButton = {
                         Button(
-
                             onClick = {
                                 openDialog.value = false
-                                val intent = Intent(
-                                    context,
-                                    MainActivity::class.java
-                                ).putExtra(Constants.SAVE_URL, saveAbleText)
-                                startActivity(context, intent, null)
+                                Temporary.url = urlString
+                                Temporary.tempReflexionItem.videoUrl = urlString
+                                val route = "$BuildRoute/true"
+                                navController.navigate(BuildRoute)
                             }) {
                             Text(stringResource(R.string.yes))
                         }

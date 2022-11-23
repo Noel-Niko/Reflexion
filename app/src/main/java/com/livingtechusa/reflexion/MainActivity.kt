@@ -1,24 +1,36 @@
 package com.livingtechusa.reflexion
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.core.util.Consumer
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.livingtechusa.reflexion.navigation.NavigationHosting
+import com.livingtechusa.reflexion.navigation.Screen
+import com.livingtechusa.reflexion.ui.build.BuildItemScreen
 import com.livingtechusa.reflexion.ui.components.ConfirmSaveAlertDialog
+import com.livingtechusa.reflexion.ui.components.VideoPlayer
 import com.livingtechusa.reflexion.ui.theme.ReflexionTheme
+import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants
+import com.livingtechusa.reflexion.util.Constants.REFLEXION_ITEM
+import com.livingtechusa.reflexion.util.Constants.SOURCE
 import com.livingtechusa.reflexion.util.MediaUtil
+import com.livingtechusa.reflexion.util.Temporary
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -29,6 +41,8 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var app: BaseApplication
+
+    lateinit var navigationController: NavHostController
 
     @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,34 +74,70 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 )
-
-            }
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (intent.extras?.get(Constants.URL) != null && intent?.extras?.get(Constants.URL) != Constants.EMPTY_STRING) {
-            val url = intent.extras?.get(Constants.URL).toString()
-            setContent {
-                ConfirmSaveAlertDialog(url)
-            }
-        } else {
-            setContent {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
+                val navController = rememberNavController()
+                navigationController = navController
+                NavHost(
+                    navController = navController,
+                    startDestination = Screen.BuildItemScreen.route, // + "/{reflexion_item}"
                 ) {
-                    var urlText: String? = null
-                    if (intent.extras?.get(Constants.SAVE_URL) != null && intent?.extras?.get(
-                            Constants.SAVE_URL
-                        ).toString() != Constants.EMPTY_STRING
-                    ) {
-                        urlText = intent.extras?.get(Constants.SAVE_URL).toString()
-                        NavigationHosting(urlText)
-                    } else {
-                        NavigationHosting(urlText)
+
+                    composable(
+                        route = Screen.BuildItemScreen.route, // + "/{reflexion_item}",
+//                        arguments = listOf(
+//                            navArgument(REFLEXION_ITEM) {
+//                                type = NavType.StringType
+//                            }
+//                        )
+                    ) {navBackStackEntry ->
+                        BuildItemScreen(
+                            navHostController = navController,
+                           // useTempItem = navBackStackEntry.arguments?.getString(REFLEXION_ITEM) ?: "false"
+                        )
                     }
+
+                    composable(
+                        route = Screen.VideoView.route + "/{sourceType}", // "/{required arg}/{required arg} ?not_required_arg = {arg}"
+                        arguments = listOf(
+                            navArgument(SOURCE) {
+                                type = NavType.StringType
+                            }
+                        )
+                    ) { navBackStackEntry ->
+                        val parentEntry = remember(navBackStackEntry) {
+                            navController.getBackStackEntry(Screen.BuildItemScreen.route)
+                        }
+                        val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
+                        VideoPlayer(
+                            navBackStackEntry.arguments?.getString(SOURCE) ?: Constants.URL,
+                            parentViewModel
+                        )
+                    }
+
+                    composable(
+                        route = Screen.ConfirmSaveScreen.route
+                    ) { navBackStackEntry ->
+                        val parentEntry = remember(navBackStackEntry) {
+                            navController.getBackStackEntry(Screen.BuildItemScreen.route)
+                        }
+                        val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
+                        ConfirmSaveAlertDialog(
+                            itemViewModel = parentViewModel,
+                            navController = navController
+                        )
+                    }
+                }
+
+                DisposableEffect(Unit) {
+                    val listener = Consumer<Intent> { intent ->
+                        if (intent.clipData?.getItemAt(0)?.text != null && intent.clipData?.getItemAt(0)?.text != Constants.EMPTY_STRING
+                        ) {
+                            val url = intent.clipData?.getItemAt(0)?.text
+                            Temporary.url = url.toString()
+                            navigationController.navigate(Screen.ConfirmSaveScreen.route)
+                        }
+                    }
+                    addOnNewIntentListener(listener)
+                    onDispose { removeOnNewIntentListener(listener) }
                 }
             }
         }

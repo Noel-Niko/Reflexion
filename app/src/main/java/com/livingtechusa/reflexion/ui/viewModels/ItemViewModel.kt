@@ -4,6 +4,7 @@ package com.livingtechusa.reflexion.ui.viewModels
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.livingtechusa.reflexion.R
@@ -12,7 +13,6 @@ import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.util.BaseApplication
-import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.MediaStoreUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import androidx.navigation.NavHostController
 
 const val STATE_KEY_URL = "com.livingtechusa.reflexion.ui.build.BuildItemScreen.url"
 
@@ -32,13 +33,17 @@ enum class ApiStatus { PRE_INIT, LOADING, ERROR, DONE }
 
 @HiltViewModel
 class ItemViewModel @Inject constructor(
-    private val localServiceImpl: LocalServiceImpl
+    private val localServiceImpl: LocalServiceImpl,
+    private val state: SavedStateHandle
 ) : ViewModel() {
 
     private val TAG = "ItemViewModel"
 
     private val _reflexionItem = MutableStateFlow(ReflexionItem())
     val reflexionItem: StateFlow<ReflexionItem> get() = _reflexionItem
+//
+//    private val _reflexionItemUrl = MutableStateFlow(EMPTY_STRING)
+//    val reflexionItemUrl: StateFlow<String> get() = _reflexionItemUrl
 
     private val _isParent = MutableStateFlow(false)
     val isParent: StateFlow<Boolean> get() = _isParent
@@ -68,9 +73,11 @@ class ItemViewModel @Inject constructor(
         Log.i(TAG, "ERROR: $throwable")
         throwable.printStackTrace()
     }
+    private val num = 1
 
     init {
-        _reflexionItem.value.name = Constants.EMPTY_STRING
+
+        _reflexionItem.value.name += num
     }
 
     fun onTriggerEvent(event: BuildEvent) {
@@ -111,8 +118,13 @@ class ItemViewModel @Inject constructor(
                         }
                     }
 
+                    is BuildEvent.UpdateVideoURL -> {
+//                        _reflexionItemUrl.value = event.videoUrl
+                        _reflexionItem.value.videoUrl = event.videoUrl
+                    }
+
                     is BuildEvent.ShowChildren -> {
-                        //ItemRecyclerView()
+//                        ItemRecyclerView()
                     }
 
                     else -> {

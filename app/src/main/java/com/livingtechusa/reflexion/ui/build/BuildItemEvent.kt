@@ -23,8 +23,9 @@ sealed class BuildEvent {
     object UpdateSavedVideo : BuildEvent() {
     }
 
-    object UpdateVideoURL : BuildEvent() {
-    }
+    data class UpdateVideoURL(
+        val videoUrl: String
+    ) : BuildEvent()
 
     object ShowSiblings : BuildEvent() {
     }
