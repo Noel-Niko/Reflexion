@@ -22,6 +22,7 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildItemScreen
 import com.livingtechusa.reflexion.ui.components.ConfirmSaveAlertDialog
+import com.livingtechusa.reflexion.ui.components.PasteAndSaveDialog
 import com.livingtechusa.reflexion.ui.components.VideoPlayer
 import com.livingtechusa.reflexion.ui.theme.ReflexionTheme
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
@@ -120,6 +121,20 @@ class MainActivity : ComponentActivity() {
                             navController = navController
                         )
                     }
+
+                    composable(
+                        route = Screen.PasteAndSaveScreen.route
+                    ) { navBackStackEntry ->
+                        val parentEntry = remember(navBackStackEntry) {
+                            navController.getBackStackEntry(Screen.BuildItemScreen.route)
+                        }
+                        val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
+                        PasteAndSaveDialog(
+                            itemViewModel = parentViewModel,
+                            navController = navController
+                        )
+                    }
+
                 }
 
                 DisposableEffect(Unit) {

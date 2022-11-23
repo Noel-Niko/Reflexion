@@ -47,6 +47,7 @@ import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
+import com.livingtechusa.reflexion.ui.components.PasteAndSaveDialog
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
@@ -129,6 +130,7 @@ fun BuildItemScreen(
             contract = ActivityResultContracts.GetContent(),
             onResult = { uri ->
                 reflexionItem.value.videoUri = uri.toString()
+                Temporary.tempReflexionItem.videoUri = uri.toString()
             }
         )
 
@@ -138,6 +140,7 @@ fun BuildItemScreen(
             targetVideoUri?.let { uri ->
                 targetVideoUri = null
                 reflexionItem.value.videoUri = uri.toString()
+                Temporary.tempReflexionItem.videoUrl = uri.toString()
             }
         }
 
@@ -300,7 +303,7 @@ fun BuildItemScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        if (reflexionItem.value.videoUri == EMPTY_STRING) {
+                                        if (reflexionItem.value.videoUri.isNullOrEmpty()) {
                                             Toast
                                                 .makeText(
                                                     context,
@@ -360,13 +363,7 @@ fun BuildItemScreen(
                                     .clickable(
                                         onClick = {
                                             if (reflexionItem.value.videoUrl == EMPTY_STRING) {
-                                                Toast
-                                                    .makeText(
-                                                        context,
-                                                        resource.getString(R.string.is_saved),
-                                                        Toast.LENGTH_SHORT
-                                                    )
-                                                    .show()
+                                                navHostController.navigate(Screen.PasteAndSaveScreen.route)
                                             } else {
                                                 val route: String = Screen.VideoView.route + URL
                                                 navHostController.navigate(route)

@@ -48,7 +48,12 @@ fun VideoPlayer(
             navController.popBackStack(BuildRoute, false )
         }
     } else {
-        val videoSource: String = savedReflexionItem.videoUri ?: EMPTY_STRING
+        val tempUri = Temporary.tempReflexionItem.videoUri
+        val videoSource: String = if (tempUri.isNullOrEmpty().not()) {
+            tempUri.toString()
+        }  else {
+            savedReflexionItem.videoUri.toString()
+        }
         val exoPlayer = ExoPlayer.Builder(LocalContext.current)
             .build()
             .also { exoPlayer ->

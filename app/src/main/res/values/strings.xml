@@ -21,4 +21,7 @@
     <string name="no">No</string>
     <string name="confirm_to_add_content_link">Confirm to add content link</string>
     <string name="changes_saved">Changes Saved</string>
+    <string name="save">Save</string>
+    <string name="close">Close</string>
+    <string name="paste_web_address_here">"Paste web address here: "</string>
 </resources>
