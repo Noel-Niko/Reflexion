@@ -103,7 +103,8 @@ class MainActivity : ComponentActivity() {
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         VideoPlayer(
                             navBackStackEntry.arguments?.getString(SOURCE) ?: Constants.URL,
-                            parentViewModel
+                            parentViewModel,
+                            navController = navController
                         )
                     }
 

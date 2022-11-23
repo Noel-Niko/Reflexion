@@ -16,8 +16,9 @@
     <string name="back_button">Back</string>
     <string name="add_child">Add Child</string>
     <string name="error_message">There was an error. Please try again.</string>
-    <string name="is_saved">Did you save the video before moving to this screen?</string>
+    <string name="is_saved">Did you save a video?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="confirm_to_add_content_link">Confirm to add content link</string>
+    <string name="changes_saved">Changes Saved</string>
 </resources>

@@ -151,13 +151,15 @@ fun BuildItemScreen(
             floatingActionButton = {
                 /* SAVE */
                 FloatingActionButton(onClick = {
-                    Toast.makeText(context, "Changes Saved", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, resource.getString(R.string.changes_saved), Toast.LENGTH_SHORT).show()
                     if (savedReflexionItem.autogenPK != 0L) {
                         reflexionItem.value.autogenPK = savedReflexionItem.autogenPK
                         reflexionItem.value.name = reflexionItem.value.name.trim()
                         itemViewModel.onTriggerEvent(BuildEvent.UpdateReflexionItem(reflexionItem.value))
+                        Temporary.tempReflexionItem = ReflexionItem()
                     } else {
                         itemViewModel.onTriggerEvent(BuildEvent.SaveNew(reflexionItem.value))
+                        Temporary.tempReflexionItem = ReflexionItem()
                     }
                 }) {
                     Icon(
@@ -306,9 +308,10 @@ fun BuildItemScreen(
                                                     Toast.LENGTH_SHORT
                                                 )
                                                 .show()
+                                        } else {
+                                            val route: String = Screen.VideoView.route + URI
+                                            navHostController.navigate(route)
                                         }
-                                        val route: String = Screen.VideoView.route + URI
-                                        navHostController.navigate(route)
                                     },
                                 text = AnnotatedString(stringResource(R.string.saved_video)),
                                 color = Color.Blue
@@ -364,9 +367,10 @@ fun BuildItemScreen(
                                                         Toast.LENGTH_SHORT
                                                     )
                                                     .show()
+                                            } else {
+                                                val route: String = Screen.VideoView.route + URL
+                                                navHostController.navigate(route)
                                             }
-                                            val route: String = Screen.VideoView.route + URL
-                                            navHostController.navigate(route)
                                         },
                                     ),
                                 text = AnnotatedString(stringResource(R.string.video_link)),
@@ -407,7 +411,6 @@ fun BuildItemScreen(
                                     Toast.makeText(context, "Button Clicked", Toast.LENGTH_SHORT)
                                         .show()
                                     itemViewModel.onTriggerEvent(BuildEvent.ShowSiblings)
-
                                 }
                             ) {
                                 Text(

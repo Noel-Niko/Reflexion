@@ -81,6 +81,7 @@ class ItemViewModel @Inject constructor(
         if (Temporary.use) {
             _reflexionItem.value = Temporary.tempReflexionItem
             Temporary.use = false
+            Temporary.tempReflexionItem = ReflexionItem()
         }
     }
 
