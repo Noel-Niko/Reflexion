@@ -25,6 +25,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import androidx.navigation.NavHostController
+import com.livingtechusa.reflexion.util.Constants
+import com.livingtechusa.reflexion.util.Temporary
 
 const val STATE_KEY_URL = "com.livingtechusa.reflexion.ui.build.BuildItemScreen.url"
 
@@ -76,8 +78,10 @@ class ItemViewModel @Inject constructor(
     private val num = 1
 
     init {
-
-        _reflexionItem.value.name += num
+        if (Temporary.use) {
+            _reflexionItem.value = Temporary.tempReflexionItem
+            Temporary.use = false
+        }
     }
 
     fun onTriggerEvent(event: BuildEvent) {

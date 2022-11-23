@@ -82,16 +82,10 @@ class MainActivity : ComponentActivity() {
                 ) {
 
                     composable(
-                        route = Screen.BuildItemScreen.route, // + "/{reflexion_item}",
-//                        arguments = listOf(
-//                            navArgument(REFLEXION_ITEM) {
-//                                type = NavType.StringType
-//                            }
-//                        )
-                    ) {navBackStackEntry ->
+                        route = Screen.BuildItemScreen.route,
+                    ) {
                         BuildItemScreen(
                             navHostController = navController,
-                           // useTempItem = navBackStackEntry.arguments?.getString(REFLEXION_ITEM) ?: "false"
                         )
                     }
 

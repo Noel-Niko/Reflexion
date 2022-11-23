@@ -49,6 +49,7 @@ import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.Constants
+import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.SEARCH_YOUTUBE
 import com.livingtechusa.reflexion.util.Constants.VIDEO
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
@@ -167,9 +168,7 @@ fun BuildItemScreen(
             }
         ) {
             it // padding values?
-            if (useTempItem.equals("true")) {
-                reflexionItem.value = Temporary.tempReflexionItem
-            }
+
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -299,7 +298,7 @@ fun BuildItemScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        if (reflexionItem.value.videoUri == Constants.EMPTY_STRING) {
+                                        if (reflexionItem.value.videoUri == EMPTY_STRING) {
                                             Toast
                                                 .makeText(
                                                     context,
@@ -357,7 +356,7 @@ fun BuildItemScreen(
                                     .fillMaxWidth()
                                     .clickable(
                                         onClick = {
-                                            if (reflexionItem.value.videoUrl == Constants.EMPTY_STRING) {
+                                            if (reflexionItem.value.videoUrl == EMPTY_STRING) {
                                                 Toast
                                                     .makeText(
                                                         context,

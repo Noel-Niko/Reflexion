@@ -17,6 +17,7 @@ object Constants {
 }
 
 object Temporary {
+    var use: Boolean = false
     var url = EMPTY_STRING
     var tempReflexionItem: ReflexionItem = ReflexionItem()
 }

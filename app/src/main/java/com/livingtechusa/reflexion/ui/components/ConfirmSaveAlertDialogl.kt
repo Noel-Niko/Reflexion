@@ -36,7 +36,6 @@ fun ConfirmSaveAlertDialog(
         Column {
             val openDialog = remember { mutableStateOf(true) }
             if (openDialog.value) {
-
                 AlertDialog(
                     onDismissRequest = {
                         // Dismiss the dialog when the user clicks outside the dialog or on the back
@@ -45,7 +44,7 @@ fun ConfirmSaveAlertDialog(
                         openDialog.value = false
                     },
                     title = {
-                        Text(text = "Confirm to add content link")
+                        Text(text = stringResource(R.string.confirm_to_add_content_link))
                     },
                     text = {
                         Text("Do you want to add: $urlString")
@@ -56,7 +55,7 @@ fun ConfirmSaveAlertDialog(
                                 openDialog.value = false
                                 Temporary.url = urlString
                                 Temporary.tempReflexionItem.videoUrl = urlString
-                                val route = "$BuildRoute/true"
+                                Temporary.use = true
                                 navController.navigate(BuildRoute)
                             }) {
                             Text(stringResource(R.string.yes))
@@ -64,7 +63,6 @@ fun ConfirmSaveAlertDialog(
                     },
                     dismissButton = {
                         Button(
-
                             onClick = {
                                 openDialog.value = false
                                 startActivity(

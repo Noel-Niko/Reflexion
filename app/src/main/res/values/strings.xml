@@ -19,4 +19,5 @@
     <string name="is_saved">Did you save the video before moving to this screen?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="confirm_to_add_content_link">Confirm to add content link</string>
 </resources>
