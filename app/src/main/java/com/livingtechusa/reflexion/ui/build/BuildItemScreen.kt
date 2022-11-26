@@ -128,8 +128,8 @@ fun BuildItemScreen(
         val selectVideo = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetContent(),
             onResult = { uri ->
-                reflexionItem.videoUri = uri.toString()
-                Temporary.tempReflexionItem.videoUri = uri.toString()
+                val copy = reflexionItem.copy(videoUri = uri.toString())
+                itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
             }
         )
 
@@ -138,8 +138,8 @@ fun BuildItemScreen(
         ) { _ ->
             targetVideoUri?.let { uri ->
                 targetVideoUri = null
-                reflexionItem.videoUri = uri.toString()
-                Temporary.tempReflexionItem.videoUrl = uri.toString()
+                val copy = reflexionItem.copy(videoUri = uri.toString())
+                itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
             }
         }
 

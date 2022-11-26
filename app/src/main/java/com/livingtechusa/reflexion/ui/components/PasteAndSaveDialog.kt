@@ -19,6 +19,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.MainActivity
 import com.livingtechusa.reflexion.R
+import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.build.BuildRoute
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
@@ -61,10 +62,7 @@ fun PasteAndSaveDialog(
                     confirmButton = {
                         Button(
                             onClick = {
-                                Temporary.url = webAddress.value
-                                Temporary.tempReflexionItem.videoUrl = webAddress.value
-                                Temporary.use = true
-                                navController.navigate(BuildRoute)
+                                itemViewModel.onTriggerEvent( BuildEvent.UpdateVideoURL(webAddress.value))
                                 openDialog.value = false
                                 navController.navigate(BuildRoute)
                             }) {

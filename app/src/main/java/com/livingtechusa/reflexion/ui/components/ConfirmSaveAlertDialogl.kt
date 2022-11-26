@@ -17,21 +17,22 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.MainActivity
 import com.livingtechusa.reflexion.R
+import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.build.BuildRoute
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Temporary
 
 const val CONFIRM_SAVE = "ConfirmSaveAlertDialog"
 
 @Composable
 fun ConfirmSaveAlertDialog(
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: ItemViewModel = hiltViewModel()
 ) {
-
-    val urlString = Temporary.url
+    val url = Temporary.url
     MaterialTheme {
-        val context = LocalContext.current
         Column {
             val openDialog = remember { mutableStateOf(true) }
             if (openDialog.value) {
@@ -46,15 +47,13 @@ fun ConfirmSaveAlertDialog(
                         Text(text = stringResource(R.string.confirm_to_add_content_link))
                     },
                     text = {
-                        Text("Do you want to add: $urlString")
+                        Text("Do you want to add: $url")
                     },
                     confirmButton = {
                         Button(
                             onClick = {
+                                viewModel.onTriggerEvent(BuildEvent.UpdateVideoURL(url ?: EMPTY_STRING))
                                 openDialog.value = false
-                                Temporary.url = urlString
-                                Temporary.tempReflexionItem.videoUrl = urlString
-                                Temporary.use = true
                                 navController.navigate(BuildRoute)
                             }) {
                             Text(stringResource(R.string.yes))
@@ -63,12 +62,9 @@ fun ConfirmSaveAlertDialog(
                     dismissButton = {
                         Button(
                             onClick = {
+                                Temporary.url = EMPTY_STRING
                                 openDialog.value = false
-                                startActivity(
-                                    context,
-                                    Intent(context, MainActivity::class.java),
-                                    null
-                                )
+                                navController.navigate(Screen.BuildItemScreen.route)
                             }) {
                             Text(stringResource(R.string.no))
                         }

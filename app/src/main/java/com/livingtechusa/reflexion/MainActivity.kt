@@ -31,6 +31,7 @@ import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.Constants.SOURCE
+import com.livingtechusa.reflexion.util.Constants.URL
 import com.livingtechusa.reflexion.util.MediaUtil
 import com.livingtechusa.reflexion.util.Temporary
 import dagger.hilt.android.AndroidEntryPoint
@@ -124,14 +125,15 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable(
-                        route = Screen.ConfirmSaveScreen.route
+                        route = Screen.ConfirmSaveScreen.route,
                     ) { navBackStackEntry ->
                         val parentEntry = remember(navBackStackEntry) {
                             navController.getBackStackEntry(Screen.HomeScreen.route)
                         }
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         ConfirmSaveAlertDialog(
-                            navController = navController
+                            navController = navController,
+                            viewModel = parentViewModel
                         )
                     }
 
@@ -169,7 +171,7 @@ class MainActivity : ComponentActivity() {
                         ) {
                             val url = intent.clipData?.getItemAt(0)?.text
                             Temporary.url = url.toString()
-                            navigationController.navigate(Screen.ConfirmSaveScreen.route)
+                            navigationController.navigate(Screen.ConfirmSaveScreen.route )
                         }
                     }
                     addOnNewIntentListener(listener)

@@ -140,11 +140,6 @@ class ItemViewModel @Inject constructor(
                         _reflexionItem.value.videoUrl = event.videoUrl
                     }
 
-                    is BuildEvent.ShowChildren -> {
-//                        ItemRecyclerView()
-                    }
-
-
                     else -> {
 
                     }
