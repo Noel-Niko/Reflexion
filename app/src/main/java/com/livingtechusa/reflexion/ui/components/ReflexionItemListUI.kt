@@ -22,6 +22,7 @@ import com.livingtechusa.reflexion.ui.children.ChildEvent
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.ItemTypeEnum
 import com.livingtechusa.reflexion.util.ItemTypeEnum.CHILD
+import com.livingtechusa.reflexion.util.Temporary
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -37,7 +38,9 @@ fun ReflexionItemListUI(
             ReflexionItemsContent(
                 reflexionItems = reflexionItems,
                 onSelected = {
-                    navController.navigate(route = Screen.BuildItemScreen.route + "/"  + it.autogenPK)
+                    Temporary.tempReflexionItem = it
+                    Temporary.use = true
+                    navController.navigate(route = Screen.BuildItemScreen.route)
                 }
             )
         }

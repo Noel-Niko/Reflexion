@@ -62,8 +62,7 @@ const val BuildRoute = "build"
 @Composable
 fun BuildItemScreen(
     navHostController: NavHostController,
-    viewModel: ItemViewModel = hiltViewModel(),
-    pk: Long?
+    viewModel: ItemViewModel = hiltViewModel()
 ) {
 //
 //    SystemBroadcastReceiver(Intent.ACTION_SEND) { send ->
@@ -79,9 +78,9 @@ fun BuildItemScreen(
         // BuildItemScreenLandscape(navHostController)
     } else {
         val itemViewModel: ItemViewModel = viewModel
-        if(pk != null) {
-            itemViewModel.onTriggerEvent(BuildEvent.GetSelectedReflexionItem(pk))
-        }
+//        if(pk != null) {
+//            itemViewModel.onTriggerEvent(BuildEvent.GetSelectedReflexionItem(pk))
+//        }
 
         val scope = rememberCoroutineScope()
         val error by viewModel.errorFlow.collectAsState(null)
@@ -116,8 +115,10 @@ fun BuildItemScreen(
             reflexionItem.value.videoUrl = urlString
         }
 
-        val initReflexionItem by itemViewModel.reflexionItem.collectAsState()
-
+        val name = remember { mutableStateOf(savedReflexionItem.name) }
+        val description = remember { mutableStateOf(savedReflexionItem.description) }
+        val detailedDescription =
+            remember { mutableStateOf(savedReflexionItem.detailedDescription) }
         val image = remember { mutableStateOf(savedReflexionItem.image) }
         val videoUri = remember { mutableStateOf(savedReflexionItem.videoUri) }
         val videoUrl = remember { mutableStateOf(savedReflexionItem.videoUrl) }
@@ -156,11 +157,7 @@ fun BuildItemScreen(
             floatingActionButton = {
                 /* SAVE */
                 FloatingActionButton(onClick = {
-                    Toast.makeText(
-                        context,
-                        resource.getString(R.string.changes_saved),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(context, resource.getString(R.string.changes_saved), Toast.LENGTH_SHORT).show()
                     if (savedReflexionItem.autogenPK != 0L) {
                         reflexionItem.value.autogenPK = savedReflexionItem.autogenPK
                         reflexionItem.value.name = reflexionItem.value.name.trim()
@@ -205,9 +202,9 @@ fun BuildItemScreen(
                             ) {
                                 TextField(
                                     modifier = Modifier.fillMaxWidth(),
-                                    value = initReflexionItem.name,
+                                    value = name.value,
                                     onValueChange = {
-                                        initReflexionItem.name = it
+                                        name.value = it
                                         reflexionItem.value.name = it
                                     }
                                 )
@@ -232,9 +229,9 @@ fun BuildItemScreen(
                             ) {
                                 TextField(
                                     modifier = Modifier.fillMaxWidth(),
-                                    value = initReflexionItem.name,
+                                    value = name.value,
                                     onValueChange = {
-                                        initReflexionItem.name = it
+                                        name.value = it
                                         reflexionItem.value.name = it
                                     }
                                 )
@@ -260,9 +257,9 @@ fun BuildItemScreen(
                         ) {
                             TextField(
                                 modifier = Modifier.fillMaxWidth(),
-                                value = initReflexionItem.description ?: "",
+                                value = description.value ?: "",
                                 onValueChange = {
-                                    initReflexionItem.description = it
+                                    description.value = it
                                     reflexionItem.value.description = it
                                 }
                             )
@@ -287,9 +284,9 @@ fun BuildItemScreen(
                         ) {
                             TextField(
                                 modifier = Modifier.fillMaxWidth(),
-                                value = initReflexionItem.detailedDescription ?: "",
+                                value = detailedDescription.value ?: "",
                                 onValueChange = {
-                                    initReflexionItem.detailedDescription = it
+                                    detailedDescription.value = it
                                     reflexionItem.value.detailedDescription = it
                                 }
                             )
@@ -479,9 +476,9 @@ fun BuildItemScreen(
                                 Temporary.use = false
                                 itemViewModel.onTriggerEvent(BuildEvent.clearReflexionItem)
                                 reflexionItem.value = ReflexionItem()
-                                initReflexionItem.name = reflexionItem.value.name
-                                initReflexionItem.description = reflexionItem.value.description
-                                initReflexionItem.detailedDescription = reflexionItem.value.detailedDescription
+                                name.value = reflexionItem.value.name
+                                description.value = reflexionItem.value.description
+                                detailedDescription.value = reflexionItem.value.detailedDescription
                             }
                             ) {
                                 Text(stringResource(R.string.new_item))

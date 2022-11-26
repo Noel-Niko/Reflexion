@@ -80,20 +80,14 @@ class MainActivity : ComponentActivity() {
                 navigationController = navController
                 NavHost(
                     navController = navController,
-                    startDestination = Screen.BuildItemScreen.route + "/{reflexion_item_pk}"
+                    startDestination = Screen.BuildItemScreen.route, // + "/{reflexion_item}"
                 ) {
 
                     composable(
-                        route = Screen.BuildItemScreen.route + "/{reflexion_item_pk}",
-                        arguments = listOf(
-                            navArgument(REFLEXION_ITEM_PK) {
-                                type = NavType.LongType
-                            }
-                        )
-                    ) { navBackStackEntry ->
+                        route = Screen.BuildItemScreen.route,
+                    ) {
                         BuildItemScreen(
                             navHostController = navController,
-                            pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK),
                         )
                     }
 
@@ -106,7 +100,7 @@ class MainActivity : ComponentActivity() {
                         )
                     ) { navBackStackEntry ->
                         val parentEntry = remember(navBackStackEntry) {
-                            navController.getBackStackEntry(Screen.BuildItemScreen.route + "/{reflexion_item_pk}")
+                            navController.getBackStackEntry(Screen.BuildItemScreen.route)
                         }
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         VideoPlayer(
@@ -120,7 +114,7 @@ class MainActivity : ComponentActivity() {
                         route = Screen.ConfirmSaveScreen.route
                     ) { navBackStackEntry ->
                         val parentEntry = remember(navBackStackEntry) {
-                            navController.getBackStackEntry(Screen.BuildItemScreen.route + "/{reflexion_item_pk}")
+                            navController.getBackStackEntry(Screen.BuildItemScreen.route)
                         }
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         ConfirmSaveAlertDialog(
@@ -133,7 +127,7 @@ class MainActivity : ComponentActivity() {
                         route = Screen.PasteAndSaveScreen.route
                     ) { navBackStackEntry ->
                         val parentEntry = remember(navBackStackEntry) {
-                            navController.getBackStackEntry(Screen.BuildItemScreen.route + "/{reflexion_item_pk}")
+                            navController.getBackStackEntry(Screen.BuildItemScreen.route)
                         }
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         PasteAndSaveDialog(
@@ -147,7 +141,7 @@ class MainActivity : ComponentActivity() {
                         route = Screen.ChildV2Screen.route
                     ) { navBackStackEntry ->
                         val parentEntry = remember(navBackStackEntry) {
-                            navController.getBackStackEntry(Screen.BuildItemScreen.route + "/{reflexion_item_pk}")
+                            navController.getBackStackEntry(Screen.BuildItemScreen.route)
                         }
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         ChildrenV2(
@@ -157,21 +151,19 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                    DisposableEffect(Unit) {
-                        val listener = Consumer<Intent> { intent ->
-                            if (intent.clipData?.getItemAt(0)?.text != null && intent.clipData?.getItemAt(
-                                    0
-                                )?.text != Constants.EMPTY_STRING
-                            ) {
-                                val url = intent.clipData?.getItemAt(0)?.text
-                                Temporary.url = url.toString()
-                                navigationController.navigate(Screen.ConfirmSaveScreen.route)
-                            }
+                DisposableEffect(Unit) {
+                    val listener = Consumer<Intent> { intent ->
+                        if (intent.clipData?.getItemAt(0)?.text != null && intent.clipData?.getItemAt(0)?.text != Constants.EMPTY_STRING
+                        ) {
+                            val url = intent.clipData?.getItemAt(0)?.text
+                            Temporary.url = url.toString()
+                            navigationController.navigate(Screen.ConfirmSaveScreen.route)
                         }
-                        addOnNewIntentListener(listener)
-                        onDispose { removeOnNewIntentListener(listener) }
                     }
+                    addOnNewIntentListener(listener)
+                    onDispose { removeOnNewIntentListener(listener) }
                 }
             }
         }
     }
+}
