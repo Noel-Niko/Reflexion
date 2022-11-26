@@ -15,6 +15,7 @@
     <string name="DisplayScreen">Display Screen</string>
     <string name="back_button">Back</string>
     <string name="add_child">Add Child</string>
+    <string name="new_item">Create New Item</string>
     <string name="error_message">There was an error. Please try again.</string>
     <string name="is_saved">Did you save a video?</string>
     <string name="yes">Yes</string>

@@ -29,8 +29,8 @@ class LocalServiceImpl @Inject constructor(
         reflexionItemDao.clearALLReflexionItems()
     }
 
-    override suspend fun selectItem(autogenPK: Long, name: String): ReflexionItem? {
-        return reflexionItemDao.selectReflexionItem(autogenPK, name)
+    override suspend fun selectItem(autogenPK: Long): ReflexionItem? {
+        return reflexionItemDao.selectReflexionItem(autogenPK)
     }
 
     override suspend fun deleteReflexionItem(autogenPK: Long, name: String) {

@@ -20,7 +20,7 @@ sealed class BuildEvent {
 
     object Delete : BuildEvent()
 
-    object UpdateSavedVideo : BuildEvent() {
+    object clearReflexionItem : BuildEvent() {
     }
 
     data class UpdateVideoURL(
@@ -31,4 +31,8 @@ sealed class BuildEvent {
     }
 
     object ShowChildren : BuildEvent()
+    data class GetSelectedReflexionItem(
+        val pk: Long
+    ): BuildEvent() {
+    }
 }

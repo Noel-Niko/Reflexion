@@ -20,8 +20,8 @@ interface ReflexionItemDao {
     @Query("Delete FROM ReflexionItem")
     suspend fun clearALLReflexionItems()
 
-    @Query("Select * FROM ReflexionItem WHERE autogenPK = :autogenPK AND name = :name")
-    suspend fun selectReflexionItem(autogenPK: Long, name: String): ReflexionItem?
+    @Query("Select * FROM ReflexionItem WHERE autogenPK = :autogenPK")
+    suspend fun selectReflexionItem(autogenPK: Long): ReflexionItem?
 
     @Query("Delete FROM ReflexionItem WHERE autogenPK = :autogenPK AND name = :name")
     suspend fun deleteReflexionItem(autogenPK: Long, name: String)

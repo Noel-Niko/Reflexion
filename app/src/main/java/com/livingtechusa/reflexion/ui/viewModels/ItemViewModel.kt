@@ -4,6 +4,7 @@ package com.livingtechusa.reflexion.ui.viewModels
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,8 +25,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import androidx.navigation.NavHostController
-import com.livingtechusa.reflexion.util.Constants
+import com.livingtechusa.reflexion.ui.children.ChildEvent
 import com.livingtechusa.reflexion.util.Temporary
 
 const val STATE_KEY_URL = "com.livingtechusa.reflexion.ui.build.BuildItemScreen.url"
@@ -63,7 +63,7 @@ class ItemViewModel @Inject constructor(
     val siblings: StateFlow<List<ReflexionItem?>> get() = _siblings
 
     private val _children = MutableStateFlow(emptyList<ReflexionItem>())
-    val children: StateFlow<List<ReflexionItem?>> get() = _children
+    val children: StateFlow<List<ReflexionItem>> get() = _children
 
     private val context: Context
         get() = BaseApplication.getInstance()
@@ -104,6 +104,11 @@ class ItemViewModel @Inject constructor(
                                 localServiceImpl.selectReflexionItemByName(event.reflexionItem.name)
                         }
                     }
+                    is BuildEvent.GetSelectedReflexionItem -> {
+                        withContext(Dispatchers.Main) {
+                            _reflexionItem.value = localServiceImpl.selectItem(event.pk) ?: ReflexionItem()
+                        }
+                    }
 
                     is BuildEvent.Delete -> {
                         withContext(Dispatchers.IO) {
@@ -123,8 +128,11 @@ class ItemViewModel @Inject constructor(
                         }
                     }
 
+                    is BuildEvent.clearReflexionItem -> {
+                        _reflexionItem.value = ReflexionItem()
+                    }
+
                     is BuildEvent.UpdateVideoURL -> {
-//                        _reflexionItemUrl.value = event.videoUrl
                         _reflexionItem.value.videoUrl = event.videoUrl
                     }
 
@@ -132,9 +140,36 @@ class ItemViewModel @Inject constructor(
 //                        ItemRecyclerView()
                     }
 
+
                     else -> {
 
                     }
+                }
+            } catch (e: Exception) {
+                Log.e(
+                    TAG,
+                    "Exception: ${e.message}  with cause: ${e.cause}"
+                )
+            }
+        }
+    }
+
+    fun onTriggerEvent(event: ChildEvent) {
+        viewModelScope.launch {
+            try {
+                when (event) {
+                    is ChildEvent.GetChildren -> {
+                        try {
+                            _children.value = localServiceImpl.getAllItems() as List<ReflexionItem>
+                        } catch (e: Exception) {
+                            Toast.makeText(context, "No items found", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                    else -> {
+                        Toast.makeText(context, "No matching events", Toast.LENGTH_SHORT).show()
+                    }
+
                 }
             } catch (e: Exception) {
                 Log.e(

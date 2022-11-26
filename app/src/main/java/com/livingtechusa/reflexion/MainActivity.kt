@@ -21,6 +21,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildItemScreen
+import com.livingtechusa.reflexion.ui.children.ChildrenV2
 import com.livingtechusa.reflexion.ui.components.ConfirmSaveAlertDialog
 import com.livingtechusa.reflexion.ui.components.PasteAndSaveDialog
 import com.livingtechusa.reflexion.ui.components.VideoPlayer
@@ -28,7 +29,7 @@ import com.livingtechusa.reflexion.ui.theme.ReflexionTheme
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants
-import com.livingtechusa.reflexion.util.Constants.REFLEXION_ITEM
+import com.livingtechusa.reflexion.util.Constants.REFLEXION_ITEM_PK
 import com.livingtechusa.reflexion.util.Constants.SOURCE
 import com.livingtechusa.reflexion.util.MediaUtil
 import com.livingtechusa.reflexion.util.Temporary
@@ -79,14 +80,20 @@ class MainActivity : ComponentActivity() {
                 navigationController = navController
                 NavHost(
                     navController = navController,
-                    startDestination = Screen.BuildItemScreen.route, // + "/{reflexion_item}"
+                    startDestination = Screen.BuildItemScreen.route + "/{reflexion_item_pk}"
                 ) {
 
                     composable(
-                        route = Screen.BuildItemScreen.route,
-                    ) {
+                        route = Screen.BuildItemScreen.route + "/{reflexion_item_pk}",
+                        arguments = listOf(
+                            navArgument(REFLEXION_ITEM_PK) {
+                                type = NavType.LongType
+                            }
+                        )
+                    ) { navBackStackEntry ->
                         BuildItemScreen(
                             navHostController = navController,
+                            pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK),
                         )
                     }
 
@@ -99,7 +106,7 @@ class MainActivity : ComponentActivity() {
                         )
                     ) { navBackStackEntry ->
                         val parentEntry = remember(navBackStackEntry) {
-                            navController.getBackStackEntry(Screen.BuildItemScreen.route)
+                            navController.getBackStackEntry(Screen.BuildItemScreen.route + "/{reflexion_item_pk}")
                         }
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         VideoPlayer(
@@ -113,7 +120,7 @@ class MainActivity : ComponentActivity() {
                         route = Screen.ConfirmSaveScreen.route
                     ) { navBackStackEntry ->
                         val parentEntry = remember(navBackStackEntry) {
-                            navController.getBackStackEntry(Screen.BuildItemScreen.route)
+                            navController.getBackStackEntry(Screen.BuildItemScreen.route + "/{reflexion_item_pk}")
                         }
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         ConfirmSaveAlertDialog(
@@ -126,7 +133,7 @@ class MainActivity : ComponentActivity() {
                         route = Screen.PasteAndSaveScreen.route
                     ) { navBackStackEntry ->
                         val parentEntry = remember(navBackStackEntry) {
-                            navController.getBackStackEntry(Screen.BuildItemScreen.route)
+                            navController.getBackStackEntry(Screen.BuildItemScreen.route + "/{reflexion_item_pk}")
                         }
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         PasteAndSaveDialog(
@@ -135,21 +142,36 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
+
+                    composable(
+                        route = Screen.ChildV2Screen.route
+                    ) { navBackStackEntry ->
+                        val parentEntry = remember(navBackStackEntry) {
+                            navController.getBackStackEntry(Screen.BuildItemScreen.route + "/{reflexion_item_pk}")
+                        }
+                        val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
+                        ChildrenV2(
+                            itemViewModel = parentViewModel,
+                            navController = navController
+                        )
+                    }
                 }
 
-                DisposableEffect(Unit) {
-                    val listener = Consumer<Intent> { intent ->
-                        if (intent.clipData?.getItemAt(0)?.text != null && intent.clipData?.getItemAt(0)?.text != Constants.EMPTY_STRING
-                        ) {
-                            val url = intent.clipData?.getItemAt(0)?.text
-                            Temporary.url = url.toString()
-                            navigationController.navigate(Screen.ConfirmSaveScreen.route)
+                    DisposableEffect(Unit) {
+                        val listener = Consumer<Intent> { intent ->
+                            if (intent.clipData?.getItemAt(0)?.text != null && intent.clipData?.getItemAt(
+                                    0
+                                )?.text != Constants.EMPTY_STRING
+                            ) {
+                                val url = intent.clipData?.getItemAt(0)?.text
+                                Temporary.url = url.toString()
+                                navigationController.navigate(Screen.ConfirmSaveScreen.route)
+                            }
                         }
+                        addOnNewIntentListener(listener)
+                        onDispose { removeOnNewIntentListener(listener) }
                     }
-                    addOnNewIntentListener(listener)
-                    onDispose { removeOnNewIntentListener(listener) }
                 }
             }
         }
     }
-}

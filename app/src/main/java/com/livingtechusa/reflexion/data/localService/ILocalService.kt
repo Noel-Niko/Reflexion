@@ -9,7 +9,7 @@ interface ILocalService {
     suspend fun updateReflexionItem(item: ReflexionItem)
     suspend fun getAllItems(): List<ReflexionItem?>
     suspend fun clearALLReflexionItems()
-    suspend fun selectItem(autogenPK: Long, name: String): ReflexionItem?
+    suspend fun selectItem(autogenPK: Long): ReflexionItem?
     suspend fun deleteReflexionItem(autogenPK: Long, name: String)
     suspend fun renameItem(autogenPK: Long, name: String, newName: String)
     suspend fun selectChildItems(parent: Long): List<ReflexionItem?>
