@@ -25,6 +25,7 @@ import com.livingtechusa.reflexion.ui.children.ChildrenV2
 import com.livingtechusa.reflexion.ui.components.ConfirmSaveAlertDialog
 import com.livingtechusa.reflexion.ui.components.PasteAndSaveDialog
 import com.livingtechusa.reflexion.ui.components.VideoPlayer
+import com.livingtechusa.reflexion.ui.home.HomeScreen
 import com.livingtechusa.reflexion.ui.theme.ReflexionTheme
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.BaseApplication
@@ -80,12 +81,24 @@ class MainActivity : ComponentActivity() {
                 navigationController = navController
                 NavHost(
                     navController = navController,
-                    startDestination = Screen.BuildItemScreen.route, // + "/{reflexion_item}"
+                    startDestination = Screen.HomeScreen.route
                 ) {
 
                     composable(
-                        route = Screen.BuildItemScreen.route,
+                        route = Screen.HomeScreen.route,
                     ) {
+                        HomeScreen(
+                            navHostController = navController,
+                        )
+                    }
+
+                    composable(
+                        route = Screen.BuildItemScreen.route,
+                    ) { navBackStackEntry ->
+                        val parentEntry = remember(navBackStackEntry) {
+                            navController.getBackStackEntry(Screen.HomeScreen.route)
+                        }
+                        val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         BuildItemScreen(
                             navHostController = navController,
                         )
@@ -100,7 +113,7 @@ class MainActivity : ComponentActivity() {
                         )
                     ) { navBackStackEntry ->
                         val parentEntry = remember(navBackStackEntry) {
-                            navController.getBackStackEntry(Screen.BuildItemScreen.route)
+                            navController.getBackStackEntry(Screen.HomeScreen.route)
                         }
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         VideoPlayer(
@@ -114,7 +127,7 @@ class MainActivity : ComponentActivity() {
                         route = Screen.ConfirmSaveScreen.route
                     ) { navBackStackEntry ->
                         val parentEntry = remember(navBackStackEntry) {
-                            navController.getBackStackEntry(Screen.BuildItemScreen.route)
+                            navController.getBackStackEntry(Screen.HomeScreen.route)
                         }
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         ConfirmSaveAlertDialog(
@@ -127,7 +140,7 @@ class MainActivity : ComponentActivity() {
                         route = Screen.PasteAndSaveScreen.route
                     ) { navBackStackEntry ->
                         val parentEntry = remember(navBackStackEntry) {
-                            navController.getBackStackEntry(Screen.BuildItemScreen.route)
+                            navController.getBackStackEntry(Screen.HomeScreen.route)
                         }
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         PasteAndSaveDialog(
@@ -141,7 +154,7 @@ class MainActivity : ComponentActivity() {
                         route = Screen.ChildV2Screen.route
                     ) { navBackStackEntry ->
                         val parentEntry = remember(navBackStackEntry) {
-                            navController.getBackStackEntry(Screen.BuildItemScreen.route)
+                            navController.getBackStackEntry(Screen.HomeScreen.route)
                         }
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         ChildrenV2(

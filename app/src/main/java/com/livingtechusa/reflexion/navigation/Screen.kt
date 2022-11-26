@@ -6,9 +6,11 @@ import com.livingtechusa.reflexion.ui.children.ChildRouteV2
 import com.livingtechusa.reflexion.ui.components.CONFIRM_SAVE
 import com.livingtechusa.reflexion.ui.components.PASTE_SAVE
 import com.livingtechusa.reflexion.ui.components.VideoScreenRoute
+import com.livingtechusa.reflexion.ui.home.HOME
 
 
 sealed class Screen(val route: String) {
+    object HomeScreen : Screen(HOME)
     object BuildItemScreen : Screen(BuildRoute)
     object VideoView : Screen(VideoScreenRoute)
 //    object ChildrenScreen : Screen(ChildRoute)
