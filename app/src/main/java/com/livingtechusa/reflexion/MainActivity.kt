@@ -30,7 +30,6 @@ import com.livingtechusa.reflexion.ui.theme.ReflexionTheme
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants
-import com.livingtechusa.reflexion.util.Constants.REFLEXION_ITEM_PK
 import com.livingtechusa.reflexion.util.Constants.SOURCE
 import com.livingtechusa.reflexion.util.MediaUtil
 import com.livingtechusa.reflexion.util.Temporary
@@ -101,6 +100,7 @@ class MainActivity : ComponentActivity() {
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         BuildItemScreen(
                             navHostController = navController,
+                            viewModel = parentViewModel
                         )
                     }
 
@@ -131,7 +131,6 @@ class MainActivity : ComponentActivity() {
                         }
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         ConfirmSaveAlertDialog(
-                            itemViewModel = parentViewModel,
                             navController = navController
                         )
                     }

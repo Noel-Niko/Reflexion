@@ -26,7 +26,6 @@ const val CONFIRM_SAVE = "ConfirmSaveAlertDialog"
 
 @Composable
 fun ConfirmSaveAlertDialog(
-    itemViewModel: ItemViewModel = hiltViewModel(),
     navController: NavHostController
 ) {
 

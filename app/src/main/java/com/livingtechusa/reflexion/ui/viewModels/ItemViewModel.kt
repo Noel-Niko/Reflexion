@@ -104,6 +104,10 @@ class ItemViewModel @Inject constructor(
                                 localServiceImpl.selectReflexionItemByName(event.reflexionItem.name)
                         }
                     }
+
+                    is BuildEvent.UpdateDisplayedReflexionItem -> {
+                        _reflexionItem.value = event.reflexionItem
+                    }
                     is BuildEvent.GetSelectedReflexionItem -> {
                         withContext(Dispatchers.Main) {
                             _reflexionItem.value = localServiceImpl.selectItem(event.pk) ?: ReflexionItem()
@@ -128,7 +132,7 @@ class ItemViewModel @Inject constructor(
                         }
                     }
 
-                    is BuildEvent.clearReflexionItem -> {
+                    is BuildEvent.ClearReflexionItem -> {
                         _reflexionItem.value = ReflexionItem()
                     }
 

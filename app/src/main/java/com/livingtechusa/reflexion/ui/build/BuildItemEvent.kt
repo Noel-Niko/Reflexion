@@ -1,6 +1,5 @@
 package com.livingtechusa.reflexion.ui.build
 
-import android.net.Uri
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 
 sealed class BuildEvent {
@@ -13,6 +12,10 @@ sealed class BuildEvent {
         val reflexionItem: ReflexionItem
     ) : BuildEvent()
 
+    data class UpdateDisplayedReflexionItem(
+        val reflexionItem: ReflexionItem
+    ) : BuildEvent()
+
     data class ShowVideo(
         val uri: String?,
         val Url: String?
@@ -20,7 +23,7 @@ sealed class BuildEvent {
 
     object Delete : BuildEvent()
 
-    object clearReflexionItem : BuildEvent() {
+    object ClearReflexionItem : BuildEvent() {
     }
 
     data class UpdateVideoURL(
