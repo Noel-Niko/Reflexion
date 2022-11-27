@@ -55,7 +55,9 @@ import com.livingtechusa.reflexion.util.Constants.SEARCH_YOUTUBE
 import com.livingtechusa.reflexion.util.Constants.VIDEO
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import com.livingtechusa.reflexion.util.Temporary
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 const val BuildRoute = "build"
 
@@ -420,8 +422,7 @@ fun BuildItemScreen(
                             Modifier.weight(1f)
                         ) {
                             Button(onClick = {
-                                itemViewModel.onTriggerEvent(ChildEvent.GetChildren)
-                                navHostController.navigate(Screen.ChildV2Screen.route)
+                                navHostController.navigate(Screen.ChildV2Screen.route + "/" + reflexionItem.autogenPK)
                             }
                             ) {
                                 Text(
@@ -430,7 +431,7 @@ fun BuildItemScreen(
                             }
                         }
                     }
-                    /* DELETE CHILDREN */
+                    /* DELETE ITEM */
                     Row(
                         modifier = Modifier.padding(8.dp)
                     ) {
@@ -440,9 +441,15 @@ fun BuildItemScreen(
                                 Modifier.weight(1f)
                             ) {
                                 Button(onClick = {
-                                    Toast.makeText(context, "Button Clicked", Toast.LENGTH_SHORT)
-                                        .show()
-                                    itemViewModel.onTriggerEvent(BuildEvent.Delete)
+                                    scope.launch {
+                                        withContext(Dispatchers.Main) {
+                                            if (itemViewModel.hasNoChildren(reflexionItem.autogenPK)) {
+                                                itemViewModel.onTriggerEvent(BuildEvent.Delete)
+                                            } else {
+                                                Toast.makeText(context, resource.getString(R.string.is_parent), Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+                                    }
                                 }
                                 ) {
                                     Text(stringResource(R.string.delete))
@@ -453,8 +460,9 @@ fun BuildItemScreen(
                             Modifier.weight(1f)
                         ) {
                             Button(onClick = {
-                                Toast.makeText(context, "Button Clicked", Toast.LENGTH_SHORT).show()
-                                itemViewModel.onTriggerEvent(BuildEvent.Delete)
+                                val parent = reflexionItem.autogenPK
+                                itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
+                                itemViewModel.onTriggerEvent(BuildEvent.SetParent(parent))
                             }
                             ) {
                                 Text(stringResource(R.string.add_child))
@@ -469,11 +477,31 @@ fun BuildItemScreen(
                             Modifier.weight(1f)
                         ) {
                             Button(onClick = {
-                                Temporary.use = false
                                 itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
                             }
                             ) {
                                 Text(stringResource(R.string.new_item))
+                            }
+                        }
+                    }
+                    /* PARENT */
+                    Row(
+                        modifier = Modifier.padding(8.dp)
+                    ) {
+                        Column(
+                            Modifier.weight(1f)
+                        ) {
+                            Button(onClick = {
+                                val parent = reflexionItem.parent
+                                if(parent != null) {
+                                    itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
+                                    itemViewModel.onTriggerEvent(BuildEvent.GetSelectedReflexionItem(parent))
+                                } else {
+                                    Toast.makeText(context, resource.getString(R.string.no_parent_found), Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                            ) {
+                                Text(stringResource(R.string.go_to_parent))
                             }
                         }
                     }

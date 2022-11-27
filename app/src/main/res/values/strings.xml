@@ -25,4 +25,8 @@
     <string name="save">Save</string>
     <string name="close">Close</string>
     <string name="paste_web_address_here">"Paste web address here: "</string>
+    <string name="is_parent">This item cannot be deleted because it is parent to other items.</string>
+    <string name="go_to_parent">Move Up To Parent</string>
+    <string name="no_parent_found">No Parent Found</string>
+    <string name="no_children_found">No Children Found</string>
 </resources>

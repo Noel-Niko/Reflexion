@@ -52,13 +52,13 @@ fun HomeScreen(
             ) {
                 Text(stringResource(R.string.BuildScreen))
             }
-            Spacer(Modifier.height(16.dp))
-            Button(onClick = {
-                navHostController.navigate(Screen.ChildV2Screen.route)
-            }
-            ) {
-                Text(stringResource(R.string.children))
-            }
+//            Spacer(Modifier.height(16.dp))
+//            Button(onClick = {
+//                navHostController.navigate(Screen.ChildV2Screen.route + "/")
+//            }
+//            ) {
+//                Text(stringResource(R.string.children))
+//            }
         }
 
     }

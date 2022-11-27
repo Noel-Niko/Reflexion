@@ -30,6 +30,7 @@ import com.livingtechusa.reflexion.ui.theme.ReflexionTheme
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants
+import com.livingtechusa.reflexion.util.Constants.REFLEXION_ITEM_PK
 import com.livingtechusa.reflexion.util.Constants.SOURCE
 import com.livingtechusa.reflexion.util.Constants.URL
 import com.livingtechusa.reflexion.util.MediaUtil
@@ -152,7 +153,12 @@ class MainActivity : ComponentActivity() {
 
 
                     composable(
-                        route = Screen.ChildV2Screen.route
+                        route = Screen.ChildV2Screen.route + "/{reflexion_item_pk}",
+                        arguments = listOf(
+                            navArgument(REFLEXION_ITEM_PK) {
+                                type = NavType.LongType
+                            }
+                        )
                     ) { navBackStackEntry ->
                         val parentEntry = remember(navBackStackEntry) {
                             navController.getBackStackEntry(Screen.HomeScreen.route)
@@ -160,7 +166,8 @@ class MainActivity : ComponentActivity() {
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         ChildrenV2(
                             itemViewModel = parentViewModel,
-                            navController = navController
+                            navController = navController,
+                            pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK) ?: -1L
                         )
                     }
                 }

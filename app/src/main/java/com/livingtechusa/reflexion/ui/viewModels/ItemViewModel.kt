@@ -85,6 +85,10 @@ class ItemViewModel @Inject constructor(
         }
     }
 
+    suspend fun hasNoChildren(pk: Long): Boolean {
+        return localServiceImpl.selectChildren(pk).isEmpty()
+    }
+
     fun onTriggerEvent(event: BuildEvent) {
         viewModelScope.launch {
             try {
@@ -109,8 +113,11 @@ class ItemViewModel @Inject constructor(
                         _reflexionItem.value = event.reflexionItem
                     }
                     is BuildEvent.GetSelectedReflexionItem -> {
-                        withContext(Dispatchers.Main) {
-                            _reflexionItem.value = localServiceImpl.selectItem(event.pk) ?: ReflexionItem()
+                        if (event.pk != null) {
+                            withContext(Dispatchers.Main) {
+                                _reflexionItem.value =
+                                    localServiceImpl.selectItem(event.pk) ?: ReflexionItem()
+                            }
                         }
                     }
 
@@ -140,6 +147,10 @@ class ItemViewModel @Inject constructor(
                         _reflexionItem.value.videoUrl = event.videoUrl
                     }
 
+                    is BuildEvent.SetParent -> {
+                        _reflexionItem.value.parent = event.parent
+                    }
+
                     else -> {
 
                     }
@@ -159,14 +170,14 @@ class ItemViewModel @Inject constructor(
                 when (event) {
                     is ChildEvent.GetChildren -> {
                         try {
-                            _children.value = localServiceImpl.getAllItems() as List<ReflexionItem>
+                            _children.value = localServiceImpl.selectChildren(event.parentPK) as List<ReflexionItem>
                         } catch (e: Exception) {
                             Toast.makeText(context, "No items found", Toast.LENGTH_SHORT).show()
                         }
                     }
 
                     else -> {
-                        Toast.makeText(context, "No matching events", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "No matching items", Toast.LENGTH_SHORT).show()
                     }
 
                 }

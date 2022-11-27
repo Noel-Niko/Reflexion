@@ -25,6 +25,10 @@ class LocalServiceImpl @Inject constructor(
         return reflexionItemDao.getAllReflexionItems()
     }
 
+    override suspend fun selectChildren(pk: Long): List<ReflexionItem?> {
+        return reflexionItemDao.selectChildReflexionItems(pk)
+    }
+
     override suspend fun clearALLReflexionItems() {
         reflexionItemDao.clearALLReflexionItems()
     }

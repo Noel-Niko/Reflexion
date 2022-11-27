@@ -23,19 +23,18 @@ sealed class BuildEvent {
 
     object Delete : BuildEvent()
 
-    object ClearReflexionItem : BuildEvent() {
-    }
+    object ClearReflexionItem : BuildEvent()
 
     data class UpdateVideoURL(
         val videoUrl: String
     ) : BuildEvent()
 
-    object ShowSiblings : BuildEvent() {
-    }
+    object ShowSiblings : BuildEvent()
 
-    object ShowChildren : BuildEvent()
     data class GetSelectedReflexionItem(
-        val pk: Long
-    ): BuildEvent() {
-    }
+        val pk: Long?
+    ): BuildEvent()
+
+    data class SetParent(val parent: Long): BuildEvent()
+
 }
