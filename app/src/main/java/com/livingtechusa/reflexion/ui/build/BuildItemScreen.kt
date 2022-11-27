@@ -66,37 +66,19 @@ fun BuildItemScreen(
     navHostController: NavHostController,
     viewModel: ItemViewModel = hiltViewModel()
 ) {
-//
-//    SystemBroadcastReceiver(Intent.ACTION_SEND) { send ->
-//        val isCharging = /* Get from batteryStatus ... */ true
-//        /* Do something if the device is charging */
-//    }
-
 
     val URI = "/Uri"
     val URL = "/Url"
     val configuration = LocalConfiguration.current
+    val context = LocalContext.current
     if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
         // BuildItemScreenLandscape(navHostController)
     } else {
         val itemViewModel: ItemViewModel = viewModel
-//        if(pk != null) {
-//            itemViewModel.onTriggerEvent(BuildEvent.GetSelectedReflexionItem(pk))
-//        }
-
         val scope = rememberCoroutineScope()
         val error by viewModel.errorFlow.collectAsState(null)
         val savedReflexionItem by itemViewModel.reflexionItem.collectAsState()
-        val isParent by itemViewModel.isParent.collectAsState()
-        //        val topic by itemViewModel.topic.collectAsState()
-        val parentName by itemViewModel.parentName.collectAsState()
-        val keyWords by itemViewModel.keyWords.collectAsState()
-        val linkedLists by itemViewModel.linkedLists.collectAsState()
-        val siblings by itemViewModel.siblings.collectAsState()
-        val children by itemViewModel.children.collectAsState()
         val resource = ResourceProviderSingleton
-
-        val context = LocalContext.current
         val reflexionItem =
                 ReflexionItem(
                     autogenPK = savedReflexionItem.autogenPK,
@@ -110,23 +92,7 @@ fun BuildItemScreen(
                     hasChildren = savedReflexionItem.hasChildren
                 )
 
-        fun addUrl(urlString: String) {
-            reflexionItem.videoUrl = urlString
-        }
-
-//        val name = remember { mutableStateOf(savedReflexionItem.name) }
-//        val description = remember { mutableStateOf(savedReflexionItem.description) }
-//        val detailedDescription =
-//            remember { mutableStateOf(savedReflexionItem.detailedDescription) }
-        val image = remember { mutableStateOf(savedReflexionItem.image) }
-        val videoUri = remember { mutableStateOf(savedReflexionItem.videoUri) }
-        val videoUrl = remember { mutableStateOf(savedReflexionItem.videoUrl) }
-        val parent = remember { mutableStateOf(savedReflexionItem.parent) }
-
         var targetVideoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
-
-        val showSavedVideo = remember { mutableStateOf(false) }
-        val showOnLineVideo = remember { mutableStateOf(false) }
         val selectVideo = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetContent(),
             onResult = { uri ->
@@ -175,7 +141,6 @@ fun BuildItemScreen(
             }
         ) { paddingValues ->
             paddingValues // padding values?
-
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()

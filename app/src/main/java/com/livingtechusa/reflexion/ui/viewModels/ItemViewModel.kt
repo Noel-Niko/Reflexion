@@ -1,6 +1,5 @@
 package com.livingtechusa.reflexion.ui.viewModels
 
-//import com.livingtechusa.reflexion.ui.components.VideoView
 import android.content.Context
 import android.net.Uri
 import android.util.Log
@@ -43,24 +42,21 @@ class ItemViewModel @Inject constructor(
 
     private val _reflexionItem = MutableStateFlow(ReflexionItem())
     val reflexionItem: StateFlow<ReflexionItem> get() = _reflexionItem
+
+//    private val _isParent = MutableStateFlow(false)
+//    val isParent: StateFlow<Boolean> get() = _isParent
 //
-//    private val _reflexionItemUrl = MutableStateFlow(EMPTY_STRING)
-//    val reflexionItemUrl: StateFlow<String> get() = _reflexionItemUrl
-
-    private val _isParent = MutableStateFlow(false)
-    val isParent: StateFlow<Boolean> get() = _isParent
-
-    private val _parentName = MutableStateFlow(String())
-    val parentName: StateFlow<String?> get() = _parentName
-
-    private val _keyWords = MutableStateFlow(emptyList<String>())
-    val keyWords: StateFlow<List<String?>> get() = _keyWords
-
-    private val _linkedLists = MutableStateFlow(emptyList<LinkedList>())
-    val linkedLists: StateFlow<List<LinkedList?>> get() = _linkedLists
-
-    private val _siblings = MutableStateFlow(emptyList<ReflexionItem>())
-    val siblings: StateFlow<List<ReflexionItem?>> get() = _siblings
+//    private val _parentName = MutableStateFlow(String())
+//    val parentName: StateFlow<String?> get() = _parentName
+//
+//    private val _keyWords = MutableStateFlow(emptyList<String>())
+//    val keyWords: StateFlow<List<String?>> get() = _keyWords
+//
+//    private val _linkedLists = MutableStateFlow(emptyList<LinkedList>())
+//    val linkedLists: StateFlow<List<LinkedList?>> get() = _linkedLists
+//
+//    private val _siblings = MutableStateFlow(emptyList<ReflexionItem>())
+//    val siblings: StateFlow<List<ReflexionItem?>> get() = _siblings
 
     private val _children = MutableStateFlow(emptyList<ReflexionItem>())
     val children: StateFlow<List<ReflexionItem>> get() = _children
