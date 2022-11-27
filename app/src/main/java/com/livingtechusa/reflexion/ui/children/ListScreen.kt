@@ -14,26 +14,28 @@ import com.livingtechusa.reflexion.ui.components.ReflexionItemListUI
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 
-const val ChildRouteV2 = "children"
+const val ListRoute = "list"
+
 @Composable
-fun ChildrenV2(
+fun ListDisplay(
     itemViewModel: ItemViewModel = hiltViewModel(),
     navController: NavHostController,
     pk: Long
 ) {
     val configuration = LocalConfiguration.current
-    itemViewModel.onTriggerEvent(ChildEvent.GetChildren(pk))
+    itemViewModel.onTriggerEvent(ListEvent.GetList(pk))
+    val reflexionItemList by itemViewModel.list.collectAsState()
+    val context = LocalContext.current
     val resource = ResourceProviderSingleton
 
     if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
         // TODO
     } else {
-        val children by itemViewModel.children.collectAsState()
-        val context = LocalContext.current
-
-        if(children.isEmpty()){
-            Toast.makeText(context, resource.getString(R.string.no_children_found), Toast.LENGTH_SHORT).show()
+        if (reflexionItemList.isEmpty()) {
+            Toast.makeText(context, resource.getString(R.string.no_items_found), Toast.LENGTH_SHORT)
+                .show()
+        } else {
+            ReflexionItemListUI(reflexionItemList, navController, viewModel = itemViewModel)
         }
-        ReflexionItemListUI(children, navController)
     }
 }

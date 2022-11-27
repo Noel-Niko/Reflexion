@@ -1,7 +1,6 @@
 package com.livingtechusa.reflexion.ui.components
 
 import android.annotation.SuppressLint
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -13,15 +12,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.media3.common.C
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildEvent
-import com.livingtechusa.reflexion.ui.children.ChildEvent
+import com.livingtechusa.reflexion.ui.children.ListEvent
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
-import com.livingtechusa.reflexion.util.ItemTypeEnum
-import com.livingtechusa.reflexion.util.ItemTypeEnum.CHILD
 import com.livingtechusa.reflexion.util.Temporary
 
 
@@ -29,7 +26,8 @@ import com.livingtechusa.reflexion.util.Temporary
 @Composable
 fun ReflexionItemListUI(
     reflexionItems: List<ReflexionItem>,
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: ItemViewModel
     ) {
     val context = LocalContext.current
     Scaffold(
@@ -38,9 +36,11 @@ fun ReflexionItemListUI(
             ReflexionItemsContent(
                 reflexionItems = reflexionItems,
                 onSelected = {
-                    Temporary.tempReflexionItem = it
-                    Temporary.use = true
-                    navController.navigate(route = Screen.BuildItemScreen.route)
+                    navController.navigate(route = Screen.BuildItemScreen.route) {// + "/" + it.autogenPK) {
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                    viewModel.onTriggerEvent(BuildEvent.GetSelectedReflexionItem(it.autogenPK))
                 }
             )
         }

@@ -8,7 +8,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.livingtechusa.reflexion.R
-import com.livingtechusa.reflexion.data.entities.LinkedList
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.ui.build.BuildEvent
@@ -24,7 +23,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import com.livingtechusa.reflexion.ui.children.ChildEvent
+import com.livingtechusa.reflexion.ui.children.ListEvent
 import com.livingtechusa.reflexion.util.Temporary
 
 const val STATE_KEY_URL = "com.livingtechusa.reflexion.ui.build.BuildItemScreen.url"
@@ -58,8 +57,8 @@ class ItemViewModel @Inject constructor(
 //    private val _siblings = MutableStateFlow(emptyList<ReflexionItem>())
 //    val siblings: StateFlow<List<ReflexionItem?>> get() = _siblings
 
-    private val _children = MutableStateFlow(emptyList<ReflexionItem>())
-    val children: StateFlow<List<ReflexionItem>> get() = _children
+    private val _list = MutableStateFlow(emptyList<ReflexionItem>())
+    val list: StateFlow<List<ReflexionItem>> get() = _list
 
     private val context: Context
         get() = BaseApplication.getInstance()
@@ -108,13 +107,17 @@ class ItemViewModel @Inject constructor(
                     is BuildEvent.UpdateDisplayedReflexionItem -> {
                         _reflexionItem.value = event.reflexionItem
                     }
+
                     is BuildEvent.GetSelectedReflexionItem -> {
-                        if (event.pk != null) {
                             withContext(Dispatchers.Main) {
-                                _reflexionItem.value =
-                                    localServiceImpl.selectItem(event.pk) ?: ReflexionItem()
+                                when (event.pk) {
+                                    -2L ->
+                                        _reflexionItem.value = ReflexionItem()
+                                    else ->
+                                        _reflexionItem.value =
+                                            event.pk?.let { localServiceImpl.selectItem(it) } ?: ReflexionItem()
+                                }
                             }
-                        }
                     }
 
                     is BuildEvent.Delete -> {
@@ -160,15 +163,17 @@ class ItemViewModel @Inject constructor(
         }
     }
 
-    fun onTriggerEvent(event: ChildEvent) {
+    fun onTriggerEvent(event: ListEvent) {
         viewModelScope.launch {
             try {
                 when (event) {
-                    is ChildEvent.GetChildren -> {
-                        try {
-                            _children.value = localServiceImpl.selectChildren(event.parentPK) as List<ReflexionItem>
-                        } catch (e: Exception) {
-                            Toast.makeText(context, "No items found", Toast.LENGTH_SHORT).show()
+                    is ListEvent.GetList -> {
+
+                        if (event.pk == -1L) {
+                            _list.value = localServiceImpl.getAllItems() as List<ReflexionItem>
+                        } else {
+                            _list.value =
+                                localServiceImpl.selectChildren(event.pk) as List<ReflexionItem>
                         }
                     }
 

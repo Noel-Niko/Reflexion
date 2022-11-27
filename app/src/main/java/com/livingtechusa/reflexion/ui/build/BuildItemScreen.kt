@@ -28,7 +28,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -47,7 +46,6 @@ import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
-import com.livingtechusa.reflexion.ui.children.ChildEvent
 import com.livingtechusa.reflexion.ui.components.MainTopBar
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
@@ -64,9 +62,8 @@ const val BuildRoute = "build"
 @Composable
 fun BuildItemScreen(
     navHostController: NavHostController,
-    viewModel: ItemViewModel = hiltViewModel()
+    viewModel: ItemViewModel = hiltViewModel(),
 ) {
-
     val URI = "/Uri"
     val URL = "/Url"
     val configuration = LocalConfiguration.current
@@ -80,17 +77,17 @@ fun BuildItemScreen(
         val savedReflexionItem by itemViewModel.reflexionItem.collectAsState()
         val resource = ResourceProviderSingleton
         val reflexionItem =
-                ReflexionItem(
-                    autogenPK = savedReflexionItem.autogenPK,
-                    name = savedReflexionItem.name,
-                    description = savedReflexionItem.description,
-                    detailedDescription = savedReflexionItem.detailedDescription,
-                    image = savedReflexionItem.image,
-                    videoUri = savedReflexionItem.videoUri,
-                    videoUrl = savedReflexionItem.videoUrl,
-                    parent = savedReflexionItem.parent,
-                    hasChildren = savedReflexionItem.hasChildren
-                )
+            ReflexionItem(
+                autogenPK = savedReflexionItem.autogenPK,
+                name = savedReflexionItem.name,
+                description = savedReflexionItem.description,
+                detailedDescription = savedReflexionItem.detailedDescription,
+                image = savedReflexionItem.image,
+                videoUri = savedReflexionItem.videoUri,
+                videoUrl = savedReflexionItem.videoUrl,
+                parent = savedReflexionItem.parent,
+                hasChildren = savedReflexionItem.hasChildren
+            )
 
         var targetVideoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
         val selectVideo = rememberLauncherForActivityResult(
@@ -122,7 +119,11 @@ fun BuildItemScreen(
             floatingActionButton = {
                 /* SAVE */
                 FloatingActionButton(onClick = {
-                    Toast.makeText(context, resource.getString(R.string.changes_saved), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        resource.getString(R.string.changes_saved),
+                        Toast.LENGTH_SHORT
+                    ).show()
                     if (savedReflexionItem.autogenPK != 0L) {
                         reflexionItem.autogenPK = savedReflexionItem.autogenPK
                         reflexionItem.name = reflexionItem.name.trim()
@@ -167,9 +168,13 @@ fun BuildItemScreen(
                                 TextField(
                                     modifier = Modifier.fillMaxWidth(),
                                     value = reflexionItem.name,
-                                    onValueChange = {name ->
+                                    onValueChange = { name ->
                                         val copy = reflexionItem.copy(name = name)
-                                        itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
+                                        itemViewModel.onTriggerEvent(
+                                            BuildEvent.UpdateDisplayedReflexionItem(
+                                                copy
+                                            )
+                                        )
                                     }
                                 )
                             }
@@ -194,9 +199,13 @@ fun BuildItemScreen(
                                 TextField(
                                     modifier = Modifier.fillMaxWidth(),
                                     value = reflexionItem.name,
-                                    onValueChange = {name ->
+                                    onValueChange = { name ->
                                         val copy = reflexionItem.copy(name = name)
-                                        itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
+                                        itemViewModel.onTriggerEvent(
+                                            BuildEvent.UpdateDisplayedReflexionItem(
+                                                copy
+                                            )
+                                        )
                                     }
                                 )
                             }
@@ -222,9 +231,13 @@ fun BuildItemScreen(
                             TextField(
                                 modifier = Modifier.fillMaxWidth(),
                                 value = reflexionItem.description ?: EMPTY_STRING,
-                                onValueChange = {description ->
+                                onValueChange = { description ->
                                     val copy = reflexionItem.copy(description = description)
-                                    itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
+                                    itemViewModel.onTriggerEvent(
+                                        BuildEvent.UpdateDisplayedReflexionItem(
+                                            copy
+                                        )
+                                    )
                                 }
                             )
                         }
@@ -249,9 +262,14 @@ fun BuildItemScreen(
                             TextField(
                                 modifier = Modifier.fillMaxWidth(),
                                 value = reflexionItem.detailedDescription ?: EMPTY_STRING,
-                                onValueChange = {detailedDescription ->
-                                    val copy = reflexionItem.copy(detailedDescription = detailedDescription)
-                                    itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
+                                onValueChange = { detailedDescription ->
+                                    val copy =
+                                        reflexionItem.copy(detailedDescription = detailedDescription)
+                                    itemViewModel.onTriggerEvent(
+                                        BuildEvent.UpdateDisplayedReflexionItem(
+                                            copy
+                                        )
+                                    )
                                 }
                             )
                         }
@@ -387,7 +405,7 @@ fun BuildItemScreen(
                             Modifier.weight(1f)
                         ) {
                             Button(onClick = {
-                                navHostController.navigate(Screen.ChildV2Screen.route + "/" + reflexionItem.autogenPK)
+                                navHostController.navigate(Screen.ListScreen.route + "/" + reflexionItem.autogenPK)
                             }
                             ) {
                                 Text(
@@ -411,7 +429,11 @@ fun BuildItemScreen(
                                             if (itemViewModel.hasNoChildren(reflexionItem.autogenPK)) {
                                                 itemViewModel.onTriggerEvent(BuildEvent.Delete)
                                             } else {
-                                                Toast.makeText(context, resource.getString(R.string.is_parent), Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(
+                                                    context,
+                                                    resource.getString(R.string.is_parent),
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
                                             }
                                         }
                                     }
@@ -458,11 +480,19 @@ fun BuildItemScreen(
                         ) {
                             Button(onClick = {
                                 val parent = reflexionItem.parent
-                                if(parent != null) {
+                                if (parent != null) {
                                     itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
-                                    itemViewModel.onTriggerEvent(BuildEvent.GetSelectedReflexionItem(parent))
+                                    itemViewModel.onTriggerEvent(
+                                        BuildEvent.GetSelectedReflexionItem(
+                                            parent
+                                        )
+                                    )
                                 } else {
-                                    Toast.makeText(context, resource.getString(R.string.no_parent_found), Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        resource.getString(R.string.no_parent_found),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                             }
                             ) {

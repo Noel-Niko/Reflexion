@@ -64,7 +64,7 @@ fun ConfirmSaveAlertDialog(
                             onClick = {
                                 Temporary.url = EMPTY_STRING
                                 openDialog.value = false
-                                navController.navigate(Screen.BuildItemScreen.route)
+                                navController.navigate(Screen.BuildItemScreen.route + "/" + -2L)
                             }) {
                             Text(stringResource(R.string.no))
                         }
