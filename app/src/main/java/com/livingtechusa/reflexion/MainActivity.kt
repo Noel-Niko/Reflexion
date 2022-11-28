@@ -20,6 +20,7 @@ import androidx.navigation.navArgument
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.livingtechusa.reflexion.navigation.Screen
+import com.livingtechusa.reflexion.navigation.calculateWindowSizeClass
 import com.livingtechusa.reflexion.ui.build.BuildItemScreen
 import com.livingtechusa.reflexion.ui.children.ListDisplay
 import com.livingtechusa.reflexion.ui.components.ConfirmSaveAlertDialog

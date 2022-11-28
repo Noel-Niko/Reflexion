@@ -28,14 +28,10 @@ fun ListDisplay(
     val context = LocalContext.current
     val resource = ResourceProviderSingleton
 
-    if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-        // TODO
+    if (reflexionItemList.isEmpty()) {
+        Toast.makeText(context, resource.getString(R.string.no_items_found), Toast.LENGTH_SHORT)
+            .show()
     } else {
-        if (reflexionItemList.isEmpty()) {
-            Toast.makeText(context, resource.getString(R.string.no_items_found), Toast.LENGTH_SHORT)
-                .show()
-        } else {
-            ReflexionItemListUI(reflexionItemList, navController, viewModel = itemViewModel)
-        }
+        ReflexionItemListUI(reflexionItemList, navController, viewModel = itemViewModel)
     }
 }

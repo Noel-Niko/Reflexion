@@ -75,163 +75,107 @@ fun BuildItemScreen(
     val URL = "/Url"
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
-    if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-        // BuildItemScreenLandscape(navHostController)
-    } else {
 
-        val itemViewModel: ItemViewModel = viewModel
-        val scope = rememberCoroutineScope()
-        val error by viewModel.errorFlow.collectAsState(null)
-        val savedReflexionItem by itemViewModel.reflexionItem.collectAsState()
-        val resource = ResourceProviderSingleton
-        val reflexionItem =
-            ReflexionItem(
-                autogenPK = savedReflexionItem.autogenPK,
-                name = savedReflexionItem.name,
-                description = savedReflexionItem.description,
-                detailedDescription = savedReflexionItem.detailedDescription,
-                image = savedReflexionItem.image,
-                videoUri = savedReflexionItem.videoUri,
-                videoUrl = savedReflexionItem.videoUrl,
-                parent = savedReflexionItem.parent,
-                hasChildren = savedReflexionItem.hasChildren
-            )
 
-        var targetVideoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
-        val selectVideo = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.GetContent(),
-            onResult = { uri ->
-                val copy = reflexionItem.copy(videoUri = uri.toString())
-                itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
-            }
+    val itemViewModel: ItemViewModel = viewModel
+    val scope = rememberCoroutineScope()
+    val error by viewModel.errorFlow.collectAsState(null)
+    val savedReflexionItem by itemViewModel.reflexionItem.collectAsState()
+    val resource = ResourceProviderSingleton
+    val reflexionItem =
+        ReflexionItem(
+            autogenPK = savedReflexionItem.autogenPK,
+            name = savedReflexionItem.name,
+            description = savedReflexionItem.description,
+            detailedDescription = savedReflexionItem.detailedDescription,
+            image = savedReflexionItem.image,
+            videoUri = savedReflexionItem.videoUri,
+            videoUrl = savedReflexionItem.videoUrl,
+            parent = savedReflexionItem.parent,
+            hasChildren = savedReflexionItem.hasChildren
         )
 
-        val takeVideo = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.CaptureVideo()
-        ) { _ ->
-            targetVideoUri?.let { uri ->
-                targetVideoUri = null
-                val copy = reflexionItem.copy(videoUri = uri.toString())
-                itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
+    var targetVideoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+    val selectVideo = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
+            val copy = reflexionItem.copy(videoUri = uri.toString())
+            itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
+        }
+    )
+
+    val takeVideo = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CaptureVideo()
+    ) { _ ->
+        targetVideoUri?.let { uri ->
+            targetVideoUri = null
+            val copy = reflexionItem.copy(videoUri = uri.toString())
+            itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
+        }
+    }
+
+    val scaffoldState = rememberScaffoldState()
+
+    LaunchedEffect(error) {
+        error?.let { scaffoldState.snackbarHostState.showSnackbar(it) }
+    }
+
+    Scaffold(
+        topBar = { MainTopBar() },
+        floatingActionButton = {
+            /* SAVE */
+            FloatingActionButton(onClick = {
+                Toast.makeText(
+                    context,
+                    resource.getString(R.string.changes_saved),
+                    Toast.LENGTH_SHORT
+                ).show()
+                if (savedReflexionItem.autogenPK != 0L) {
+                    reflexionItem.autogenPK = savedReflexionItem.autogenPK
+                    reflexionItem.name = reflexionItem.name.trim()
+                    itemViewModel.onTriggerEvent(BuildEvent.UpdateReflexionItem(reflexionItem))
+                    Temporary.tempReflexionItem = ReflexionItem()
+                } else {
+                    itemViewModel.onTriggerEvent(BuildEvent.SaveNew(reflexionItem))
+                    Temporary.tempReflexionItem = ReflexionItem()
+                }
+            }) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_baseline_save_alt_24),
+                    contentDescription = null
+                )
+            }
+        },
+        drawerContent = {
+            val icons = NavBarItems.BuildBarItems
+            if (context.findActivity() != null) {
+                when (calculateWindowSizeClass(context.findActivity()!!)) {
+                    WindowWidthSizeClass.COMPACT -> {
+                        CompactScreen(navHostController, icons)
+                    }
+
+                    WindowWidthSizeClass.MEDIUM -> {
+                        MediumScreen(navHostController, icons)
+                    }
+
+                    WindowWidthSizeClass.EXPANDED -> {
+                        ExpandedScreen(navHostController, icons)
+                    }
+
+                    else -> CompactScreen(navHostController, icons)
+                }
             }
         }
-
-        val scaffoldState = rememberScaffoldState()
-
-        LaunchedEffect(error) {
-            error?.let { scaffoldState.snackbarHostState.showSnackbar(it) }
-        }
-
-        Scaffold(
-            topBar = { MainTopBar() },
-            floatingActionButton = {
-                /* SAVE */
-                FloatingActionButton(onClick = {
-                    Toast.makeText(
-                        context,
-                        resource.getString(R.string.changes_saved),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    if (savedReflexionItem.autogenPK != 0L) {
-                        reflexionItem.autogenPK = savedReflexionItem.autogenPK
-                        reflexionItem.name = reflexionItem.name.trim()
-                        itemViewModel.onTriggerEvent(BuildEvent.UpdateReflexionItem(reflexionItem))
-                        Temporary.tempReflexionItem = ReflexionItem()
-                    } else {
-                        itemViewModel.onTriggerEvent(BuildEvent.SaveNew(reflexionItem))
-                        Temporary.tempReflexionItem = ReflexionItem()
-                    }
-                }) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_baseline_save_alt_24),
-                        contentDescription = null
-                    )
-                }
-            },
-            drawerContent = {
-                val icons = NavBarItems.BuildBarItems
-                if(context.findActivity() != null) {
-                    when(calculateWindowSizeClass(context.findActivity()!!)) {
-                        WindowWidthSizeClass.COMPACT -> { CompactScreen(navHostController, icons) }
-                        WindowWidthSizeClass.MEDIUM -> { MediumScreen(navHostController, icons) }
-                        WindowWidthSizeClass.EXPANDED -> { ExpandedScreen(navHostController, icons) }
-                        else -> CompactScreen(navHostController, icons)
-                    }
-                }
-            }
-        ) { paddingValues ->
-            paddingValues // padding values?
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                item {
-                    Spacer(Modifier.height(16.dp))
-                    /* TOPIC */
-                    if (savedReflexionItem.parent == null) {
-                        Row(
-                            modifier = Modifier.padding(12.dp)
-                        ) {
-                            Column(
-                                Modifier
-                                    .weight(1f)
-                                    .align(Alignment.CenterVertically)
-                            ) {
-                                Text(text = stringResource(R.string.topic))
-                            }
-                            Column(
-                                Modifier
-                                    .weight(3f)
-                                    .align(Alignment.CenterVertically)
-                            ) {
-                                TextField(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    value = reflexionItem.name,
-                                    onValueChange = { name ->
-                                        val copy = reflexionItem.copy(name = name)
-                                        itemViewModel.onTriggerEvent(
-                                            BuildEvent.UpdateDisplayedReflexionItem(
-                                                copy
-                                            )
-                                        )
-                                    }
-                                )
-                            }
-                        }
-                    } else {
-                        /* TITLE */
-                        Row(
-                            modifier = Modifier.padding(12.dp)
-                        ) {
-                            Column(
-                                Modifier
-                                    .weight(1f)
-                                    .align(Alignment.CenterVertically)
-                            ) {
-                                Text(text = stringResource(R.string.title))
-                            }
-                            Column(
-                                Modifier
-                                    .weight(3f)
-                                    .align(Alignment.CenterVertically)
-                            ) {
-                                TextField(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    value = reflexionItem.name,
-                                    onValueChange = { name ->
-                                        val copy = reflexionItem.copy(name = name)
-                                        itemViewModel.onTriggerEvent(
-                                            BuildEvent.UpdateDisplayedReflexionItem(
-                                                copy
-                                            )
-                                        )
-                                    }
-                                )
-                            }
-                        }
-                    }
-                    Spacer(Modifier.height(16.dp))
-                    /* DESCRIPTION */
+    ) { paddingValues ->
+        paddingValues // padding values?
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            item {
+                Spacer(Modifier.height(16.dp))
+                /* TOPIC */
+                if (savedReflexionItem.parent == null) {
                     Row(
                         modifier = Modifier.padding(12.dp)
                     ) {
@@ -240,7 +184,7 @@ fun BuildItemScreen(
                                 .weight(1f)
                                 .align(Alignment.CenterVertically)
                         ) {
-                            Text(text = stringResource(R.string.description))
+                            Text(text = stringResource(R.string.topic))
                         }
                         Column(
                             Modifier
@@ -249,9 +193,9 @@ fun BuildItemScreen(
                         ) {
                             TextField(
                                 modifier = Modifier.fillMaxWidth(),
-                                value = reflexionItem.description ?: EMPTY_STRING,
-                                onValueChange = { description ->
-                                    val copy = reflexionItem.copy(description = description)
+                                value = reflexionItem.name,
+                                onValueChange = { name ->
+                                    val copy = reflexionItem.copy(name = name)
                                     itemViewModel.onTriggerEvent(
                                         BuildEvent.UpdateDisplayedReflexionItem(
                                             copy
@@ -261,8 +205,8 @@ fun BuildItemScreen(
                             )
                         }
                     }
-                    Spacer(Modifier.height(16.dp))
-                    /* DETAILS */
+                } else {
+                    /* TITLE */
                     Row(
                         modifier = Modifier.padding(12.dp)
                     ) {
@@ -271,7 +215,7 @@ fun BuildItemScreen(
                                 .weight(1f)
                                 .align(Alignment.CenterVertically)
                         ) {
-                            Text(text = stringResource(R.string.detailedDescription))
+                            Text(text = stringResource(R.string.title))
                         }
                         Column(
                             Modifier
@@ -280,10 +224,9 @@ fun BuildItemScreen(
                         ) {
                             TextField(
                                 modifier = Modifier.fillMaxWidth(),
-                                value = reflexionItem.detailedDescription ?: EMPTY_STRING,
-                                onValueChange = { detailedDescription ->
-                                    val copy =
-                                        reflexionItem.copy(detailedDescription = detailedDescription)
+                                value = reflexionItem.name,
+                                onValueChange = { name ->
+                                    val copy = reflexionItem.copy(name = name)
                                     itemViewModel.onTriggerEvent(
                                         BuildEvent.UpdateDisplayedReflexionItem(
                                             copy
@@ -293,230 +236,293 @@ fun BuildItemScreen(
                             )
                         }
                     }
-                    Spacer(Modifier.height(16.dp))
-                    /* SAVED VIDEO */
-                    Row(
-                        modifier = Modifier.padding(8.dp)
+                }
+                Spacer(Modifier.height(16.dp))
+                /* DESCRIPTION */
+                Row(
+                    modifier = Modifier.padding(12.dp)
+                ) {
+                    Column(
+                        Modifier
+                            .weight(1f)
+                            .align(Alignment.CenterVertically)
                     ) {
-                        Column(
-                            Modifier
-                                .weight(1f)
-                                .align(Alignment.CenterVertically)
-                        ) {
-                            Text(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        if (reflexionItem.videoUri.isNullOrEmpty()) {
-                                            Toast
-                                                .makeText(
-                                                    context,
-                                                    resource.getString(R.string.is_saved),
-                                                    Toast.LENGTH_SHORT
-                                                )
-                                                .show()
+                        Text(text = stringResource(R.string.description))
+                    }
+                    Column(
+                        Modifier
+                            .weight(3f)
+                            .align(Alignment.CenterVertically)
+                    ) {
+                        TextField(
+                            modifier = Modifier.fillMaxWidth(),
+                            value = reflexionItem.description ?: EMPTY_STRING,
+                            onValueChange = { description ->
+                                val copy = reflexionItem.copy(description = description)
+                                itemViewModel.onTriggerEvent(
+                                    BuildEvent.UpdateDisplayedReflexionItem(
+                                        copy
+                                    )
+                                )
+                            }
+                        )
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
+                /* DETAILS */
+                Row(
+                    modifier = Modifier.padding(12.dp)
+                ) {
+                    Column(
+                        Modifier
+                            .weight(1f)
+                            .align(Alignment.CenterVertically)
+                    ) {
+                        Text(text = stringResource(R.string.detailedDescription))
+                    }
+                    Column(
+                        Modifier
+                            .weight(3f)
+                            .align(Alignment.CenterVertically)
+                    ) {
+                        TextField(
+                            modifier = Modifier.fillMaxWidth(),
+                            value = reflexionItem.detailedDescription ?: EMPTY_STRING,
+                            onValueChange = { detailedDescription ->
+                                val copy =
+                                    reflexionItem.copy(detailedDescription = detailedDescription)
+                                itemViewModel.onTriggerEvent(
+                                    BuildEvent.UpdateDisplayedReflexionItem(
+                                        copy
+                                    )
+                                )
+                            }
+                        )
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
+                /* SAVED VIDEO */
+                Row(
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Column(
+                        Modifier
+                            .weight(1f)
+                            .align(Alignment.CenterVertically)
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    if (reflexionItem.videoUri.isNullOrEmpty()) {
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                resource.getString(R.string.is_saved),
+                                                Toast.LENGTH_SHORT
+                                            )
+                                            .show()
+                                    } else {
+                                        val route: String = Screen.VideoView.route + URI
+                                        navHostController.navigate(route)
+                                    }
+                                },
+                            text = AnnotatedString(stringResource(R.string.saved_video)),
+                            color = Color.Blue
+
+                        )
+                    }
+                    Column(
+                        Modifier
+                            .weight(1f)
+                            .align(Alignment.CenterVertically)
+                    ) {
+                        IconButton(
+                            onClick = {
+                                selectVideo.launch(VIDEO)
+                            }) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_video_library_24),
+                                contentDescription = null
+                            )
+                        }
+
+                        IconButton(
+                            onClick = {
+                                scope.launch {
+                                    viewModel.createVideoUri()?.let { uri ->
+                                        targetVideoUri = uri
+                                        takeVideo.launch(uri)
+                                    }
+                                }
+                            }) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_videocam_24),
+                                contentDescription = null
+                            )
+                        }
+                    }
+                    /* VIDEO URL */
+                    Column(
+                        Modifier
+                            .weight(1f)
+                            .align(Alignment.CenterVertically)
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable(
+                                    onClick = {
+                                        if (reflexionItem.videoUrl == EMPTY_STRING) {
+                                            navHostController.navigate(Screen.PasteAndSaveScreen.route)
                                         } else {
-                                            val route: String = Screen.VideoView.route + URI
+                                            val route: String = Screen.VideoView.route + URL
                                             navHostController.navigate(route)
                                         }
                                     },
-                                text = AnnotatedString(stringResource(R.string.saved_video)),
-                                color = Color.Blue
-
+                                ),
+                            text = AnnotatedString(stringResource(R.string.video_link)),
+                            color = Color.Blue
+                        )
+                    }
+                    Column(
+                        Modifier
+                            .weight(1f)
+                            .align(Alignment.CenterVertically)
+                    ) {
+                        IconButton(
+                            onClick = {
+                                val query = SEARCH_YOUTUBE + reflexionItem.name
+                                val intent = Intent(
+                                    Intent.ACTION_VIEW, Uri.parse(query)
+                                )
+                                startActivity(context, intent, null)
+                            }) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_youtube_searched_for_24),
+                                contentDescription = null
                             )
                         }
-                        Column(
-                            Modifier
-                                .weight(1f)
-                                .align(Alignment.CenterVertically)
-                        ) {
-                            IconButton(
-                                onClick = {
-                                    selectVideo.launch(VIDEO)
-                                }) {
-                                Icon(
-                                    painter = painterResource(R.drawable.baseline_video_library_24),
-                                    contentDescription = null
-                                )
-                            }
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
 
-                            IconButton(
-                                onClick = {
-                                    scope.launch {
-                                        viewModel.createVideoUri()?.let { uri ->
-                                            targetVideoUri = uri
-                                            takeVideo.launch(uri)
-                                        }
-                                    }
-                                }) {
-                                Icon(
-                                    painter = painterResource(R.drawable.baseline_videocam_24),
-                                    contentDescription = null
-                                )
+                Row(
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    /* SIBLINGS */
+                    Column(
+                        Modifier.weight(1f)
+                    ) {
+                        Button(
+                            onClick = {
+                                Toast.makeText(context, "Button Clicked", Toast.LENGTH_SHORT)
+                                    .show()
+                                itemViewModel.onTriggerEvent(BuildEvent.ShowSiblings)
                             }
-                        }
-                        /* VIDEO URL */
-                        Column(
-                            Modifier
-                                .weight(1f)
-                                .align(Alignment.CenterVertically)
                         ) {
                             Text(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable(
-                                        onClick = {
-                                            if (reflexionItem.videoUrl == EMPTY_STRING) {
-                                                navHostController.navigate(Screen.PasteAndSaveScreen.route)
-                                            } else {
-                                                val route: String = Screen.VideoView.route + URL
-                                                navHostController.navigate(route)
-                                            }
-                                        },
-                                    ),
-                                text = AnnotatedString(stringResource(R.string.video_link)),
-                                color = Color.Blue
+                                stringResource(R.string.siblings)
                             )
                         }
-                        Column(
-                            Modifier
-                                .weight(1f)
-                                .align(Alignment.CenterVertically)
+                    }
+                    /* CHILDREN */
+                    Column(
+                        Modifier.weight(1f)
+                    ) {
+                        Button(onClick = {
+                            navHostController.navigate(Screen.ListScreen.route + "/" + reflexionItem.autogenPK)
+                        }
                         ) {
-                            IconButton(
-                                onClick = {
-                                    val query = SEARCH_YOUTUBE + reflexionItem.name
-                                    val intent = Intent(
-                                        Intent.ACTION_VIEW, Uri.parse(query)
-                                    )
-                                    startActivity(context, intent, null)
-                                }) {
-                                Icon(
-                                    painter = painterResource(R.drawable.baseline_youtube_searched_for_24),
-                                    contentDescription = null
-                                )
-                            }
+                            Text(
+                                stringResource(R.string.children)
+                            )
                         }
                     }
-                    Spacer(Modifier.height(16.dp))
-
-                    Row(
-                        modifier = Modifier.padding(8.dp)
-                    ) {
-                        /* SIBLINGS */
-                        Column(
-                            Modifier.weight(1f)
-                        ) {
-                            Button(
-                                onClick = {
-                                    Toast.makeText(context, "Button Clicked", Toast.LENGTH_SHORT)
-                                        .show()
-                                    itemViewModel.onTriggerEvent(BuildEvent.ShowSiblings)
-                                }
-                            ) {
-                                Text(
-                                    stringResource(R.string.siblings)
-                                )
-                            }
-                        }
-                        /* CHILDREN */
+                }
+                /* DELETE ITEM */
+                Row(
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    if (savedReflexionItem.hasChildren == false) {
                         Column(
                             Modifier.weight(1f)
                         ) {
                             Button(onClick = {
-                                navHostController.navigate(Screen.ListScreen.route + "/" + reflexionItem.autogenPK)
-                            }
-                            ) {
-                                Text(
-                                    stringResource(R.string.children)
-                                )
-                            }
-                        }
-                    }
-                    /* DELETE ITEM */
-                    Row(
-                        modifier = Modifier.padding(8.dp)
-                    ) {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        if (savedReflexionItem.hasChildren == false) {
-                            Column(
-                                Modifier.weight(1f)
-                            ) {
-                                Button(onClick = {
-                                    scope.launch {
-                                        withContext(Dispatchers.Main) {
-                                            if (itemViewModel.hasNoChildren(reflexionItem.autogenPK)) {
-                                                itemViewModel.onTriggerEvent(BuildEvent.Delete)
-                                            } else {
-                                                Toast.makeText(
-                                                    context,
-                                                    resource.getString(R.string.is_parent),
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-                                            }
+                                scope.launch {
+                                    withContext(Dispatchers.Main) {
+                                        if (itemViewModel.hasNoChildren(reflexionItem.autogenPK)) {
+                                            itemViewModel.onTriggerEvent(BuildEvent.Delete)
+                                        } else {
+                                            Toast.makeText(
+                                                context,
+                                                resource.getString(R.string.is_parent),
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                         }
                                     }
                                 }
-                                ) {
-                                    Text(stringResource(R.string.delete))
-                                }
-                            }
-                        }
-                        Column(
-                            Modifier.weight(1f)
-                        ) {
-                            Button(onClick = {
-                                val parent = reflexionItem.autogenPK
-                                itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
-                                itemViewModel.onTriggerEvent(BuildEvent.SetParent(parent))
                             }
                             ) {
-                                Text(stringResource(R.string.add_child))
+                                Text(stringResource(R.string.delete))
                             }
                         }
                     }
-                    /* NEW ITEM */
-                    Row(
-                        modifier = Modifier.padding(8.dp)
+                    Column(
+                        Modifier.weight(1f)
                     ) {
-                        Column(
-                            Modifier.weight(1f)
+                        Button(onClick = {
+                            val parent = reflexionItem.autogenPK
+                            itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
+                            itemViewModel.onTriggerEvent(BuildEvent.SetParent(parent))
+                        }
                         ) {
-                            Button(onClick = {
-                                itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
-                            }
-                            ) {
-                                Text(stringResource(R.string.new_item))
-                            }
+                            Text(stringResource(R.string.add_child))
                         }
                     }
-                    /* PARENT */
-                    Row(
-                        modifier = Modifier.padding(8.dp)
+                }
+                /* NEW ITEM */
+                Row(
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Column(
+                        Modifier.weight(1f)
                     ) {
-                        Column(
-                            Modifier.weight(1f)
+                        Button(onClick = {
+                            itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
+                        }
                         ) {
-                            Button(onClick = {
-                                val parent = reflexionItem.parent
-                                if (parent != null) {
-                                    itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
-                                    itemViewModel.onTriggerEvent(
-                                        BuildEvent.GetSelectedReflexionItem(
-                                            parent
-                                        )
+                            Text(stringResource(R.string.new_item))
+                        }
+                    }
+                }
+                /* PARENT */
+                Row(
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Column(
+                        Modifier.weight(1f)
+                    ) {
+                        Button(onClick = {
+                            val parent = reflexionItem.parent
+                            if (parent != null) {
+                                itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
+                                itemViewModel.onTriggerEvent(
+                                    BuildEvent.GetSelectedReflexionItem(
+                                        parent
                                     )
-                                } else {
-                                    Toast.makeText(
-                                        context,
-                                        resource.getString(R.string.no_parent_found),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
+                                )
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    resource.getString(R.string.no_parent_found),
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
-                            ) {
-                                Text(stringResource(R.string.go_to_parent))
-                            }
+                        }
+                        ) {
+                            Text(stringResource(R.string.go_to_parent))
                         }
                     }
                 }
