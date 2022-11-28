@@ -43,9 +43,15 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.window.core.layout.WindowWidthSizeClass
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
+import com.livingtechusa.reflexion.navigation.CompactScreen
+import com.livingtechusa.reflexion.navigation.ExpandedScreen
+import com.livingtechusa.reflexion.navigation.MediumScreen
+import com.livingtechusa.reflexion.navigation.NavBarItems
 import com.livingtechusa.reflexion.navigation.Screen
+import com.livingtechusa.reflexion.navigation.calculateWindowSizeClass
 import com.livingtechusa.reflexion.ui.components.MainTopBar
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
@@ -53,6 +59,7 @@ import com.livingtechusa.reflexion.util.Constants.SEARCH_YOUTUBE
 import com.livingtechusa.reflexion.util.Constants.VIDEO
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import com.livingtechusa.reflexion.util.Temporary
+import com.livingtechusa.reflexion.util.extensions.findActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -71,6 +78,7 @@ fun BuildItemScreen(
     if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
         // BuildItemScreenLandscape(navHostController)
     } else {
+
         val itemViewModel: ItemViewModel = viewModel
         val scope = rememberCoroutineScope()
         val error by viewModel.errorFlow.collectAsState(null)
@@ -138,6 +146,17 @@ fun BuildItemScreen(
                         painter = painterResource(R.drawable.ic_baseline_save_alt_24),
                         contentDescription = null
                     )
+                }
+            },
+            drawerContent = {
+                val icons = NavBarItems.BuildBarItems
+                if(context.findActivity() != null) {
+                    when(calculateWindowSizeClass(context.findActivity()!!)) {
+                        WindowWidthSizeClass.COMPACT -> { CompactScreen(navHostController, icons) }
+                        WindowWidthSizeClass.MEDIUM -> { MediumScreen(navHostController, icons) }
+                        WindowWidthSizeClass.EXPANDED -> { ExpandedScreen(navHostController, icons) }
+                        else -> CompactScreen(navHostController, icons)
+                    }
                 }
             }
         ) { paddingValues ->
