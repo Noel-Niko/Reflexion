@@ -157,9 +157,8 @@ class ItemViewModel @Inject constructor(
             try {
                 when (event) {
                     is ListEvent.GetList -> {
-
                         if (event.pk == -1L) {
-                            _list.value = localServiceImpl.getAllItems() as List<ReflexionItem>
+                            _list.value = localServiceImpl.getAllTopics() as List<ReflexionItem>
                         } else {
                             _list.value =
                                 localServiceImpl.selectChildren(event.pk) as List<ReflexionItem>

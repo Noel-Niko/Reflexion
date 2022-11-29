@@ -1,11 +1,11 @@
 package com.livingtechusa.reflexion.data.localService
 
-import com.livingtechusa.reflexion.data.dao.ReflexionItemDao
 import com.livingtechusa.reflexion.data.dao.KeyWordsDao
 import com.livingtechusa.reflexion.data.dao.LinkedListDao
-import com.livingtechusa.reflexion.data.entities.ReflexionItem
+import com.livingtechusa.reflexion.data.dao.ReflexionItemDao
 import com.livingtechusa.reflexion.data.entities.KeyWords
 import com.livingtechusa.reflexion.data.entities.LinkedList
+import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import javax.inject.Inject
 
 class LocalServiceImpl @Inject constructor(
@@ -18,11 +18,15 @@ class LocalServiceImpl @Inject constructor(
     }
 
     override suspend fun updateReflexionItem(item: ReflexionItem) {
-        reflexionItemDao.updateReflexionItem(item.autogenPK, item.name, item.description, item.detailedDescription, item.image, item.videoUri, item.videoUrl, item.parent, item.hasChildren)
+        reflexionItemDao.updateReflexionItem(item.autogenPK, item.name, item.description, item.detailedDescription, item.image, item.videoUri, item.videoUrl, item.parent)
     }
 
     override suspend fun getAllItems(): List<ReflexionItem?> {
         return reflexionItemDao.getAllReflexionItems()
+    }
+
+    override suspend fun getAllTopics(): List<ReflexionItem?> {
+        return reflexionItemDao.getReflexionItemTopics()
     }
 
     override suspend fun selectChildren(pk: Long): List<ReflexionItem?> {

@@ -28,8 +28,7 @@ data class ReflexionItem(
     var image: ByteArray? = null,
     var videoUri: String? = "",
     var videoUrl: String? = "",
-    var parent: Long? = null,
-    var hasChildren: Boolean? = true
+    var parent: Long? = null
 ): Parcelable {
     companion object {
         val AUTOGEN_PK = "autogenPK"
@@ -41,7 +40,6 @@ data class ReflexionItem(
         val VIDEO_URL = "videoUrl"
         val PARENT = "parent"
         val SIBLINGS = "siblings"
-        val HAS_CHILDREN = "hasChildren"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -61,7 +59,6 @@ data class ReflexionItem(
         if (videoUri != other.videoUri) return false
         if (videoUrl != other.videoUrl) return false
         if (parent != other.parent) return false
-        if (hasChildren != other.hasChildren) return false
 
         return true
     }
@@ -75,7 +72,7 @@ data class ReflexionItem(
         result = 31 * result + (videoUri?.hashCode() ?: 0)
         result = 31 * result + (videoUrl?.hashCode() ?: 0)
         result = 31 * result + (parent?.hashCode() ?: 0)
-        result = 31 * result + (hasChildren?.hashCode() ?: 0)
+
         return result
     }
 }

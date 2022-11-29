@@ -32,4 +32,5 @@ interface ILocalService {
     suspend fun renameLinkedList(title: String, itemPK: Long, newTitle: String)
     suspend fun selectReflexionItemByName(name: String): ReflexionItem
     suspend fun selectChildren(pk: Long): List<ReflexionItem?>
+    suspend fun getAllTopics(): List<ReflexionItem?>
 }

@@ -1,12 +1,16 @@
 package com.livingtechusa.reflexion.ui.children
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.Scaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -72,33 +76,36 @@ fun ListDisplay(
 }
 
 @Composable
-fun ListContent(itemViewModel: ItemViewModel = hiltViewModel(),
-                navController: NavHostController,
-                pk: Long) {
+fun ListContent(
+    itemViewModel: ItemViewModel = hiltViewModel(),
+    navController: NavHostController,
+    pk: Long,
+) {
     itemViewModel.onTriggerEvent(ListEvent.GetList(pk))
     val reflexionItemList by itemViewModel.list.collectAsState()
-    val context = LocalContext.current
-    val resource = ResourceProviderSingleton
-    if (reflexionItemList.isEmpty()) {
-        Toast.makeText(context, resource.getString(R.string.no_items_found), Toast.LENGTH_SHORT)
-            .show()
-    } else {
-        ReflexionItemListUI(reflexionItems = reflexionItemList, navController = navController, viewModel = itemViewModel)
-    }
+    ReflexionItemListUI(
+        reflexionItems = reflexionItemList,
+        navController = navController,
+        viewModel = itemViewModel
+    )
 }
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CompactScreen(navController: NavHostController, icons: List<BarItem>, viewModel: ItemViewModel, pk: Long) {
+fun CompactScreen(
+    navController: NavHostController,
+    icons: List<BarItem>,
+    viewModel: ItemViewModel,
+    pk: Long
+) {
     androidx.compose.material3.Scaffold(
         containerColor = Color.LightGray,
         bottomBar = {
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
             BottomNavigation(
-                backgroundColor =  MaterialTheme.colorScheme.onSecondaryContainer,
+                backgroundColor = MaterialTheme.colorScheme.onSecondaryContainer,
             ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(
@@ -125,21 +132,32 @@ fun CompactScreen(navController: NavHostController, icons: List<BarItem>, viewMo
                 }
             }
         }
-    ) {
-        it
-        ListContent(navController = navController, itemViewModel = viewModel, pk = pk)
+    ) { paddingValue ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValue)
+        ) {
+            ListContent(navController = navController, itemViewModel = viewModel, pk = pk)
+        }
+
     }
 }
 
 @Composable
-fun MediumScreen(navController: NavHostController, icons: List<BarItem>, viewModel: ItemViewModel, pk: Long) {
+fun MediumScreen(
+    navController: NavHostController,
+    icons: List<BarItem>,
+    viewModel: ItemViewModel,
+    pk: Long
+) {
     val icons = NavBarItems.HomeBarItems
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
     Row(modifier = Modifier.fillMaxSize()) {
         NavigationRail(
             containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
-              ) {
+        ) {
             icons.forEach { navItem ->
                 Spacer(modifier = Modifier.height(32.dp))
                 NavigationRailItem(
@@ -161,13 +179,27 @@ fun MediumScreen(navController: NavHostController, icons: List<BarItem>, viewMod
                     })
             }
         }
-        ListContent(navController = navController, itemViewModel = viewModel, pk = pk)
+        Scaffold(
+            modifier = Modifier
+                .fillMaxSize()
+        ) { paddingValues ->
+            ListContent(
+                navController = navController,
+                itemViewModel = viewModel,
+                pk = pk
+            )
+        }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExpandedScreen(navController: NavHostController, icons: List<BarItem>, viewModel: ItemViewModel, pk: Long) {
+fun ExpandedScreen(
+    navController: NavHostController,
+    icons: List<BarItem>,
+    viewModel: ItemViewModel,
+    pk: Long
+) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
     PermanentNavigationDrawer(
@@ -195,7 +227,16 @@ fun ExpandedScreen(navController: NavHostController, icons: List<BarItem>, viewM
             }
         },
         content = {
-            ListContent(navController = navController, itemViewModel = viewModel, pk = pk)
+            Scaffold(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) { paddingValues -> //TODO
+                ListContent(
+                    navController = navController,
+                    itemViewModel = viewModel,
+                    pk = pk
+                )
+            }
         }
     )
 }

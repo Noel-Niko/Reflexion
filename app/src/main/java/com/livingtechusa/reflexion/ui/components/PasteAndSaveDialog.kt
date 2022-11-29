@@ -72,11 +72,7 @@ fun PasteAndSaveDialog(
                         Button(
                             onClick = {
                                 openDialog.value = false
-                                startActivity(
-                                    context,
-                                    Intent(context, MainActivity::class.java),
-                                    null
-                                )
+                                navController.navigate(BuildRoute)
                             }) {
                             Text(stringResource(R.string.close))
                         }
