@@ -1,7 +1,6 @@
 package com.livingtechusa.reflexion.ui.build
 
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -15,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Button
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
@@ -23,6 +24,11 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -42,17 +48,18 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
-import com.livingtechusa.reflexion.navigation.CompactScreen
-import com.livingtechusa.reflexion.navigation.ExpandedScreen
-import com.livingtechusa.reflexion.navigation.MediumScreen
+import com.livingtechusa.reflexion.navigation.BarItem
 import com.livingtechusa.reflexion.navigation.NavBarItems
+import com.livingtechusa.reflexion.navigation.ReflexionNavigationType
 import com.livingtechusa.reflexion.navigation.Screen
-import com.livingtechusa.reflexion.navigation.calculateWindowSizeClass
 import com.livingtechusa.reflexion.ui.components.MainTopBar
+import com.livingtechusa.reflexion.ui.home.homeContent
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.SEARCH_YOUTUBE
@@ -69,11 +76,38 @@ const val BuildRoute = "build"
 @Composable
 fun BuildItemScreen(
     navHostController: NavHostController,
+    windowSize: WindowWidthSizeClass,
     viewModel: ItemViewModel = hiltViewModel(),
 ) {
+    val context = LocalContext.current
+    val icons = NavBarItems.BuildBarItems
+    if (context.findActivity() != null) {
+        when (windowSize) {
+            WindowWidthSizeClass.COMPACT -> {
+                CompactScreen(navHostController, icons, viewModel)
+                viewModel.navigationType = ReflexionNavigationType.BOTTOM_NAVIGATION
+            }
+
+            WindowWidthSizeClass.MEDIUM -> {
+                MediumScreen(navHostController, icons, viewModel)
+                viewModel.navigationType = ReflexionNavigationType.NAVIGATION_RAIL
+            }
+
+            WindowWidthSizeClass.EXPANDED -> {
+                ExpandedScreen(navHostController, icons, viewModel)
+                viewModel.navigationType = ReflexionNavigationType.PERMANENT_NAVIGATION_DRAWER
+            }
+
+            else -> CompactScreen(navHostController, icons, viewModel)
+        }
+    }
+}
+
+@Composable
+fun BuildContent(navHostController: NavHostController,
+                 viewModel: ItemViewModel) {
     val URI = "/Uri"
     val URL = "/Url"
-    val configuration = LocalConfiguration.current
     val context = LocalContext.current
 
 
@@ -147,24 +181,24 @@ fun BuildItemScreen(
             }
         },
         drawerContent = {
-            val icons = NavBarItems.BuildBarItems
-            if (context.findActivity() != null) {
-                when (calculateWindowSizeClass(context.findActivity()!!)) {
-                    WindowWidthSizeClass.COMPACT -> {
-                        CompactScreen(navHostController, icons)
-                    }
-
-                    WindowWidthSizeClass.MEDIUM -> {
-                        MediumScreen(navHostController, icons)
-                    }
-
-                    WindowWidthSizeClass.EXPANDED -> {
-                        ExpandedScreen(navHostController, icons)
-                    }
-
-                    else -> CompactScreen(navHostController, icons)
-                }
-            }
+//            val icons = NavBarItems.BuildBarItems
+//            if (context.findActivity() != null) {
+//                when (calculateWindowSizeClass(context.findActivity()!!)) {
+//                    WindowWidthSizeClass.COMPACT -> {
+//                        CompactScreen(navHostController, icons)
+//                    }
+//
+//                    WindowWidthSizeClass.MEDIUM -> {
+//                        MediumScreen(navHostController, icons)
+//                    }
+//
+//                    WindowWidthSizeClass.EXPANDED -> {
+//                        ExpandedScreen(navHostController, icons)
+//                    }
+//
+//                    else -> CompactScreen(navHostController, icons)
+//                }
+//            }
         }
     ) { paddingValues ->
         paddingValues // padding values?
@@ -529,5 +563,114 @@ fun BuildItemScreen(
             }
         }
     }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CompactScreen(navController: NavHostController, icons: List<BarItem>, viewModel: ItemViewModel) {
+    androidx.compose.material3.Scaffold(
+        containerColor = Color.LightGray,
+        bottomBar = {
+            val backStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = backStackEntry?.destination?.route
+            BottomNavigation {
+                icons.forEach { navItem ->
+                    BottomNavigationItem(
+                        selected = currentRoute == navItem.route,
+                        onClick = {
+                            navController.navigate(navItem.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
+                        icon = {
+                            androidx.compose.material3.Icon(
+                                imageVector = navItem.image,
+                                contentDescription = navItem.title
+                            )
+                        },
+                        label = {
+                            androidx.compose.material3.Text(text = navItem.title)
+                        }
+                    )
+                }
+            }
+        }
+    ) {
+        it
+        BuildContent(navController, viewModel)
+    }
+}
+
+@Composable
+fun MediumScreen(navController: NavHostController, icons: List<BarItem>, viewModel: ItemViewModel) {
+    val icons = NavBarItems.HomeBarItems
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = backStackEntry?.destination?.route
+    Row(modifier = Modifier.fillMaxSize()) {
+        NavigationRail {
+            icons.forEach { navItem ->
+                Spacer(modifier = Modifier.height(32.dp))
+                NavigationRailItem(
+                    selected = currentRoute == navItem.route,
+                    onClick = {
+                        navController.navigate(navItem.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    icon = {
+                        androidx.compose.material3.Icon(
+                            imageVector = navItem.image,
+                            contentDescription = navItem.title
+                        )
+                    })
+            }
+        }
+            BuildContent(navController, viewModel)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ExpandedScreen(navController: NavHostController, icons: List<BarItem>, viewModel: ItemViewModel) {
+    val icons = NavBarItems.HomeBarItems
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = backStackEntry?.destination?.route
+    PermanentNavigationDrawer(
+        drawerContent = {
+            icons.forEach { navItem ->
+                NavigationDrawerItem(
+                    icon = {
+                        androidx.compose.material3.Icon(
+                            imageVector = navItem.image,
+                            contentDescription = navItem.title
+                        )
+                    },
+                    label = { androidx.compose.material3.Text(text = navItem.title) },
+                    selected = currentRoute == navItem.route,
+                    onClick = {
+                        navController.navigate(navItem.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
+            }
+        },
+        content = {
+            BuildContent(navController, viewModel)
+        }
+    )
 }
 

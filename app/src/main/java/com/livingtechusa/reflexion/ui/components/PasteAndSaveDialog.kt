@@ -23,13 +23,12 @@ import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.build.BuildRoute
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
-import com.livingtechusa.reflexion.util.Temporary
 
 const val PASTE_SAVE = "PasteAndSaveDialog"
 
 @Composable
 fun PasteAndSaveDialog(
-    itemViewModel: ItemViewModel = hiltViewModel(),
+    viewModel: ItemViewModel = hiltViewModel(),
     navController: NavHostController
 ) {
 
@@ -62,7 +61,7 @@ fun PasteAndSaveDialog(
                     confirmButton = {
                         Button(
                             onClick = {
-                                itemViewModel.onTriggerEvent( BuildEvent.UpdateVideoURL(webAddress.value))
+                                viewModel.onTriggerEvent( BuildEvent.UpdateVideoURL(webAddress.value))
                                 openDialog.value = false
                                 navController.navigate(BuildRoute)
                             }) {

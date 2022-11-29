@@ -1,12 +1,16 @@
 package com.livingtechusa.reflexion
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.unit.dp
 import androidx.core.util.Consumer
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -17,10 +21,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.window.core.layout.WindowSizeClass
+import androidx.window.core.layout.WindowWidthSizeClass
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.livingtechusa.reflexion.navigation.Screen
-import com.livingtechusa.reflexion.navigation.calculateWindowSizeClass
 import com.livingtechusa.reflexion.ui.build.BuildItemScreen
 import com.livingtechusa.reflexion.ui.children.ListDisplay
 import com.livingtechusa.reflexion.ui.components.ConfirmSaveAlertDialog
@@ -80,6 +85,7 @@ class MainActivity : ComponentActivity() {
                 )
                 val navController = rememberNavController()
                 navigationController = navController
+                val windowSize = calculateWindowSizeClass(this)
                 NavHost(
                     navController = navController,
                     startDestination = Screen.HomeScreen.route
@@ -90,16 +96,12 @@ class MainActivity : ComponentActivity() {
                     ) {
                         HomeScreen(
                             navHostController = navController,
+                            windowSize = windowSize
                         )
                     }
 
                     composable(
-                        route = Screen.BuildItemScreen.route //+ "/{reflexion_item_pk}",
-//                        arguments = listOf(
-//                            navArgument(REFLEXION_ITEM_PK) {
-//                                type = NavType.LongType
-//                            }
-//                        )
+                        route = Screen.BuildItemScreen.route
                     ) { navBackStackEntry ->
                         val parentEntry = remember(navBackStackEntry) {
                             navController.getBackStackEntry(Screen.HomeScreen.route)
@@ -107,16 +109,8 @@ class MainActivity : ComponentActivity() {
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         BuildItemScreen(
                             navHostController = navController,
-                            viewModel = parentViewModel,
-                           // pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK)
-                        )
-                    }
-
-                    composable(
-                        route = Screen.HomeScreen.route,
-                    ) {
-                        HomeScreen(
-                            navHostController = navController,
+                            windowSize = windowSize,
+                            viewModel = parentViewModel
                         )
                     }
 
@@ -160,7 +154,7 @@ class MainActivity : ComponentActivity() {
                         }
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         PasteAndSaveDialog(
-                            itemViewModel = parentViewModel,
+                            viewModel = parentViewModel,
                             navController = navController
                         )
                     }
@@ -178,9 +172,10 @@ class MainActivity : ComponentActivity() {
                         }
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         ListDisplay(
-                            itemViewModel = parentViewModel,
-                            navController = navController,
-                            pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK) ?: -1L
+                            viewModel = parentViewModel,
+                            navHostController = navController,
+                            pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK) ?: -1L,
+                            windowSize = windowSize,
                         )
                     }
                 }
@@ -202,4 +197,13 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
+
+
+@Composable
+fun calculateWindowSizeClass(activity: Activity): WindowWidthSizeClass {
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val screenWidth = configuration.screenWidthDp.dp
+    return WindowSizeClass.compute(screenWidth.value, screenHeight.value).windowWidthSizeClass
 }

@@ -7,9 +7,11 @@ import android.widget.Toast
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.window.core.layout.WindowWidthSizeClass
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
+import com.livingtechusa.reflexion.navigation.ReflexionNavigationType
 import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.MediaStoreUtils
@@ -38,6 +40,8 @@ class ItemViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val TAG = "ItemViewModel"
+
+    var navigationType = ReflexionNavigationType.BOTTOM_NAVIGATION
 
     private val _reflexionItem = MutableStateFlow(ReflexionItem())
     val reflexionItem: StateFlow<ReflexionItem> get() = _reflexionItem
