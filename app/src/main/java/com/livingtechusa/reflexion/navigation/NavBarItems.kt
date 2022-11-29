@@ -45,7 +45,7 @@ object NavBarItems {
         ),
         BarItem(
             title = "Home",
-            image = Icons.Filled.DataArray,
+            image = Icons.Filled.AddHome,
             route = Screen.HomeScreen.route
         )
     )
