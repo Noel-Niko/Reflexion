@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.contentColorFor
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
@@ -115,7 +117,9 @@ fun CompactScreen(navController: NavHostController, icons: List<BarItem>) {
         bottomBar = {
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
-            BottomNavigation {
+            BottomNavigation(
+                backgroundColor =  MaterialTheme.colorScheme.onSecondaryContainer,
+            ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(
                         selected = currentRoute == navItem.route,
@@ -153,7 +157,9 @@ fun MediumScreen(navController: NavHostController, icons: List<BarItem>) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
     Row(modifier = Modifier.fillMaxSize()) {
-        NavigationRail {
+        NavigationRail(
+            containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+           ) {
             icons.forEach { navItem ->
                 Spacer(modifier = Modifier.height(32.dp))
                 NavigationRailItem(
@@ -182,7 +188,6 @@ fun MediumScreen(navController: NavHostController, icons: List<BarItem>) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExpandedScreen(navController: NavHostController, icons: List<BarItem>) {
-    val icons = NavBarItems.HomeBarItems
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
     PermanentNavigationDrawer(
