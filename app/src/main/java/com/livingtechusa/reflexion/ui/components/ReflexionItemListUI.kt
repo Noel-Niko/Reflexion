@@ -31,7 +31,6 @@ fun ReflexionItemListUI(
     ) {
     val context = LocalContext.current
     Scaffold(
-        topBar = { MainTopBar() },
         content = {
             ReflexionItemsContent(
                 reflexionItems = reflexionItems,

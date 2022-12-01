@@ -20,7 +20,7 @@ interface ReflexionItemDao {
     @Query("Delete FROM ReflexionItem")
     suspend fun clearALLReflexionItems()
 
-    @Query("Select * FROM ReflexionItem WHERE parent IS NULL")
+    @Query("Select * FROM ReflexionItem WHERE parent IS NULL ORDER BY name")
     suspend fun getReflexionItemTopics(): List<ReflexionItem?>
 
     @Query("Select * FROM ReflexionItem WHERE autogenPK = :autogenPK")
@@ -40,4 +40,9 @@ interface ReflexionItemDao {
 
     @Query("Select * FROM ReflexionItem WHERE name =:name")
     suspend fun selectReflexionItemByName(name: String): ReflexionItem
+
+    @Query("Select * FROM ReflexionItem WHERE parent IS NULL AND name LIKE :search || '%' order by name")
+    suspend fun getAllTopicsContainingString(search: String): List<ReflexionItem?>
+    @Query("Select * FROM ReflexionItem WHERE parent =:pk AND name LIKE :search || '%' order by name")
+    suspend fun selectChildrenContainingString(pk: Long, search: String?): List<ReflexionItem?>
 }

@@ -49,6 +49,9 @@ class ItemViewModel @Inject constructor(
     private val _list = MutableStateFlow(emptyList<ReflexionItem>())
     val list: StateFlow<List<ReflexionItem>> get() = _list
 
+    private val _search = MutableStateFlow(null as String?)
+    val search: StateFlow<String?> = _search
+
     private val context: Context
         get() = BaseApplication.getInstance()
 
@@ -59,15 +62,16 @@ class ItemViewModel @Inject constructor(
         Log.i(TAG, "ERROR: $throwable")
         throwable.printStackTrace()
     }
-    private val num = 1
 
-    init {
-        if (Temporary.use) {
-            _reflexionItem.value = Temporary.tempReflexionItem
-            Temporary.use = false
-            Temporary.tempReflexionItem = ReflexionItem()
-        }
-    }
+    var listPK = 0L
+
+//    init {
+//        if (Temporary.use) {
+//            _reflexionItem.value = Temporary.tempReflexionItem
+//            Temporary.use = false
+//            Temporary.tempReflexionItem = ReflexionItem()
+//        }
+//    }
 
     suspend fun hasNoChildren(pk: Long): Boolean {
         return localServiceImpl.selectChildren(pk).isEmpty()
@@ -98,15 +102,17 @@ class ItemViewModel @Inject constructor(
                     }
 
                     is BuildEvent.GetSelectedReflexionItem -> {
-                            withContext(Dispatchers.Main) {
-                                when (event.pk) {
-                                    -2L ->
-                                        _reflexionItem.value = ReflexionItem()
-                                    else ->
-                                        _reflexionItem.value =
-                                            event.pk?.let { localServiceImpl.selectItem(it) } ?: ReflexionItem()
-                                }
+                        withContext(Dispatchers.Main) {
+                            when (event.pk) {
+                                -2L ->
+                                    _reflexionItem.value = ReflexionItem()
+
+                                else ->
+                                    _reflexionItem.value =
+                                        event.pk?.let { localServiceImpl.selectItem(it) }
+                                            ?: ReflexionItem()
                             }
+                        }
                     }
 
                     is BuildEvent.Delete -> {
@@ -165,6 +171,23 @@ class ItemViewModel @Inject constructor(
                         }
                     }
 
+                    is ListEvent.Search -> {
+                        if (event.pk == -1L) {
+                            if (event.search.isNullOrEmpty()) {
+                                _list.value = localServiceImpl.getAllTopics() as List<ReflexionItem>
+                            } else {
+                                _list.value =
+                                    localServiceImpl.getAllTopicsContainingString(event.search) as List<ReflexionItem>
+                            }
+                        } else {
+                            _list.value =
+                                localServiceImpl.selectChildrenContainingString(
+                                    event.pk,
+                                    event.search
+                                ) as List<ReflexionItem>
+                        }
+                    }
+
                     else -> {
                         Toast.makeText(context, "No matching items", Toast.LENGTH_SHORT).show()
                     }
@@ -187,6 +210,18 @@ class ItemViewModel @Inject constructor(
         } else {
             _errorFlow.emit("Could not create a video Uri\n$filename")
             null
+        }
+    }
+
+    //    private fun effect(block: suspend () -> Unit) {
+//        viewModelScope.launch(Dispatchers.IO) { block() }
+//    }
+    fun searchEvent(term: String?) {
+        _search.value = term
+        if (term.isNullOrEmpty()) {
+            onTriggerEvent(ListEvent.GetList(listPK))
+        } else {
+            onTriggerEvent(ListEvent.Search(term, reflexionItem.value.autogenPK))
         }
     }
 }

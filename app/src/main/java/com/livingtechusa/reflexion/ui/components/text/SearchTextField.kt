@@ -22,7 +22,8 @@ internal fun SearchTextField(
   val textFieldColors = TextFieldDefaults.textFieldColors()
   val focusRequester = remember { FocusRequester() }
   val cursorColor = TextFieldDefaults.textFieldColors().cursorColor(isError = false).value
-  BasicTextField(
+
+    BasicTextField(
       modifier = Modifier
           .fillMaxWidth()
           .focusRequester(focusRequester),

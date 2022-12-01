@@ -1,8 +1,6 @@
 package com.livingtechusa.reflexion.ui.children
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,26 +18,29 @@ import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.window.core.layout.WindowWidthSizeClass
-import com.livingtechusa.reflexion.R
+import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.BarItem
 import com.livingtechusa.reflexion.navigation.NavBarItems
 import com.livingtechusa.reflexion.navigation.ReflexionNavigationType
-import com.livingtechusa.reflexion.ui.build.BuildContent
 import com.livingtechusa.reflexion.ui.components.ReflexionItemListUI
+import com.livingtechusa.reflexion.ui.components.bars.SearchBar
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
-import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import com.livingtechusa.reflexion.util.extensions.findActivity
 
 const val ListRoute = "list"
@@ -51,38 +52,62 @@ fun ListDisplay(
     windowSize: WindowWidthSizeClass,
     pk: Long
 ) {
+    val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
+
+    // If `lifecycleOwner` changes, dispose and reset the effect
+    DisposableEffect(lifecycleOwner) {
+        // Create an observer that triggers our remembered callbacks
+        // for sending analytics events
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_CREATE) {
+                viewModel.listPK = pk
+                viewModel.onTriggerEvent(ListEvent.GetList(pk))
+            }
+        }
+
+        // Add the observer to the lifecycle
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        // When the effect leaves the Composition, remove the observer
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     val context = LocalContext.current
     val icons = NavBarItems.ListBarItems
+    val reflexionItemList by viewModel.list.collectAsState()
+
+    val search by viewModel.search.collectAsState()
+
     if (context.findActivity() != null) {
         when (windowSize) {
             WindowWidthSizeClass.COMPACT -> {
-                CompactScreen(navHostController, icons, viewModel, pk)
+                CompactScreen(navHostController, icons, viewModel, search, reflexionItemList, viewModel::searchEvent)
                 viewModel.navigationType = ReflexionNavigationType.BOTTOM_NAVIGATION
             }
 
-            WindowWidthSizeClass.MEDIUM -> {
-                MediumScreen(navHostController, icons, viewModel, pk)
-                viewModel.navigationType = ReflexionNavigationType.NAVIGATION_RAIL
-            }
+//            WindowWidthSizeClass.MEDIUM -> {
+//                MediumScreen(navHostController, icons, viewModel, pk)
+//                viewModel.navigationType = ReflexionNavigationType.NAVIGATION_RAIL
+//            }
+//
+//            WindowWidthSizeClass.EXPANDED -> {
+//                ExpandedScreen(navHostController, icons, viewModel, pk)
+//                viewModel.navigationType = ReflexionNavigationType.PERMANENT_NAVIGATION_DRAWER
+//            }
 
-            WindowWidthSizeClass.EXPANDED -> {
-                ExpandedScreen(navHostController, icons, viewModel, pk)
-                viewModel.navigationType = ReflexionNavigationType.PERMANENT_NAVIGATION_DRAWER
-            }
-
-            else -> CompactScreen(navHostController, icons, viewModel, pk)
+            else -> CompactScreen(navHostController, icons, viewModel, search, reflexionItemList, viewModel::searchEvent)
         }
     }
 }
 
 @Composable
 fun ListContent(
-    itemViewModel: ItemViewModel = hiltViewModel(),
+    itemViewModel: ItemViewModel,
     navController: NavHostController,
-    pk: Long,
+    reflexionItemList: List<ReflexionItem>
 ) {
-    itemViewModel.onTriggerEvent(ListEvent.GetList(pk))
-    val reflexionItemList by itemViewModel.list.collectAsState()
     ReflexionItemListUI(
         reflexionItems = reflexionItemList,
         navController = navController,
@@ -97,9 +122,14 @@ fun CompactScreen(
     navController: NavHostController,
     icons: List<BarItem>,
     viewModel: ItemViewModel,
-    pk: Long
+    search: String?,
+    reflexionItemList: List<ReflexionItem>,
+    onSearch: (String?) -> Unit
 ) {
     androidx.compose.material3.Scaffold(
+        topBar = {
+            SearchBar(search = search, onSearch = onSearch )
+        },
         containerColor = Color.LightGray,
         bottomBar = {
             val backStackEntry by navController.currentBackStackEntryAsState()
@@ -138,7 +168,7 @@ fun CompactScreen(
                 .fillMaxSize()
                 .padding(paddingValue)
         ) {
-            ListContent(navController = navController, itemViewModel = viewModel, pk = pk)
+            ListContent(navController = navController, itemViewModel = viewModel, reflexionItemList= reflexionItemList)
         }
 
     }
@@ -148,8 +178,7 @@ fun CompactScreen(
 fun MediumScreen(
     navController: NavHostController,
     icons: List<BarItem>,
-    viewModel: ItemViewModel,
-    pk: Long
+    viewModel: ItemViewModel
 ) {
     val icons = NavBarItems.HomeBarItems
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -183,11 +212,11 @@ fun MediumScreen(
             modifier = Modifier
                 .fillMaxSize()
         ) { paddingValues ->
-            ListContent(
-                navController = navController,
-                itemViewModel = viewModel,
-                pk = pk
-            )
+//            ListContent(
+//                navController = navController,
+//                itemViewModel = viewModel,
+//                reflexionItemList = reflexionItemList
+//            )
         }
     }
 }
@@ -197,8 +226,7 @@ fun MediumScreen(
 fun ExpandedScreen(
     navController: NavHostController,
     icons: List<BarItem>,
-    viewModel: ItemViewModel,
-    pk: Long
+    viewModel: ItemViewModel
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
@@ -231,11 +259,11 @@ fun ExpandedScreen(
                 modifier = Modifier
                     .fillMaxSize()
             ) { paddingValues -> //TODO
-                ListContent(
-                    navController = navController,
-                    itemViewModel = viewModel,
-                    pk = pk
-                )
+//                ListContent(
+//                    navController = navController,
+//                    itemViewModel = viewModel,
+//                    reflexionItemList = reflexionItemList
+//                )
             }
         }
     )

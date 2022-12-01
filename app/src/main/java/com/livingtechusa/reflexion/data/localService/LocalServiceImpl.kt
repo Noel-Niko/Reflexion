@@ -29,6 +29,25 @@ class LocalServiceImpl @Inject constructor(
         return reflexionItemDao.getReflexionItemTopics()
     }
 
+    override suspend fun getAllTopicsContainingString(
+        search: String
+    ): List<ReflexionItem?> {
+        return reflexionItemDao.getAllTopicsContainingString(search)
+    }
+
+    override suspend fun selectChildrenContainingString(
+        pk: Long,
+        search: String?
+    ): List<ReflexionItem?> {
+        var list = emptyList<ReflexionItem>()
+            if (pk <= 0) {
+                list = search?.let { reflexionItemDao.getAllTopicsContainingString(it) } as List<ReflexionItem>
+            } else {
+                reflexionItemDao.selectChildrenContainingString(pk, search)
+            }
+        return list
+    }
+
     override suspend fun selectChildren(pk: Long): List<ReflexionItem?> {
         return reflexionItemDao.selectChildReflexionItems(pk)
     }

@@ -12,4 +12,9 @@ sealed class ListEvent {
         val pk: Long
     ) : ListEvent() {}
 
+   data class Search(
+       val search: String?,
+       val pk: Long
+       ): ListEvent() {}
+
 }

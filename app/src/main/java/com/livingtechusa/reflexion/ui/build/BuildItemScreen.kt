@@ -122,7 +122,7 @@ fun BuildContent(
     val error by viewModel.errorFlow.collectAsState(null)
     val savedReflexionItem by itemViewModel.reflexionItem.collectAsState()
     val resource = ResourceProviderSingleton
-    val reflexionItem =
+    val reflexionItem = // remember??? TODO
         ReflexionItem(
             autogenPK = savedReflexionItem.autogenPK,
             name = savedReflexionItem.name,

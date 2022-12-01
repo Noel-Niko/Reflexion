@@ -33,4 +33,6 @@ interface ILocalService {
     suspend fun selectReflexionItemByName(name: String): ReflexionItem
     suspend fun selectChildren(pk: Long): List<ReflexionItem?>
     suspend fun getAllTopics(): List<ReflexionItem?>
+    suspend fun getAllTopicsContainingString(search: String): List<ReflexionItem?>
+    suspend fun selectChildrenContainingString(pk: Long, search: String?): List<ReflexionItem?>
 }
