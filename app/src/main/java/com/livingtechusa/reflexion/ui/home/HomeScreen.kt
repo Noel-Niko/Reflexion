@@ -118,7 +118,7 @@ fun CompactScreen(navController: NavHostController, icons: List<BarItem>) {
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
             BottomNavigation(
-                backgroundColor =  MaterialTheme.colorScheme.onSecondaryContainer,
+                backgroundColor =  MaterialTheme.colorScheme.onSecondary,
             ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(
@@ -158,7 +158,7 @@ fun MediumScreen(navController: NavHostController, icons: List<BarItem>) {
     val currentRoute = backStackEntry?.destination?.route
     Row(modifier = Modifier.fillMaxSize()) {
         NavigationRail(
-            containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            containerColor = MaterialTheme.colorScheme.onSecondary,
            ) {
             icons.forEach { navItem ->
                 Spacer(modifier = Modifier.height(32.dp))

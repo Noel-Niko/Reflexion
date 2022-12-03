@@ -1,4 +1,4 @@
-package com.livingtechusa.reflexion.ui.components
+package com.livingtechusa.reflexion.ui.components.bars
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.Text
@@ -15,7 +15,7 @@ fun MainTopBar(
     actions: @Composable RowScope.() -> Unit = {}
 ) {
   TopAppBar(
-      backgroundColor = MaterialTheme.colorScheme.onSecondaryContainer,
+      backgroundColor = MaterialTheme.colorScheme.onSecondary,
       elevation = 4.dp,
       title = {
         Text(text = stringResource(id = R.string.app_name))

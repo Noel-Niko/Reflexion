@@ -43,7 +43,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -61,8 +60,7 @@ import com.livingtechusa.reflexion.navigation.BarItem
 import com.livingtechusa.reflexion.navigation.NavBarItems
 import com.livingtechusa.reflexion.navigation.ReflexionNavigationType
 import com.livingtechusa.reflexion.navigation.Screen
-import com.livingtechusa.reflexion.ui.components.MainTopBar
-import com.livingtechusa.reflexion.ui.home.homeContent
+import com.livingtechusa.reflexion.ui.components.bars.MainTopBar
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.SEARCH_YOUTUBE
@@ -430,7 +428,6 @@ fun BuildContent(
                         }
                     }
                     Spacer(Modifier.height(16.dp))
-
                     Row(
                         modifier = Modifier.padding(8.dp)
                     ) {
@@ -440,9 +437,7 @@ fun BuildContent(
                         ) {
                             Button(
                                 onClick = {
-                                    Toast.makeText(context, "Button Clicked", Toast.LENGTH_SHORT)
-                                        .show()
-                                    itemViewModel.onTriggerEvent(BuildEvent.ShowSiblings)
+                                    navHostController.navigate(Screen.ListScreen.route + "/" + reflexionItem.parent)
                                 }
                             ) {
                                 Text(
@@ -464,11 +459,51 @@ fun BuildContent(
                             }
                         }
                     }
-                    /* DELETE ITEM */
+                    Row(
+                        modifier = Modifier.padding(8.dp)
+                    ) {
+                        Spacer(Modifier.height(16.dp))
+                        /* ADD SIBLING */
+                        Column(
+                            Modifier.weight(1f)
+                        ) {
+                            Button(onClick = {
+                                val parent = reflexionItem.parent
+                                itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
+                                if (parent != null) {
+                                    itemViewModel.onTriggerEvent(BuildEvent.SetParent(parent))
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        resource.getString(R.string.no_parent),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                            ) {
+                                Text(stringResource(R.string.add_sibling))
+                            }
+                        }
+                        Spacer(Modifier.height(16.dp))
+                        /* ADD CHILD */
+                        Column(
+                            Modifier.weight(1f)
+                        ) {
+                            Button(onClick = {
+                                val parent = reflexionItem.autogenPK
+                                itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
+                                itemViewModel.onTriggerEvent(BuildEvent.SetParent(parent))
+                            }
+                            ) {
+                                Text(stringResource(R.string.add_child))
+                            }
+                        }
+                    }
                     Row(
                         modifier = Modifier.padding(8.dp)
                     ) {
                         Spacer(modifier = Modifier.height(16.dp))
+                        /* DELETE ITEM */
                         Column(
                             Modifier.weight(1f)
                         ) {
@@ -493,23 +528,8 @@ fun BuildContent(
                                 Text(stringResource(R.string.delete))
                             }
                         }
-                        Column(
-                            Modifier.weight(1f)
-                        ) {
-                            Button(onClick = {
-                                val parent = reflexionItem.autogenPK
-                                itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
-                                itemViewModel.onTriggerEvent(BuildEvent.SetParent(parent))
-                            }
-                            ) {
-                                Text(stringResource(R.string.add_child))
-                            }
-                        }
-                    }
-                    /* NEW ITEM */
-                    Row(
-                        modifier = Modifier.padding(8.dp)
-                    ) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        /* CREATE NEW */
                         Column(
                             Modifier.weight(1f)
                         ) {
@@ -570,7 +590,7 @@ fun CompactScreen(
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
             BottomNavigation(
-                backgroundColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                backgroundColor = MaterialTheme.colorScheme.onSecondary,
             ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(
@@ -604,7 +624,7 @@ fun MediumScreen(navController: NavHostController, icons: List<BarItem>, viewMod
     val currentRoute = backStackEntry?.destination?.route
     Row(modifier = Modifier.fillMaxSize()) {
         NavigationRail(
-            containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            containerColor = MaterialTheme.colorScheme.onSecondary,
         ) {
             icons.forEach { navItem ->
                 Spacer(modifier = Modifier.height(32.dp))
