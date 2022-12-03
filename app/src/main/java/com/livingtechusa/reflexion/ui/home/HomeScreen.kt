@@ -1,5 +1,6 @@
 package com.livingtechusa.reflexion.ui.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -82,10 +83,11 @@ fun HomeScreen(
 fun homeContent() {
     Row(Modifier.fillMaxSize()) {
         Box(
-            modifier = Modifier.align(
+            modifier = Modifier
+                .align(
                 Alignment.CenterVertically,
-
                 )
+                .background(color = MaterialTheme.colorScheme.onSurface)
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -113,12 +115,12 @@ fun homeContent() {
 @Composable
 fun CompactScreen(navController: NavHostController, icons: List<BarItem>) {
     Scaffold(
-        containerColor = Color.LightGray,
+        containerColor = androidx.compose.material.MaterialTheme.colors.background,
         bottomBar = {
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
             BottomNavigation(
-                backgroundColor =  MaterialTheme.colorScheme.onSecondary,
+                backgroundColor =  MaterialTheme.colorScheme.onPrimaryContainer,
             ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(
@@ -158,7 +160,7 @@ fun MediumScreen(navController: NavHostController, icons: List<BarItem>) {
     val currentRoute = backStackEntry?.destination?.route
     Row(modifier = Modifier.fillMaxSize()) {
         NavigationRail(
-            containerColor = MaterialTheme.colorScheme.onSecondary,
+            containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
            ) {
             icons.forEach { navItem ->
                 Spacer(modifier = Modifier.height(32.dp))

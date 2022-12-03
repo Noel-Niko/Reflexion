@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,12 +15,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Button
-import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
@@ -32,21 +33,26 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.PermanentNavigationDrawer
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -71,6 +77,7 @@ import com.livingtechusa.reflexion.util.extensions.findActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.roundToInt
 
 const val BuildRoute = "build"
 
@@ -156,6 +163,11 @@ fun BuildContent(
     LaunchedEffect(error) {
         error?.let { scaffoldState.snackbarHostState.showSnackbar(it) }
     }
+
+
+    val offsetX = remember { mutableStateOf(0f) }
+    val offsetY = remember { mutableStateOf(0f) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -165,29 +177,51 @@ fun BuildContent(
             topBar = { MainTopBar() },
             floatingActionButton = {
                 /* SAVE */
-                FloatingActionButton(onClick = {
-                    Toast.makeText(
-                        context,
-                        resource.getString(R.string.changes_saved),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    if (savedReflexionItem.autogenPK != 0L) {
-                        reflexionItem.autogenPK = savedReflexionItem.autogenPK
-                        reflexionItem.name = reflexionItem.name.trim()
-                        itemViewModel.onTriggerEvent(BuildEvent.UpdateReflexionItem(reflexionItem))
-                        Temporary.tempReflexionItem = ReflexionItem()
-                    } else {
-                        itemViewModel.onTriggerEvent(BuildEvent.SaveNew(reflexionItem))
-                        Temporary.tempReflexionItem = ReflexionItem()
-                    }
-                }) {
+                SmallFloatingActionButton(
+                    modifier = Modifier
+                        .offset {
+                            IntOffset(
+                                x = offsetX.value.roundToInt(),
+                                y = offsetY.value.roundToInt()
+                            )
+                        }
+                        .pointerInput(Unit) {
+                            detectDragGestures { change, dragAmount ->
+                                change.consumeAllChanges()
+                                offsetX.value += dragAmount.x
+                                offsetY.value += dragAmount.y
+                            }
+                        },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    onClick = {
+                        Toast.makeText(
+                            context,
+                            resource.getString(R.string.changes_saved),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        if (savedReflexionItem.autogenPK != 0L) {
+                            reflexionItem.autogenPK = savedReflexionItem.autogenPK
+                            reflexionItem.name = reflexionItem.name.trim()
+                            itemViewModel.onTriggerEvent(
+                                BuildEvent.UpdateReflexionItem(
+                                    reflexionItem
+                                )
+                            )
+                            Temporary.tempReflexionItem = ReflexionItem()
+                        } else {
+                            itemViewModel.onTriggerEvent(BuildEvent.SaveNew(reflexionItem))
+                            Temporary.tempReflexionItem = ReflexionItem()
+                        }
+                    }) {
                     Icon(
                         painter = painterResource(R.drawable.ic_baseline_save_alt_24),
                         contentDescription = null
                     )
                 }
             },
-            drawerContent = { }
+            drawerContent = {
+                drawerNavContent(navHostController, viewModel, reflexionItem)
+            }
         ) { paddingValues ->
             LazyColumn(
                 modifier = Modifier
@@ -427,155 +461,165 @@ fun BuildContent(
                             }
                         }
                     }
-                    Spacer(Modifier.height(16.dp))
-                    Row(
-                        modifier = Modifier.padding(8.dp)
-                    ) {
-                        /* SIBLINGS */
-                        Column(
-                            Modifier.weight(1f)
-                        ) {
-                            Button(
-                                onClick = {
-                                    navHostController.navigate(Screen.ListScreen.route + "/" + reflexionItem.parent)
-                                }
-                            ) {
-                                Text(
-                                    stringResource(R.string.siblings)
-                                )
-                            }
-                        }
-                        /* CHILDREN */
-                        Column(
-                            Modifier.weight(1f)
-                        ) {
-                            Button(onClick = {
-                                navHostController.navigate(Screen.ListScreen.route + "/" + reflexionItem.autogenPK)
-                            }
-                            ) {
-                                Text(
-                                    stringResource(R.string.children)
-                                )
-                            }
-                        }
-                    }
-                    Row(
-                        modifier = Modifier.padding(8.dp)
-                    ) {
-                        Spacer(Modifier.height(16.dp))
-                        /* ADD SIBLING */
-                        Column(
-                            Modifier.weight(1f)
-                        ) {
-                            Button(onClick = {
-                                val parent = reflexionItem.parent
-                                itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
-                                if (parent != null) {
-                                    itemViewModel.onTriggerEvent(BuildEvent.SetParent(parent))
-                                } else {
-                                    Toast.makeText(
-                                        context,
-                                        resource.getString(R.string.no_parent),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
-                            ) {
-                                Text(stringResource(R.string.add_sibling))
-                            }
-                        }
-                        Spacer(Modifier.height(16.dp))
-                        /* ADD CHILD */
-                        Column(
-                            Modifier.weight(1f)
-                        ) {
-                            Button(onClick = {
-                                val parent = reflexionItem.autogenPK
-                                itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
-                                itemViewModel.onTriggerEvent(BuildEvent.SetParent(parent))
-                            }
-                            ) {
-                                Text(stringResource(R.string.add_child))
-                            }
-                        }
-                    }
-                    Row(
-                        modifier = Modifier.padding(8.dp)
-                    ) {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        /* DELETE ITEM */
-                        Column(
-                            Modifier.weight(1f)
-                        ) {
-                            Button(onClick = {
-                                scope.launch {
-                                    withContext(Dispatchers.Main) {
-                                        val noChildren =
-                                            itemViewModel.hasNoChildren(reflexionItem.autogenPK)
-                                        if (noChildren) {
-                                            itemViewModel.onTriggerEvent(BuildEvent.Delete)
-                                        } else {
-                                            Toast.makeText(
-                                                context,
-                                                resource.getString(R.string.is_parent),
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        }
-                                    }
-                                }
-                            }
-                            ) {
-                                Text(stringResource(R.string.delete))
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(16.dp))
-                        /* CREATE NEW */
-                        Column(
-                            Modifier.weight(1f)
-                        ) {
-                            Button(onClick = {
-                                itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
-                            }
-                            ) {
-                                Text(stringResource(R.string.new_item))
-                            }
-                        }
-                    }
-                    /* PARENT */
-                    Row(
-                        modifier = Modifier.padding(8.dp)
-                    ) {
-                        Column(
-                            Modifier.weight(1f)
-                        ) {
-                            Button(onClick = {
-                                val parent = reflexionItem.parent
-                                if (parent != null) {
-                                    itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
-                                    itemViewModel.onTriggerEvent(
-                                        BuildEvent.GetSelectedReflexionItem(
-                                            parent
-                                        )
-                                    )
-                                } else {
-                                    Toast.makeText(
-                                        context,
-                                        resource.getString(R.string.no_parent_found),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
-                            ) {
-                                Text(stringResource(R.string.go_to_parent))
-                            }
-                        }
-                    }
+
                 }
             }
         }
     }
 }
 
+
+@Composable
+fun drawerNavContent(
+    navHostController: NavHostController,
+    itemViewModel: ItemViewModel,
+    reflexionItem: ReflexionItem
+) {
+    val context = LocalContext.current
+    Spacer(Modifier.height(16.dp))
+    Row(
+        modifier = Modifier.padding(8.dp)
+    ) {
+        /* SIBLINGS */
+        Column(
+            Modifier.weight(1f)
+        ) {
+            Button(
+                onClick = {
+                    navHostController.navigate(Screen.ListScreen.route + "/" + reflexionItem.parent)
+                }
+            ) {
+                Text(
+                    stringResource(R.string.siblings)
+                )
+            }
+        }
+        /* CHILDREN */
+        Column(
+            Modifier.weight(1f)
+        ) {
+            Button(onClick = {
+                navHostController.navigate(Screen.ListScreen.route + "/" + reflexionItem.autogenPK)
+            }
+            ) {
+                Text(
+                    stringResource(R.string.children)
+                )
+            }
+        }
+    }
+    Row(
+        modifier = Modifier.padding(8.dp)
+    ) {
+        Spacer(Modifier.height(16.dp))
+        /* ADD SIBLING */
+        Column(
+            Modifier.weight(1f)
+        ) {
+            Button(onClick = {
+                val parent = reflexionItem.parent
+                itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
+                if (parent != null) {
+                    itemViewModel.onTriggerEvent(BuildEvent.SetParent(parent))
+                } else {
+                    Toast.makeText(
+                        context,
+                        resource.getString(R.string.no_parent),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+            ) {
+                Text(stringResource(R.string.add_sibling))
+            }
+        }
+        Spacer(Modifier.height(16.dp))
+        /* ADD CHILD */
+        Column(
+            Modifier.weight(1f)
+        ) {
+            Button(onClick = {
+                val parent = reflexionItem.autogenPK
+                itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
+                itemViewModel.onTriggerEvent(BuildEvent.SetParent(parent))
+            }
+            ) {
+                Text(stringResource(R.string.add_child))
+            }
+        }
+    }
+    Row(
+        modifier = Modifier.padding(8.dp)
+    ) {
+        Spacer(modifier = Modifier.height(16.dp))
+        /* DELETE ITEM */
+        Column(
+            Modifier.weight(1f)
+        ) {
+            Button(onClick = {
+                scope.launch {
+                    withContext(Dispatchers.Main) {
+                        val noChildren =
+                            itemViewModel.hasNoChildren(reflexionItem.autogenPK)
+                        if (noChildren) {
+                            itemViewModel.onTriggerEvent(BuildEvent.Delete)
+                        } else {
+                            Toast.makeText(
+                                context,
+                                resource.getString(R.string.is_parent),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+            }
+            ) {
+                Text(stringResource(R.string.delete))
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        /* CREATE NEW */
+        Column(
+            Modifier.weight(1f)
+        ) {
+            Button(onClick = {
+                itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
+            }
+            ) {
+                Text(stringResource(R.string.new_item))
+            }
+        }
+    }
+    /* PARENT */
+    Row(
+        modifier = Modifier.padding(8.dp)
+    ) {
+        Column(
+            Modifier.weight(1f)
+        ) {
+            Button(onClick = {
+                val parent = reflexionItem.parent
+                if (parent != null) {
+                    itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
+                    itemViewModel.onTriggerEvent(
+                        BuildEvent.GetSelectedReflexionItem(
+                            parent
+                        )
+                    )
+                } else {
+                    Toast.makeText(
+                        context,
+                        resource.getString(R.string.no_parent_found),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+            ) {
+                Text(stringResource(R.string.go_to_parent))
+            }
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -590,7 +634,7 @@ fun CompactScreen(
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
             BottomNavigation(
-                backgroundColor = MaterialTheme.colorScheme.onSecondary,
+                backgroundColor = MaterialTheme.colorScheme.onPrimaryContainer,
             ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(
@@ -624,7 +668,7 @@ fun MediumScreen(navController: NavHostController, icons: List<BarItem>, viewMod
     val currentRoute = backStackEntry?.destination?.route
     Row(modifier = Modifier.fillMaxSize()) {
         NavigationRail(
-            containerColor = MaterialTheme.colorScheme.onSecondary,
+            containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
         ) {
             icons.forEach { navItem ->
                 Spacer(modifier = Modifier.height(32.dp))

@@ -15,7 +15,7 @@ fun MainTopBar(
     actions: @Composable RowScope.() -> Unit = {}
 ) {
   TopAppBar(
-      backgroundColor = MaterialTheme.colorScheme.onSecondary,
+      backgroundColor = MaterialTheme.colorScheme.onPrimaryContainer,
       elevation = 4.dp,
       title = {
         Text(text = stringResource(id = R.string.app_name))
