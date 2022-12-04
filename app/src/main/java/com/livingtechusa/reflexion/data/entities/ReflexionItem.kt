@@ -6,6 +6,8 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 import android.os.Parcelable
+import com.livingtechusa.reflexion.util.Constants.EMPTY_ITEM
+import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 
 @Parcelize
 @Entity(tableName = "ReflexionItem",
@@ -22,12 +24,12 @@ import android.os.Parcelable
 data class ReflexionItem(
     @PrimaryKey(autoGenerate = true)
     var autogenPK: Long = 0,
-    var name: String = "",
-    var description: String? = "",
-    var detailedDescription: String? = "",
+    var name: String = EMPTY_ITEM,
+    var description: String? = EMPTY_STRING,
+    var detailedDescription: String? = EMPTY_STRING,
     var image: ByteArray? = null,
-    var videoUri: String? = "",
-    var videoUrl: String? = "",
+    var videoUri: String? = EMPTY_STRING,
+    var videoUrl: String? = EMPTY_STRING,
     var parent: Long? = null
 ): Parcelable {
     companion object {

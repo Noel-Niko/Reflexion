@@ -65,14 +65,6 @@ class ItemViewModel @Inject constructor(
 
     var listPK = 0L
 
-//    init {
-//        if (Temporary.use) {
-//            _reflexionItem.value = Temporary.tempReflexionItem
-//            Temporary.use = false
-//            Temporary.tempReflexionItem = ReflexionItem()
-//        }
-//    }
-
     suspend fun hasNoChildren(pk: Long): Boolean {
         return localServiceImpl.selectChildren(pk).isEmpty()
     }

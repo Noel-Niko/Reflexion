@@ -9,8 +9,8 @@
     <string name="video_link">Video Link</string>
     <string name="update"><i>Update</i></string>
     <string name="parent">Parent</string>
-    <string name="siblings">Siblings</string>
-    <string name="children">Children</string>
+    <string name="siblings">View Siblings</string>
+    <string name="children">View Children</string>
     <string name="BuildScreen">Build Screen</string>
     <string name="DisplayScreen">Display Screen</string>
     <string name="back_button">Back</string>
@@ -32,4 +32,7 @@
     <string name="no_items_found">No items found.</string>
     <string name="welcome_to_reflexion">Welcome to Reflexion</string>
     <string name="no_parent">This item does not have a parent.</string>
+    <string name="no_siblings_found">No siblings found.</string>
+    <string name="no_children_found">No children found.</string>
+    <string name="toggle_drawer">Toggle Drawer</string>
 </resources>
