@@ -87,7 +87,7 @@ fun homeContent() {
                 .align(
                 Alignment.CenterVertically,
                 )
-                .background(color = MaterialTheme.colorScheme.onSurface)
+                .background(color = MaterialTheme.colorScheme.background)
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -120,7 +120,7 @@ fun CompactScreen(navController: NavHostController, icons: List<BarItem>) {
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
             BottomNavigation(
-                backgroundColor =  MaterialTheme.colorScheme.onPrimaryContainer,
+                backgroundColor =  MaterialTheme.colorScheme.background,
             ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(
@@ -128,10 +128,9 @@ fun CompactScreen(navController: NavHostController, icons: List<BarItem>) {
                         onClick = {
                             navController.navigate(navItem.route) {
                                 popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
                                 }
                                 launchSingleTop = true
-                                restoreState = true
+//                                restoreState = true
                             }
                         },
                         icon = {
@@ -160,7 +159,7 @@ fun MediumScreen(navController: NavHostController, icons: List<BarItem>) {
     val currentRoute = backStackEntry?.destination?.route
     Row(modifier = Modifier.fillMaxSize()) {
         NavigationRail(
-            containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            containerColor = MaterialTheme.colorScheme.inverseOnSurface,
            ) {
             icons.forEach { navItem ->
                 Spacer(modifier = Modifier.height(32.dp))
@@ -169,10 +168,10 @@ fun MediumScreen(navController: NavHostController, icons: List<BarItem>) {
                     onClick = {
                         navController.navigate(navItem.route) {
                             popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
+
                             }
                             launchSingleTop = true
-                            restoreState = true
+
                         }
                     },
                     icon = {

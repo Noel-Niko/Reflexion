@@ -227,7 +227,4 @@ object MediaStoreUtils {
             }
         }
     }
-
-
-
 }

@@ -14,7 +14,7 @@ interface ReflexionItemDao {
     @Query("UPDATE ReflexionItem SET name = :name, description = :description, detailedDescription = :detailedDescription, image = :image, videoUri = :videoUri, videoUrl = :videoUrl, parent = :parent WHERE autogenPK = :autogenPK")
     suspend fun updateReflexionItem(autogenPK: Long , name: String, description: String?, detailedDescription: String?, image: ByteArray?, videoUri: String?, videoUrl: String?, parent: Long?)
 
-    @Query("Select * FROM ReflexionItem")
+    @Query("Select * FROM ReflexionItem order by name")
     suspend fun getAllReflexionItems(): List<ReflexionItem?>
 
     @Query("Delete FROM ReflexionItem")
@@ -32,7 +32,7 @@ interface ReflexionItemDao {
     @Query("UPDATE ReflexionItem SET name = :newName WHERE autogenPK = :autogenPK AND name = :name")
     suspend fun renameReflexionItem(autogenPK: Long, name: String, newName: String)
 
-    @Query("Select * FROM ReflexionItem WHERE parent =:parent")
+    @Query("Select * FROM ReflexionItem WHERE parent =:parent order by name")
     suspend fun selectChildReflexionItems(parent: Long): List<ReflexionItem?>
 
     @Query("UPDATE ReflexionItem SET parent = :newParent WHERE autogenPK = :autogenPK AND name = :name")
@@ -45,4 +45,6 @@ interface ReflexionItemDao {
     suspend fun getAllTopicsContainingString(search: String): List<ReflexionItem?>
     @Query("Select * FROM ReflexionItem WHERE parent =:pk AND name LIKE :search || '%' order by name")
     suspend fun selectChildrenContainingString(pk: Long, search: String?): List<ReflexionItem?>
+    @Query("SELECT * FROM ReflexionItem WHERE parent = :parent AND autogenPK IS NOT :pk order by name")
+    suspend fun selectSiblings(pk: Long, parent: Long): List<ReflexionItem?>
 }

@@ -1,18 +1,22 @@
 package com.livingtechusa.reflexion.ui.viewModels
 
+import android.R.attr
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.window.core.layout.WindowWidthSizeClass
 import com.livingtechusa.reflexion.R
+import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.navigation.ReflexionNavigationType
 import com.livingtechusa.reflexion.ui.build.BuildEvent
+import com.livingtechusa.reflexion.ui.children.ListEvent
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.MediaStoreUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,8 +29,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import com.livingtechusa.reflexion.ui.children.ListEvent
-import com.livingtechusa.reflexion.util.Temporary
+
 
 const val STATE_KEY_URL = "com.livingtechusa.reflexion.ui.build.BuildItemScreen.url"
 
@@ -67,6 +70,10 @@ class ItemViewModel @Inject constructor(
 
     suspend fun hasNoChildren(pk: Long): Boolean {
         return localServiceImpl.selectChildren(pk).isEmpty()
+    }
+
+    suspend fun hasNoSiblings(pk: Long, parentPk: Long): Boolean {
+        return localServiceImpl.selectSiblings(pk, parentPk).isEmpty()
     }
 
     fun onTriggerEvent(event: BuildEvent) {
@@ -135,6 +142,22 @@ class ItemViewModel @Inject constructor(
 
                     is BuildEvent.SetParent -> {
                         _reflexionItem.value.parent = event.parent
+                    }
+
+                    is BuildEvent.SendText -> {
+                        val text =
+                            reflexionItem.value.name + "\n" + reflexionItem.value.description + " \n" + reflexionItem.value.detailedDescription + "\n"
+                        val url = Uri.parse(reflexionItem.value.videoUrl)
+                        val image = reflexionItem.value.image?.let { ByteArray ->
+                            Converters().getBitmapFromByteArray(ByteArray)
+                            }
+                        val shareIntent = Intent()
+                        shareIntent.action = Intent.ACTION_SEND
+                        shareIntent.putExtra(Intent.EXTRA_TEXT, text)
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, image)
+                        shareIntent.type = "image/*"
+                        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        startActivity(context, Intent.createChooser(shareIntent, "Send Item text, Url, and Image"), null)
                     }
 
                     else -> {

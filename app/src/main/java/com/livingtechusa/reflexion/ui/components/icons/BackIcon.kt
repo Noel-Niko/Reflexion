@@ -1,4 +1,4 @@
-package com.livingtechusa.reflexion.ui.components
+package com.livingtechusa.reflexion.ui.components.icons
 
 
 import androidx.compose.material.Icon

@@ -37,4 +37,6 @@ sealed class BuildEvent {
 
     data class SetParent(val parent: Long): BuildEvent()
 
+    object SendText : BuildEvent()
+
 }

@@ -136,7 +136,7 @@ fun CompactScreen(
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
             BottomNavigation(
-                backgroundColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                backgroundColor = MaterialTheme.colorScheme.background,
             ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(
@@ -144,10 +144,10 @@ fun CompactScreen(
                         onClick = {
                             navController.navigate(navItem.route) {
                                 popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+//                                    saveState = true
                                 }
                                 launchSingleTop = true
-                                restoreState = true
+//                                restoreState = true
                             }
                         },
                         icon = {
@@ -169,7 +169,7 @@ fun CompactScreen(
                 .fillMaxSize()
                 .padding(paddingValue)
         ) {
-            ListContent(navController = navController, itemViewModel = viewModel, reflexionItemList= reflexionItemList)
+            ListContent(navController = navController, itemViewModel = viewModel, reflexionItemList = reflexionItemList)
         }
 
     }
@@ -186,7 +186,7 @@ fun MediumScreen(
     val currentRoute = backStackEntry?.destination?.route
     Row(modifier = Modifier.fillMaxSize()) {
         NavigationRail(
-            containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            containerColor = MaterialTheme.colorScheme.background,
         ) {
             icons.forEach { navItem ->
                 Spacer(modifier = Modifier.height(32.dp))
@@ -195,10 +195,10 @@ fun MediumScreen(
                     onClick = {
                         navController.navigate(navItem.route) {
                             popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
+//                                saveState = true
                             }
                             launchSingleTop = true
-                            restoreState = true
+//                            restoreState = true
                         }
                     },
                     icon = {
@@ -246,10 +246,10 @@ fun ExpandedScreen(
                     onClick = {
                         navController.navigate(navItem.route) {
                             popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
+//                                saveState = true
                             }
                             launchSingleTop = true
-                            restoreState = true
+//                            restoreState = true
                         }
                     }
                 )
