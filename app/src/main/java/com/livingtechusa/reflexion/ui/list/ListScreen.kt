@@ -88,11 +88,11 @@ fun ListDisplay(
                 viewModel.navigationType = ReflexionNavigationType.BOTTOM_NAVIGATION
             }
 
-//            WindowWidthSizeClass.MEDIUM -> {
-//                MediumScreen(navHostController, icons, viewModel, pk)
-//                viewModel.navigationType = ReflexionNavigationType.NAVIGATION_RAIL
-//            }
-//
+            WindowWidthSizeClass.MEDIUM -> {
+                MediumScreen(navHostController, icons, viewModel, search, reflexionItemList, viewModel::searchEvent)
+                viewModel.navigationType = ReflexionNavigationType.NAVIGATION_RAIL
+            }
+
 //            WindowWidthSizeClass.EXPANDED -> {
 //                ExpandedScreen(navHostController, icons, viewModel, pk)
 //                viewModel.navigationType = ReflexionNavigationType.PERMANENT_NAVIGATION_DRAWER
@@ -117,160 +117,53 @@ fun ListContent(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CompactScreen(
-    navController: NavHostController,
-    icons: List<BarItem>,
-    viewModel: ItemViewModel,
-    search: String?,
-    reflexionItemList: List<ReflexionItem>,
-    onSearch: (String?) -> Unit
-) {
-    androidx.compose.material3.Scaffold(
-        topBar = {
-            SearchBar(search = search, onSearch = onSearch )
-        },
-        containerColor = Color.LightGray,
-        bottomBar = {
-            val backStackEntry by navController.currentBackStackEntryAsState()
-            val currentRoute = backStackEntry?.destination?.route
-            BottomNavigation(
-                backgroundColor = MaterialTheme.colors.background,
-            ) {
-                icons.forEach { navItem ->
-                    BottomNavigationItem(
-                        selected = currentRoute == navItem.route,
-                        onClick = {
-                            navController.navigate(navItem.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-//                                    saveState = true
-                                }
-                                launchSingleTop = true
-//                                restoreState = true
-                            }
-                        },
-                        icon = {
-                            Icon(
-                                imageVector = navItem.image,
-                                contentDescription = navItem.title,
-                                tint = MaterialTheme.colors.onBackground
-                            )
-                        },
-                        label = {
-                            Text(text = navItem.title, color = MaterialTheme.colors.onBackground)
-                        }
-                    )
-                }
-            }
-        }
-    ) { paddingValue ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValue)
-        ) {
-            ListContent(navController = navController, itemViewModel = viewModel, reflexionItemList = reflexionItemList)
-        }
 
-    }
-}
-
-@Composable
-fun MediumScreen(
-    navController: NavHostController,
-    icons: List<BarItem>,
-    viewModel: ItemViewModel
-) {
-    val icons = NavBarItems.HomeBarItems
-    val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = backStackEntry?.destination?.route
-    Row(modifier = Modifier.fillMaxSize()) {
-        NavigationRail(
-            containerColor = MaterialTheme.colors.background,
-            contentColor = MaterialTheme.colors.onBackground
-
-        ) {
-            icons.forEach { navItem ->
-                Spacer(modifier = Modifier.height(32.dp))
-                NavigationRailItem(
-                    selected = currentRoute == navItem.route,
-                    onClick = {
-                        navController.navigate(navItem.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-//                                saveState = true
-                            }
-                            launchSingleTop = true
-//                            restoreState = true
-                        }
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = navItem.image,
-                            contentDescription = navItem.title,
-                            tint = MaterialTheme.colors.onBackground
-                        )
-                    })
-            }
-        }
-        Scaffold(
-            modifier = Modifier
-                .fillMaxSize()
-        ) { paddingValues ->
-//            ListContent(
-//                navController = navController,
-//                itemViewModel = viewModel,
-//                reflexionItemList = reflexionItemList
-//            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ExpandedScreen(
-    navController: NavHostController,
-    icons: List<BarItem>,
-    viewModel: ItemViewModel
-) {
-    val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = backStackEntry?.destination?.route
-    PermanentNavigationDrawer(
-        drawerContent = {
-            icons.forEach { navItem ->
-                NavigationDrawerItem(
-                    icon = {
-                        Icon(
-                            imageVector = navItem.image,
-                            contentDescription = navItem.title
-                        )
-                    },
-                    label = { Text(text = navItem.title, color = MaterialTheme.colors.onBackground) },
-                    selected = currentRoute == navItem.route,
-                    onClick = {
-                        navController.navigate(navItem.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-//                                saveState = true
-                            }
-                            launchSingleTop = true
-//                            restoreState = true
-                        }
-                    }
-                )
-            }
-        },
-        content = {
-            Scaffold(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) { paddingValues -> //TODO
-//                ListContent(
-//                    navController = navController,
-//                    itemViewModel = viewModel,
-//                    reflexionItemList = reflexionItemList
+//
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun ExpandedScreen(
+//    navController: NavHostController,
+//    icons: List<BarItem>,
+//    viewModel: ItemViewModel
+//) {
+//    val backStackEntry by navController.currentBackStackEntryAsState()
+//    val currentRoute = backStackEntry?.destination?.route
+//    PermanentNavigationDrawer(
+//        drawerContent = {
+//            icons.forEach { navItem ->
+//                NavigationDrawerItem(
+//                    icon = {
+//                        Icon(
+//                            imageVector = navItem.image,
+//                            contentDescription = navItem.title
+//                        )
+//                    },
+//                    label = { Text(text = navItem.title, color = MaterialTheme.colors.onBackground) },
+//                    selected = currentRoute == navItem.route,
+//                    onClick = {
+//                        navController.navigate(navItem.route) {
+//                            popUpTo(navController.graph.findStartDestination().id) {
+////                                saveState = true
+//                            }
+//                            launchSingleTop = true
+////                            restoreState = true
+//                        }
+//                    }
 //                )
-            }
-        }
-    )
-}
-
+//            }
+//        },
+//        content = {
+//            Scaffold(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//            ) { paddingValues -> //TODO
+////                ListContent(
+////                    navController = navController,
+////                    itemViewModel = viewModel,
+////                    reflexionItemList = reflexionItemList
+////                )
+//            }
+//        }
+//    )
+//}
+//

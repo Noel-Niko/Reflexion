@@ -1,7 +1,6 @@
 package com.livingtechusa.reflexion.ui.components
 
 import android.annotation.SuppressLint
-import android.widget.Toast
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,15 +33,16 @@ fun ReflexionItemListUI(
         content = {
             ReflexionItemsContent(
                 reflexionItems = reflexionItems,
-                onClick = {
+                onDoubleTap = {
                     navController.navigate(route = Screen.BuildItemScreen.route) {// + "/" + it.autogenPK) {
                         launchSingleTop = true
-                        restoreState = true
                     }
                     viewModel.onTriggerEvent(BuildEvent.GetSelectedReflexionItem(it.autogenPK))
                 },
-                onDoubleTap = {
-                    Toast.makeText(context, "LONG PRESSED", Toast.LENGTH_SHORT).show()
+                onLongPress = {
+                    navController.navigate(route = Screen.ListScreen.route +"/" + it.autogenPK) {
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -52,14 +52,14 @@ fun ReflexionItemListUI(
 @Composable
 private fun ReflexionItemColumnItem(
     reflexionItem: ReflexionItem,
-    onClick: () -> Unit,
-    onDoubleTap: () -> Unit
+    onDoubleTap: () -> Unit,
+    onLongPress: () -> Unit
 ) {
     Row(
         modifier = Modifier.pointerInput(Unit) {
             detectTapGestures(
-                onPress = { onClick() },
-                onDoubleTap = { onDoubleTap ()}
+                onDoubleTap = { onDoubleTap() },
+                onLongPress = { onLongPress ()}
             )
         }
     ) {
@@ -73,8 +73,8 @@ private fun ReflexionItemColumnItem(
 @Composable
 private fun ReflexionItemsContent(
     reflexionItems: List<ReflexionItem>,
-    onClick: (ReflexionItem) -> Unit,
-    onDoubleTap: (ReflexionItem) -> Unit
+    onDoubleTap: (ReflexionItem) -> Unit,
+    onLongPress: (ReflexionItem) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -84,8 +84,8 @@ private fun ReflexionItemsContent(
         items(reflexionItems) { reflexionItem ->
             ReflexionItemColumnItem(
                 reflexionItem = reflexionItem,
-                onClick = { onClick(reflexionItem) },
-                onDoubleTap = { onDoubleTap(reflexionItem) }
+                onDoubleTap = { onDoubleTap(reflexionItem) },
+                onLongPress = { onLongPress(reflexionItem) }
             )
         }
     }
