@@ -27,7 +27,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildItemScreen
-import com.livingtechusa.reflexion.ui.children.ListDisplay
+import com.livingtechusa.reflexion.ui.list.ListDisplay
 import com.livingtechusa.reflexion.ui.components.ConfirmSaveAlertDialog
 import com.livingtechusa.reflexion.ui.components.PasteAndSaveDialog
 import com.livingtechusa.reflexion.ui.components.VideoPlayer

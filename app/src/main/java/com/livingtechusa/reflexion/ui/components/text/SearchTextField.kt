@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.LocalTextStyle
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,26 +20,26 @@ internal fun SearchTextField(
     search: String,
     onSearch: (String?) -> Unit,
 ) {
-  val textFieldColors = TextFieldDefaults.textFieldColors()
-  val focusRequester = remember { FocusRequester() }
-  val cursorColor = TextFieldDefaults.textFieldColors().cursorColor(isError = false).value
+    val textFieldColors = TextFieldDefaults.textFieldColors()
+    val focusRequester = remember { FocusRequester() }
+    val cursorColor = TextFieldDefaults.textFieldColors().cursorColor(isError = false).value
 
     BasicTextField(
-      modifier = Modifier
-          .fillMaxWidth()
-          .focusRequester(focusRequester),
-      value = search,
-      onValueChange = onSearch,
-      singleLine = true,
-      keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-      cursorBrush = SolidColor(cursorColor),
-      textStyle = LocalTextStyle.current.copy(
-          color = textFieldColors.textColor(enabled = true).value
-      ),
-  )
-  LaunchedEffect(Unit) {
-    if (search.isEmpty()) {
-      focusRequester.requestFocus()
+        modifier = Modifier
+            .fillMaxWidth()
+            .focusRequester(focusRequester),
+        value = search,
+        onValueChange = onSearch,
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        cursorBrush = SolidColor(cursorColor),
+        textStyle = LocalTextStyle.current.copy(
+            color = MaterialTheme.colors.onBackground
+        ),
+    )
+    LaunchedEffect(Unit) {
+        if (search.isEmpty()) {
+            focusRequester.requestFocus()
+        }
     }
-  }
 }

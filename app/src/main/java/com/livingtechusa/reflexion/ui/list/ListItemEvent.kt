@@ -1,6 +1,4 @@
-package com.livingtechusa.reflexion.ui.children
-
-import com.livingtechusa.reflexion.data.entities.ReflexionItem
+package com.livingtechusa.reflexion.ui.list
 
 sealed class ListEvent {
 

@@ -1,6 +1,5 @@
 package com.livingtechusa.reflexion.ui.viewModels
 
-import android.R.attr
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -16,7 +15,7 @@ import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.navigation.ReflexionNavigationType
 import com.livingtechusa.reflexion.ui.build.BuildEvent
-import com.livingtechusa.reflexion.ui.children.ListEvent
+import com.livingtechusa.reflexion.ui.list.ListEvent
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.MediaStoreUtils
 import dagger.hilt.android.lifecycle.HiltViewModel

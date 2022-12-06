@@ -17,7 +17,7 @@ import androidx.compose.material.icons.filled.SendToMobile
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -52,7 +52,12 @@ fun CompactScreen(
         scaffoldState = state,
         topBar = {
             TopAppBar(
-                title = { Text(text = stringResource(id = R.string.app_name)) },
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.app_name),
+                        color = MaterialTheme.colors.onBackground
+                    )
+                },
                 actions = {
                     Row() {
                         IconButton(
@@ -61,24 +66,26 @@ fun CompactScreen(
                                 Icon(
                                     imageVector = Icons.Default.SendToMobile,
                                     contentDescription = "send",
-                                    tint = ReflexionItemsColors.salem,
+                                    tint = MaterialTheme.colors.onBackground,
                                 )
                             },
                         )
                         IconButton(
-                            onClick = {  viewModel.onTriggerEvent(BuildEvent.SendText) },
+                            onClick = { viewModel.onTriggerEvent(BuildEvent.SendText) },
                             content = {
                                 Icon(
                                     imageVector = Icons.Default.Send,
                                     contentDescription = "send",
-                                    tint = ReflexionItemsColors.salem,
+                                    tint = MaterialTheme.colors.onBackground,
                                 )
                             },
                         )
                         IconButton(
                             onClick = {
                                 Toast.makeText(
-                                    context, resource.getString(R.string.changes_saved), Toast.LENGTH_SHORT
+                                    context,
+                                    resource.getString(R.string.changes_saved),
+                                    Toast.LENGTH_SHORT
                                 ).show()
 //                                if (savedReflexionItem.autogenPK != 0L) {
 //                                    reflexionItem.autogenPK = savedReflexionItem.autogenPK
@@ -98,13 +105,13 @@ fun CompactScreen(
                                 Icon(
                                     imageVector = Icons.Default.Save,
                                     contentDescription = "save",
-                                    tint = ReflexionItemsColors.salem,
+                                    tint = MaterialTheme.colors.onBackground
                                 )
                             },
                         )
                     }
                 },
-                backgroundColor = MaterialTheme.colorScheme.background,
+                backgroundColor = MaterialTheme.colors.background,
                 elevation = 4.dp,
                 navigationIcon = {
                     Icon(
@@ -114,7 +121,8 @@ fun CompactScreen(
                             scope.launch {
                                 if (state.drawerState.isClosed) state.drawerState.open() else state.drawerState.close()
                             }
-                        })
+                        }),
+                        tint = MaterialTheme.colors.onBackground
                     )
                 })
         },
@@ -132,17 +140,19 @@ fun CompactScreen(
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
             BottomNavigation(
-                backgroundColor = MaterialTheme.colorScheme.background,
+                backgroundColor = MaterialTheme.colors.background,
             ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(selected = currentRoute == navItem.route, onClick = {
                         navController.navigate(navItem.route) {}
                     }, icon = {
                         Icon(
-                            imageVector = navItem.image, contentDescription = navItem.title
+                            imageVector = navItem.image,
+                            contentDescription = navItem.title,
+                            tint = MaterialTheme.colors.onBackground
                         )
                     }, label = {
-                        Text(text = navItem.title)
+                        Text(text = navItem.title, color = MaterialTheme.colors.onBackground)
                     })
                 }
             }

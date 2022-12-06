@@ -3,6 +3,7 @@ package com.livingtechusa.reflexion.ui.components.icons
 
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
@@ -16,7 +17,7 @@ fun SearchIcon(onClick: () -> Unit) {
         Icon(
             imageVector = Icons.Default.Search,
             contentDescription = "search",
-            tint = ReflexionItemsColors.salem,
+            tint = MaterialTheme.colors.onBackground,
         )
       },
   )

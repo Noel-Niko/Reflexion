@@ -1,4 +1,4 @@
-package com.livingtechusa.reflexion.ui.children
+package com.livingtechusa.reflexion.ui.list
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,10 +8,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
@@ -136,7 +136,7 @@ fun CompactScreen(
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
             BottomNavigation(
-                backgroundColor = MaterialTheme.colorScheme.background,
+                backgroundColor = MaterialTheme.colors.background,
             ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(
@@ -153,11 +153,12 @@ fun CompactScreen(
                         icon = {
                             Icon(
                                 imageVector = navItem.image,
-                                contentDescription = navItem.title
+                                contentDescription = navItem.title,
+                                tint = MaterialTheme.colors.onBackground
                             )
                         },
                         label = {
-                            Text(text = navItem.title)
+                            Text(text = navItem.title, color = MaterialTheme.colors.onBackground)
                         }
                     )
                 }
@@ -186,7 +187,9 @@ fun MediumScreen(
     val currentRoute = backStackEntry?.destination?.route
     Row(modifier = Modifier.fillMaxSize()) {
         NavigationRail(
-            containerColor = MaterialTheme.colorScheme.background,
+            containerColor = MaterialTheme.colors.background,
+            contentColor = MaterialTheme.colors.onBackground
+
         ) {
             icons.forEach { navItem ->
                 Spacer(modifier = Modifier.height(32.dp))
@@ -204,7 +207,8 @@ fun MediumScreen(
                     icon = {
                         Icon(
                             imageVector = navItem.image,
-                            contentDescription = navItem.title
+                            contentDescription = navItem.title,
+                            tint = MaterialTheme.colors.onBackground
                         )
                     })
             }
@@ -241,7 +245,7 @@ fun ExpandedScreen(
                             contentDescription = navItem.title
                         )
                     },
-                    label = { Text(text = navItem.title) },
+                    label = { Text(text = navItem.title, color = MaterialTheme.colors.onBackground) },
                     selected = currentRoute == navItem.route,
                     onClick = {
                         navController.navigate(navItem.route) {
