@@ -39,4 +39,7 @@ sealed class BuildEvent {
 
     object SendText : BuildEvent()
 
+    object SaveFromTopBar : BuildEvent()
+
+
 }

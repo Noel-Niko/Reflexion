@@ -65,6 +65,9 @@ class ItemViewModel @Inject constructor(
         throwable.printStackTrace()
     }
 
+    private val _SaveNow = MutableStateFlow(false)
+    val saveNow: StateFlow<Boolean> get() = _SaveNow
+
     var listPK = 0L
 
     suspend fun hasNoChildren(pk: Long): Boolean {
@@ -144,19 +147,28 @@ class ItemViewModel @Inject constructor(
                     }
 
                     is BuildEvent.SendText -> {
-                        val text =
-                            reflexionItem.value.name + "\n" + reflexionItem.value.description + " \n" + reflexionItem.value.detailedDescription + "\n"
-                        val url = Uri.parse(reflexionItem.value.videoUrl)
-                        val image = reflexionItem.value.image?.let { ByteArray ->
-                            Converters().getBitmapFromByteArray(ByteArray)
-                            }
-                        val shareIntent = Intent()
+                        val text = reflexionItem.value.name + "\n" + reflexionItem.value.description +
+                                " \n" + reflexionItem.value.detailedDescription + "\n" + reflexionItem.value.videoUrl
+
+                        val video = reflexionItem.value.videoUri?.let {
+                            Converters().convertStringToUri(
+                                it
+                            )
+                        }
+                         val shareIntent = Intent()
                         shareIntent.action = Intent.ACTION_SEND
+                        shareIntent.type = "text/*"
+
                         shareIntent.putExtra(Intent.EXTRA_TEXT, text)
-                        shareIntent.putExtra(Intent.EXTRA_STREAM, image)
-                        shareIntent.type = "image/*"
-                        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                        startActivity(context, Intent.createChooser(shareIntent, "Send Item text, Url, and Image"), null)
+                        //shareIntent.putExtra(Intent.EXTRA_STREAM, video)
+
+                        //shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(context, shareIntent, null)
+  }
+
+                    is BuildEvent.SaveFromTopBar -> {
+                        _SaveNow.value = true
                     }
 
                     else -> {
@@ -237,5 +249,9 @@ class ItemViewModel @Inject constructor(
         } else {
             onTriggerEvent(ListEvent.Search(term, reflexionItem.value.autogenPK))
         }
+    }
+
+    fun setSaveNow(saveNow: Boolean) {
+            _SaveNow.value = saveNow
     }
 }

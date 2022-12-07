@@ -13,7 +13,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
@@ -52,9 +52,9 @@ fun MediumScreen(
             TopAppBar(
                 modifier = Modifier.fillMaxWidth(),
                 title = {
-                    Text(text = stringResource(id = R.string.app_name))
+                    Text(text = stringResource(id = R.string.app_name), color = MaterialTheme.colors.onBackground)
                 },
-                backgroundColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                backgroundColor = MaterialTheme.colors.background,
                 elevation = 4.dp,
                 navigationIcon = {
                     Icon(
@@ -85,7 +85,7 @@ fun MediumScreen(
             Column() {
                 NavigationRail(
                     modifier = Modifier.fillMaxHeight(),
-                    containerColor = MaterialTheme.colorScheme.background,
+                    containerColor = MaterialTheme.colors.background,
                 ) {
                     icons.forEach { navItem ->
                         Spacer(modifier = Modifier.height(32.dp))

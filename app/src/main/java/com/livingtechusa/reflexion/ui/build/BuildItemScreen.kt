@@ -138,6 +138,7 @@ fun BuildContent(
     val scope = rememberCoroutineScope()
     val error by viewModel.errorFlow.collectAsState(null)
     val savedReflexionItem by itemViewModel.reflexionItem.collectAsState()
+    val saveNow by itemViewModel.saveNow.collectAsState()
     val resource = ResourceProviderSingleton
     val reflexionItem = // remember??? TODO
         ReflexionItem(
@@ -179,11 +180,31 @@ fun BuildContent(
     val offsetX = remember { mutableStateOf(0f) }
     val offsetY = remember { mutableStateOf(0f) }
 
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)
     ) {
+        if(saveNow) {
+            Toast.makeText(
+                context, resource.getString(R.string.changes_saved), Toast.LENGTH_SHORT
+            ).show()
+            if (savedReflexionItem.autogenPK != 0L) {
+                reflexionItem.autogenPK = savedReflexionItem.autogenPK
+                reflexionItem.name = reflexionItem.name.trim()
+                itemViewModel.onTriggerEvent(
+                    BuildEvent.UpdateReflexionItem(
+                        reflexionItem
+                    )
+                )
+                Temporary.tempReflexionItem = ReflexionItem()
+            } else {
+                itemViewModel.onTriggerEvent(BuildEvent.SaveNew(reflexionItem))
+                Temporary.tempReflexionItem = ReflexionItem()
+            }
+            itemViewModel.setSaveNow(false)
+        }
         Scaffold(floatingActionButton = {
             /* SAVE */
             SmallFloatingActionButton(modifier = Modifier

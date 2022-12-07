@@ -8,6 +8,7 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -17,7 +18,6 @@ import androidx.compose.material.icons.filled.SendToMobile
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -32,7 +32,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.BarItem
-import com.livingtechusa.reflexion.ui.theme.ReflexionItemsColors
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import kotlinx.coroutines.launch
@@ -87,19 +86,7 @@ fun CompactScreen(
                                     resource.getString(R.string.changes_saved),
                                     Toast.LENGTH_SHORT
                                 ).show()
-//                                if (savedReflexionItem.autogenPK != 0L) {
-//                                    reflexionItem.autogenPK = savedReflexionItem.autogenPK
-//                                    reflexionItem.name = reflexionItem.name.trim()
-//                                    viewModel.onTriggerEvent(
-//                                        BuildEvent.UpdateReflexionItem(
-//                                            reflexionItem
-//                                        )
-//                                    )
-//                                    Temporary.tempReflexionItem = ReflexionItem()
-//                                } else {
-//                                    viewModel.onTriggerEvent(BuildEvent.SaveNew(reflexionItem))
-//                                    Temporary.tempReflexionItem = ReflexionItem()
-//                                }
+                                viewModel.onTriggerEvent(BuildEvent.SaveFromTopBar)
                             },
                             content = {
                                 Icon(

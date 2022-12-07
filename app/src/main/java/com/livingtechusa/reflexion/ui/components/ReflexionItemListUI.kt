@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -19,6 +20,9 @@ import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -29,18 +33,22 @@ fun ReflexionItemListUI(
     viewModel: ItemViewModel
     ) {
     val context = LocalContext.current
+    val scope =  rememberCoroutineScope()
     Scaffold(
         content = {
             ReflexionItemsContent(
                 reflexionItems = reflexionItems,
-                onDoubleTap = {
-                    navController.navigate(route = Screen.BuildItemScreen.route) {// + "/" + it.autogenPK) {
-                        launchSingleTop = true
+                onDoubleTap = { reflexionItem ->
+                    CoroutineScope(Dispatchers.Main).launch {
+                        val job = launch {  viewModel.onTriggerEvent(BuildEvent.GetSelectedReflexionItem(reflexionItem.autogenPK)) }
+                        job.join()
+                        navController.navigate(route = Screen.BuildItemScreen.route) {// + "/" + it.autogenPK) {
+                            launchSingleTop = true
+                        }
                     }
-                    viewModel.onTriggerEvent(BuildEvent.GetSelectedReflexionItem(it.autogenPK))
                 },
-                onLongPress = {
-                    navController.navigate(route = Screen.ListScreen.route +"/" + it.autogenPK) {
+                onLongPress = { reflexionItem ->
+                    navController.navigate(route = Screen.ListScreen.route +"/" + reflexionItem.autogenPK) {
                         launchSingleTop = true
                     }
                 }
