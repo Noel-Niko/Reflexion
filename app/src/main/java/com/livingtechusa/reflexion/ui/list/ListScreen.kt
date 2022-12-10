@@ -50,7 +50,7 @@ fun ListDisplay(
     viewModel: ItemViewModel = hiltViewModel(),
     navHostController: NavHostController,
     windowSize: WindowWidthSizeClass,
-    pk: Long
+    pk: Long?
 ) {
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
 
@@ -60,7 +60,6 @@ fun ListDisplay(
         // for sending analytics events
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_CREATE) {
-                viewModel.listPK = pk
                 viewModel.onTriggerEvent(ListEvent.GetList(pk))
             }
         }
@@ -70,7 +69,6 @@ fun ListDisplay(
 
         // When the effect leaves the Composition, remove the observer
         onDispose {
-            viewModel.listPK = 0L
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
@@ -85,12 +83,10 @@ fun ListDisplay(
         when (windowSize) {
             WindowWidthSizeClass.COMPACT -> {
                 CompactScreen(navHostController, icons, viewModel, search, reflexionItemList, viewModel::searchEvent)
-                viewModel.navigationType = ReflexionNavigationType.BOTTOM_NAVIGATION
             }
 
             WindowWidthSizeClass.MEDIUM -> {
                 MediumScreen(navHostController, icons, viewModel, search, reflexionItemList, viewModel::searchEvent)
-                viewModel.navigationType = ReflexionNavigationType.NAVIGATION_RAIL
             }
 
 //            WindowWidthSizeClass.EXPANDED -> {

@@ -13,7 +13,6 @@ import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
-import com.livingtechusa.reflexion.navigation.ReflexionNavigationType
 import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.list.ListEvent
 import com.livingtechusa.reflexion.util.BaseApplication
@@ -21,9 +20,7 @@ import com.livingtechusa.reflexion.util.MediaStoreUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -43,22 +40,20 @@ class ItemViewModel @Inject constructor(
 
     private val TAG = "ItemViewModel"
 
-    var navigationType = ReflexionNavigationType.BOTTOM_NAVIGATION
-
+    // The active item being viewed in build or selected from a list to be viewed in build
     private val _reflexionItem = MutableStateFlow(ReflexionItem())
     val reflexionItem: StateFlow<ReflexionItem> get() = _reflexionItem
 
+    // Currently displayed list of items in the list
     private val _list = MutableStateFlow(emptyList<ReflexionItem>())
     val list: StateFlow<List<ReflexionItem>> get() = _list
 
+    // Term for query
     private val _search = MutableStateFlow(null as String?)
     val search: StateFlow<String?> = _search
 
     private val context: Context
         get() = BaseApplication.getInstance()
-
-    private val _errorFlow = MutableSharedFlow<String>()
-    val errorFlow: SharedFlow<String> = _errorFlow
 
     private val handler = CoroutineExceptionHandler { _, throwable ->
         Log.i(TAG, "ERROR: $throwable")
@@ -82,7 +77,6 @@ class ItemViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 when (event) {
-
                     is BuildEvent.UpdateReflexionItem -> {
                         withContext(Dispatchers.IO) {
                             _reflexionItem.value = event.reflexionItem
@@ -147,15 +141,16 @@ class ItemViewModel @Inject constructor(
                     }
 
                     is BuildEvent.SendText -> {
-                        val text = reflexionItem.value.name + "\n" + reflexionItem.value.description +
-                                " \n" + reflexionItem.value.detailedDescription + "\n" + reflexionItem.value.videoUrl
+                        val text =
+                            reflexionItem.value.name + "\n" + reflexionItem.value.description +
+                                    " \n" + reflexionItem.value.detailedDescription + "\n" + reflexionItem.value.videoUrl
 
                         val video = reflexionItem.value.videoUri?.let {
                             Converters().convertStringToUri(
                                 it
                             )
                         }
-                         val shareIntent = Intent()
+                        val shareIntent = Intent()
                         shareIntent.action = Intent.ACTION_SEND
                         shareIntent.type = "text/*"
 
@@ -165,7 +160,7 @@ class ItemViewModel @Inject constructor(
                         //shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                         shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         startActivity(context, shareIntent, null)
-  }
+                    }
 
                     is BuildEvent.SaveFromTopBar -> {
                         _SaveNow.value = true
@@ -189,12 +184,13 @@ class ItemViewModel @Inject constructor(
             try {
                 when (event) {
                     is ListEvent.GetList -> {
-                        if (event.pk == -1L) {
+                        if (event.pk == null || event.pk == -1L) {
                             _list.value = localServiceImpl.getAllTopics() as List<ReflexionItem>
                         } else {
                             _list.value =
                                 localServiceImpl.selectChildren(event.pk) as List<ReflexionItem>
                         }
+                        val x = list
                     }
 
                     is ListEvent.Search -> {
@@ -202,16 +198,22 @@ class ItemViewModel @Inject constructor(
                             if (event.search.isNullOrEmpty()) {
                                 _list.value = localServiceImpl.getAllTopics() as List<ReflexionItem>
                             } else {
+                                // Topic key work search
                                 _list.value =
                                     localServiceImpl.getAllTopicsContainingString(event.search) as List<ReflexionItem>
                             }
                         } else {
+                            // Children keyword search
                             _list.value =
                                 localServiceImpl.selectChildrenContainingString(
                                     event.pk,
                                     event.search
                                 ) as List<ReflexionItem>
                         }
+                    }
+
+                    is ListEvent.ClearList -> {
+                        _list.value = emptyList()
                     }
 
                     else -> {
@@ -234,7 +236,8 @@ class ItemViewModel @Inject constructor(
         return if (uri != null) {
             uri
         } else {
-            _errorFlow.emit("Could not create a video Uri\n$filename")
+            Toast.makeText(context, "Could not create a video Uri\n$filename", Toast.LENGTH_SHORT)
+                .show()
             null
         }
     }
@@ -252,6 +255,6 @@ class ItemViewModel @Inject constructor(
     }
 
     fun setSaveNow(saveNow: Boolean) {
-            _SaveNow.value = saveNow
+        _SaveNow.value = saveNow
     }
 }

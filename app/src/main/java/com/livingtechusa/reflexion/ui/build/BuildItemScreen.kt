@@ -106,12 +106,10 @@ fun BuildItemScreen(
         when (windowSize) {
             WindowWidthSizeClass.COMPACT -> {
                 CompactScreen(navHostController, icons, viewModel)
-                viewModel.navigationType = ReflexionNavigationType.BOTTOM_NAVIGATION
             }
 
             WindowWidthSizeClass.MEDIUM -> {
                 MediumScreen(navHostController, icons, viewModel)
-                viewModel.navigationType = ReflexionNavigationType.NAVIGATION_RAIL
             }
 
 //            WindowWidthSizeClass.EXPANDED -> {
@@ -136,7 +134,6 @@ fun BuildContent(
 
     val itemViewModel: ItemViewModel = viewModel
     val scope = rememberCoroutineScope()
-    val error by viewModel.errorFlow.collectAsState(null)
     val savedReflexionItem by itemViewModel.reflexionItem.collectAsState()
     val saveNow by itemViewModel.saveNow.collectAsState()
     val resource = ResourceProviderSingleton
@@ -169,13 +166,6 @@ fun BuildContent(
             itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
         }
     }
-
-
-
-    LaunchedEffect(error) {
-        error?.let { scaffoldState.snackbarHostState.showSnackbar(it) }
-    }
-
 
     val offsetX = remember { mutableStateOf(0f) }
     val offsetY = remember { mutableStateOf(0f) }

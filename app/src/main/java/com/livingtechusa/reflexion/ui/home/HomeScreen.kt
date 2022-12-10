@@ -44,12 +44,10 @@ fun HomeScreen(
         when (windowSize) {
             WindowWidthSizeClass.COMPACT -> {
                 CompactScreen(navHostController, icons)
-                viewModel.navigationType = ReflexionNavigationType.BOTTOM_NAVIGATION
             }
 
             WindowWidthSizeClass.MEDIUM -> {
                 Landscape(navHostController, icons)
-                viewModel.navigationType = ReflexionNavigationType.NAVIGATION_RAIL
             }
 
 //            WindowWidthSizeClass.EXPANDED -> {

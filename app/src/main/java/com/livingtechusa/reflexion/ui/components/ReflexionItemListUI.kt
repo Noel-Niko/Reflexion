@@ -1,6 +1,7 @@
 package com.livingtechusa.reflexion.ui.components
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -19,6 +21,7 @@ import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildEvent
+import com.livingtechusa.reflexion.ui.list.ListEvent
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,16 +34,21 @@ fun ReflexionItemListUI(
     reflexionItems: List<ReflexionItem>,
     navController: NavHostController,
     viewModel: ItemViewModel
-    ) {
+) {
     val context = LocalContext.current
-    val scope =  rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
+    val list = viewModel.list.collectAsState()
     Scaffold(
         content = {
             ReflexionItemsContent(
-                reflexionItems = reflexionItems,
+                reflexionItems = list.value,
                 onDoubleTap = { reflexionItem ->
-                    CoroutineScope(Dispatchers.Main).launch {
-                        val job = launch {  viewModel.onTriggerEvent(BuildEvent.GetSelectedReflexionItem(reflexionItem.autogenPK)) }
+                    scope.launch {
+                        val job = launch {
+                            viewModel.onTriggerEvent(
+                                BuildEvent.GetSelectedReflexionItem(reflexionItem.autogenPK)
+                            )
+                        }
                         job.join()
                         navController.navigate(route = Screen.BuildItemScreen.route) {// + "/" + it.autogenPK) {
                             launchSingleTop = true
@@ -48,8 +56,14 @@ fun ReflexionItemListUI(
                     }
                 },
                 onLongPress = { reflexionItem ->
-                    navController.navigate(route = Screen.ListScreen.route +"/" + reflexionItem.autogenPK) {
-                        launchSingleTop = true
+                    scope.launch {
+                        if (viewModel.hasNoChildren(reflexionItem.autogenPK)) {
+                            Toast.makeText(context, "No child items found.", Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            viewModel.onTriggerEvent(ListEvent.ClearList)
+                            viewModel.onTriggerEvent(ListEvent.GetList(reflexionItem.autogenPK))
+                        }
                     }
                 }
             )
@@ -67,7 +81,7 @@ private fun ReflexionItemColumnItem(
         modifier = Modifier.pointerInput(Unit) {
             detectTapGestures(
                 onDoubleTap = { onDoubleTap() },
-                onLongPress = { onLongPress ()}
+                onLongPress = { onLongPress() }
             )
         }
     ) {
