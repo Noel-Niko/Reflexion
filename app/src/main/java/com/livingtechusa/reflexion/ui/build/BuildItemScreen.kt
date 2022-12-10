@@ -47,6 +47,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -62,6 +63,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -69,6 +71,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -88,6 +93,7 @@ import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import com.livingtechusa.reflexion.util.Temporary
 import com.livingtechusa.reflexion.util.extensions.findActivity
 import com.livingtechusa.reflexion.ui.components.icons.BuildIcons
+import com.livingtechusa.reflexion.ui.list.ListEvent
 import com.livingtechusa.reflexion.ui.theme.ReflexionItemsColors
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -99,19 +105,40 @@ fun BuildItemScreen(
     navHostController: NavHostController,
     windowSize: WindowWidthSizeClass,
     viewModel: ItemViewModel = hiltViewModel(),
+    pk: Long?
 ) {
+
     val context = LocalContext.current
     val icons = NavBarItems.BuildBarItems
+
+    val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
+    // If `lifecycleOwner` changes, dispose and reset the effect
+    DisposableEffect(lifecycleOwner) {
+        // Create an observer that triggers our remembered callbacks
+        // for sending analytics events
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_CREATE) {
+                viewModel.onTriggerEvent(BuildEvent.GetSelectedReflexionItem(pk))
+            }
+        }
+
+        // Add the observer to the lifecycle
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        // When the effect leaves the Composition, remove the observer
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     if (context.findActivity() != null) {
         when (windowSize) {
             WindowWidthSizeClass.COMPACT -> {
                 CompactScreen(navHostController, icons, viewModel)
-                viewModel.navigationType = ReflexionNavigationType.BOTTOM_NAVIGATION
             }
 
             WindowWidthSizeClass.MEDIUM -> {
                 MediumScreen(navHostController, icons, viewModel)
-                viewModel.navigationType = ReflexionNavigationType.NAVIGATION_RAIL
             }
 
 //            WindowWidthSizeClass.EXPANDED -> {
@@ -179,7 +206,6 @@ fun BuildContent(
 
     val offsetX = remember { mutableStateOf(0f) }
     val offsetY = remember { mutableStateOf(0f) }
-
 
     Box(
         modifier = Modifier

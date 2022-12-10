@@ -7,9 +7,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -19,7 +24,9 @@ import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildEvent
+import com.livingtechusa.reflexion.ui.list.ListEvent
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import com.livingtechusa.reflexion.ui.viewModels.ListViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,27 +35,30 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ReflexionItemListUI(
-    reflexionItems: List<ReflexionItem>,
     navController: NavHostController,
-    viewModel: ItemViewModel
+    viewModel: ListViewModel
     ) {
     val context = LocalContext.current
     val scope =  rememberCoroutineScope()
+    val state = rememberScaffoldState()
+    val reflexionItemList by viewModel.list.collectAsState()
     Scaffold(
+        scaffoldState = state,
         content = {
             ReflexionItemsContent(
-                reflexionItems = reflexionItems,
+                reflexionItems = reflexionItemList,
                 onDoubleTap = { reflexionItem ->
-                    CoroutineScope(Dispatchers.Main).launch {
-                        val job = launch {  viewModel.onTriggerEvent(BuildEvent.GetSelectedReflexionItem(reflexionItem.autogenPK)) }
-                        job.join()
-                        navController.navigate(route = Screen.BuildItemScreen.route) {// + "/" + it.autogenPK) {
+                    //CoroutineScope(Dispatchers.Main).launch {
+                       // viewModel.onTriggerEvent(ListEvent.GetList(pk))
+
+                        navController.navigate(route = Screen.BuildItemScreen.route + "/" + reflexionItem.autogenPK) {
                             launchSingleTop = true
                         }
-                    }
+                   // }
                 },
                 onLongPress = { reflexionItem ->
                     navController.navigate(route = Screen.ListScreen.route +"/" + reflexionItem.autogenPK) {
+                        viewModel.onTriggerEvent(ListEvent.GetList(reflexionItem.autogenPK))
                         launchSingleTop = true
                     }
                 }

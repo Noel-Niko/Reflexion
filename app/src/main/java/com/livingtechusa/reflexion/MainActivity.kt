@@ -110,7 +110,28 @@ class MainActivity : ComponentActivity() {
                         BuildItemScreen(
                             navHostController = navController,
                             windowSize = windowSize,
-                            viewModel = parentViewModel
+                            viewModel = parentViewModel,
+                            pk = null
+                        )
+                    }
+
+                    composable(
+                        route = Screen.BuildItemScreen.route + "/{reflexion_item_pk}",
+                        arguments = listOf(
+                            navArgument(REFLEXION_ITEM_PK) {
+                                type = NavType.LongType
+                            }
+                        )
+                    ) { navBackStackEntry ->
+                        val parentEntry = remember(navBackStackEntry) {
+                            navController.getBackStackEntry(Screen.HomeScreen.route)
+                        }
+                        val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
+                        BuildItemScreen(
+                            navHostController = navController,
+                            windowSize = windowSize,
+                            viewModel = parentViewModel,
+                            pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK)
                         )
                     }
 
@@ -167,12 +188,7 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     ) { navBackStackEntry ->
-                        val parentEntry = remember(navBackStackEntry) {
-                            navController.getBackStackEntry(Screen.HomeScreen.route)
-                        }
-                        val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         ListDisplay(
-                            viewModel = parentViewModel,
                             navHostController = navController,
                             pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK) ?: -1L,
                             windowSize = windowSize,

@@ -37,22 +37,17 @@ enum class ApiStatus { PRE_INIT, LOADING, ERROR, DONE }
 
 @HiltViewModel
 class ItemViewModel @Inject constructor(
-    private val localServiceImpl: LocalServiceImpl,
-    private val state: SavedStateHandle
+    private val localServiceImpl: LocalServiceImpl
 ) : ViewModel() {
 
     private val TAG = "ItemViewModel"
 
-    var navigationType = ReflexionNavigationType.BOTTOM_NAVIGATION
-
+//    var navigationType = ReflexionNavigationType.BOTTOM_NAVIGATION
+//
     private val _reflexionItem = MutableStateFlow(ReflexionItem())
     val reflexionItem: StateFlow<ReflexionItem> get() = _reflexionItem
 
-    private val _list = MutableStateFlow(emptyList<ReflexionItem>())
-    val list: StateFlow<List<ReflexionItem>> get() = _list
 
-    private val _search = MutableStateFlow(null as String?)
-    val search: StateFlow<String?> = _search
 
     private val context: Context
         get() = BaseApplication.getInstance()
@@ -67,8 +62,6 @@ class ItemViewModel @Inject constructor(
 
     private val _SaveNow = MutableStateFlow(false)
     val saveNow: StateFlow<Boolean> get() = _SaveNow
-
-    var listPK = 0L
 
     suspend fun hasNoChildren(pk: Long): Boolean {
         return localServiceImpl.selectChildren(pk).isEmpty()
@@ -184,49 +177,6 @@ class ItemViewModel @Inject constructor(
         }
     }
 
-    fun onTriggerEvent(event: ListEvent) {
-        viewModelScope.launch {
-            try {
-                when (event) {
-                    is ListEvent.GetList -> {
-                        if (event.pk == -1L) {
-                            _list.value = localServiceImpl.getAllTopics() as List<ReflexionItem>
-                        } else {
-                            _list.value =
-                                localServiceImpl.selectChildren(event.pk) as List<ReflexionItem>
-                        }
-                    }
-
-                    is ListEvent.Search -> {
-                        if (event.pk == -1L) {
-                            if (event.search.isNullOrEmpty()) {
-                                _list.value = localServiceImpl.getAllTopics() as List<ReflexionItem>
-                            } else {
-                                _list.value =
-                                    localServiceImpl.getAllTopicsContainingString(event.search) as List<ReflexionItem>
-                            }
-                        } else {
-                            _list.value =
-                                localServiceImpl.selectChildrenContainingString(
-                                    event.pk,
-                                    event.search
-                                ) as List<ReflexionItem>
-                        }
-                    }
-
-                    else -> {
-                        Toast.makeText(context, "No matching items", Toast.LENGTH_SHORT).show()
-                    }
-
-                }
-            } catch (e: Exception) {
-                Log.e(
-                    TAG,
-                    "Exception: ${e.message}  with cause: ${e.cause}"
-                )
-            }
-        }
-    }
 
     suspend fun createVideoUri(): Uri? {
         val filename = context.getString(R.string.app_name) + "${System.currentTimeMillis()}.mp4"
@@ -242,14 +192,7 @@ class ItemViewModel @Inject constructor(
     //    private fun effect(block: suspend () -> Unit) {
 //        viewModelScope.launch(Dispatchers.IO) { block() }
 //    }
-    fun searchEvent(term: String?) {
-        _search.value = term
-        if (term.isNullOrEmpty()) {
-            onTriggerEvent(ListEvent.GetList(listPK))
-        } else {
-            onTriggerEvent(ListEvent.Search(term, reflexionItem.value.autogenPK))
-        }
-    }
+
 
     fun setSaveNow(saveNow: Boolean) {
             _SaveNow.value = saveNow

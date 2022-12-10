@@ -41,13 +41,14 @@ import com.livingtechusa.reflexion.navigation.ReflexionNavigationType
 import com.livingtechusa.reflexion.ui.components.ReflexionItemListUI
 import com.livingtechusa.reflexion.ui.components.bars.SearchBar
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import com.livingtechusa.reflexion.ui.viewModels.ListViewModel
 import com.livingtechusa.reflexion.util.extensions.findActivity
 
 const val ListRoute = "list"
 
 @Composable
 fun ListDisplay(
-    viewModel: ItemViewModel = hiltViewModel(),
+    viewModel: ListViewModel = hiltViewModel(),
     navHostController: NavHostController,
     windowSize: WindowWidthSizeClass,
     pk: Long
@@ -59,8 +60,7 @@ fun ListDisplay(
         // Create an observer that triggers our remembered callbacks
         // for sending analytics events
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_CREATE) {
-                viewModel.listPK = pk
+            if (event == Lifecycle.Event.ON_RESUME) {
                 viewModel.onTriggerEvent(ListEvent.GetList(pk))
             }
         }
@@ -70,27 +70,23 @@ fun ListDisplay(
 
         // When the effect leaves the Composition, remove the observer
         onDispose {
-            viewModel.listPK = 0L
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
 
     val context = LocalContext.current
     val icons = NavBarItems.ListBarItems
-    val reflexionItemList by viewModel.list.collectAsState()
 
     val search by viewModel.search.collectAsState()
 
     if (context.findActivity() != null) {
         when (windowSize) {
             WindowWidthSizeClass.COMPACT -> {
-                CompactScreen(navHostController, icons, viewModel, search, reflexionItemList, viewModel::searchEvent)
-                viewModel.navigationType = ReflexionNavigationType.BOTTOM_NAVIGATION
+                CompactScreen(navHostController, icons, viewModel, search, viewModel::searchEvent)
             }
 
             WindowWidthSizeClass.MEDIUM -> {
-                MediumScreen(navHostController, icons, viewModel, search, reflexionItemList, viewModel::searchEvent)
-                viewModel.navigationType = ReflexionNavigationType.NAVIGATION_RAIL
+              //  MediumScreen(navHostController, icons, viewModel, search, viewModel::searchEvent)
             }
 
 //            WindowWidthSizeClass.EXPANDED -> {
@@ -98,23 +94,23 @@ fun ListDisplay(
 //                viewModel.navigationType = ReflexionNavigationType.PERMANENT_NAVIGATION_DRAWER
 //            }
 
-            else -> CompactScreen(navHostController, icons, viewModel, search, reflexionItemList, viewModel::searchEvent)
+            else -> CompactScreen(navHostController, icons, viewModel, search, viewModel::searchEvent)
         }
     }
 }
 
-@Composable
-fun ListContent(
-    itemViewModel: ItemViewModel,
-    navController: NavHostController,
-    reflexionItemList: List<ReflexionItem>
-) {
-    ReflexionItemListUI(
-        reflexionItems = reflexionItemList,
-        navController = navController,
-        viewModel = itemViewModel
-    )
-}
+//@Composable
+//fun ListContent(
+//    listViewModel: ListViewModel,
+//    navController: NavHostController,
+//    reflexionItemList: List<ReflexionItem>
+//) {
+//    ReflexionItemListUI(
+//        reflexionItems = reflexionItemList,
+//        navController = navController,
+//        viewModel = itemViewModel
+//    )
+//}
 
 
 
