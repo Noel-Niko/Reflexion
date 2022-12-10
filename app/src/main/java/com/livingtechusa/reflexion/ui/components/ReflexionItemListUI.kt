@@ -31,7 +31,6 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ReflexionItemListUI(
-    reflexionItems: List<ReflexionItem>,
     navController: NavHostController,
     viewModel: ItemViewModel
 ) {

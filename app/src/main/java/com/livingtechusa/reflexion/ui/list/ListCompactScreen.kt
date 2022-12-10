@@ -74,7 +74,7 @@ fun CompactScreen(
                 .fillMaxSize()
                 .padding(paddingValue)
         ) {
-            ListContent(navController = navController, itemViewModel = viewModel, reflexionItemList = reflexionItemList)
+            ListContent(navController = navController, itemViewModel = viewModel)
         }
 
     }

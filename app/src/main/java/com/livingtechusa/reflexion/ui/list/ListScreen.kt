@@ -102,11 +102,9 @@ fun ListDisplay(
 @Composable
 fun ListContent(
     itemViewModel: ItemViewModel,
-    navController: NavHostController,
-    reflexionItemList: List<ReflexionItem>
+    navController: NavHostController
 ) {
     ReflexionItemListUI(
-        reflexionItems = reflexionItemList,
         navController = navController,
         viewModel = itemViewModel
     )
