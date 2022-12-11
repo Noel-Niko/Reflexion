@@ -62,7 +62,7 @@ import com.livingtechusa.reflexion.ui.components.cascade.internal.cascadeTransit
  *   expanded = expanded,
  *   onDismissRequest = { expanded = false }
  * ) {
- *   DropdownMenuItem(
+ *   ParentDropdownMenuItem(
  *     text = { Text("Horizon") },
  *     children = {
  *       DropdownMenuItem(
@@ -184,7 +184,7 @@ interface CascadeColumnScope : ColumnScope {
     contentPadding: PaddingValues = MenuDefaults.DropdownMenuItemContentPadding,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
   ) {
-     InnerDropDownMenu(
+    DropdownMenuItem(
       text = text,
       onClick = {
         cascadeState.navigateTo(
