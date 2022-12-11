@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
 data class ListNode(
     @PrimaryKey(autoGenerate = true)
     val nodePk: Long,
+    val topic: Long,
     val title: String,
     val parentPk: Long?,  // FK - ITEM.autogenPK
     val childPk: Long?     // FK - ITEM.autogenPK

@@ -18,7 +18,16 @@ class LocalServiceImpl @Inject constructor(
     }
 
     override suspend fun updateReflexionItem(item: ReflexionItem) {
-        reflexionItemDao.updateReflexionItem(item.autogenPK, item.name, item.description, item.detailedDescription, item.image, item.videoUri, item.videoUrl, item.parent)
+        reflexionItemDao.updateReflexionItem(
+            item.autogenPK,
+            item.name,
+            item.description,
+            item.detailedDescription,
+            item.image,
+            item.videoUri,
+            item.videoUrl,
+            item.parent
+        )
     }
 
     override suspend fun getAllItems(): List<ReflexionItem?> {
@@ -40,11 +49,12 @@ class LocalServiceImpl @Inject constructor(
         search: String?
     ): List<ReflexionItem?> {
         var list = emptyList<ReflexionItem>()
-            if (pk <= 0) {
-                list = search?.let { reflexionItemDao.getAllTopicsContainingString(it) } as List<ReflexionItem>
-            } else {
-                reflexionItemDao.selectChildrenContainingString(pk, search)
-            }
+        if (pk <= 0) {
+            list =
+                search?.let { reflexionItemDao.getAllTopicsContainingString(it) } as List<ReflexionItem>
+        } else {
+            reflexionItemDao.selectChildrenContainingString(pk, search)
+        }
         return list
     }
 
@@ -119,8 +129,12 @@ class LocalServiceImpl @Inject constructor(
         linkedListDao.insertNewNode(listNode = listNode)
     }
 
+    override suspend fun selectNodeHeadsByTopic(topicPk: Long): List<ListNode?> {
+        return linkedListDao.selectNodeHeadsByTopic(topicPk)
+    }
+
     override suspend fun selectChildNode(nodePk: Long): ListNode? {
-       return linkedListDao.selectChildNode(nodePk = nodePk)
+        return linkedListDao.selectChildNode(nodePk = nodePk)
     }
 
     override suspend fun selectParentNode(parentPk: Long): ListNode? {
@@ -133,7 +147,12 @@ class LocalServiceImpl @Inject constructor(
         parentPK: Long,
         childPk: Long
     ) {
-        linkedListDao.updateListNode(nodePk = nodePk, title = title, parentPK = parentPK, childPk = childPk)
+        linkedListDao.updateListNode(
+            nodePk = nodePk,
+            title = title,
+            parentPK = parentPK,
+            childPk = childPk
+        )
     }
 
     override suspend fun getAllLinkedLists(): List<ListNode?> {

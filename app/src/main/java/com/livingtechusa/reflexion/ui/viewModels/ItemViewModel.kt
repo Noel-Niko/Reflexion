@@ -78,14 +78,14 @@ class ItemViewModel @Inject constructor(
             try {
                 when (event) {
                     is BuildEvent.UpdateReflexionItem -> {
-                        withContext(Dispatchers.IO) {
+                        viewModelScope.launch {
                             _reflexionItem.value = event.reflexionItem
                             localServiceImpl.updateReflexionItem(event.reflexionItem)
                         }
                     }
 
                     is BuildEvent.SaveNew -> {
-                        withContext(Dispatchers.IO) {
+                        viewModelScope.launch {
                             localServiceImpl.setItem(event.reflexionItem)
                             _reflexionItem.value =
                                 localServiceImpl.selectReflexionItemByName(event.reflexionItem.name)
@@ -97,7 +97,7 @@ class ItemViewModel @Inject constructor(
                     }
 
                     is BuildEvent.GetSelectedReflexionItem -> {
-                        withContext(Dispatchers.Main) {
+                        viewModelScope.launch {
                             when (event.pk) {
                                 -2L ->
                                     _reflexionItem.value = ReflexionItem()
@@ -111,7 +111,7 @@ class ItemViewModel @Inject constructor(
                     }
 
                     is BuildEvent.Delete -> {
-                        withContext(Dispatchers.IO) {
+                        viewModelScope.launch {
                             localServiceImpl.deleteReflexionItem(
                                 _reflexionItem.value.autogenPK,
                                 _reflexionItem.value.name

@@ -57,6 +57,7 @@ fun CustomListCompactScreen(
     val context = LocalContext.current
     val resource = ResourceProviderSingleton
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = {
@@ -121,7 +122,7 @@ fun CustomListCompactScreen(
                     )
                 })
         },
-        containerColor = Color.LightGray,
+        containerColor = MaterialTheme.colors.background,
         bottomBar = {
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route

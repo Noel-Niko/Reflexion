@@ -40,6 +40,11 @@ object NavBarItems {
             title = "Topics",
             image = Icons.Filled.DataArray,
             route = Screen.ListScreen.route + "/" + -1L
+        ),
+        BarItem(
+            title = "CustomLists",
+            image = Icons.Filled.AddLink,
+            route = Screen.CustomLists.route
         )
     )
 

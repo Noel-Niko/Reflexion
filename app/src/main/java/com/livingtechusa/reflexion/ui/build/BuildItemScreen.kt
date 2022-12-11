@@ -195,7 +195,8 @@ fun BuildContent(
             }
             itemViewModel.setSaveNow(false)
         }
-        Scaffold(floatingActionButton = {
+        Scaffold(
+            floatingActionButton = {
             /* SAVE */
             SmallFloatingActionButton(modifier = Modifier
                 .offset {
@@ -209,7 +210,8 @@ fun BuildContent(
                         offsetX.value += dragAmount.x
                         offsetY.value += dragAmount.y
                     }
-                }, containerColor = MaterialTheme.colorScheme.primary,
+                },
+                containerColor = MaterialTheme.colorScheme.primary,
                 onClick = {
                 Toast.makeText(
                     context, resource.getString(R.string.changes_saved), Toast.LENGTH_SHORT

@@ -4,6 +4,7 @@ import androidx.room.Query
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.entities.KeyWords
 import com.livingtechusa.reflexion.data.entities.ListNode
+import org.w3c.dom.NodeList
 
 interface ILocalService {
     suspend fun setItem(item: ReflexionItem)
@@ -34,6 +35,8 @@ interface ILocalService {
     suspend fun deleteAllChildNodes(nodePk: Long)
 
     suspend fun insertNewNode(listNode: ListNode)
+
+    suspend fun selectNodeHeadsByTopic(topicPk: Long): List<ListNode?>
 
     suspend fun selectChildNode(nodePk: Long): ListNode?
 
