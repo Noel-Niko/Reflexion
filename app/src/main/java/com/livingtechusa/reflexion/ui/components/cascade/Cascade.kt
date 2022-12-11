@@ -184,7 +184,7 @@ interface CascadeColumnScope : ColumnScope {
     contentPadding: PaddingValues = MenuDefaults.DropdownMenuItemContentPadding,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
   ) {
-    InnerDropDownMenu(
+     InnerDropDownMenu(
       text = text,
       onClick = {
         cascadeState.navigateTo(
