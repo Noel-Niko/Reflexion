@@ -31,6 +31,7 @@ import com.livingtechusa.reflexion.ui.list.ListDisplay
 import com.livingtechusa.reflexion.ui.components.ConfirmSaveAlertDialog
 import com.livingtechusa.reflexion.ui.components.PasteAndSaveDialog
 import com.livingtechusa.reflexion.ui.components.VideoPlayer
+import com.livingtechusa.reflexion.ui.customLists.BuildCustomListsScreen
 import com.livingtechusa.reflexion.ui.home.HomeScreen
 import com.livingtechusa.reflexion.ui.theme.ReflexionTheme
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
@@ -176,6 +177,14 @@ class MainActivity : ComponentActivity() {
                             navHostController = navController,
                             pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK) ?: -1L,
                             windowSize = windowSize,
+                        )
+                    }
+                    composable(
+                        route = Screen.CustomLists.route,
+                    ) {
+                        BuildCustomListsScreen(
+                            navController = navController,
+                            windowSize = windowSize
                         )
                     }
                 }

@@ -6,6 +6,7 @@ import com.livingtechusa.reflexion.ui.list.ListRoute
 import com.livingtechusa.reflexion.ui.components.CONFIRM_SAVE
 import com.livingtechusa.reflexion.ui.components.PASTE_SAVE
 import com.livingtechusa.reflexion.ui.components.VideoScreenRoute
+import com.livingtechusa.reflexion.ui.customLists.BuildCustomList
 import com.livingtechusa.reflexion.ui.home.HOME
 
 
@@ -17,6 +18,8 @@ sealed class Screen(val route: String) {
     object ConfirmSaveScreen: Screen(CONFIRM_SAVE)
     object PasteAndSaveScreen: Screen(PASTE_SAVE)
     object ListScreen: Screen(ListRoute)
+
+    object CustomLists: Screen(BuildCustomList)
 
     fun withArgs(vararg args: String): String {
         return  buildString {

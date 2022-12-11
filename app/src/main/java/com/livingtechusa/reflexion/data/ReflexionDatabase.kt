@@ -9,13 +9,13 @@ import com.livingtechusa.reflexion.data.dao.LinkedListDao
 import com.livingtechusa.reflexion.data.entities.Converters
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.entities.KeyWords
-import com.livingtechusa.reflexion.data.entities.LinkedList
+import com.livingtechusa.reflexion.data.entities.ListNode
 
 @Database(
     entities =
     [ReflexionItem::class,
         KeyWords::class,
-    LinkedList::class],
+    ListNode::class],
     version = 1,
     exportSchema = false
 )

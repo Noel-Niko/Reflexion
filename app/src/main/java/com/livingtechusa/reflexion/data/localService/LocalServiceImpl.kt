@@ -4,7 +4,7 @@ import com.livingtechusa.reflexion.data.dao.KeyWordsDao
 import com.livingtechusa.reflexion.data.dao.LinkedListDao
 import com.livingtechusa.reflexion.data.dao.ReflexionItemDao
 import com.livingtechusa.reflexion.data.entities.KeyWords
-import com.livingtechusa.reflexion.data.entities.LinkedList
+import com.livingtechusa.reflexion.data.entities.ListNode
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import javax.inject.Inject
 
@@ -104,41 +104,55 @@ class LocalServiceImpl @Inject constructor(
         keyWordsDao.renameKeyWord(word, newWord)
     }
 
-    override suspend fun setLinkedList(linkedList: LinkedList) {
-        linkedListDao.setLinkedList(linkedList)
+    override suspend fun deleteAllChildNodes(nodePk: Long) {
+        var child = linkedListDao.selectChildNode(nodePk = nodePk)
+        do {
+            val parent: Long? = child?.nodePk
+            if (parent != null) {
+                linkedListDao.deleteSelectedNode(parent)
+            }
+            child = parent?.let { linkedListDao.selectChildNode(nodePk = it) }
+        } while (child != null)
     }
 
-    override suspend fun getAllLinkedLists(): LinkedList? {
+    override suspend fun insertNewNode(listNode: ListNode) {
+        linkedListDao.insertNewNode(listNode = listNode)
+    }
+
+    override suspend fun selectChildNode(nodePk: Long): ListNode? {
+       return linkedListDao.selectChildNode(nodePk = nodePk)
+    }
+
+    override suspend fun selectParentNode(parentPk: Long): ListNode? {
+        return linkedListDao.selectParentNode(parentPk = parentPk)
+    }
+
+    override suspend fun updateListNode(
+        nodePk: Long,
+        title: String,
+        parentPK: Long,
+        childPk: Long
+    ) {
+        linkedListDao.updateListNode(nodePk = nodePk, title = title, parentPK = parentPK, childPk = childPk)
+    }
+
+    override suspend fun getAllLinkedLists(): List<ListNode?> {
         return linkedListDao.getAllLinkedLists()
     }
 
-    override suspend fun clearLinkedList() {
-        linkedListDao.clearLinkedList()
+    override suspend fun deleteAllLinkedLists() {
+        linkedListDao.deleteAllLinkedLists()
     }
 
-    override suspend fun selectLinkedList(title: String, itemPK: Long): LinkedList? {
-        return linkedListDao.selectLinkedList(title, itemPK)
+    override suspend fun selectLinkedList(nodePk: Long): ListNode? {
+        return linkedListDao.selectLinkedList(nodePk)
     }
 
-    override suspend fun deleteLinkedList(title: String, itemPK: Long) {
-        linkedListDao.deleteLinkedList(title, itemPK)
-    }
-
-    override suspend fun setLinkedListIndex(title: String, itemPK: Long, index: Int) {
-        linkedListDao.setLinkedListIndex(title, itemPK, index)
-    }
-
-    override suspend fun renameLinkedList(title: String, itemPK: Long, newTitle: String) {
-        linkedListDao.renameLinkedList(title, itemPK, newTitle)
+    override suspend fun deleteSelectedNode(nodePk: Long) {
+        linkedListDao.deleteSelectedNode(nodePk = nodePk)
     }
 
     override suspend fun selectReflexionItemByName(name: String): ReflexionItem {
         return reflexionItemDao.selectReflexionItemByName(name)
     }
-
-    override suspend fun selectChildLinkedLists(parent: Long): List<LinkedList?> {
-        return linkedListDao.selectChildLinkedLists(parent)
-    }
-
-
 }

@@ -4,31 +4,32 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.livingtechusa.reflexion.data.entities.LinkedList
+import com.livingtechusa.reflexion.data.entities.ListNode
 
 @Dao
 interface LinkedListDao{
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun setLinkedList(linkedList: LinkedList)
+    suspend fun insertNewNode(listNode: ListNode)
 
-    @Query("Select * FROM LinkedList")
-    suspend fun getAllLinkedLists(): LinkedList?
+    @Query("Select * FROM LinkedList WHERE parentPk =:nodePk")
+    suspend fun selectChildNode(nodePk: Long): ListNode?
+
+    @Query("Select * FROM LinkedList WHERE parentPk =:parentPk")
+    suspend fun selectParentNode(parentPk: Long): ListNode?
+
+    @Query("UPDATE LinkedList SET title = :title, parentPk = :parentPK, childPk = :childPk WHERE nodePk = :nodePk")
+    suspend fun updateListNode(nodePk: Long, title: String, parentPK: Long, childPk: Long)
+
+    @Query("Select * FROM LinkedList WHERE parentPk IS NULL")
+    suspend fun getAllLinkedLists(): List<ListNode?>
 
     @Query("Delete FROM LinkedList")
-    suspend fun clearLinkedList()
+    suspend fun deleteAllLinkedLists()
 
-    @Query("Select * FROM LinkedList WHERE title = :title AND ITEM_PK = :itemPK")
-    suspend fun selectLinkedList(title: String, itemPK: Long): LinkedList?
+    @Query("Select * FROM LinkedList WHERE nodePk = :nodePk")
+    suspend fun selectLinkedList(nodePk: Long): ListNode?
 
-    @Query("Delete FROM LinkedList WHERE title = :title AND ITEM_PK = :itemPK")
-    suspend fun deleteLinkedList(title: String, itemPK: Long)
+    @Query("Delete FROM LinkedList WHERE nodePk = :nodePk")
+    suspend fun deleteSelectedNode(nodePk: Long)
 
-    @Query("UPDATE LinkedList SET 'index' = :index WHERE  title = :title AND ITEM_PK = :itemPK")
-    suspend fun setLinkedListIndex(title: String, itemPK: Long, index: Int)
-
-    @Query("Select * FROM LinkedList WHERE title =:parent")
-    suspend fun selectChildLinkedLists(parent: Long): List<LinkedList?>
-
-    @Query("UPDATE LinkedList SET title = :newTitle WHERE title = :title AND ITEM_PK = :itemPK")
-    suspend fun renameLinkedList(title: String, itemPK: Long, newTitle: String)
 }

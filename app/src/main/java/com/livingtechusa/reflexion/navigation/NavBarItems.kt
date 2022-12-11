@@ -2,6 +2,7 @@ package com.livingtechusa.reflexion.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddHome
+import androidx.compose.material.icons.filled.AddLink
 import androidx.compose.material.icons.filled.DataArray
 import androidx.compose.material.icons.filled.Desk
 import androidx.compose.material.icons.filled.DesktopWindows
@@ -21,6 +22,11 @@ object NavBarItems {
             title = "Topics",
             image = Icons.Filled.DataArray,
             route = Screen.ListScreen.route + "/" + -1L
+        ),
+        BarItem(
+            title = "CustomLists",
+            image = Icons.Filled.AddLink,
+            route = Screen.CustomLists.route
         )
     )
 
@@ -48,5 +54,23 @@ object NavBarItems {
             image = Icons.Filled.AddHome,
             route = Screen.HomeScreen.route
         )
+    )
+
+    val CustomListsBarItems = listOf(
+        BarItem(
+            title = "Home",
+            image = Icons.Filled.AddHome,
+            route = Screen.HomeScreen.route
+        ),
+        BarItem(
+            title = "Topics",
+            image = Icons.Filled.DataArray,
+            route = Screen.ListScreen.route + "/" + -1L
+        ),
+        BarItem(
+            title = "New",
+            image = Icons.Filled.DeveloperMode,
+            route = Screen.BuildItemScreen.route
+        ),
     )
 }

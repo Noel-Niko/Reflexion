@@ -1,8 +1,9 @@
 package com.livingtechusa.reflexion.data.localService
 
+import androidx.room.Query
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.entities.KeyWords
-import com.livingtechusa.reflexion.data.entities.LinkedList
+import com.livingtechusa.reflexion.data.entities.ListNode
 
 interface ILocalService {
     suspend fun setItem(item: ReflexionItem)
@@ -15,6 +16,13 @@ interface ILocalService {
     suspend fun selectChildItems(parent: Long): List<ReflexionItem?>
     suspend fun setItemParent(autogenPK: Long, name: String, newParent: Long)
 
+
+    suspend fun selectReflexionItemByName(name: String): ReflexionItem
+    suspend fun selectChildren(pk: Long): List<ReflexionItem?>
+    suspend fun getAllTopics(): List<ReflexionItem?>
+    suspend fun getAllTopicsContainingString(search: String): List<ReflexionItem?>
+    suspend fun selectChildrenContainingString(pk: Long, search: String?): List<ReflexionItem?>
+    suspend fun selectSiblings(pk: Long, parent: Long): List<ReflexionItem?>
     suspend fun setKeyWords(keyWords: KeyWords)
     suspend fun getKeyWords(): KeyWords?
     suspend fun clearKeyWords()
@@ -22,18 +30,22 @@ interface ILocalService {
     suspend fun deleteKeyWord(word: String)
     suspend fun renameKeyWord(word: String, newWord: String)
 
-    suspend fun setLinkedList(linkedList: LinkedList)
-    suspend fun getAllLinkedLists(): LinkedList?
-    suspend fun clearLinkedList()
-    suspend fun selectLinkedList(title: String, itemPK: Long): LinkedList?
-    suspend fun deleteLinkedList(title: String, itemPK: Long)
-    suspend fun setLinkedListIndex(title: String, itemPK: Long, index: Int)
-    suspend fun selectChildLinkedLists(parent: Long): List<LinkedList?>
-    suspend fun renameLinkedList(title: String, itemPK: Long, newTitle: String)
-    suspend fun selectReflexionItemByName(name: String): ReflexionItem
-    suspend fun selectChildren(pk: Long): List<ReflexionItem?>
-    suspend fun getAllTopics(): List<ReflexionItem?>
-    suspend fun getAllTopicsContainingString(search: String): List<ReflexionItem?>
-    suspend fun selectChildrenContainingString(pk: Long, search: String?): List<ReflexionItem?>
-    suspend fun selectSiblings(pk: Long, parent: Long): List<ReflexionItem?>
+
+    suspend fun deleteAllChildNodes(nodePk: Long)
+
+    suspend fun insertNewNode(listNode: ListNode)
+
+    suspend fun selectChildNode(nodePk: Long): ListNode?
+
+    suspend fun selectParentNode(parentPk: Long): ListNode?
+
+    suspend fun updateListNode(nodePk: Long, title: String, parentPK: Long, childPk: Long)
+
+    suspend fun getAllLinkedLists(): List<ListNode?>
+
+    suspend fun deleteAllLinkedLists()
+
+    suspend fun selectLinkedList(nodePk: Long): ListNode?
+
+    suspend fun deleteSelectedNode(nodePk: Long)
 }
