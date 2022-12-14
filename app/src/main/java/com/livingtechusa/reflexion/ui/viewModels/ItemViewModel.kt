@@ -190,7 +190,6 @@ class ItemViewModel @Inject constructor(
                             _list.value =
                                 localServiceImpl.selectChildren(event.pk) as List<ReflexionItem>
                         }
-                        val x = list
                     }
 
                     is ListEvent.Search -> {
