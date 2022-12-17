@@ -60,8 +60,7 @@ fun getMenu(): MenuItem<String> {
 
 @ExperimentalAnimationApi
 @Composable
-fun CustomDropDownMenu(isOpen: Boolean = false, setIsOpen: (Boolean) -> Unit, itemSelected: (String) -> Unit) {
-    val menu = getMenu()
+fun CustomDropDownMenu(isOpen: Boolean = false, setIsOpen: (Boolean) -> Unit, itemSelected: (String) -> Unit, menu: MenuItem<String> ) {
     Dropdown(
         isOpen = isOpen,
         menu = menu,

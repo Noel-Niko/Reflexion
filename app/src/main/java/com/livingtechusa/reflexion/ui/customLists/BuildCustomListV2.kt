@@ -1,6 +1,5 @@
 package com.livingtechusa.reflexion.ui.customLists
 
-import android.widget.Toast
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,13 +8,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExposedDropdownMenuBox
 import androidx.compose.material.ExposedDropdownMenuDefaults
@@ -23,6 +18,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.twotone.Close
+import androidx.compose.material.icons.twotone.DeleteSweep
+import androidx.compose.material.icons.twotone.Done
+import androidx.compose.material.icons.twotone.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,21 +35,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.recyclerview.widget.RecyclerView
 import androidx.window.core.layout.WindowWidthSizeClass
+import com.androidpoet.dropdown.MenuItem
+import com.androidpoet.dropdown.dropDownMenu
+import com.livingtechusa.reflexion.data.entities.ReflexionItem
+import com.livingtechusa.reflexion.data.models.AbridgedReflexionItem
 import com.livingtechusa.reflexion.navigation.NavBarItems
-import com.livingtechusa.reflexion.ui.components.cascade.CascadeDropdownMenu
 import com.livingtechusa.reflexion.ui.components.cascade.rememberCascadeState
 import com.livingtechusa.reflexion.ui.components.menu.CustomDropDownMenu
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
-import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.extensions.findActivity
-import kotlinx.coroutines.flow.forEach
-import kotlinx.coroutines.launch
 
 const val BuildCustomList = "build_custom_lists"
 
@@ -97,14 +95,14 @@ fun CustomListsContent(
     navController: NavHostController, viewModel: CustomListsViewModel, paddingValues: PaddingValues
 ) {
     val scope = rememberCoroutineScope()
-    val listItems = viewModel.topicsList.collectAsState()
-    val childList = viewModel.childList.collectAsState()
+    val parents = viewModel.topicsList.collectAsState()
+    val children = viewModel.childList.collectAsState()
     val state = rememberCascadeState()
     var selectedItem by remember {
         mutableStateOf("")
     }
     var expanded by remember {
-        mutableStateOf(true)
+        mutableStateOf(false)
     }
     Scaffold(modifier = Modifier.padding(paddingValues)) { innerPadding ->
         Spacer(Modifier.height(16.dp))
@@ -128,17 +126,85 @@ fun CustomListsContent(
                         .fillMaxWidth()
                         .padding(20.dp)
                 ) {
-                    // filter options based on text field value
-                    val filteringOptions =
-                        listItems.value.filter { it.name.contains(selectedItem, ignoreCase = true) }
-                    CustomDropDownMenu(isOpen = expanded, setIsOpen = {
-                        expanded = !expanded
-                    }, itemSelected = viewModel::selectItem)
+                    ExposedDropdownMenuBox(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        expanded = expanded,
+                        onExpandedChange = {
+                            expanded = !expanded
+                        }
+                    ) {
+                        TextField(
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally),
+                            //.offset(100.dp),
+                            value = selectedItem,
+                            onValueChange = { selectedItem = it },
+                            label = { Text(text = "Topic") },
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(
+                                    expanded = expanded
+                                )
+                            },
+                            colors = ExposedDropdownMenuDefaults.textFieldColors()
+                        )
 
+                        // filter options based on text field value
+                        val filteringOptions =
+                            parents.value.filter { abridgedParent ->
+                                abridgedParent?.name?.contains(
+                                    selectedItem,
+                                    ignoreCase = true
+                                ) ?: true
+                            }
+
+                        if (filteringOptions.isNotEmpty()) {
+
+                            CustomDropDownMenu(
+                                isOpen = expanded,
+                                setIsOpen = {
+                                    expanded = !expanded
+                                },
+                                itemSelected = viewModel::selectItem,
+                                menu = getMenu(viewModel, parents = parents.value, children = children.value)
+                            )
+
+                        }
+                    }
                 }
             }
         }
     }
 }
 
+fun getMenu(viewModel: CustomListsViewModel, parents: List<AbridgedReflexionItem?>, children: List<AbridgedReflexionItem?>): MenuItem<String> {
+    val menu = dropDownMenu<String> {
+        parents.forEach() { abridgedParent ->
+            item(abridgedParent?.autogenPK.toString(), abridgedParent?.name.toString()) {
+                icon(Icons.TwoTone.Share)
+                children.forEach() { abridgedChild ->
+                    item(abridgedChild?.autogenPK.toString(), abridgedChild?.name.toString()) {
+                    }
+                }
+//                item("as_a_file", "As a file") {
+//                    item("pdf", "PDF")
+//                    item("epub", "EPUB")
+//                    item("web_page", "Web page")
+//                    item("microsoft_word", "Microsoft word")
+//                }
+            }
+            item("remove", "Remove") {
+                icon(Icons.TwoTone.DeleteSweep)
+                item("yep", "Yep") {
+                    icon(Icons.TwoTone.Done)
+                }
+                item("go_back", "Go back") {
+                    icon(Icons.TwoTone.Close)
+                }
+            }
+        }
+
+    }
+    return menu
+}
 

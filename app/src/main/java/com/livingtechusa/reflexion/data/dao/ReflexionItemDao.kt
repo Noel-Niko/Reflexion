@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
+import com.livingtechusa.reflexion.data.models.AbridgedReflexionItem
 
 @Dao
 interface ReflexionItemDao {
@@ -34,6 +35,14 @@ interface ReflexionItemDao {
 
     @Query("Select * FROM ReflexionItem WHERE parent =:parent order by name")
     suspend fun selectChildReflexionItems(parent: Long): List<ReflexionItem?>
+
+    @Query("Select autogenPK, name, parent FROM ReflexionItem WHERE parent IS NULL order by name")
+    suspend fun getAbridgedReflexionItemTopics(): List<AbridgedReflexionItem?>
+    @Query("Select autogenPK, name, parent FROM ReflexionItem WHERE parent =:parent order by name")
+    suspend fun selectAbridgedReflexionItemDataByParentPk(parent: Long): List<AbridgedReflexionItem?>
+
+    @Query("Select autogenPK, name, parent FROM ReflexionItem WHERE autogenPK =:pk")
+    suspend fun selectSingleAbridgedReflexionItemDataByParentPk(pk: Long): AbridgedReflexionItem
 
     @Query("UPDATE ReflexionItem SET parent = :newParent WHERE autogenPK = :autogenPK AND name = :name")
     suspend fun setReflexionItemParent(autogenPK: Long, name: String, newParent: Long)

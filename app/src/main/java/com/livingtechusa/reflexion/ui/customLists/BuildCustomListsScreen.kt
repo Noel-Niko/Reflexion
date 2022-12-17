@@ -143,7 +143,7 @@
 //                            listItems.value.filter { it.name.contains(selectedItem, ignoreCase = true) }
 //
 //                        if (filteringOptions.isNotEmpty()) {
-//
+
 //                            ExposedDropdownMenu(
 //                                expanded = expanded,
 //                                onDismissRequest = { expanded = false }

@@ -4,6 +4,8 @@ import androidx.room.Query
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.entities.KeyWords
 import com.livingtechusa.reflexion.data.entities.ListNode
+import com.livingtechusa.reflexion.data.models.AbridgedReflexionItem
+import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import org.w3c.dom.NodeList
 
 interface ILocalService {
@@ -14,9 +16,11 @@ interface ILocalService {
     suspend fun selectItem(autogenPK: Long): ReflexionItem?
     suspend fun deleteReflexionItem(autogenPK: Long, name: String)
     suspend fun renameItem(autogenPK: Long, name: String, newName: String)
-    suspend fun selectChildItems(parent: Long): List<ReflexionItem?>
     suspend fun setItemParent(autogenPK: Long, name: String, newParent: Long)
 
+    suspend fun selectAbridgedReflexionItemDataByParentPk(pk: Long?): List<AbridgedReflexionItem?>
+
+    suspend fun selectSingleAbridgedReflexionItemDataByParentPk(pk: Long): AbridgedReflexionItem
 
     suspend fun selectReflexionItemByName(name: String): ReflexionItem
     suspend fun selectChildren(pk: Long): List<ReflexionItem?>
@@ -51,4 +55,5 @@ interface ILocalService {
     suspend fun selectLinkedList(nodePk: Long): ListNode?
 
     suspend fun deleteSelectedNode(nodePk: Long)
+    suspend fun selectReflexionArrayItemsByParentPk(pk: Long?): List<ReflexionArrayItem?>
 }
