@@ -19,12 +19,12 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.twotone.Abc
 import androidx.compose.material.icons.twotone.Close
 import androidx.compose.material.icons.twotone.DeleteSweep
 import androidx.compose.material.icons.twotone.Done
 import androidx.compose.material.icons.twotone.FileCopy
-import androidx.compose.material.icons.twotone.Language
-import androidx.compose.material.icons.twotone.Share
+import androidx.compose.material.icons.twotone.Satellite
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -41,10 +41,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.window.core.layout.WindowWidthSizeClass
+import com.androidpoet.dropdown.DropDownMenuBuilder
 import com.androidpoet.dropdown.MenuItem
 import com.androidpoet.dropdown.dropDownMenu
-import com.livingtechusa.reflexion.data.entities.ReflexionItem
-import com.livingtechusa.reflexion.data.models.AbridgedReflexionItem
 import com.livingtechusa.reflexion.navigation.NavBarItems
 import com.livingtechusa.reflexion.ui.components.cascade.rememberCascadeState
 import com.livingtechusa.reflexion.ui.components.menu.CustomDropDownMenu
@@ -177,60 +176,70 @@ fun CustomListsContent(
     }
 }
 
-//
-//fun getMenu(
-//    tree: ReflexionArrayItem
-//): MenuItem<String> {
-//    val menu = dropDownMenu<String> {
-//        tree.  forEach() { abridgedParent ->
-//            item(abridgedParent?.autogenPK.toString(), abridgedParent?.name.toString()) {
-//                icon(Icons.TwoTone.Share)
-//                children.forEach() { abridgedChild ->
-//                    item(abridgedChild?.autogenPK.toString(), abridgedChild?.name.toString()) {
-//                    }
-//                }
-////                item("as_a_file", "As a file") {
-////                    item("pdf", "PDF")
-////                    item("epub", "EPUB")
-////                    item("web_page", "Web page")
-////                    item("microsoft_word", "Microsoft word")
-////                }
-//            }
-//            item("remove", "Remove") {
-//                icon(Icons.TwoTone.DeleteSweep)
-//                item("yep", "Yep") {
-//                    icon(Icons.TwoTone.Done)
-//                }
-//                item("go_back", "Go back") {
-//                    icon(Icons.TwoTone.Close)
-//                }
-//            }
-//        }
-//
-//    }
-//    return menu
-//}
-
+private
 
 fun getMenu(tree: ReflexionArrayItem): MenuItem<String> {
+
+//    fun nextLevel(item: ReflexionArrayItem): MutableList<MenuItem<String>>? {
+//        this.menu.children.add()
+//        var list : MutableList<MenuItem<String>>? =  mutableListOf()
+//        val menuItem: MenuItem<String> = CustomDropDownMenuBuilder().MenuItem<String>(item.reflexionItemPk.toString(), item.reflexionItemName)
+//        list?.add(menuItem)
+//    }
+
+
+    val menuBuilder = DropDownMenuBuilder<String>()
+    fun getChild(reflxionArrayItemList: MutableList<ReflexionArrayItem>?): MutableList<MenuItem<String>>? {
+        val itemList: MutableList<MenuItem<String>> =  mutableListOf()
+        reflxionArrayItemList?.forEach() {
+           itemList.add( menuBuilder.menu.apply {
+                this.id = it.reflexionItemPk.toString()
+                this.title = it.reflexionItemName
+                children = getChild(it.items?.toMutableList())
+            }
+           )
+        }
+        return itemList
+    }
+
+    fun addItem(reflexionArrayItem: ReflexionArrayItem) {
+
+    }
+
     val menu = dropDownMenu<String> {
         item("copy", "Copy") {
             icon(Icons.TwoTone.FileCopy)
         }
+//        item(tree.reflexionItemPk.toString(), tree.reflexionItemName) {
+//            icon(Icons.TwoTone.Language)
+//            tree.items?.forEach() { it1 ->
+//                item(it1.reflexionItemPk.toString(), it1.reflexionItemName) {
+//                    it1.items?.forEach { it2 ->
+//                        item(it2.reflexionItemPk.toString(), it2.reflexionItemName) {
+//                            it2.items?.forEach { it3 ->
+//                                item(it3.reflexionItemPk.toString(), it3.reflexionItemName)
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
         item(tree.reflexionItemPk.toString(), tree.reflexionItemName) {
-            icon(Icons.TwoTone.Language)
-            tree.items?.forEach() { it1 ->
-                item(it1.reflexionItemPk.toString(), it1.reflexionItemName) {
-                    it1.items?.forEach { it2 ->
-                        item(it2.reflexionItemPk.toString(), it2.reflexionItemName) {
-                            it2.items?.forEach { it3 ->
-                                item(it3.reflexionItemPk.toString(), it3.reflexionItemName)
+            icon(Icons.TwoTone.Abc)
+            tree.items?.forEach() { it2 ->
+                item(it2.reflexionItemPk.toString(), it2.reflexionItemName) {
+                        var next = it2.items
+                        while(next.isNullOrEmpty().not()) {
+                            next?.forEach {
+                                item(it.reflexionItemPk.toString(), it.reflexionItemName) {
+                                }
+                                next = it.items
                             }
                         }
+
                     }
                 }
             }
-        }
         item("remove", "Remove") {
             icon(Icons.TwoTone.DeleteSweep)
             item("yep", "Yep") {

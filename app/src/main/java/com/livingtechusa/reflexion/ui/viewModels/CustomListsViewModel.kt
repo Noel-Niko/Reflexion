@@ -53,18 +53,6 @@ class CustomListsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-//            _parentList.value = localServiceImpl.selectAbridgedReflexionItemDataByParentPk(null)
-//            val childList = mutableListOf<AbridgedReflexionItem>()
-//            topicsList.value.forEach() { abridgedParent ->
-//                localServiceImpl.selectAbridgedReflexionItemDataByParentPk(abridgedParent?.autogenPK)
-//                    .forEach() { abridgedChild ->
-//                        if (abridgedChild != null) {
-//                            childList.add(abridgedChild)
-//                        }
-//                    }
-//            }
-//            _childList.value = childList
-
             _itemTree.value = newLevel(item1, getMore(item1.reflexionItemPk))
         }
 
@@ -115,8 +103,8 @@ class CustomListsViewModel @Inject constructor(
     fun selectItem(itemPk: String?) {
         if (itemPk != null) {
             viewModelScope.launch {
-                _selectedItem.value =
-                    localServiceImpl.selectItem(itemPk.toLong()) ?: ReflexionItem()
+//                _selectedItem.value =
+//                    localServiceImpl.selectItem(itemPk.toLong()) ?: ReflexionItem()
             }
         }
     }
