@@ -115,8 +115,8 @@ class CustomListsViewModel @Inject constructor(
     fun selectItem(itemPk: String?) {
         if (itemPk != null) {
             viewModelScope.launch {
-                _selectedItem.value =
-                    localServiceImpl.selectItem(itemPk.toLong()) ?: ReflexionItem()
+//                _selectedItem.value =
+//                    localServiceImpl.selectItem(itemPk.toLong()) ?: ReflexionItem()
             }
         }
     }
