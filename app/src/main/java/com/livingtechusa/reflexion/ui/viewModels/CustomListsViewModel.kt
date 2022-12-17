@@ -30,16 +30,22 @@ class CustomListsViewModel @Inject constructor(
     private val context: Context
         get() = BaseApplication.getInstance()
 
-    private val _parentList = MutableStateFlow(emptyList<AbridgedReflexionItem?>())
-    val topicsList: StateFlow<List<AbridgedReflexionItem?>> get() = _parentList
-
-    private val _childList = MutableStateFlow(emptyList<AbridgedReflexionItem?>())
-    val childList: StateFlow<List<AbridgedReflexionItem?>> get() = _childList
+//    private val _parentList = MutableStateFlow(emptyList<AbridgedReflexionItem?>())
+//    val topicsList: StateFlow<List<AbridgedReflexionItem?>> get() = _parentList
+//
+//    private val _childList = MutableStateFlow(emptyList<AbridgedReflexionItem?>())
+//    val childList: StateFlow<List<AbridgedReflexionItem?>> get() = _childList
 
     private val _selectedItem = MutableStateFlow(ReflexionItem())
     val selectedItem: StateFlow<ReflexionItem> get() = _selectedItem
 
-    var bigList = mutableListOf<MutableList<MutableList<AbridgedReflexionItem>>>()
+    val item1 = ReflexionArrayItem(
+        itemPK = null,
+        itemName = "Topics",
+        children = mutableListOf()
+    )
+    private val _itemTree = MutableStateFlow(item1)
+    val itemTree: StateFlow<ReflexionArrayItem> get() = _itemTree
 
     suspend fun hasChildren(pk: Long): Boolean {
         return localServiceImpl.selectChildren(pk).isNotEmpty()
@@ -47,26 +53,19 @@ class CustomListsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            _parentList.value = localServiceImpl.selectAbridgedReflexionItemDataByParentPk(null)
-            val childList = mutableListOf<AbridgedReflexionItem>()
-            topicsList.value.forEach() { abridgedParent ->
-                localServiceImpl.selectAbridgedReflexionItemDataByParentPk(abridgedParent?.autogenPK)
-                    .forEach() { abridgedChild ->
-                        if (abridgedChild != null) {
-                            childList.add(abridgedChild)
-                        }
-                    }
-            }
-            _childList.value = childList
+//            _parentList.value = localServiceImpl.selectAbridgedReflexionItemDataByParentPk(null)
+//            val childList = mutableListOf<AbridgedReflexionItem>()
+//            topicsList.value.forEach() { abridgedParent ->
+//                localServiceImpl.selectAbridgedReflexionItemDataByParentPk(abridgedParent?.autogenPK)
+//                    .forEach() { abridgedChild ->
+//                        if (abridgedChild != null) {
+//                            childList.add(abridgedChild)
+//                        }
+//                    }
+//            }
+//            _childList.value = childList
 
-            val item1 = ReflexionArrayItem(
-                itemPK = null,
-                itemName = "Topics",
-                children = mutableListOf()
-            )
-            val bigList = newLevel(item1, getMore(item1.reflexionItemPk))
-            println(bigList)
-
+            _itemTree.value = newLevel(item1, getMore(item1.reflexionItemPk))
         }
 
     }
@@ -81,7 +80,7 @@ class CustomListsViewModel @Inject constructor(
 
     suspend fun getMore(pk: Long?): MutableList<ReflexionArrayItem> {
         val _list = mutableListOf<ReflexionArrayItem>()
-            val job = viewModelScope.async {
+        val job = viewModelScope.async {
             localServiceImpl.selectReflexionArrayItemsByParentPk(pk).forEach() {
                 val list: MutableList<ReflexionArrayItem> = getMore(it?.reflexionItemPk)
                 val subLevel = it?.let { it1 -> newLevel(it1, list) }
@@ -116,11 +115,8 @@ class CustomListsViewModel @Inject constructor(
     fun selectItem(itemPk: String?) {
         if (itemPk != null) {
             viewModelScope.launch {
-                if (hasChildren(itemPk.toLong())) {
-                    _parentList.value = childList.value
-                    _childList.value =
-                        localServiceImpl.selectAbridgedReflexionItemDataByParentPk(itemPk.toLong())
-                }
+                _selectedItem.value =
+                    localServiceImpl.selectItem(itemPk.toLong()) ?: ReflexionItem()
             }
         }
     }

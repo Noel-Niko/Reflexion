@@ -22,6 +22,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.twotone.Close
 import androidx.compose.material.icons.twotone.DeleteSweep
 import androidx.compose.material.icons.twotone.Done
+import androidx.compose.material.icons.twotone.FileCopy
+import androidx.compose.material.icons.twotone.Language
 import androidx.compose.material.icons.twotone.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -47,6 +49,7 @@ import com.livingtechusa.reflexion.navigation.NavBarItems
 import com.livingtechusa.reflexion.ui.components.cascade.rememberCascadeState
 import com.livingtechusa.reflexion.ui.components.menu.CustomDropDownMenu
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
+import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import com.livingtechusa.reflexion.util.extensions.findActivity
 
 const val BuildCustomList = "build_custom_lists"
@@ -95,8 +98,7 @@ fun CustomListsContent(
     navController: NavHostController, viewModel: CustomListsViewModel, paddingValues: PaddingValues
 ) {
     val scope = rememberCoroutineScope()
-    val parents = viewModel.topicsList.collectAsState()
-    val children = viewModel.childList.collectAsState()
+    val itemTree = viewModel.itemTree.collectAsState()
     val state = rememberCascadeState()
     var selectedItem by remember {
         mutableStateOf("")
@@ -149,62 +151,95 @@ fun CustomListsContent(
                             colors = ExposedDropdownMenuDefaults.textFieldColors()
                         )
 
-                        // filter options based on text field value
-                        val filteringOptions =
-                            parents.value.filter { abridgedParent ->
-                                abridgedParent?.name?.contains(
-                                    selectedItem,
-                                    ignoreCase = true
-                                ) ?: true
+//                        // filter options based on text field value
+//                        val filteringOptions =
+//                            itemTree.value.filter { abridgedParent ->
+//                                abridgedParent?.name?.contains(
+//                                    selectedItem,
+//                                    ignoreCase = true
+//                                ) ?: true
+//                            }
+//
+//                        if (filteringOptions.isNotEmpty()) {
+
+                        CustomDropDownMenu(
+                            isOpen = expanded,
+                            setIsOpen = {
+                                expanded = !expanded
+                            },
+                            itemSelected = viewModel::selectItem,
+                            menu = getMenu(itemTree.value)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+//
+//fun getMenu(
+//    tree: ReflexionArrayItem
+//): MenuItem<String> {
+//    val menu = dropDownMenu<String> {
+//        tree.  forEach() { abridgedParent ->
+//            item(abridgedParent?.autogenPK.toString(), abridgedParent?.name.toString()) {
+//                icon(Icons.TwoTone.Share)
+//                children.forEach() { abridgedChild ->
+//                    item(abridgedChild?.autogenPK.toString(), abridgedChild?.name.toString()) {
+//                    }
+//                }
+////                item("as_a_file", "As a file") {
+////                    item("pdf", "PDF")
+////                    item("epub", "EPUB")
+////                    item("web_page", "Web page")
+////                    item("microsoft_word", "Microsoft word")
+////                }
+//            }
+//            item("remove", "Remove") {
+//                icon(Icons.TwoTone.DeleteSweep)
+//                item("yep", "Yep") {
+//                    icon(Icons.TwoTone.Done)
+//                }
+//                item("go_back", "Go back") {
+//                    icon(Icons.TwoTone.Close)
+//                }
+//            }
+//        }
+//
+//    }
+//    return menu
+//}
+
+
+fun getMenu(tree: ReflexionArrayItem): MenuItem<String> {
+    val menu = dropDownMenu<String> {
+        item("copy", "Copy") {
+            icon(Icons.TwoTone.FileCopy)
+        }
+        item(tree.reflexionItemPk.toString(), tree.reflexionItemName) {
+            icon(Icons.TwoTone.Language)
+            tree.items?.forEach() { it1 ->
+                item(it1.reflexionItemPk.toString(), it1.reflexionItemName) {
+                    it1.items?.forEach { it2 ->
+                        item(it2.reflexionItemPk.toString(), it2.reflexionItemName) {
+                            it2.items?.forEach { it3 ->
+                                item(it3.reflexionItemPk.toString(), it3.reflexionItemName)
                             }
-
-                        if (filteringOptions.isNotEmpty()) {
-
-                            CustomDropDownMenu(
-                                isOpen = expanded,
-                                setIsOpen = {
-                                    expanded = !expanded
-                                },
-                                itemSelected = viewModel::selectItem,
-                                menu = getMenu(viewModel, parents = parents.value, children = children.value)
-                            )
-
                         }
                     }
                 }
             }
         }
-    }
-}
-
-fun getMenu(viewModel: CustomListsViewModel, parents: List<AbridgedReflexionItem?>, children: List<AbridgedReflexionItem?>): MenuItem<String> {
-    val menu = dropDownMenu<String> {
-        parents.forEach() { abridgedParent ->
-            item(abridgedParent?.autogenPK.toString(), abridgedParent?.name.toString()) {
-                icon(Icons.TwoTone.Share)
-                children.forEach() { abridgedChild ->
-                    item(abridgedChild?.autogenPK.toString(), abridgedChild?.name.toString()) {
-                    }
-                }
-//                item("as_a_file", "As a file") {
-//                    item("pdf", "PDF")
-//                    item("epub", "EPUB")
-//                    item("web_page", "Web page")
-//                    item("microsoft_word", "Microsoft word")
-//                }
+        item("remove", "Remove") {
+            icon(Icons.TwoTone.DeleteSweep)
+            item("yep", "Yep") {
+                icon(Icons.TwoTone.Done)
             }
-            item("remove", "Remove") {
-                icon(Icons.TwoTone.DeleteSweep)
-                item("yep", "Yep") {
-                    icon(Icons.TwoTone.Done)
-                }
-                item("go_back", "Go back") {
-                    icon(Icons.TwoTone.Close)
-                }
+            item("go_back", "Go back") {
+                icon(Icons.TwoTone.Close)
             }
         }
-
     }
     return menu
 }
-
