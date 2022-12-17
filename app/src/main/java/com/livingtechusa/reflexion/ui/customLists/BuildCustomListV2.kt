@@ -20,11 +20,18 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.twotone.AddCard
+import androidx.compose.material.icons.twotone.AirlineStops
+import androidx.compose.material.icons.twotone.Anchor
+import androidx.compose.material.icons.twotone.Architecture
+import androidx.compose.material.icons.twotone.Archive
+import androidx.compose.material.icons.twotone.Circle
 import androidx.compose.material.icons.twotone.Close
 import androidx.compose.material.icons.twotone.DeleteSweep
 import androidx.compose.material.icons.twotone.Done
 import androidx.compose.material.icons.twotone.FileCopy
+import androidx.compose.material.icons.twotone.Lan
 import androidx.compose.material.icons.twotone.Language
+import androidx.compose.material.icons.twotone.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -182,16 +190,20 @@ fun CustomListsContent(
     }
 }
 
+
 fun getItems(
     reflexionArrayItem: ReflexionArrayItem,
-    newBuilder: DropDownMenuBuilder<String>
+    newBuilder: DropDownMenuBuilder<String>,
+    list: List<ImageVector>
 ): DropDownMenuBuilder<String> {
+    var next = list.random()
     newBuilder.item(
         reflexionArrayItem.reflexionItemPk.toString(),
         reflexionArrayItem.reflexionItemName.toString()
     ) {
+        icon(next)
         reflexionArrayItem.items?.forEach {
-            getItems(it, this)
+            getItems(it, this, list)
         }
     }
     return newBuilder
@@ -212,16 +224,24 @@ fun getItems(
 //    return menu
 
 
-
 fun getMenu(
     tree: ReflexionArrayItem
 ): MenuItem<String> {
-
+    val list: MutableList<ImageVector> = mutableListOf(
+        Icons.TwoTone.Language,
+        Icons.TwoTone.FileCopy,
+        Icons.TwoTone.Share,
+        Icons.TwoTone.Done,
+        Icons.TwoTone.AirlineStops,
+        Icons.TwoTone.Lan,
+        Icons.TwoTone.AddCard,
+        Icons.TwoTone.Circle,
+        Icons.TwoTone.Anchor,
+        Icons.TwoTone.Architecture,
+        Icons.TwoTone.Archive
+    )
     val menu = dropDownMenu<String> {
-        getItems(tree, this)
-        item("copy", "Copy") {
-            icon(Icons.TwoTone.FileCopy)
-        }
+        getItems(tree, this, list)
     }
     return menu
 }
