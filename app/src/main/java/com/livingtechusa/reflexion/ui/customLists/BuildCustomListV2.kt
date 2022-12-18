@@ -54,7 +54,6 @@ import com.livingtechusa.reflexion.navigation.NavBarItems
 import com.livingtechusa.reflexion.ui.components.cascade.rememberCascadeState
 import com.livingtechusa.reflexion.ui.components.menu.CustomDropDownMenu
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
-import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import com.livingtechusa.reflexion.util.ReflexionArrayItem.Companion.traverseDepthFirst
 import com.livingtechusa.reflexion.util.extensions.findActivity
@@ -75,7 +74,8 @@ fun BuildCustomListsScreen(
             WindowWidthSizeClass.COMPACT -> {
                 CustomListCompactScreen(
                     navController = navController,
-                    icons = icons
+                    icons = icons,
+                    viewModel = viewModel,
                 )
             }
 
@@ -90,7 +90,8 @@ fun BuildCustomListsScreen(
 
             else -> CustomListCompactScreen(
                 navController = navController,
-                icons = icons
+                icons = icons,
+                viewModel = viewModel,
             )
         }
     }
@@ -100,7 +101,7 @@ fun BuildCustomListsScreen(
 @OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun CustomListsContent(
-    navController: NavHostController, paddingValues: PaddingValues, viewModel: CustomListsViewModel = hiltViewModel()
+    navController: NavHostController, viewModel: CustomListsViewModel, paddingValues: PaddingValues
 ) {
     val scope = rememberCoroutineScope()
     val itemTree = viewModel.itemTree.collectAsState()
