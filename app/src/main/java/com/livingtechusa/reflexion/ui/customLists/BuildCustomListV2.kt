@@ -25,8 +25,6 @@ import androidx.compose.material.icons.twotone.Anchor
 import androidx.compose.material.icons.twotone.Architecture
 import androidx.compose.material.icons.twotone.Archive
 import androidx.compose.material.icons.twotone.Circle
-import androidx.compose.material.icons.twotone.Close
-import androidx.compose.material.icons.twotone.DeleteSweep
 import androidx.compose.material.icons.twotone.Done
 import androidx.compose.material.icons.twotone.FileCopy
 import androidx.compose.material.icons.twotone.Lan
@@ -56,8 +54,8 @@ import com.livingtechusa.reflexion.navigation.NavBarItems
 import com.livingtechusa.reflexion.ui.components.cascade.rememberCascadeState
 import com.livingtechusa.reflexion.ui.components.menu.CustomDropDownMenu
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
+import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
-import com.livingtechusa.reflexion.util.ReflexionArrayItem.Companion.traverseBreadthFirst
 import com.livingtechusa.reflexion.util.ReflexionArrayItem.Companion.traverseDepthFirst
 import com.livingtechusa.reflexion.util.extensions.findActivity
 
@@ -77,8 +75,7 @@ fun BuildCustomListsScreen(
             WindowWidthSizeClass.COMPACT -> {
                 CustomListCompactScreen(
                     navController = navController,
-                    icons = icons,
-                    viewModel = viewModel,
+                    icons = icons
                 )
             }
 
@@ -93,8 +90,7 @@ fun BuildCustomListsScreen(
 
             else -> CustomListCompactScreen(
                 navController = navController,
-                icons = icons,
-                viewModel = viewModel,
+                icons = icons
             )
         }
     }
@@ -104,7 +100,7 @@ fun BuildCustomListsScreen(
 @OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun CustomListsContent(
-    navController: NavHostController, viewModel: CustomListsViewModel, paddingValues: PaddingValues
+    navController: NavHostController, paddingValues: PaddingValues, viewModel: CustomListsViewModel = hiltViewModel()
 ) {
     val scope = rememberCoroutineScope()
     val itemTree = viewModel.itemTree.collectAsState()
