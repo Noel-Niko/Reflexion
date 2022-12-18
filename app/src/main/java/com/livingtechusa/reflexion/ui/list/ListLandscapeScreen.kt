@@ -20,15 +20,15 @@ import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.BarItem
 import com.livingtechusa.reflexion.navigation.NavBarItems
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import com.livingtechusa.reflexion.ui.viewModels.ListViewModel
 
 
 @Composable
 fun MediumScreen(
     navController: NavHostController,
     icons: List<BarItem>,
-    viewModel: ItemViewModel,
+    viewModel: ListViewModel,
     search: String?,
-    reflexionItemList: List<ReflexionItem>,
     onSearch: (String?) -> Unit
 ) {
     val icons = NavBarItems.HomeBarItems

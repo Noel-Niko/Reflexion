@@ -41,13 +41,14 @@ import com.livingtechusa.reflexion.navigation.ReflexionNavigationType
 import com.livingtechusa.reflexion.ui.components.ReflexionItemListUI
 import com.livingtechusa.reflexion.ui.components.bars.SearchBar
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import com.livingtechusa.reflexion.ui.viewModels.ListViewModel
 import com.livingtechusa.reflexion.util.extensions.findActivity
 
 const val ListRoute = "list"
 
 @Composable
 fun ListDisplay(
-    viewModel: ItemViewModel = hiltViewModel(),
+    viewModel: ListViewModel = hiltViewModel(),
     navHostController: NavHostController,
     windowSize: WindowWidthSizeClass,
     pk: Long?
@@ -59,9 +60,9 @@ fun ListDisplay(
         // Create an observer that triggers our remembered callbacks
         // for sending analytics events
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_CREATE) {
+
                 viewModel.onTriggerEvent(ListEvent.GetList(pk))
-            }
+
         }
 
         // Add the observer to the lifecycle
@@ -75,18 +76,17 @@ fun ListDisplay(
 
     val context = LocalContext.current
     val icons = NavBarItems.ListBarItems
-    val reflexionItemList by viewModel.list.collectAsState()
 
     val search by viewModel.search.collectAsState()
 
     if (context.findActivity() != null) {
         when (windowSize) {
             WindowWidthSizeClass.COMPACT -> {
-                CompactScreen(navHostController, icons, viewModel, search, reflexionItemList, viewModel::searchEvent)
+                CompactScreen(navHostController, icons, viewModel, search, viewModel::searchEvent)
             }
 
             WindowWidthSizeClass.MEDIUM -> {
-                MediumScreen(navHostController, icons, viewModel, search, reflexionItemList, viewModel::searchEvent)
+                MediumScreen(navHostController, icons, viewModel, search, viewModel::searchEvent)
             }
 
 //            WindowWidthSizeClass.EXPANDED -> {
@@ -94,14 +94,14 @@ fun ListDisplay(
 //                viewModel.navigationType = ReflexionNavigationType.PERMANENT_NAVIGATION_DRAWER
 //            }
 
-            else -> CompactScreen(navHostController, icons, viewModel, search, reflexionItemList, viewModel::searchEvent)
+            else -> CompactScreen(navHostController, icons, viewModel, search, viewModel::searchEvent)
         }
     }
 }
 
 @Composable
 fun ListContent(
-    itemViewModel: ItemViewModel,
+    itemViewModel: ListViewModel,
     navController: NavHostController
 ) {
     ReflexionItemListUI(

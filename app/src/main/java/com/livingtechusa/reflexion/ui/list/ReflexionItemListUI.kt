@@ -12,58 +12,60 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.list.ListEvent
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import com.livingtechusa.reflexion.ui.viewModels.ListViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ReflexionItemListUI(
     navController: NavHostController,
-    viewModel: ItemViewModel
+    viewModel: ListViewModel
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val list = viewModel.list.collectAsState()
+    val reflexionItemList by viewModel.list.collectAsState()
     Scaffold(
         content = {
             ReflexionItemsContent(
-                reflexionItems = list.value,
+                reflexionItems = reflexionItemList,
                 onDoubleTap = { reflexionItem ->
-                    scope.launch {
-                        val job = launch {
-                            viewModel.onTriggerEvent(
-                                BuildEvent.GetSelectedReflexionItem(reflexionItem.autogenPK)
-                            )
-                        }
-                        job.join()
-                        navController.navigate(route = Screen.BuildItemScreen.route) {// + "/" + it.autogenPK) {
-                            launchSingleTop = true
-                        }
+//                    scope.launch {
+//                        viewModel.onTriggerEvent(
+//                            BuildEvent.GetSelectedReflexionItem(reflexionItem.autogenPK)
+//                        )
+//                    }
+                    navController.navigate(route = Screen.BuildItemScreen.route) {// + "/" + it.autogenPK) {
+                        launchSingleTop = true
                     }
                 },
                 onLongPress = { reflexionItem ->
-                    scope.launch {
-                        if (viewModel.hasNoChildren(reflexionItem.autogenPK)) {
-                            Toast.makeText(context, "No child items found.", Toast.LENGTH_SHORT)
-                                .show()
-                        } else {
-                            viewModel.onTriggerEvent(ListEvent.ClearList)
-                            viewModel.onTriggerEvent(ListEvent.GetList(reflexionItem.autogenPK))
-                        }
-                    }
+                   // CoroutineScope(Dispatchers.Main).launch {
+//                        if (viewModel.hasNoChildren(reflexionItem.autogenPK)) {
+//                            Toast.makeText(context, "No child items found.", Toast.LENGTH_SHORT)
+//                                .show()
+//                        } else {
+                                viewModel.onTriggerEvent(ListEvent.GetList(reflexionItem.autogenPK))
+                        //}
+                    //}
                 }
             )
         }

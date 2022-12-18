@@ -168,12 +168,12 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     ) { navBackStackEntry ->
-                        val parentEntry = remember(navBackStackEntry) {
-                            navController.getBackStackEntry(Screen.HomeScreen.route)
-                        }
-                        val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
+//                        val parentEntry = remember(navBackStackEntry) {
+//                            navController.getBackStackEntry(Screen.HomeScreen.route)
+//                        }
+//                        val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         ListDisplay(
-                            viewModel = parentViewModel,
+//                            viewModel = parentViewModel,
                             navHostController = navController,
                             pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK) ?: -1L,
                             windowSize = windowSize,

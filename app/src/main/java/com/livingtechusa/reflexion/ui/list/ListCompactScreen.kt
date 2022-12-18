@@ -20,15 +20,15 @@ import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.BarItem
 import com.livingtechusa.reflexion.ui.components.bars.SearchBar
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import com.livingtechusa.reflexion.ui.viewModels.ListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CompactScreen(
     navController: NavHostController,
     icons: List<BarItem>,
-    viewModel: ItemViewModel,
+    viewModel: ListViewModel,
     search: String?,
-    reflexionItemList: List<ReflexionItem>,
     onSearch: (String?) -> Unit
 ) {
     androidx.compose.material3.Scaffold(
