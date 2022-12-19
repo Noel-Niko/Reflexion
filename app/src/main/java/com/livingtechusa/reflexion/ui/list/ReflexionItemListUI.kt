@@ -1,7 +1,6 @@
 package com.livingtechusa.reflexion.ui.components
 
 import android.annotation.SuppressLint
-import android.widget.Toast
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,20 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
-import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.list.ListEvent
-import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.ui.viewModels.ListViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -79,7 +69,7 @@ private fun ReflexionItemColumnItem(
     onLongPress: () -> Unit
 ) {
     Row(
-        modifier = Modifier.pointerInput(Unit) {
+        modifier = Modifier.pointerInput(key1 = reflexionItem) {
             detectTapGestures(
                 onDoubleTap = { onDoubleTap() },
                 onLongPress = { onLongPress() }

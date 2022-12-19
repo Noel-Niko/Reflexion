@@ -3,14 +3,19 @@ package com.livingtechusa.reflexion.ui.viewModels
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
+import com.livingtechusa.reflexion.di.DefaultDispatcher
 import com.livingtechusa.reflexion.ui.list.ListEvent
 import com.livingtechusa.reflexion.util.BaseApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ListViewModel @Inject constructor(
     private val localServiceImpl: LocalServiceImpl,
-    private val state: SavedStateHandle
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
     private val TAG = "ListViewModel"
 
@@ -42,42 +47,45 @@ class ListViewModel @Inject constructor(
     }
 
     fun onTriggerEvent(event: ListEvent) {
-        viewModelScope.launch {
+
             try {
                 when (event) {
                     is ListEvent.GetList -> {
-                        _list.value = emptyList()
+                        viewModelScope.launch {
+                            //_list.value = emptyList()
                             if (event.pk == null || event.pk == -1L) {
                                 _list.value = localServiceImpl.getAllTopics() as List<ReflexionItem>
                             } else {
-                                val job = async {_list.value =
-                                    localServiceImpl.selectChildren(event.pk) as List<ReflexionItem> }
-                                job.join()
+                                val newList = withContext(defaultDispatcher) {
+                                        localServiceImpl.selectChildren(event.pk) as List<ReflexionItem>
+                                }
+                              _list.value = newList
                             }
-                    }
-
-                    is ListEvent.Search -> {
-                        if (event.pk == -1L) {
-                            if (event.search.isNullOrEmpty()) {
-                                _list.value = localServiceImpl.getAllTopics() as List<ReflexionItem>
-                            } else {
-                                // Topic key work search
-                                _list.value =
-                                    localServiceImpl.getAllTopicsContainingString(event.search) as List<ReflexionItem>
-                            }
-                        } else {
-                            // Children keyword search
-                            _list.value =
-                                localServiceImpl.selectChildrenContainingString(
-                                    event.pk,
-                                    event.search
-                                ) as List<ReflexionItem>
                         }
                     }
 
-                    is ListEvent.ClearList -> {
-                        _list.value = emptyList()
-                    }
+//                    is ListEvent.Search -> {
+//                        if (event.pk == -1L) {
+//                            if (event.search.isNullOrEmpty()) {
+//                                _list.value = localServiceImpl.getAllTopics() as List<ReflexionItem>
+//                            } else {
+//                                // Topic key work search
+//                                _list.value =
+//                                    localServiceImpl.getAllTopicsContainingString(event.search) as List<ReflexionItem>
+//                            }
+//                        } else {
+//                            // Children keyword search
+//                            _list.value =
+//                                localServiceImpl.selectChildrenContainingString(
+//                                    event.pk,
+//                                    event.search
+//                                ) as List<ReflexionItem>
+//                        }
+//                    }
+//
+//                    is ListEvent.ClearList -> {
+//                        _list.value = emptyList()
+//                    }
 
                     else -> {
                         Toast.makeText(context, "No matching items", Toast.LENGTH_SHORT).show()
@@ -90,7 +98,7 @@ class ListViewModel @Inject constructor(
                     "Exception: ${e.message}  with cause: ${e.cause}"
                 )
             }
-        }
+
     }
 
     var listPK = 0L
