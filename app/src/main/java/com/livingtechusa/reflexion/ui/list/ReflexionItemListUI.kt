@@ -1,6 +1,7 @@
 package com.livingtechusa.reflexion.ui.components
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,9 +20,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
+import com.livingtechusa.reflexion.di.DefaultDispatcher
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.list.ListEvent
 import com.livingtechusa.reflexion.ui.viewModels.ListViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -38,24 +44,19 @@ fun ReflexionItemListUI(
             ReflexionItemsContent(
                 reflexionItems = reflexionItemList,
                 onDoubleTap = { reflexionItem ->
-//                    scope.launch {
-//                        viewModel.onTriggerEvent(
-//                            BuildEvent.GetSelectedReflexionItem(reflexionItem.autogenPK)
-//                        )
-//                    }
-                    navController.navigate(route = Screen.BuildItemScreen.route) {// + "/" + it.autogenPK) {
+                    navController.navigate(route = Screen.BuildItemScreen.route + "/" + reflexionItem.autogenPK) {
                         launchSingleTop = true
                     }
                 },
                 onLongPress = { reflexionItem ->
-                   // CoroutineScope(Dispatchers.Main).launch {
-//                        if (viewModel.hasNoChildren(reflexionItem.autogenPK)) {
-//                            Toast.makeText(context, "No child items found.", Toast.LENGTH_SHORT)
-//                                .show()
-//                        } else {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        if (viewModel.hasNoChildren(reflexionItem.autogenPK)) {
+                            Toast.makeText(context, "No child items found.", Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
                                 viewModel.onTriggerEvent(ListEvent.GetList(reflexionItem.autogenPK))
-                        //}
-                    //}
+                        }
+                    }
                 }
             )
         }

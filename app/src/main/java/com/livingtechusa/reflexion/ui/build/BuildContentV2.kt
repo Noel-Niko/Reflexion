@@ -18,17 +18,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.rememberScaffoldState
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,16 +37,22 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.BlendMode.Companion.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.Blue
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
@@ -59,34 +64,37 @@ import com.livingtechusa.reflexion.util.Temporary
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BuildContent(
-    navHostController: NavHostController, viewModel: ItemViewModel, paddingValues: PaddingValues
+fun BuildContentV2(pk: Long, navHostController: NavHostController, viewModel: ItemViewModel, paddingValues: PaddingValues
 ) {
     val URI = "/Uri"
     val URL = "/Url"
     val context = LocalContext.current
-    val scaffoldState = rememberScaffoldState()
+//    val scaffoldState = rememberScaffoldState()
 
     val itemViewModel: ItemViewModel = viewModel
     val scope = rememberCoroutineScope()
     val reflexionItem by itemViewModel.reflexionItem.collectAsState()
     val saveNow by itemViewModel.saveNow.collectAsState()
     val resource = ResourceProviderSingleton
-//    val reflexionItem = // remember??? TODO
-//        ReflexionItem(
-//            autogenPK = savedReflexionItem.autogenPK,
-//            name = savedReflexionItem.name,
-//            description = savedReflexionItem.description,
-//            detailedDescription = savedReflexionItem.detailedDescription,
-//            image = savedReflexionItem.image,
-//            videoUri = savedReflexionItem.videoUri,
-//            videoUrl = savedReflexionItem.videoUrl,
-//            parent = savedReflexionItem.parent
-//        )
+    val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
 
+    // If `lifecycleOwner` changes, dispose and reset the effect
+    DisposableEffect(lifecycleOwner) {
+        // Create an observer that triggers our remembered callbacks
+        // for sending analytics events
+        val observer = LifecycleEventObserver { _, event ->
+            viewModel.onTriggerEvent(BuildEvent.GetSelectedReflexionItem(pk))
+        }
+
+        // Add the observer to the lifecycle
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        // When the effect leaves the Composition, remove the observer
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
     var targetVideoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     val selectVideo =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(),
@@ -94,7 +102,6 @@ fun BuildContent(
                 val copy = reflexionItem.copy(videoUri = uri.toString())
                 itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
             })
-
     val takeVideo = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CaptureVideo()
     ) { _ ->
@@ -105,9 +112,9 @@ fun BuildContent(
         }
     }
 
+
     val offsetX = remember { mutableStateOf(0f) }
     val offsetY = remember { mutableStateOf(0f) }
-
 
     Box(
         modifier = Modifier
@@ -148,7 +155,7 @@ fun BuildContent(
                             offsetY.value += dragAmount.y
                         }
                     },
-                    containerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colors.primary,
                     onClick = {
                         Toast.makeText(
                             context, resource.getString(R.string.changes_saved), Toast.LENGTH_SHORT
@@ -199,10 +206,10 @@ fun BuildContent(
                             ) {
                                 TextField(
                                     colors = TextFieldDefaults.textFieldColors(
-                                        textColor = Color.Black,
-                                        containerColor = Color.Transparent
+                                        textColor = Black,
+                                        backgroundColor = Transparent
                                     ),
-                                    textStyle = MaterialTheme.typography.headlineSmall,
+                                    textStyle = MaterialTheme.typography.h6,
                                     modifier = Modifier.fillMaxWidth(),
                                     value = if (reflexionItem.name == Constants.EMPTY_ITEM) {
                                         ""
@@ -237,10 +244,10 @@ fun BuildContent(
                             ) {
                                 TextField(
                                     colors = TextFieldDefaults.textFieldColors(
-                                        textColor = Color.Black,
-                                        containerColor = Color.Transparent,
+                                        textColor = Black,
+                                        backgroundColor = Transparent
                                     ),
-                                    textStyle = MaterialTheme.typography.headlineSmall,
+                                    textStyle = MaterialTheme.typography.h6,
                                     value = if (reflexionItem.name == Constants.EMPTY_ITEM) {
                                         ""
                                     } else {
@@ -275,10 +282,10 @@ fun BuildContent(
                         ) {
                             TextField(
                                 colors = TextFieldDefaults.textFieldColors(
-                                    textColor = Color.Black,
-                                    containerColor = Color.Transparent
+                                    textColor = Black,
+                                    backgroundColor = Transparent
                                 ),
-                                textStyle = MaterialTheme.typography.bodyMedium,
+                                textStyle = MaterialTheme.typography.h6,
                                 modifier = Modifier.fillMaxWidth(),
                                 value = reflexionItem.description ?: Constants.EMPTY_STRING,
                                 onValueChange = { description ->
@@ -309,10 +316,10 @@ fun BuildContent(
                         ) {
                             TextField(
                                 colors = TextFieldDefaults.textFieldColors(
-                                    textColor = Color.Black,
-                                    containerColor = Color.Transparent
+                                    textColor = Black,
+                                    backgroundColor = Transparent
                                 ),
-                                textStyle = MaterialTheme.typography.bodyMedium,
+                                textStyle = MaterialTheme.typography.h6,
                                 modifier = Modifier.fillMaxWidth(),
                                 value = reflexionItem.detailedDescription ?: Constants.EMPTY_STRING,
                                 onValueChange = { detailedDescription ->
@@ -354,7 +361,7 @@ fun BuildContent(
                                         }
                                     },
                                 text = AnnotatedString(stringResource(R.string.saved_video)),
-                                color = Color.Blue
+                                color = Blue
 
                             )
                         }
@@ -406,7 +413,7 @@ fun BuildContent(
                                         },
                                     ),
                                 text = AnnotatedString(stringResource(R.string.video_link)),
-                                color = Color.Blue
+                                color = Blue
                             )
                         }
                         Column(
@@ -428,13 +435,8 @@ fun BuildContent(
                             }
                         }
                     }
-
                 }
             }
         }
     }
 }
-
-
-
-

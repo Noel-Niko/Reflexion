@@ -37,7 +37,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MediumScreen(
-    navController: NavHostController, icons: List<BarItem>, viewModel: ItemViewModel
+    pk: Long, navController: NavHostController, icons: List<BarItem>, viewModel: ItemViewModel
 ) {
     val icons = NavBarItems.BuildBarItems
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -104,7 +104,7 @@ fun MediumScreen(
                         })
                     }
                 }
-                BuildContent(navController, viewModel, it)
+                BuildContentV2(pk, navController, viewModel, it)
             }
         }
 

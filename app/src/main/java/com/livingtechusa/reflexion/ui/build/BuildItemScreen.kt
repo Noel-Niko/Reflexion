@@ -96,6 +96,7 @@ const val BuildRoute = "build"
 
 @Composable
 fun BuildItemScreen(
+    pk: Long,
     navHostController: NavHostController,
     windowSize: WindowWidthSizeClass,
     viewModel: ItemViewModel = hiltViewModel(),
@@ -105,11 +106,11 @@ fun BuildItemScreen(
     if (context.findActivity() != null) {
         when (windowSize) {
             WindowWidthSizeClass.COMPACT -> {
-                CompactScreen(navHostController, icons, viewModel)
+                CompactScreen(pk, navHostController, icons, viewModel)
             }
 
             WindowWidthSizeClass.MEDIUM -> {
-                MediumScreen(navHostController, icons, viewModel)
+                MediumScreen(pk, navHostController, icons, viewModel)
             }
 
 //            WindowWidthSizeClass.EXPANDED -> {
@@ -117,7 +118,7 @@ fun BuildItemScreen(
 //                viewModel.navigationType = ReflexionNavigationType.PERMANENT_NAVIGATION_DRAWER
 //            }
 
-            else -> CompactScreen(navHostController, icons, viewModel)
+            else -> CompactScreen(pk, navHostController, icons, viewModel)
         }
     }
 }

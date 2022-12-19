@@ -99,7 +99,7 @@ class ItemViewModel @Inject constructor(
                     is BuildEvent.GetSelectedReflexionItem -> {
                         viewModelScope.launch {
                             when (event.pk) {
-                                -2L ->
+                                -1L ->
                                     _reflexionItem.value = ReflexionItem()
 
                                 else ->

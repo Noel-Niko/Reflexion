@@ -16,7 +16,7 @@ object NavBarItems {
         BarItem(
             title = "New",
             image = Icons.Filled.DeveloperMode,
-            route = Screen.BuildItemScreen.route
+            route = Screen.BuildItemScreen.route + "/" + -1L
         ),
         BarItem(
             title = "Topics",
@@ -53,6 +53,11 @@ object NavBarItems {
             title = "New",
             image = Icons.Filled.DeveloperMode,
             route = Screen.BuildItemScreen.route
+        ),
+        BarItem(
+            title = "CustomLists",
+            image = Icons.Filled.AddLink,
+            route = Screen.CustomLists.route
         ),
         BarItem(
             title = "Home",

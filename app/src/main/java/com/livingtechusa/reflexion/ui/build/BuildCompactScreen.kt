@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CompactScreen(
-    navController: NavHostController, icons: List<BarItem>, viewModel: ItemViewModel
+    pk: Long, navController: NavHostController, icons: List<BarItem>, viewModel: ItemViewModel
 ) {
     val scope = rememberCoroutineScope()
     val state = rememberScaffoldState()
@@ -144,6 +144,6 @@ fun CompactScreen(
                 }
             }
         }) { paddingValues ->
-        BuildContent(navController, viewModel, paddingValues)
+        BuildContentV2(pk, navController, viewModel, paddingValues)
     }
 }
