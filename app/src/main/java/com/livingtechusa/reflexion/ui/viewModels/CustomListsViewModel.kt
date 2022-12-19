@@ -39,6 +39,9 @@ class CustomListsViewModel @Inject constructor(
     private val _selectedItem = MutableStateFlow(ReflexionItem())
     val selectedItem: StateFlow<ReflexionItem> get() = _selectedItem
 
+    private val _listOfLists = MutableStateFlow(emptyList<ReflexionArrayItem>())
+    val listOfLists: StateFlow<List<ReflexionArrayItem>> get() = _listOfLists
+
     val item1 = ReflexionArrayItem(
         itemPK = null,
         itemName = "Topics",
@@ -115,8 +118,11 @@ class CustomListsViewModel @Inject constructor(
     fun selectItem(itemPk: String?) {
         if (itemPk != null) {
             viewModelScope.launch {
-//                _selectedItem.value =
-//                    localServiceImpl.selectItem(itemPk.toLong()) ?: ReflexionItem()
+                val newList: MutableList<ReflexionArrayItem> = mutableListOf()
+                newList.addAll(_listOfLists.value)
+                localServiceImpl.selectReflexionArrayItemsByPk(itemPk.toLong())
+                    ?.let { newList.add(it) }
+                _listOfLists.value = newList
             }
         }
     }

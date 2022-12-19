@@ -41,8 +41,11 @@ interface ReflexionItemDao {
     @Query("Select autogenPK, name, parent FROM ReflexionItem WHERE parent =:parent order by name")
     suspend fun selectAbridgedReflexionItemDataByParentPk(parent: Long): List<AbridgedReflexionItem?>
 
-    @Query("Select autogenPK, name, parent FROM ReflexionItem WHERE autogenPK =:pk")
+    @Query("Select autogenPK, name, parent FROM ReflexionItem WHERE parent =:pk")
     suspend fun selectSingleAbridgedReflexionItemDataByParentPk(pk: Long): AbridgedReflexionItem
+
+    @Query("Select autogenPK, name, parent FROM ReflexionItem WHERE autogenPK =:pk")
+    suspend fun selectSingleAbridgedReflexionItem(pk: Long): AbridgedReflexionItem
 
     @Query("UPDATE ReflexionItem SET parent = :newParent WHERE autogenPK = :autogenPK AND name = :name")
     suspend fun setReflexionItemParent(autogenPK: Long, name: String, newParent: Long)

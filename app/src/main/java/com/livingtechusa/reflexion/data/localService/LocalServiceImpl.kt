@@ -86,40 +86,55 @@ class LocalServiceImpl @Inject constructor(
     }
 
     override suspend fun selectAbridgedReflexionItemDataByParentPk(pk: Long?): List<AbridgedReflexionItem?> {
-        if(pk == null){
+        if (pk == null) {
             return reflexionItemDao.getAbridgedReflexionItemTopics()
         }
         return reflexionItemDao.selectAbridgedReflexionItemDataByParentPk(pk)
     }
 
     override suspend fun selectReflexionArrayItemsByParentPk(pk: Long?): List<ReflexionArrayItem?> {
-        if(pk == null){
+        if (pk == null) {
             val result: MutableList<ReflexionArrayItem> = mutableListOf()
-                reflexionItemDao.getAbridgedReflexionItemTopics().forEach() {
-                    val Rai = ReflexionArrayItem(
-                        itemPK  = it?.autogenPK ?: 0L,
-                        itemName = it?.name ?: EMPTY_STRING,
-                        children = mutableListOf()
-                    )
-                    if (Rai != null) {
-                        result.add(Rai)
-                    }
+            reflexionItemDao.getAbridgedReflexionItemTopics().forEach() {
+                val Rai = ReflexionArrayItem(
+                    itemPK = it?.autogenPK ?: 0L,
+                    itemName = it?.name ?: EMPTY_STRING,
+                    children = mutableListOf()
+                )
+                if (Rai != null) {
+                    result.add(Rai)
                 }
+            }
             return result
         } else {
             val result: MutableList<ReflexionArrayItem> = mutableListOf()
             reflexionItemDao.selectAbridgedReflexionItemDataByParentPk(pk).forEach() {
                 val Rai: ReflexionArrayItem =
-                        ReflexionArrayItem(
-                            itemPK  = it?.autogenPK ?: 0L,
-                            itemName = it?.name ?: EMPTY_STRING,
-                            children = mutableListOf()
-                        )
+                    ReflexionArrayItem(
+                        itemPK = it?.autogenPK ?: 0L,
+                        itemName = it?.name ?: EMPTY_STRING,
+                        children = mutableListOf()
+                    )
                 result.add(Rai)
             }
             return result
         }
     }
+
+    override suspend fun selectReflexionArrayItemsByPk(pk: Long): ReflexionArrayItem? {
+        var result:ReflexionArrayItem = ReflexionArrayItem(null, null, null)
+        reflexionItemDao.selectSingleAbridgedReflexionItem(pk).let {
+            val Rai: ReflexionArrayItem =
+                ReflexionArrayItem(
+                    itemPK = it.autogenPK ?: 0L,
+                    itemName = it.name ?: EMPTY_STRING,
+                    children = mutableListOf()
+                )
+            result = Rai
+        }
+        return result
+    }
+
     override suspend fun selectSingleAbridgedReflexionItemDataByParentPk(pk: Long): AbridgedReflexionItem {
         return reflexionItemDao.selectSingleAbridgedReflexionItemDataByParentPk(pk)
     }

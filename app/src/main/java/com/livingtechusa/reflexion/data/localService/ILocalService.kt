@@ -56,4 +56,8 @@ interface ILocalService {
 
     suspend fun deleteSelectedNode(nodePk: Long)
     suspend fun selectReflexionArrayItemsByParentPk(pk: Long?): List<ReflexionArrayItem?>
+
+    suspend fun selectReflexionArrayItemsByPk(pk: Long): ReflexionArrayItem?
+
+
 }
