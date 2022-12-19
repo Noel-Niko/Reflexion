@@ -18,6 +18,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.twotone.AddCard
 import androidx.compose.material.icons.twotone.AirlineStops
@@ -149,16 +150,18 @@ fun CustomListsContent(
                         TextField(
                             modifier = Modifier
                                 .align(Alignment.CenterHorizontally),
-                            //.offset(100.dp),
                             value = selectedItem,
                             onValueChange = { selectedItem = it },
-                            label = { Text(text = "Topic") },
+                            label = { Text(
+                                text = "Topic"
+                            ) },
                             trailingIcon = {
                                 ExposedDropdownMenuDefaults.TrailingIcon(
                                     expanded = expanded
                                 )
                             },
-                            colors = ExposedDropdownMenuDefaults.textFieldColors()
+                            colors = ExposedDropdownMenuDefaults.textFieldColors(textColor = Color.Black,
+                                backgroundColor = Color.Transparent)
                         )
 
 //                        // filter options based on text field value
