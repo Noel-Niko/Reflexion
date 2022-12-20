@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.di.DefaultDispatcher
@@ -88,7 +89,7 @@ class ListViewModel @Inject constructor(
 //                    }
 
                     else -> {
-                        Toast.makeText(context, "No matching items", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.no_matching_items), Toast.LENGTH_SHORT).show()
                     }
 
                 }

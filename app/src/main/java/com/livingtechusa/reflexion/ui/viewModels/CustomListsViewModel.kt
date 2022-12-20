@@ -6,24 +6,27 @@ import android.widget.Toast
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
-import com.livingtechusa.reflexion.data.models.AbridgedReflexionItem
+import com.livingtechusa.reflexion.di.DefaultDispatcher
 import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
 @HiltViewModel
 class CustomListsViewModel @Inject constructor(
     private val localServiceImpl: LocalServiceImpl,
-    private val state: SavedStateHandle
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private val TAG = "CustomListsViewModel"
@@ -39,8 +42,8 @@ class CustomListsViewModel @Inject constructor(
     private val _selectedItem = MutableStateFlow(ReflexionItem())
     val selectedItem: StateFlow<ReflexionItem> get() = _selectedItem
 
-    private val _listOfLists = MutableStateFlow(emptyList<ReflexionArrayItem>())
-    val listOfLists: StateFlow<List<ReflexionArrayItem>> get() = _listOfLists
+    private val _customList = MutableStateFlow(ReflexionArrayItem(0L, "New List", mutableListOf<ReflexionArrayItem>()))
+    val customList: StateFlow<ReflexionArrayItem> get() = _customList
 
     val item1 = ReflexionArrayItem(
         itemPK = null,
@@ -106,7 +109,7 @@ class CustomListsViewModel @Inject constructor(
 //                    }
 
                     else -> {
-                        Toast.makeText(context, "No matching items", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.no_matching_items), Toast.LENGTH_SHORT).show()
                     }
                 }
             } catch (e: Exception) {
@@ -118,12 +121,16 @@ class CustomListsViewModel @Inject constructor(
     fun selectItem(itemPk: String?) {
         if (itemPk != null) {
             viewModelScope.launch {
-                val newList: MutableList<ReflexionArrayItem> = mutableListOf()
-                newList.addAll(_listOfLists.value)
-                localServiceImpl.selectReflexionArrayItemsByPk(itemPk.toLong())
-                    ?.let { newList.add(it) }
-                _listOfLists.value = newList
+                val newListItem = ReflexionArrayItem(
+                    _customList.value.reflexionItemPk,
+                    _customList.value.reflexionItemName,
+                    _customList.value.items
+                )
+                withContext(defaultDispatcher) { localServiceImpl.selectReflexionArrayItemsByPk(itemPk.toLong())
+                    ?.let { newListItem.items?.add(it) } }
+                _customList.value = newListItem
             }
+
         }
     }
 }
