@@ -94,20 +94,23 @@ class CustomListsViewModel @Inject constructor(
     }
 
     fun onTriggerEvent(event: CustomListEvent) {
-        viewModelScope.launch {
             try {
                 when (event) {
                     is CustomListEvent.UpdateListName -> {
-                        _customList.value.reflexionItemName = event.text
+                        val newListItem = ReflexionArrayItem(
+                            _customList.value.reflexionItemPk,
+                            _customList.value.reflexionItemName,
+                            _customList.value.items
+                        )
+                        newListItem.reflexionItemName = event.text
+                        _customList.value = newListItem
                     }
-
                     else -> {}
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Exception: ${e.message}  with cause: ${e.cause}")
             }
         }
-    }
 
     fun selectItem(itemPk: String?) {
         if (itemPk.isNullOrEmpty().not() && itemPk.equals(EMPTY_PK_STRING).not()) {
