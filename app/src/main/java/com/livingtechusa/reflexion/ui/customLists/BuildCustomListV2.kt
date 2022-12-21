@@ -201,9 +201,11 @@ fun CustomListsContent(
                     .fillMaxSize()
                     .background(Color.Red)
             ) {
-                Column(modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Yellow)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Yellow)
+                ) {
                     Spacer(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -218,7 +220,6 @@ fun CustomListsContent(
                             .background(Color.Green)
                     )
                 CustomListContent(navController = navController, viewModel = viewModel)
-
                 }
             }
         }

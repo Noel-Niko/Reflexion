@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.Text
@@ -36,7 +37,7 @@ fun CustomListContent(
     val listOfLists by viewModel.listOfLists.collectAsState()
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().padding(4.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         items( 1) { index -> //customList.items?.size ?:
@@ -58,15 +59,14 @@ fun CustomListContent(
                         .fillMaxWidth()
                 )
                 LazyRow(
-                    modifier = Modifier.fillMaxHeight(),
+                    modifier = Modifier.fillMaxHeight().padding(20.dp),
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     if (customList.items.isNullOrEmpty().not()) {
                         val count: Int = customList.items?.size ?: 0
                         items(count) {
                             Text(
-                                text = customList.items?.get(it)?.reflexionItemName.toString()
-                                    ?: "Empty"
+                                text = customList.items?.get(it)?.reflexionItemName.toString() + ", "
                             )
                         }
                     }
