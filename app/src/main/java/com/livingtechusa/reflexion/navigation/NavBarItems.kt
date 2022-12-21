@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.DesktopWindows
 import androidx.compose.material.icons.filled.DeveloperMode
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Face
+import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 
 object NavBarItems {
@@ -16,12 +17,12 @@ object NavBarItems {
         BarItem(
             title = "New",
             image = Icons.Filled.DeveloperMode,
-            route = Screen.BuildItemScreen.route + "/" + -1L
+            route = Screen.BuildItemScreen.route + "/" + EMPTY_PK
         ),
         BarItem(
             title = "Topics",
             image = Icons.Filled.DataArray,
-            route = Screen.ListScreen.route + "/" + -1L
+            route = Screen.ListScreen.route + "/" + EMPTY_PK
         ),
         BarItem(
             title = "CustomLists",
@@ -39,7 +40,7 @@ object NavBarItems {
         BarItem(
             title = "Topics",
             image = Icons.Filled.DataArray,
-            route = Screen.ListScreen.route + "/" + -1L
+            route = Screen.ListScreen.route + "/" + EMPTY_PK
         ),
         BarItem(
             title = "CustomLists",
@@ -75,7 +76,7 @@ object NavBarItems {
         BarItem(
             title = "Topics",
             image = Icons.Filled.DataArray,
-            route = Screen.ListScreen.route + "/" + -1L
+            route = Screen.ListScreen.route + "/" + EMPTY_PK
         ),
         BarItem(
             title = "New",

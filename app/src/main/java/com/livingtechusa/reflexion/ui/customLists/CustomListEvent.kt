@@ -6,4 +6,9 @@ sealed class CustomListEvent {
     data class GetChildList(
         val pk: Long
     ) : CustomListEvent() {}
+
+    data class UpdateListName(
+        val index: Int,
+        val text: String? = ""
+    ) : CustomListEvent() {}
 }

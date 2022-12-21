@@ -37,6 +37,7 @@ import com.livingtechusa.reflexion.ui.theme.ReflexionTheme
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants
+import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.REFLEXION_ITEM_PK
 import com.livingtechusa.reflexion.util.Constants.SOURCE
 import com.livingtechusa.reflexion.util.MediaUtil
@@ -114,7 +115,7 @@ class MainActivity : ComponentActivity() {
                         }
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         BuildItemScreen(
-                            pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK) ?: -1L,
+                            pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK) ?: EMPTY_PK,
                             navHostController = navController,
                             windowSize = windowSize,
                             viewModel = parentViewModel
@@ -176,7 +177,7 @@ class MainActivity : ComponentActivity() {
                     ) { navBackStackEntry ->
                         ListDisplay(
                             navHostController = navController,
-                            pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK) ?: -1L,
+                            pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK) ?: EMPTY_PK,
                             windowSize = windowSize,
                         )
                     }

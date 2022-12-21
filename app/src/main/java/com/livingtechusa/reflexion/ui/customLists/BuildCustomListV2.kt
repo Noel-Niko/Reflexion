@@ -190,7 +190,7 @@ fun CustomListsContent(
                                     expanded = !expanded
                                 },
                                 itemSelected = viewModel::selectItem,
-                                menu = getMenu(itemTree.value)
+                                menu = getMenu(itemTree.value )
                             )
                         }
                     }

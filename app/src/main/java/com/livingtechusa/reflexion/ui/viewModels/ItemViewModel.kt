@@ -16,6 +16,7 @@ import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.list.ListEvent
 import com.livingtechusa.reflexion.util.BaseApplication
+import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.MediaStoreUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -99,7 +100,7 @@ class ItemViewModel @Inject constructor(
                     is BuildEvent.GetSelectedReflexionItem -> {
                         viewModelScope.launch {
                             when (event.pk) {
-                                -1L ->
+                                EMPTY_PK ->
                                     _reflexionItem.value = ReflexionItem()
 
                                 else ->
@@ -184,7 +185,7 @@ class ItemViewModel @Inject constructor(
 //            try {
 //                when (event) {
 //                    is ListEvent.GetList -> {
-//                        if (event.pk == null || event.pk == -1L) {
+//                        if (event.pk == null || event.pk == EMPTY_PK) {
 //                            _list.value = localServiceImpl.getAllTopics() as List<ReflexionItem>
 //                        } else {
 //                            _list.value =
@@ -193,7 +194,7 @@ class ItemViewModel @Inject constructor(
 //                    }
 //
 //                    is ListEvent.Search -> {
-//                        if (event.pk == -1L) {
+//                        if (event.pk == EMPTY_PK) {
 //                            if (event.search.isNullOrEmpty()) {
 //                                _list.value = localServiceImpl.getAllTopics() as List<ReflexionItem>
 //                            } else {

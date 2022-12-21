@@ -14,6 +14,8 @@ object Constants {
     const val SOURCE = "sourceType"
     const val REFLEXION_ITEM_PK = "reflexion_item_pk"
     const val EMPTY_ITEM = "Empty Item"
+    const val EMPTY_PK = -1L
+    const val EMPTY_PK_STRING = "-1"
 }
 
 object Temporary {

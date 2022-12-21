@@ -15,6 +15,7 @@ import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.di.DefaultDispatcher
 import com.livingtechusa.reflexion.ui.list.ListEvent
 import com.livingtechusa.reflexion.util.BaseApplication
+import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -54,7 +55,7 @@ class ListViewModel @Inject constructor(
                     is ListEvent.GetList -> {
                         viewModelScope.launch {
                             //_list.value = emptyList()
-                            if (event.pk == null || event.pk == -1L) {
+                            if (event.pk == null || event.pk == EMPTY_PK) {
                                 _list.value = localServiceImpl.getAllTopics() as List<ReflexionItem>
                             } else {
                                 val newList = withContext(defaultDispatcher) {
@@ -66,7 +67,7 @@ class ListViewModel @Inject constructor(
                     }
 
 //                    is ListEvent.Search -> {
-//                        if (event.pk == -1L) {
+//                        if (event.pk == EMPTY_PK) {
 //                            if (event.search.isNullOrEmpty()) {
 //                                _list.value = localServiceImpl.getAllTopics() as List<ReflexionItem>
 //                            } else {

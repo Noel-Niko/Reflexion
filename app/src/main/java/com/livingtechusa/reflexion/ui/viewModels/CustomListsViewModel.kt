@@ -12,6 +12,8 @@ import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.di.DefaultDispatcher
 import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
 import com.livingtechusa.reflexion.util.BaseApplication
+import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
+import com.livingtechusa.reflexion.util.Constants.EMPTY_PK_STRING
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -45,6 +47,11 @@ class CustomListsViewModel @Inject constructor(
     private val _customList = MutableStateFlow(ReflexionArrayItem(0L, "New List", mutableListOf<ReflexionArrayItem>()))
     val customList: StateFlow<ReflexionArrayItem> get() = _customList
 
+
+    private val _listOfLists = MutableStateFlow(listOf(customList.value))
+    val listOfLists: StateFlow<List<ReflexionArrayItem>> get() = _listOfLists
+
+
     val item1 = ReflexionArrayItem(
         itemPK = null,
         itemName = "Topics",
@@ -59,21 +66,8 @@ class CustomListsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-//            _parentList.value = localServiceImpl.selectAbridgedReflexionItemDataByParentPk(null)
-//            val childList = mutableListOf<AbridgedReflexionItem>()
-//            topicsList.value.forEach() { abridgedParent ->
-//                localServiceImpl.selectAbridgedReflexionItemDataByParentPk(abridgedParent?.autogenPK)
-//                    .forEach() { abridgedChild ->
-//                        if (abridgedChild != null) {
-//                            childList.add(abridgedChild)
-//                        }
-//                    }
-//            }
-//            _childList.value = childList
-
             _itemTree.value = newLevel(item1, getMore(item1.reflexionItemPk))
         }
-
     }
 
     fun newLevel(
@@ -103,14 +97,11 @@ class CustomListsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 when (event) {
-//                    is CustomListEvent.GetChildList -> {
-//                        _childList.value =
-//                            localServiceImpl.selectChildren(event.pk) as List<ReflexionItem>
-//                    }
-
-                    else -> {
-                        Toast.makeText(context, context.getString(R.string.no_matching_items), Toast.LENGTH_SHORT).show()
+                    is CustomListEvent.UpdateListName -> {
+                        _customList.value.reflexionItemName = event.text
                     }
+
+                    else -> {}
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Exception: ${e.message}  with cause: ${e.cause}")
@@ -119,15 +110,21 @@ class CustomListsViewModel @Inject constructor(
     }
 
     fun selectItem(itemPk: String?) {
-        if (itemPk != null) {
+        if (itemPk.isNullOrEmpty().not() && itemPk.equals(EMPTY_PK_STRING).not()) {
             viewModelScope.launch {
                 val newListItem = ReflexionArrayItem(
                     _customList.value.reflexionItemPk,
                     _customList.value.reflexionItemName,
                     _customList.value.items
                 )
-                withContext(defaultDispatcher) { localServiceImpl.selectReflexionArrayItemsByPk(itemPk.toLong())
-                    ?.let { newListItem.items?.add(it) } }
+                withContext(defaultDispatcher) {
+                    if (itemPk.isNullOrEmpty().not()) {
+                        itemPk?.toLong()?.let { pk ->
+                            localServiceImpl.selectReflexionArrayItemsByPk(pk)
+                                ?.let { newListItem.items?.add(it) }
+                        }
+                    }
+                }
                 _customList.value = newListItem
             }
 
