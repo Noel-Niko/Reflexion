@@ -2,11 +2,8 @@ package com.livingtechusa.reflexion.ui.viewModels
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.di.DefaultDispatcher
@@ -44,7 +41,8 @@ class CustomListsViewModel @Inject constructor(
     private val _selectedItem = MutableStateFlow(ReflexionItem())
     val selectedItem: StateFlow<ReflexionItem> get() = _selectedItem
 
-    private val _customList = MutableStateFlow(ReflexionArrayItem(0L, "New List", mutableListOf<ReflexionArrayItem>()))
+    private val _customList =
+        MutableStateFlow(ReflexionArrayItem(0L, "New List", mutableListOf<ReflexionArrayItem>()))
     val customList: StateFlow<ReflexionArrayItem> get() = _customList
 
 
@@ -94,23 +92,48 @@ class CustomListsViewModel @Inject constructor(
     }
 
     fun onTriggerEvent(event: CustomListEvent) {
-            try {
-                when (event) {
-                    is CustomListEvent.UpdateListName -> {
-                        val newListItem = ReflexionArrayItem(
-                            _customList.value.reflexionItemPk,
-                            _customList.value.reflexionItemName,
-                            _customList.value.items
-                        )
-                        newListItem.reflexionItemName = event.text
-                        _customList.value = newListItem
-                    }
-                    else -> {}
+        try {
+            when (event) {
+                is CustomListEvent.UpdateListName -> {
+                    val newListItem = ReflexionArrayItem(
+                        _customList.value.reflexionItemPk,
+                        _customList.value.reflexionItemName,
+                        _customList.value.items
+                    )
+                    newListItem.reflexionItemName = event.text
+                    _customList.value = newListItem
                 }
-            } catch (e: Exception) {
-                Log.e(TAG, "Exception: ${e.message}  with cause: ${e.cause}")
+
+                is CustomListEvent.MoveItemUp -> {
+                    if (event.pk == EMPTY_PK) return
+                    val newArrayList = ReflexionArrayItem(
+                        customList.value.reflexionItemPk,
+                        customList.value.reflexionItemName,
+                        bubbleUp(_customList.value, event.pk).toMutableList()
+                    )
+                   _customList.value = newArrayList
+                }
+                else -> {}
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Exception: ${e.message}  with cause: ${e.cause}")
+        }
+    }
+
+    private fun bubbleUp(newArrayListItem: ReflexionArrayItem, pk: Long): List<ReflexionArrayItem> {
+        val newArrangement = mutableListOf<ReflexionArrayItem>()
+        newArrayListItem.items?.forEach {
+            if (it.reflexionItemPk == pk) {
+                val temp = newArrangement.last()
+                newArrangement.removeLast()
+                newArrangement.add(it)
+                newArrangement.add(temp)
+            } else {
+                newArrangement.add(it)
             }
         }
+        return newArrangement
+    }
 
     fun selectItem(itemPk: String?) {
         if (itemPk.isNullOrEmpty().not() && itemPk.equals(EMPTY_PK_STRING).not()) {

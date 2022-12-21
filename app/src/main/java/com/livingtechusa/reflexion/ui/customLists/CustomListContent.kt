@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -30,9 +31,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
+import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
+import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
 @Composable
@@ -74,15 +78,17 @@ fun CustomListContent(
                 )
                 LazyRow(
                     modifier = Modifier
-                        .fillMaxHeight()
+                        .fillMaxSize()
                         .padding(20.dp),
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     if (customList.items.isNullOrEmpty().not()) {
                         val count: Int = customList.items?.size ?: 0
                         items(count) { item ->
-                            var offsetX by remember { mutableStateOf(0f) }
-
+                            var offsetX = 0F
+                            var fontStyleStandard = MaterialTheme.typography.body2
+                            var fontStyleSelected = MaterialTheme.typography.h1
+                            var fontStyleImplemented = fontStyleStandard
                             Text(
                                 modifier = Modifier
                                     .offset { IntOffset(offsetX.roundToInt(), 0) }
@@ -90,9 +96,19 @@ fun CustomListContent(
                                         orientation = Orientation.Horizontal,
                                         state = rememberDraggableState { delta ->
                                             offsetX += delta
+                                        },
+                                        //onDragStarted = { fontStyleImplemented = fontStyleSelected },
+                                        onDragStopped = {
+                                            if(offsetX.absoluteValue > 10){
+                                                viewModel.onTriggerEvent(CustomListEvent.MoveItemUp(customList.items?.get(item)?.reflexionItemPk ?: EMPTY_PK))
+                                            } else  if(offsetX.absoluteValue < 10){
+                                                viewModel.onTriggerEvent(CustomListEvent.MoveItemDown(customList.items?.get(item)?.reflexionItemPk ?: EMPTY_PK))
+                                            }
                                         }
-                                    ),
-                                text = customList.items?.get(item)?.reflexionItemName.toString() + ", "
+                                    )
+                                    .fillMaxSize(),
+                                text = customList.items?.get(item)?.reflexionItemName.toString() + ", ",
+                               // fontStyle = fontStyleImplemented
                             )
                         }
                     }
@@ -102,4 +118,26 @@ fun CustomListContent(
     }
 }
 
+//
+//var offsetX by remember { mutableStateOf(0f) }
+//var fontStyleStandard = MaterialTheme.typography.body2
+//var fontStyleSelected = MaterialTheme.typography.h1
+//var fontStyleImplemented = fontStyleStandard
+//Text(
+//modifier = Modifier
+//.offset { IntOffset(offsetX.roundToInt(), 0) }
+//.draggable(
+//orientation = Orientation.Horizontal,
+//state = rememberDraggableState { delta ->
+//    offsetX += delta
+//},
+//onDragStarted = { fontStyleImplemented = fontStyleSelected },
+//onDragStopped = {
+//    fontStyleImplemented = fontStyleSelected
+//}
+//),
+//text = customList.items?.get(item)?.reflexionItemName.toString() + ", ",
+//// fontStyle = fontStyleImplemented
+//)
+//}
 
