@@ -61,7 +61,7 @@ fun getMenu(): MenuItem<String> {
 @ExperimentalAnimationApi
 @Composable
 fun CustomDropDownMenu(isOpen: Boolean = false, setIsOpen: (Boolean) -> Unit, itemSelected: (String) -> Unit, menu: MenuItem<String> ) {
-    Dropdown(
+    CustomDropdown(
         isOpen = isOpen,
         menu = menu,
         colors = dropDownMenuColors(),
