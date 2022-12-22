@@ -1,5 +1,6 @@
 package com.livingtechusa.reflexion.ui.customLists
 
+import android.widget.Toast
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -190,7 +191,7 @@ fun CustomListsContent(
                                     expanded = !expanded
                                 },
                                 itemSelected = viewModel::selectItem,
-                                menu = getMenu(itemTree.value )
+                                menu = getMenu(itemTree.value)
                             )
                         }
                     }

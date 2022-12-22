@@ -1,7 +1,6 @@
 package com.livingtechusa.reflexion.ui.components.menu
 
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.twotone.Close
 import androidx.compose.material.icons.twotone.DeleteSweep
@@ -10,10 +9,8 @@ import androidx.compose.material.icons.twotone.FileCopy
 import androidx.compose.material.icons.twotone.Language
 import androidx.compose.material.icons.twotone.Share
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import com.androidpoet.dropdown.Dropdown
 import com.androidpoet.dropdown.Easing
 import com.androidpoet.dropdown.EnterAnimation
 import com.androidpoet.dropdown.ExitAnimation

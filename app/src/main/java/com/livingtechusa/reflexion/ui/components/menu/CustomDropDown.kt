@@ -143,25 +143,25 @@ public fun <T : Any> DropdownContent(
             for (item in targetMenu.children!!) {
                 if (item.hasChildren()) {
                     ParentItem(
-                        item.id,
-                        item.title,
-                        item.icon,
-                        colors.contentColor
-                    ) { id ->
+                        id = item.id,
+                        title = item.title,
+                        icon = item.icon,
+                        contentColor = colors.contentColor
+                    ) {  id ->
                         val child = targetMenu.getChild(id)
                         if (child != null) {
-                            state.currentMenuItem = child
+                           state.currentMenuItem = child
                         } else {
                             throw IllegalStateException("Invalid item id : $id")
                         }
                     }
                 } else {
                     ChildItem(
-                        item.id,
-                        item.title,
-                        item.icon,
-                        colors.contentColor,
-                        onItemSelected
+                        id = item.id,
+                        title = item.title,
+                        icon =  item.icon,
+                        contentColor =  colors.contentColor,
+                        onClick = onItemSelected
                     )
                 }
             }
@@ -210,7 +210,7 @@ public fun MenuItemText(
 
 /*[MenuItem] DropdownMenuItem  wrapper to handle onclick and user interaction */
 @Composable
-public fun MenuItem(onClick: () -> Unit, content: @Composable RowScope.() -> Unit) {
+public fun CustomMenuItem(onClick: () -> Unit, content: @Composable RowScope.() -> Unit) {
     DropdownMenuItem(
         onClick = onClick,
         interactionSource = remember { MutableInteractionSource() },
@@ -225,7 +225,7 @@ public fun CascadeHeaderItem(
     contentColor: Color,
     onClick: () -> Unit,
 ) {
-    MenuItem(onClick = { onClick() }) {
+    CustomMenuItem(onClick = { onClick() }) {
         MenuItemIcon(
             icon = Icons.Rounded.ArrowLeft,
             tint = contentColor.copy(alpha = ContentAlpha.medium)
@@ -249,7 +249,8 @@ public fun <T> ParentItem(
     contentColor: Color,
     onClick: (T) -> Unit,
 ) {
-    MenuItem(onClick = { onClick(id) }) {
+    CustomMenuItem(
+        onClick = { onClick(id) }) {
         if (icon != null) {
             MenuItemIcon(icon = icon, tint = contentColor)
             Space()
