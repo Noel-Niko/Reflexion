@@ -11,10 +11,10 @@ sealed class CustomListEvent {
     ) : CustomListEvent() {}
 
     data class MoveItemUp(
-        val pk: Long,
+        val index: Int,
     ) : CustomListEvent() {}
 
     data class MoveItemDown(
-        val pk: Long,
+        val index: Int,
     ) : CustomListEvent() {}
 }

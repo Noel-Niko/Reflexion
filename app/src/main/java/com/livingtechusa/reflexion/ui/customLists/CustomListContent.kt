@@ -1,6 +1,7 @@
 package com.livingtechusa.reflexion.ui.customLists
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.DraggableState
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -91,13 +92,13 @@ fun CustomListContent(
                                         state = rememberDraggableState { delta ->
                                             offsetX += delta
                                         },
-                                        onDragStarted = { EnterAnimation.ElevationScale },
+                                        //onDragStarted = { EnterAnimation.ElevationScale },
                                         onDragStopped = { float ->
                                             if(float <= 0 ){
-                                                viewModel.onTriggerEvent(CustomListEvent.MoveItemUp(customList.items?.get(item)?.reflexionItemPk ?: EMPTY_PK))
+                                                viewModel.onTriggerEvent(CustomListEvent.MoveItemUp(item))
                                                 offsetX = 0F
                                             } else if(float > 0){
-                                                viewModel.onTriggerEvent(CustomListEvent.MoveItemDown(customList.items?.get(item)?.reflexionItemPk ?: EMPTY_PK))
+                                                viewModel.onTriggerEvent(CustomListEvent.MoveItemDown(item))
                                                 offsetX = 0F
                                             }
                                         }

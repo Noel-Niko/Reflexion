@@ -9,7 +9,6 @@ import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.di.DefaultDispatcher
 import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
 import com.livingtechusa.reflexion.util.BaseApplication
-import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK_STRING
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -104,20 +103,18 @@ class CustomListsViewModel @Inject constructor(
                     _customList.value = newListItem
                 }
                 is CustomListEvent.MoveItemUp -> {
-                    if (event.pk == EMPTY_PK) return
                     val newArrayList = ReflexionArrayItem(
                         customList.value.reflexionItemPk,
                         customList.value.reflexionItemName,
-                        bubbleUp(_customList.value, event.pk).toMutableList()
+                        bubbleUp(_customList.value, event.index).toMutableList()
                     )
                    _customList.value = newArrayList
                 }
                 is CustomListEvent.MoveItemDown -> {
-                    if (event.pk == EMPTY_PK) return
                     val newArrayList = ReflexionArrayItem(
                         customList.value.reflexionItemPk,
                         customList.value.reflexionItemName,
-                        bubbleDown(_customList.value, event.pk).toMutableList()
+                        bubbleDown(_customList.value, event.index).toMutableList()
                     )
                     _customList.value = newArrayList
                 }
@@ -128,16 +125,16 @@ class CustomListsViewModel @Inject constructor(
         }
     }
 
-    private fun bubbleDown(newArrayListItem: ReflexionArrayItem, pk: Long): List<ReflexionArrayItem> {
+    private fun bubbleDown(newArrayListItem: ReflexionArrayItem, index: Int): List<ReflexionArrayItem> {
         val newArrangement = mutableListOf<ReflexionArrayItem>()
         var temp :ReflexionArrayItem?  = null
-        newArrayListItem.items?.forEach {
-            if (it.reflexionItemPk == pk) {
-                temp = it
+        for(item in newArrayListItem.items?.indices!!) {
+            if (item == index) {
+                temp = newArrayListItem.items!![index]
             } else {
-                newArrangement.add(it)
-                temp?.apply {
-                    newArrangement.add(this)
+                newArrangement.add(newArrayListItem.items!![item])
+                temp?.let {
+                    newArrangement.add(it)
                     temp = null
                 }
             }
@@ -145,16 +142,16 @@ class CustomListsViewModel @Inject constructor(
         return newArrangement
     }
 
-    private fun bubbleUp(newArrayListItem: ReflexionArrayItem, pk: Long): List<ReflexionArrayItem> {
+    private fun bubbleUp(newArrayListItem: ReflexionArrayItem, index: Int): List<ReflexionArrayItem> {
         val newArrangement = mutableListOf<ReflexionArrayItem>()
-        newArrayListItem.items?.forEach {
-            if (it.reflexionItemPk == pk) {
+        for(item in newArrayListItem.items!!.indices) {
+            if (item == index) {
                 val temp = newArrangement.last()
                 newArrangement.removeLast()
-                newArrangement.add(it)
+                newArrangement.add(newArrayListItem.items!![item])
                 newArrangement.add(temp)
             } else {
-                newArrangement.add(it)
+                newArrangement.add(newArrayListItem.items!![item])
             }
         }
         return newArrangement
