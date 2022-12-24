@@ -145,7 +145,7 @@ fun drawerNavContent(
                         val parent = reflexionItem.autogenPK
                         itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
                         itemViewModel.onTriggerEvent(BuildEvent.SetParent(parent))
-                        navHostController.navigate(Screen.BuildItemScreen.route)
+                        navHostController.navigate(Screen.BuildItemScreen.route + parent)
                         //scaffoldState.drawerState.isClosed
                     }),
                     text = stringResource(R.string.add_child),

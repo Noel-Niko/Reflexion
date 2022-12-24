@@ -103,7 +103,6 @@ class CustomListsViewModel @Inject constructor(
                     newListItem.reflexionItemName = event.text
                     _customList.value = newListItem
                 }
-
                 is CustomListEvent.MoveItemUp -> {
                     if (event.pk == EMPTY_PK) return
                     val newArrayList = ReflexionArrayItem(
@@ -113,11 +112,37 @@ class CustomListsViewModel @Inject constructor(
                     )
                    _customList.value = newArrayList
                 }
+                is CustomListEvent.MoveItemDown -> {
+                    if (event.pk == EMPTY_PK) return
+                    val newArrayList = ReflexionArrayItem(
+                        customList.value.reflexionItemPk,
+                        customList.value.reflexionItemName,
+                        bubbleDown(_customList.value, event.pk).toMutableList()
+                    )
+                    _customList.value = newArrayList
+                }
                 else -> {}
             }
         } catch (e: Exception) {
             Log.e(TAG, "Exception: ${e.message}  with cause: ${e.cause}")
         }
+    }
+
+    private fun bubbleDown(newArrayListItem: ReflexionArrayItem, pk: Long): List<ReflexionArrayItem> {
+        val newArrangement = mutableListOf<ReflexionArrayItem>()
+        var temp :ReflexionArrayItem?  = null
+        newArrayListItem.items?.forEach {
+            if (it.reflexionItemPk == pk) {
+                temp = it
+            } else {
+                newArrangement.add(it)
+                temp?.apply {
+                    newArrangement.add(this)
+                    temp = null
+                }
+            }
+        }
+        return newArrangement
     }
 
     private fun bubbleUp(newArrayListItem: ReflexionArrayItem, pk: Long): List<ReflexionArrayItem> {

@@ -20,6 +20,9 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -27,6 +30,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.androidpoet.dropdown.EnterAnimation
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import kotlin.math.absoluteValue
@@ -78,7 +82,7 @@ fun CustomListContent(
                     if (customList.items.isNullOrEmpty().not()) {
                         val count: Int = customList.items?.size ?: 0
                         items(count) { item ->
-                            var offsetX = 0F
+                            var offsetX by remember { mutableStateOf(0f) }
                             Text(
                                 modifier = Modifier
                                     .offset { IntOffset(offsetX.roundToInt(), 0) }
@@ -87,12 +91,14 @@ fun CustomListContent(
                                         state = rememberDraggableState { delta ->
                                             offsetX += delta
                                         },
-                                        //onDragStarted = { fontStyleImplemented = fontStyleSelected },
-                                        onDragStopped = {
-                                            if(offsetX.absoluteValue > 10){
+                                        onDragStarted = { EnterAnimation.ElevationScale },
+                                        onDragStopped = { float ->
+                                            if(float <= 0 ){
                                                 viewModel.onTriggerEvent(CustomListEvent.MoveItemUp(customList.items?.get(item)?.reflexionItemPk ?: EMPTY_PK))
-                                            } else  if(offsetX.absoluteValue < 10){
+                                                offsetX = 0F
+                                            } else if(float > 0){
                                                 viewModel.onTriggerEvent(CustomListEvent.MoveItemDown(customList.items?.get(item)?.reflexionItemPk ?: EMPTY_PK))
+                                                offsetX = 0F
                                             }
                                         }
                                     )

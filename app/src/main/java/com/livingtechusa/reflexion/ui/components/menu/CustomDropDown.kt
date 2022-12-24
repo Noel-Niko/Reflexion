@@ -235,7 +235,7 @@ public fun CascadeHeaderItem(
             modifier = Modifier.weight(1f),
             text = title,
             color = contentColor.copy(alpha = ContentAlpha.medium),
-            isHeaderText = true,
+            isHeaderText = true
         )
     }
 }
