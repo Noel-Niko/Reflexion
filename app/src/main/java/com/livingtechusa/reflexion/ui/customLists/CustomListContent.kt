@@ -1,13 +1,16 @@
 package com.livingtechusa.reflexion.ui.customLists
 
-import android.widget.Toast
+import android.graphics.fonts.FontStyle
+import android.graphics.fonts.FontStyle.FONT_SLANT_ITALIC
+import android.graphics.fonts.FontStyle.FONT_WEIGHT_EXTRA_BOLD
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +26,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -33,9 +37,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
@@ -109,107 +114,60 @@ fun HorizontalScrollableRowComponent(
                 var elevated by remember { mutableStateOf(0) }
                 val h2 = MaterialTheme.typography.h2
                 val b2 = MaterialTheme.typography.body2
-                var textStyle = b2
-
+                var textStyle =  b2
+                val interactionSource = remember { MutableInteractionSource() }
+                val isPressed by interactionSource.collectIsPressedAsState()
                 Text(
-                    text =  AnnotatedString( item.reflexionItemName.toString() + ", "),
-                    color = MaterialTheme.colors.onPrimary,
+                    text = item.reflexionItemName.toString() + ", ",
                     style = textStyle,
+                    color = MaterialTheme.colors.onPrimary,
                     modifier = Modifier
                         .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
-//                        .pointerInput(Unit) {
-//                            detectTapGestures(
-//                                onLongPress = {
-//                                    dragEnabled = true
-//                                    Toast
-//                                        .makeText(context, "onLongPress", Toast.LENGTH_SHORT)
-//                                        .show()
-//                                },
-////                                onTap = {
-////                                    Toast
-////                                        .makeText(context, "onTap", Toast.LENGTH_SHORT)
-////                                        .show()
-////                                }
-//                            )
-//                        }
-//
-//                        .pointerInput(Unit) {
-//                            detectDragGesturesAfterLongPress(
-//                                onDragStart = {
-//                                    offsetY = -25f
-//                                    elevated = 4
-//                                    fontStyle = h2
-//                                },
-//                                onDrag = { change, dragAmount ->
-//                                    if (dragAmount.x <= 0) {
-//                                        customList.items
-//                                            ?.indexOf(item)
-//                                            ?.let { index ->
-//                                                viewModel.onTriggerEvent(
-//                                                    CustomListEvent.MoveItemUp(
-//                                                        index
-//                                                    )
-//                                                )
-//                                            }
-//                                        offsetX = 0F
-//                                    } else if (dragAmount.x > 0) {
-//                                        customList.items
-//                                            ?.indexOf(item)
-//                                            ?.let { index ->
-//                                                viewModel.onTriggerEvent(
-//                                                    CustomListEvent.MoveItemDown(
-//                                                        index
-//                                                    )
-//                                                )
-//                                            }
-//                                        offsetX = 0F
-//                                    }
-//                                }
-//                            )
-//                        }
+                        .pointerInput(Unit) {
+                            detectDragGesturesAfterLongPress(
+                                onDragStart = {
+                                    offsetY = -25f
+                                    elevated = 4
+                                    textStyle = h2
+                                },
+                                onDrag = { change, offset ->
+                                    change.consume()
+                                    offsetX += offset.x
+                                },
+                                onDragEnd = {
+                                    if (offsetX <= 0) {
+                                        customList.items
+                                            ?.indexOf(item)
+                                            ?.let { index ->
+                                                viewModel.onTriggerEvent(
+                                                    CustomListEvent.MoveItemUp(
+                                                        index
+                                                    )
+                                                )
+                                            }
+                                        offsetX = 0F
+                                        offsetY = 0f
+                                        elevated = 0
+                                        textStyle = b2
+                                    } else if (offsetX > 0) {
+                                        customList.items
+                                            ?.indexOf(item)
+                                            ?.let { index ->
+                                                viewModel.onTriggerEvent(
+                                                    CustomListEvent.MoveItemDown(
+                                                        index
+                                                    )
+                                                )
+                                            }
 
-                        .draggable(
-                            orientation = Orientation.Horizontal,
-                            state = rememberDraggableState { delta ->
-                                offsetX += delta
-                            },
-                            onDragStarted = {
-                                offsetY = -25f
-                                elevated = 4
-                                textStyle = h2
-                            },
-                            onDragStopped = { float ->
-                                if (float <= 0) {
-                                    customList.items
-                                        ?.indexOf(item)
-                                        ?.let { index ->
-                                            viewModel.onTriggerEvent(
-                                                CustomListEvent.MoveItemUp(
-                                                    index
-                                                )
-                                            )
-                                        }
-                                    offsetX = 0F
-                                    offsetY = 0f
-                                    elevated = 0
-                                    textStyle = b2
-                                } else if (float > 0) {
-                                    customList.items
-                                        ?.indexOf(item)
-                                        ?.let { index ->
-                                            viewModel.onTriggerEvent(
-                                                CustomListEvent.MoveItemDown(
-                                                    index
-                                                )
-                                            )
-                                        }
-                                    offsetX = 0F
-                                    offsetY = 0f
-                                    elevated = 0
-                                    textStyle = b2
+                                        offsetX = 0F
+                                        offsetY = 0f
+                                        elevated = 0
+                                        textStyle = b2
+                                    }
                                 }
-                            }
-                        )
+                            )
+                        }
                         .fillMaxSize(),
                 )
             }
