@@ -19,6 +19,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.MainActivity
 import com.livingtechusa.reflexion.R
+import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.build.BuildRoute
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
@@ -63,7 +64,7 @@ fun PasteAndSaveDialog(
                             onClick = {
                                 viewModel.onTriggerEvent( BuildEvent.UpdateVideoURL(webAddress.value))
                                 openDialog.value = false
-                                navController.navigate(BuildRoute)
+                                navController.navigate(Screen.BuildItemScreen.route + "/" + -1L)
                             }) {
                             Text(stringResource(R.string.save))
                         }
@@ -72,7 +73,7 @@ fun PasteAndSaveDialog(
                         Button(
                             onClick = {
                                 openDialog.value = false
-                                navController.navigate(BuildRoute)
+                                navController.navigate(Screen.BuildItemScreen.route + "/" + -1L)
                             }) {
                             Text(stringResource(R.string.close))
                         }

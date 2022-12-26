@@ -54,7 +54,7 @@ fun ConfirmSaveAlertDialog(
                             onClick = {
                                 viewModel.onTriggerEvent(BuildEvent.UpdateVideoURL(url ?: EMPTY_STRING))
                                 openDialog.value = false
-                                navController.navigate(BuildRoute)
+                                navController.navigate(Screen.BuildItemScreen.route + "/" + -1L)
                             }) {
                             Text(stringResource(R.string.yes))
                         }
@@ -64,7 +64,7 @@ fun ConfirmSaveAlertDialog(
                             onClick = {
                                 Temporary.url = EMPTY_STRING
                                 openDialog.value = false
-                                navController.navigate(Screen.BuildItemScreen.route + "/" + -2L)
+                                navController.navigate(Screen.BuildItemScreen.route + "/" + -1L)
                             }) {
                             Text(stringResource(R.string.no))
                         }
