@@ -119,7 +119,8 @@ fun CompactScreen(
             drawerNavContent(
                 navController,
                 viewModel,
-                viewModel.reflexionItem.collectAsState().value
+                viewModel.reflexionItem.collectAsState().value,
+                state
             )
         },
         drawerElevation = 4.dp,

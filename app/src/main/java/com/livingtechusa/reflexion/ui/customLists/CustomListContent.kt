@@ -115,8 +115,6 @@ fun HorizontalScrollableRowComponent(
                 val h2 = MaterialTheme.typography.h2
                 val b2 = MaterialTheme.typography.body2
                 var textStyle =  b2
-                val interactionSource = remember { MutableInteractionSource() }
-                val isPressed by interactionSource.collectIsPressedAsState()
                 Text(
                     text = item.reflexionItemName.toString() + ", ",
                     style = textStyle,

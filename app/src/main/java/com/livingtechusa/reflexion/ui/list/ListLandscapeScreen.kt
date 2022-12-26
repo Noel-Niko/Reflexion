@@ -16,10 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.BarItem
 import com.livingtechusa.reflexion.navigation.NavBarItems
-import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.ui.viewModels.ListViewModel
 
 
@@ -29,7 +27,8 @@ fun MediumScreen(
     icons: List<BarItem>,
     viewModel: ListViewModel,
     search: String?,
-    onSearch: (String?) -> Unit
+    onSearch: (String?) -> Unit,
+    param: Any?
 ) {
     val icons = NavBarItems.HomeBarItems
     val backStackEntry by navController.currentBackStackEntryAsState()

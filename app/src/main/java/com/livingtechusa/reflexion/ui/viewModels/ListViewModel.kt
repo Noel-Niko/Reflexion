@@ -50,21 +50,20 @@ class ListViewModel @Inject constructor(
 
     fun onTriggerEvent(event: ListEvent) {
 
-            try {
-                when (event) {
-                    is ListEvent.GetList -> {
-                        viewModelScope.launch {
-                            //_list.value = emptyList()
-                            if (event.pk == null || event.pk == EMPTY_PK) {
-                                _list.value = localServiceImpl.getAllTopics() as List<ReflexionItem>
-                            } else {
-                                val newList = withContext(defaultDispatcher) {
-                                        localServiceImpl.selectChildren(event.pk) as List<ReflexionItem>
-                                }
-                              _list.value = newList
+        try {
+            when (event) {
+                is ListEvent.GetList -> {
+                    viewModelScope.launch {
+                        if (event.pk == null || event.pk == EMPTY_PK) {
+                            _list.value = localServiceImpl.getAllTopics() as List<ReflexionItem>
+                        } else {
+                            val newList = withContext(defaultDispatcher) {
+                                localServiceImpl.selectChildren(event.pk) as List<ReflexionItem>
                             }
+                            _list.value = newList
                         }
                     }
+                }
 
 //                    is ListEvent.Search -> {
 //                        if (event.pk == EMPTY_PK) {
@@ -88,18 +87,34 @@ class ListViewModel @Inject constructor(
 //                    is ListEvent.ClearList -> {
 //                        _list.value = emptyList()
 //                    }
-
-                    else -> {
-                        Toast.makeText(context, context.getString(R.string.no_matching_items), Toast.LENGTH_SHORT).show()
+                is ListEvent.UpOneLevel -> {
+                    viewModelScope.launch {
+                        val parent: Long = list.value?.get(0)?.parent ?: -1L
+                        if (parent == -1L) {
+                            val newList =  localServiceImpl.getAllTopics() as List<ReflexionItem>
+                            _list.value = newList
+                        } else {
+                            val newList = localServiceImpl.selectAllSiblings(parent) as List<ReflexionItem>
+                            _list.value = newList
+                        }
                     }
-
                 }
-            } catch (e: Exception) {
-                Log.e(
-                    TAG,
-                    "Exception: ${e.message}  with cause: ${e.cause}"
-                )
+
+                else -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.no_matching_items),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
             }
+        } catch (e: Exception) {
+            Log.e(
+                TAG,
+                "Exception: ${e.message}  with cause: ${e.cause}"
+            )
+        }
 
     }
 
@@ -113,4 +128,11 @@ class ListViewModel @Inject constructor(
         }
     }
 
+    fun onUp() {
+        if (list.value?.get(0)?.parent == null || list.value?.get(0)?.parent == -1L) {
+            Toast.makeText(context, R.string.no_parent_found, Toast.LENGTH_SHORT).show()
+        } else {
+            onTriggerEvent(ListEvent.UpOneLevel)
+        }
+    }
 }

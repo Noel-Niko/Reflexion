@@ -144,6 +144,16 @@ class LocalServiceImpl @Inject constructor(
         return reflexionItemDao.selectSiblings(pk, parent)
     }
 
+    override suspend fun selectAllSiblings(parent: Long): List<ReflexionItem?> {
+        val grandparent: Long = reflexionItemDao.getParent(parent)?.parent ?: -1L
+        if(grandparent == -1L) {
+            return reflexionItemDao.getReflexionItemTopics()
+        } else {
+            return reflexionItemDao.selectAllSiblings(grandparent)
+        }
+    }
+
+
     override suspend fun setKeyWords(keyWords: KeyWords) {
         return keyWordsDao.setKeyWords(keyWords)
     }

@@ -74,7 +74,8 @@ fun MediumScreen(
             drawerNavContent(
                 navController,
                 viewModel,
-                viewModel.reflexionItem.collectAsState().value
+                viewModel.reflexionItem.collectAsState().value,
+                state
             )
         },
         modifier = Modifier.fillMaxSize(),

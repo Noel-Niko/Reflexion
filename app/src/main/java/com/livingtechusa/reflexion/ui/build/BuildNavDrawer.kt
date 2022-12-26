@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,12 +37,14 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun drawerNavContent(
-    navHostController: NavHostController, itemViewModel: ItemViewModel, reflexionItem: ReflexionItem
+    navHostController: NavHostController,
+    itemViewModel: ItemViewModel,
+    reflexionItem: ReflexionItem,
+    scaffoldState: ScaffoldState
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val resource = ResourceProviderSingleton
-    //val scaffoldState = rememberScaffoldState()
     Row(
         Modifier.fillMaxSize()
     ) {
@@ -67,24 +70,26 @@ fun drawerNavContent(
                 /* SIBLINGS */
                 Text(
                     modifier = Modifier.clickable(onClick = {
-                        if (reflexionItem.parent != null) {
-                            scope.launch {
-                                val hasSiblings =
-                                    itemViewModel.hasNoSiblings(reflexionItem.autogenPK, reflexionItem.parent ?: 0L)
+                        scope.launch {
+                            val hasNoSiblings =
+                                itemViewModel.hasNoSiblings(
+                                    reflexionItem.autogenPK,
+                                    reflexionItem.parent ?: 0L
+                                )
+                            if (reflexionItem.parent != null || hasNoSiblings.not()) {
                                 navHostController.navigate(Screen.ListScreen.route + "/" + reflexionItem.parent) {
                                     popUpTo(navHostController.graph.findStartDestination().id) {
-//                                    saveState = true
                                     }
                                     launchSingleTop = true
                                 }
+                                scaffoldState.drawerState.close()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    resource.getString(R.string.no_siblings_found),
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
-                            //scaffoldState.drawerState.isClosed
-                        } else {
-                            Toast.makeText(
-                                context,
-                                resource.getString(R.string.no_siblings_found),
-                                Toast.LENGTH_SHORT
-                            ).show()
                         }
                     }),
                     text = stringResource(R.string.siblings),
@@ -95,9 +100,9 @@ fun drawerNavContent(
                 Text(
                     modifier = Modifier.clickable(onClick = {
                         scope.launch {
-                            val noChildren =
+                            val hasNoChildren =
                                 itemViewModel.hasNoChildren(reflexionItem.autogenPK)
-                            if (noChildren) {
+                            if (hasNoChildren) {
                                 Toast.makeText(
                                     context,
                                     resource.getString(R.string.no_children_found),
@@ -106,9 +111,10 @@ fun drawerNavContent(
 
                             } else {
                                 navHostController.navigate(Screen.ListScreen.route + "/" + reflexionItem.autogenPK) {
-                                    popUpTo(navHostController.graph.findStartDestination().id) {  }
+                                    popUpTo(navHostController.graph.findStartDestination().id) { }
                                     launchSingleTop = true
                                 }
+                                scaffoldState.drawerState.close()
                             }
                         }
                     }),
@@ -121,11 +127,12 @@ fun drawerNavContent(
                 Text(
                     modifier = Modifier.clickable(onClick = {
                         val parent = reflexionItem.parent
-                        navHostController.navigate(Screen.BuildItemScreen.route)
                         itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
                         if (parent != null) {
                             itemViewModel.onTriggerEvent(BuildEvent.SetParent(parent))
-                            //scaffoldState.drawerState.isClosed
+                            scope.launch {
+                                scaffoldState.drawerState.close()
+                            }
                         } else {
                             Toast.makeText(
                                 context,
@@ -145,8 +152,9 @@ fun drawerNavContent(
                         val parent = reflexionItem.autogenPK
                         itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
                         itemViewModel.onTriggerEvent(BuildEvent.SetParent(parent))
-                        navHostController.navigate(Screen.BuildItemScreen.route + parent)
-                        //scaffoldState.drawerState.isClosed
+                        scope.launch {
+                            scaffoldState.drawerState.close()
+                        }
                     }),
                     text = stringResource(R.string.add_child),
                     color = MaterialTheme.colorScheme.primaryContainer,
@@ -161,7 +169,7 @@ fun drawerNavContent(
                                 itemViewModel.hasNoChildren(reflexionItem.autogenPK)
                             if (noChildren) {
                                 itemViewModel.onTriggerEvent(BuildEvent.Delete)
-                                navHostController.navigate(Screen.BuildItemScreen.route)
+                                scaffoldState.drawerState.close()
                             } else {
                                 Toast.makeText(
                                     context,
@@ -179,7 +187,9 @@ fun drawerNavContent(
                 Text(
                     modifier = Modifier.clickable(onClick = {
                         itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
-                        //scaffoldState.drawerState.isClosed
+                       scope.launch {
+                           scaffoldState.drawerState.close()
+                       }
                     }),
                     text = stringResource(R.string.new_item),
                     color = MaterialTheme.colorScheme.primaryContainer,
@@ -196,7 +206,9 @@ fun drawerNavContent(
                                     parent
                                 )
                             )
-                            navHostController.navigate(Screen.BuildItemScreen.route)
+                            scope.launch {
+                                scaffoldState.drawerState.close()
+                            }
                         } else {
                             Toast.makeText(
                                 context,

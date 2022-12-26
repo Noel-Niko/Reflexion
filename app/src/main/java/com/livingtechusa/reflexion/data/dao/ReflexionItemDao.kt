@@ -59,4 +59,9 @@ interface ReflexionItemDao {
     suspend fun selectChildrenContainingString(pk: Long, search: String?): List<ReflexionItem?>
     @Query("SELECT * FROM ReflexionItem WHERE parent = :parent AND autogenPK IS NOT :pk order by name")
     suspend fun selectSiblings(pk: Long, parent: Long): List<ReflexionItem?>
+
+    @Query("SELECT * FROM ReflexionItem WHERE parent = :parent order by name")
+    suspend fun selectAllSiblings(parent: Long): List<ReflexionItem?>
+    @Query("SELECT * FROM ReflexionItem WHERE autogenPK = :parent order by name")
+    suspend fun getParent(parent: Long): ReflexionItem?
 }

@@ -16,4 +16,6 @@ sealed class ListEvent {
        ): ListEvent() {}
 
     object  ClearList: ListEvent()
+
+    object UpOneLevel: ListEvent()
 }

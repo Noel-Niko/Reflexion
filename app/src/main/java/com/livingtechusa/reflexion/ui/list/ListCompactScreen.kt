@@ -8,18 +8,18 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.BarItem
 import com.livingtechusa.reflexion.ui.components.bars.SearchBar
-import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.ui.viewModels.ListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,11 +29,12 @@ fun CompactScreen(
     icons: List<BarItem>,
     viewModel: ListViewModel,
     search: String?,
-    onSearch: (String?) -> Unit
+    onSearch: (String?) -> Unit,
+    OnUp: () -> Unit
 ) {
-    androidx.compose.material3.Scaffold(
+    Scaffold(
         topBar = {
-            SearchBar(search = search, onSearch = onSearch )
+            SearchBar(search = search, onSearch = onSearch, onUp = OnUp)
         },
         containerColor = Color.LightGray,
         bottomBar = {

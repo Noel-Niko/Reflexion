@@ -28,6 +28,7 @@ interface ILocalService {
     suspend fun getAllTopicsContainingString(search: String): List<ReflexionItem?>
     suspend fun selectChildrenContainingString(pk: Long, search: String?): List<ReflexionItem?>
     suspend fun selectSiblings(pk: Long, parent: Long): List<ReflexionItem?>
+    suspend fun selectAllSiblings(parent: Long): List<ReflexionItem?>
     suspend fun setKeyWords(keyWords: KeyWords)
     suspend fun getKeyWords(): KeyWords?
     suspend fun clearKeyWords()
