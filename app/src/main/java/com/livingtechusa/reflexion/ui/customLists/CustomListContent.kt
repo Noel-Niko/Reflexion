@@ -1,12 +1,16 @@
 package com.livingtechusa.reflexion.ui.customLists
 
+import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.DraggableState
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,7 +18,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -26,15 +31,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.androidpoet.dropdown.EnterAnimation
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
-import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
-import kotlin.math.absoluteValue
+import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import kotlin.math.roundToInt
 
 @Composable
@@ -74,66 +79,140 @@ fun CustomListContent(
                         .height(4.dp)
                         .fillMaxWidth()
                 )
-                LazyRow(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(20.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    if (customList.items.isNullOrEmpty().not()) {
-                        val count: Int = customList.items?.size ?: 0
-                        items(count) { item ->
-                            var offsetX by remember { mutableStateOf(0f) }
-                            Text(
-                                modifier = Modifier
-                                    .offset { IntOffset(offsetX.roundToInt(), 0) }
-                                    .draggable(
-                                        orientation = Orientation.Horizontal,
-                                        state = rememberDraggableState { delta ->
-                                            offsetX += delta
-                                        },
-                                        //onDragStarted = { EnterAnimation.ElevationScale },
-                                        onDragStopped = { float ->
-                                            if(float <= 0 ){
-                                                viewModel.onTriggerEvent(CustomListEvent.MoveItemUp(item))
-                                                offsetX = 0F
-                                            } else if(float > 0){
-                                                viewModel.onTriggerEvent(CustomListEvent.MoveItemDown(item))
-                                                offsetX = 0F
-                                            }
-                                        }
-                                    )
-                                    .fillMaxSize(),
-                                text = customList.items?.get(item)?.reflexionItemName.toString() + ", ",
-                            )
-                        }
-                    }
-                }
+                HorizontalScrollableRowComponent(viewModel = viewModel, customList = customList)
             }
         }
     }
 }
 
-//
-//var offsetX by remember { mutableStateOf(0f) }
-//var fontStyleStandard = MaterialTheme.typography.body2
-//var fontStyleSelected = MaterialTheme.typography.h1
-//var fontStyleImplemented = fontStyleStandard
-//Text(
-//modifier = Modifier
-//.offset { IntOffset(offsetX.roundToInt(), 0) }
-//.draggable(
-//orientation = Orientation.Horizontal,
-//state = rememberDraggableState { delta ->
-//    offsetX += delta
-//},
-//onDragStarted = { fontStyleImplemented = fontStyleSelected },
-//onDragStopped = {
-//    fontStyleImplemented = fontStyleSelected
-//}
-//),
-//text = customList.items?.get(item)?.reflexionItemName.toString() + ", ",
-//// fontStyle = fontStyleImplemented
-//)
-//}
+@Composable
+fun HorizontalScrollableRowComponent(
+    viewModel: CustomListsViewModel,
+    customList: ReflexionArrayItem
+) {
+    val scrollState = rememberScrollState()
+    val context = LocalContext.current
+    var dragEnabled by remember { mutableStateOf(false) }
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp)
+            .horizontalScroll(state = scrollState)
+            .background(Color.Magenta),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        if (customList.items.isNullOrEmpty().not()) {
+            val count: Int = customList.items?.size ?: 0
+            customList.items?.forEach { item ->
+                var offsetX by remember { mutableStateOf(0f) }
+                var offsetY by remember { mutableStateOf(0f) }
+                var elevated by remember { mutableStateOf(0) }
+                val h2 = MaterialTheme.typography.h2
+                val b2 = MaterialTheme.typography.body2
+                var textStyle = b2
 
+                Text(
+                    text =  AnnotatedString( item.reflexionItemName.toString() + ", "),
+                    color = MaterialTheme.colors.onPrimary,
+                    style = textStyle,
+                    modifier = Modifier
+                        .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
+//                        .pointerInput(Unit) {
+//                            detectTapGestures(
+//                                onLongPress = {
+//                                    dragEnabled = true
+//                                    Toast
+//                                        .makeText(context, "onLongPress", Toast.LENGTH_SHORT)
+//                                        .show()
+//                                },
+////                                onTap = {
+////                                    Toast
+////                                        .makeText(context, "onTap", Toast.LENGTH_SHORT)
+////                                        .show()
+////                                }
+//                            )
+//                        }
+//
+//                        .pointerInput(Unit) {
+//                            detectDragGesturesAfterLongPress(
+//                                onDragStart = {
+//                                    offsetY = -25f
+//                                    elevated = 4
+//                                    fontStyle = h2
+//                                },
+//                                onDrag = { change, dragAmount ->
+//                                    if (dragAmount.x <= 0) {
+//                                        customList.items
+//                                            ?.indexOf(item)
+//                                            ?.let { index ->
+//                                                viewModel.onTriggerEvent(
+//                                                    CustomListEvent.MoveItemUp(
+//                                                        index
+//                                                    )
+//                                                )
+//                                            }
+//                                        offsetX = 0F
+//                                    } else if (dragAmount.x > 0) {
+//                                        customList.items
+//                                            ?.indexOf(item)
+//                                            ?.let { index ->
+//                                                viewModel.onTriggerEvent(
+//                                                    CustomListEvent.MoveItemDown(
+//                                                        index
+//                                                    )
+//                                                )
+//                                            }
+//                                        offsetX = 0F
+//                                    }
+//                                }
+//                            )
+//                        }
+
+                        .draggable(
+                            orientation = Orientation.Horizontal,
+                            state = rememberDraggableState { delta ->
+                                offsetX += delta
+                            },
+                            onDragStarted = {
+                                offsetY = -25f
+                                elevated = 4
+                                textStyle = h2
+                            },
+                            onDragStopped = { float ->
+                                if (float <= 0) {
+                                    customList.items
+                                        ?.indexOf(item)
+                                        ?.let { index ->
+                                            viewModel.onTriggerEvent(
+                                                CustomListEvent.MoveItemUp(
+                                                    index
+                                                )
+                                            )
+                                        }
+                                    offsetX = 0F
+                                    offsetY = 0f
+                                    elevated = 0
+                                    textStyle = b2
+                                } else if (float > 0) {
+                                    customList.items
+                                        ?.indexOf(item)
+                                        ?.let { index ->
+                                            viewModel.onTriggerEvent(
+                                                CustomListEvent.MoveItemDown(
+                                                    index
+                                                )
+                                            )
+                                        }
+                                    offsetX = 0F
+                                    offsetY = 0f
+                                    elevated = 0
+                                    textStyle = b2
+                                }
+                            }
+                        )
+                        .fillMaxSize(),
+                )
+            }
+        }
+    }
+}
