@@ -51,6 +51,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
@@ -83,8 +84,10 @@ fun BuildContentV2(pk: Long, navHostController: NavHostController, viewModel: It
     DisposableEffect(lifecycleOwner) {
         // Create an observer that triggers our remembered callbacks
         // for sending analytics events
-        val observer = LifecycleEventObserver { _, event ->
-            viewModel.onTriggerEvent(BuildEvent.GetSelectedReflexionItem(pk))
+        val observer = LifecycleEventObserver { owner, event ->
+            if(event == Lifecycle.Event.ON_CREATE) {
+                viewModel.onTriggerEvent(BuildEvent.GetSelectedReflexionItem(pk))
+            }
         }
 
         // Add the observer to the lifecycle
