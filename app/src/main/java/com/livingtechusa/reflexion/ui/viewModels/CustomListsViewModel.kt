@@ -158,7 +158,7 @@ class CustomListsViewModel @Inject constructor(
     }
 
     fun selectItem(itemPk: String?) {
-        if (itemPk.isNullOrEmpty().not() && itemPk.equals(EMPTY_PK_STRING).not()) {
+        if (itemPk.isNullOrEmpty().not() && itemPk.equals(EMPTY_PK_STRING).not() && itemPk.equals("null").not()) {
             viewModelScope.launch {
                 val newListItem = ReflexionArrayItem(
                     _customList.value.reflexionItemPk,
@@ -166,7 +166,7 @@ class CustomListsViewModel @Inject constructor(
                     _customList.value.items
                 )
                 withContext(defaultDispatcher) {
-                    if (itemPk.isNullOrEmpty().not()) {
+                    if (itemPk.isNullOrEmpty().not() && itemPk.equals("null").not()) {
                         itemPk?.toLong()?.let { pk ->
                             localServiceImpl.selectReflexionArrayItemsByPk(pk)
                                 ?.let { newListItem.items?.add(it) }

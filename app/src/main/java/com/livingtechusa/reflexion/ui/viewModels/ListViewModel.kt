@@ -55,10 +55,10 @@ class ListViewModel @Inject constructor(
                 is ListEvent.GetList -> {
                     viewModelScope.launch {
                         if (event.pk == null || event.pk == EMPTY_PK) {
-                            _list.value = localServiceImpl.getAllTopics() as List<ReflexionItem>
+                            _list.value = (localServiceImpl.getAllTopics() as? List<ReflexionItem>) ?: emptyList()
                         } else {
                             val newList = withContext(defaultDispatcher) {
-                                localServiceImpl.selectChildren(event.pk) as List<ReflexionItem>
+                                (localServiceImpl.selectChildren(event.pk) as? List<ReflexionItem>) ?: emptyList()
                             }
                             _list.value = newList
                         }

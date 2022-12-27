@@ -75,7 +75,15 @@ class MainActivity : ComponentActivity() {
                         )
                     )
                 } else {
-                    TODO("VERSION.SDK_INT < TIRAMISU")
+                    rememberMultiplePermissionsState(
+                        permissions = listOf(
+                            android.Manifest.permission.RECORD_AUDIO,
+                            android.Manifest.permission.CAMERA,
+                            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                            android.Manifest.permission.INTERNET
+                        )
+                    )
                 }
                 val lifecycleOwner = LocalLifecycleOwner.current
                 DisposableEffect(

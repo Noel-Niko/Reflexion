@@ -5,6 +5,7 @@ import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.with
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
@@ -35,8 +36,10 @@ import com.androidpoet.dropdown.Easing
 import com.androidpoet.dropdown.EnterAnimation
 import com.androidpoet.dropdown.ExitAnimation
 import com.androidpoet.dropdown.MenuItem
+import com.androidpoet.dropdown.MenuItemIcon
 import com.androidpoet.dropdown.MenuState
 import com.androidpoet.dropdown.dropDownMenuColors
+import com.livingtechusa.reflexion.util.Constants.EMPTY_PK_STRING
 
 public val MAX_WIDTH: Dp = 192.dp
 
@@ -117,6 +120,7 @@ public fun <T : Any> CustomDropdown(
                 targetMenu = targetMenu,
                 onItemSelected = onItemSelected,
                 colors = colors,
+                onTitleSelected = onItemSelected
             )
         }
     }
@@ -129,12 +133,13 @@ public fun <T : Any> DropdownContent(
     targetMenu: MenuItem<T>,
     onItemSelected: (T) -> Unit,
     colors: DropDownMenuColors,
+    onTitleSelected: (T) -> Unit
 ) {
     Column(modifier = Modifier.width(192.dp)) {
         if (targetMenu.hasParent()) {
             CascadeHeaderItem(
-                targetMenu.title,
-                colors.contentColor
+                title = targetMenu.title,
+                contentColor = colors.contentColor
             ) {
                 state.currentMenuItem = targetMenu.parent!!
             }
@@ -146,7 +151,8 @@ public fun <T : Any> DropdownContent(
                         id = item.id,
                         title = item.title,
                         icon = item.icon,
-                        contentColor = colors.contentColor
+                        contentColor = colors.contentColor,
+                        onClick = onTitleSelected
                     ) {  id ->
                         val child = targetMenu.getChild(id)
                         if (child != null) {
@@ -177,12 +183,12 @@ public fun Space() {
 
 /*[MenuItemIcon] icon properties. */
 @Composable
-public fun MenuItemIcon(icon: ImageVector, tint: Color) {
+public fun CustomMenuItemIcon(icon: ImageVector, tint: Color ) {
     Icon(
         modifier = Modifier.size(24.dp),
         imageVector = icon,
         contentDescription = null,
-        tint = tint
+        tint = tint,
     )
 }
 
@@ -226,7 +232,7 @@ public fun CascadeHeaderItem(
     onClick: () -> Unit,
 ) {
     CustomMenuItem(onClick = { onClick() }) {
-        MenuItemIcon(
+       CustomMenuItemIcon(
             icon = Icons.Rounded.ArrowLeft,
             tint = contentColor.copy(alpha = ContentAlpha.medium)
         )
@@ -235,7 +241,7 @@ public fun CascadeHeaderItem(
             modifier = Modifier.weight(1f),
             text = title,
             color = contentColor.copy(alpha = ContentAlpha.medium),
-            isHeaderText = true
+            isHeaderText = true,
         )
     }
 }
@@ -248,20 +254,21 @@ public fun <T> ParentItem(
     icon: ImageVector?,
     contentColor: Color,
     onClick: (T) -> Unit,
+    onTitleSelected: (T) -> Unit
 ) {
     CustomMenuItem(
         onClick = { onClick(id) }) {
         if (icon != null) {
-            MenuItemIcon(icon = icon, tint = contentColor)
+            CustomMenuItemIcon(icon = icon, tint = contentColor)
             Space()
         }
         MenuItemText(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).clickable(onClick = { onTitleSelected(id) }),
             text = title,
             color = contentColor,
         )
         Space()
-        MenuItemIcon(icon = Icons.Rounded.ArrowRight, tint = contentColor)
+        CustomMenuItemIcon(icon = Icons.Rounded.ArrowRight, tint = contentColor)
     }
 }
 
@@ -276,7 +283,7 @@ public fun <T> ChildItem(
 ) {
     MenuItem(onClick = { onClick(id) }) {
         if (icon != null) {
-            MenuItemIcon(icon = icon, tint = contentColor)
+            CustomMenuItemIcon(icon = icon, tint = contentColor)
             Space()
         }
         MenuItemText(
