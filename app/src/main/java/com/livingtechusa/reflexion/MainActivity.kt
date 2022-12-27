@@ -38,6 +38,7 @@ import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
+import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.REFLEXION_ITEM_PK
 import com.livingtechusa.reflexion.util.Constants.SOURCE
 import com.livingtechusa.reflexion.util.MediaUtil
@@ -191,11 +192,11 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                DisposableEffect(Unit) {
+                DisposableEffect(key1 = Intent()) {
                     val listener = Consumer<Intent> { intent ->
                         if (intent.clipData?.getItemAt(0)?.text != null && intent.clipData?.getItemAt(
                                 0
-                            )?.text != Constants.EMPTY_STRING
+                            )?.text != EMPTY_STRING
                         ) {
                             val url = intent.clipData?.getItemAt(0)?.text
                             Temporary.url = url.toString()

@@ -16,6 +16,7 @@ import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.list.ListEvent
 import com.livingtechusa.reflexion.util.BaseApplication
+import com.livingtechusa.reflexion.util.Constants.DO_NOT_UPDATE
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.MediaStoreUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -100,9 +101,10 @@ class ItemViewModel @Inject constructor(
                     is BuildEvent.GetSelectedReflexionItem -> {
                         viewModelScope.launch {
                             when (event.pk) {
-                                EMPTY_PK ->
+                                EMPTY_PK -> {
                                     _reflexionItem.value = ReflexionItem()
-
+                                }
+                                DO_NOT_UPDATE -> { }
                                 else ->
                                     _reflexionItem.value =
                                         event.pk?.let { localServiceImpl.selectItem(it) }

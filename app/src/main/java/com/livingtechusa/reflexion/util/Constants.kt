@@ -16,6 +16,7 @@ object Constants {
     const val EMPTY_ITEM = "Empty Item"
     const val EMPTY_PK = -1L
     const val EMPTY_PK_STRING = "-1"
+    const val DO_NOT_UPDATE = -2L
 }
 
 object Temporary {
