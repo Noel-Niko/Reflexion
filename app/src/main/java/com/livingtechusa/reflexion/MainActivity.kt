@@ -2,6 +2,7 @@ package com.livingtechusa.reflexion
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -61,15 +62,21 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ReflexionTheme {
-                val permissionsState = rememberMultiplePermissionsState(
-                    permissions = listOf(
-                        android.Manifest.permission.RECORD_AUDIO,
-                        android.Manifest.permission.CAMERA,
-                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                        android.Manifest.permission.INTERNET
+                val permissionsState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    rememberMultiplePermissionsState(
+                        permissions = listOf(
+                            android.Manifest.permission.RECORD_AUDIO,
+                            android.Manifest.permission.CAMERA,
+                            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                            android.Manifest.permission.INTERNET,
+                            android.Manifest.permission.BLUETOOTH_CONNECT,
+                            android.Manifest.permission.READ_MEDIA_VIDEO,
+                        )
                     )
-                )
+                } else {
+                    TODO("VERSION.SDK_INT < TIRAMISU")
+                }
                 val lifecycleOwner = LocalLifecycleOwner.current
                 DisposableEffect(
                     key1 = lifecycleOwner,

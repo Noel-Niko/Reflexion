@@ -17,7 +17,7 @@ import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 fun BuildIcons(viewModel: ItemViewModel){
     Row() {
         IconButton(
-            onClick = {},//viewModel.onTriggerEvent(BuildEvent.SendText),
+            onClick = {},
             content = {
                 Icon(
                     imageVector = Icons.Default.SendToMobile,
@@ -37,7 +37,7 @@ fun BuildIcons(viewModel: ItemViewModel){
             },
         )
         IconButton(
-            onClick = {},//viewModel.onTriggerEvent(BuildEvent.SendText),
+            onClick = {},
             content = {
                 Icon(
                     imageVector = Icons.Default.Save,

@@ -60,7 +60,9 @@ fun CompactScreen(
                 actions = {
                     Row() {
                         IconButton(
-                            onClick = {},//viewModel.onTriggerEvent(BuildEvent.SendText),
+                            onClick = {
+                                viewModel.onTriggerEvent(BuildEvent.BluetoothSend)
+                            },
                             content = {
                                 Icon(
                                     imageVector = Icons.Default.SendToMobile,

@@ -1,8 +1,10 @@
 package com.livingtechusa.reflexion.ui.viewModels
 
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.provider.DocumentsProvider
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
@@ -14,18 +16,15 @@ import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.ui.build.BuildEvent
-import com.livingtechusa.reflexion.ui.list.ListEvent
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants.DO_NOT_UPDATE
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.MediaStoreUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -104,7 +103,8 @@ class ItemViewModel @Inject constructor(
                                 EMPTY_PK -> {
                                     _reflexionItem.value = ReflexionItem()
                                 }
-                                DO_NOT_UPDATE -> { }
+
+                                DO_NOT_UPDATE -> {}
                                 else ->
                                     _reflexionItem.value =
                                         event.pk?.let { localServiceImpl.selectItem(it) }
@@ -126,7 +126,6 @@ class ItemViewModel @Inject constructor(
                     is BuildEvent.ShowVideo -> {
                         if (event.uri.isNullOrEmpty().not()) {
                             event.uri?.let {
-
                             }
                         }
                     }
@@ -141,6 +140,30 @@ class ItemViewModel @Inject constructor(
 
                     is BuildEvent.SetParent -> {
                         _reflexionItem.value.parent = event.parent
+                    }
+
+                    is BuildEvent.BluetoothSend -> {
+                        val text =
+                            reflexionItem.value.name + "\n" + reflexionItem.value.description +
+                                    " \n" + reflexionItem.value.detailedDescription + "\n" + reflexionItem.value.videoUrl
+
+                        val video = reflexionItem.value.videoUri?.let {
+                            Converters().convertStringToUri(
+                                it
+                            )
+                        }
+
+                        val resolver: ContentResolver = context.contentResolver
+                        val shareIntent = Intent()
+                        shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
+                        shareIntent.type = "video/*"
+                        shareIntent.putExtra(Intent.EXTRA_TEXT, text)
+                        shareIntent.setDataAndType(video, video?.let { resolver.getType(it) })
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, video)
+                        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        shareIntent.action = Intent.ACTION_SEND
+                        startActivity(context, shareIntent, null)
                     }
 
                     is BuildEvent.SendText -> {
@@ -158,9 +181,6 @@ class ItemViewModel @Inject constructor(
                         shareIntent.type = "text/*"
 
                         shareIntent.putExtra(Intent.EXTRA_TEXT, text)
-                        //shareIntent.putExtra(Intent.EXTRA_STREAM, video)
-
-                        //shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                         shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         startActivity(context, shareIntent, null)
                     }

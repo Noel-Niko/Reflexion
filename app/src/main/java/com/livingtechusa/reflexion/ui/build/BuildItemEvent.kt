@@ -37,6 +37,7 @@ sealed class BuildEvent {
 
     data class SetParent(val parent: Long): BuildEvent()
 
+    object BluetoothSend : BuildEvent()
     object SendText : BuildEvent()
 
     object SaveFromTopBar : BuildEvent()

@@ -48,20 +48,14 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
-
-<!--        <activity-->
-<!--            android:name="com.livingtechusa.reflexion.ui.build.buildItemScreen"-->
-<!--            android:exported="true"-->
-<!--            android:label="@string/app_name"-->
-<!--            android:theme="@style/Theme.Reflexion">-->
-<!--        <intent-filter>-->
-<!--            <action android:name="android.intent.action.SEND" />-->
-<!--            <category android:name="android.intent.category.DEFAULT" />-->
-<!--            <data android:mimeType="text/plain" />-->
-<!--        </intent-filter>-->
-<!--        </activity>-->
-
-<!--        <receiver android:name=".MainActivity" />-->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.livingtechusa.reflexion.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
     </application>
-
 </manifest>
