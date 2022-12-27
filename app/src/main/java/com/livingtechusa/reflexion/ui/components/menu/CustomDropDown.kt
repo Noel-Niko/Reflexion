@@ -92,7 +92,7 @@ public fun <T : Any> CustomDropdown(
         AnimatedContent(
             targetState = state.currentMenuItem,
             transitionSpec = {
-                if (isNavigatingBack(initialState, targetState)) {
+                if (isNavigatingBack(currentMenu = initialState, nextMenu = targetState)) {
                     animateContent(
                         CustomAnimationProp(
                             enterDuration,
@@ -231,7 +231,8 @@ public fun CascadeHeaderItem(
     contentColor: Color,
     onClick: () -> Unit,
 ) {
-    CustomMenuItem(onClick = { onClick() }) {
+    CustomMenuItem(
+        onClick = { onClick() }) {
        CustomMenuItemIcon(
             icon = Icons.Rounded.ArrowLeft,
             tint = contentColor.copy(alpha = ContentAlpha.medium)

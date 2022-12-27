@@ -17,4 +17,8 @@ sealed class CustomListEvent {
     data class MoveItemDown(
         val index: Int,
     ) : CustomListEvent() {}
+
+    data class Delete(
+        val index: Int
+    ) : CustomListEvent()
 }

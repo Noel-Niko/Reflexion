@@ -7,7 +7,10 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -114,7 +117,7 @@ fun HorizontalScrollableRowComponent(
                 var elevated by remember { mutableStateOf(0) }
                 val h2 = MaterialTheme.typography.h2
                 val b2 = MaterialTheme.typography.body2
-                var textStyle =  b2
+                var textStyle = b2
                 Text(
                     text = item.reflexionItemName.toString() + ", ",
                     style = textStyle,
@@ -166,7 +169,20 @@ fun HorizontalScrollableRowComponent(
                                 }
                             )
                         }
-                        .fillMaxSize(),
+                        .fillMaxSize()
+                        .clickable(
+                            enabled = true,
+                            onClick = {
+                                customList.items
+                                    ?.indexOf(item)
+                                    ?.let { index ->
+                                        viewModel.onTriggerEvent(
+                                            CustomListEvent.Delete(
+                                                index
+                                            )
+                                        )
+                                    }
+                            }),
                 )
             }
         }
