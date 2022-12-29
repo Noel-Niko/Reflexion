@@ -9,7 +9,7 @@ import com.livingtechusa.reflexion.data.entities.ListNode
 @Dao
 interface LinkedListDao{
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertNewNode(listNode: ListNode)
+    suspend fun insertNewNode(listNode: ListNode): Long
     @Query("Select * FROM LinkedList WHERE topic =:topicPk AND parentPk IS NULL")
     suspend fun selectNodeHeadsByTopic(topicPk: Long): List<ListNode?>
 

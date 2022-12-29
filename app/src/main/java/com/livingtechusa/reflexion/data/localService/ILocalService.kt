@@ -1,12 +1,10 @@
 package com.livingtechusa.reflexion.data.localService
 
-import androidx.room.Query
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.entities.KeyWords
 import com.livingtechusa.reflexion.data.entities.ListNode
 import com.livingtechusa.reflexion.data.models.AbridgedReflexionItem
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
-import org.w3c.dom.NodeList
 
 interface ILocalService {
     suspend fun setItem(item: ReflexionItem)
@@ -53,12 +51,10 @@ interface ILocalService {
 
     suspend fun deleteAllLinkedLists()
 
-    suspend fun selectLinkedList(nodePk: Long): ListNode?
-
     suspend fun deleteSelectedNode(nodePk: Long)
     suspend fun selectReflexionArrayItemsByParentPk(pk: Long?): List<ReflexionArrayItem?>
 
     suspend fun selectReflexionArrayItemsByPk(pk: Long): ReflexionArrayItem?
-
-
+    suspend fun selectParent(pk: Long): Long?
+    suspend fun insertNewNodeList(arrayItem: ReflexionArrayItem, topic: Long)
 }

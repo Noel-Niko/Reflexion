@@ -7,8 +7,14 @@ import com.livingtechusa.reflexion.data.entities.KeyWords
 import com.livingtechusa.reflexion.data.entities.ListNode
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.models.AbridgedReflexionItem
+import com.livingtechusa.reflexion.data.toListNode
+import com.livingtechusa.reflexion.data.toReflexionArrayItem
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import javax.inject.Inject
 
 class LocalServiceImpl @Inject constructor(
@@ -16,6 +22,7 @@ class LocalServiceImpl @Inject constructor(
     private val keyWordsDao: KeyWordsDao,
     private val linkedListDao: LinkedListDao
 ) : ILocalService {
+    private val scope = CoroutineScope(Dispatchers.IO)
     override suspend fun setItem(item: ReflexionItem) {
         reflexionItemDao.setReflexionItem(item)
     }
@@ -122,17 +129,25 @@ class LocalServiceImpl @Inject constructor(
     }
 
     override suspend fun selectReflexionArrayItemsByPk(pk: Long): ReflexionArrayItem? {
-        var result:ReflexionArrayItem = ReflexionArrayItem(null, null, null)
-        reflexionItemDao.selectSingleAbridgedReflexionItem(pk).let {
-            val Rai: ReflexionArrayItem =
-                ReflexionArrayItem(
-                    itemPK = it.autogenPK ?: 0L,
-                    itemName = it.name ?: EMPTY_STRING,
-                    children = mutableListOf()
-                )
-            result = Rai
+        val _result: Deferred<AbridgedReflexionItem> = scope.async {
+            reflexionItemDao.selectSingleAbridgedReflexionItem(pk)
         }
-        return result
+        return _result.await().toReflexionArrayItem()
+    }
+
+    override suspend fun selectParent(pk: Long): Long? {
+        return reflexionItemDao.getParent(pk)
+    }
+
+    override suspend fun insertNewNodeList(arrayItem: ReflexionArrayItem, topic: Long) {
+        val nodeList: List<ListNode?> = arrayItem.toListNode(topic)
+        var parent: Long? = null
+        nodeList.forEach {
+            if (it != null) {
+                val updated = it.copy(parentPk = parent)
+                parent = linkedListDao.insertNewNode(updated)
+            }
+        }
     }
 
     override suspend fun selectSingleAbridgedReflexionItemDataByParentPk(pk: Long): AbridgedReflexionItem {
@@ -145,7 +160,7 @@ class LocalServiceImpl @Inject constructor(
     }
 
     override suspend fun selectAllSiblings(parent: Long): List<ReflexionItem?> {
-        val grandparent: Long = reflexionItemDao.getParent(parent)?.parent ?: -1L
+        val grandparent: Long = reflexionItemDao.getParent(parent) ?: -1L
         if(grandparent == -1L) {
             return reflexionItemDao.getReflexionItemTopics()
         } else {
@@ -225,10 +240,6 @@ class LocalServiceImpl @Inject constructor(
 
     override suspend fun deleteAllLinkedLists() {
         linkedListDao.deleteAllLinkedLists()
-    }
-
-    override suspend fun selectLinkedList(nodePk: Long): ListNode? {
-        return linkedListDao.selectLinkedList(nodePk)
     }
 
     override suspend fun deleteSelectedNode(nodePk: Long) {

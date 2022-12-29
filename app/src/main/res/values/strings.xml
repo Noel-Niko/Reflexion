@@ -36,4 +36,5 @@
     <string name="no_children_found">No children found.</string>
     <string name="toggle_drawer">Toggle Drawer</string>
     <string name="no_matching_items">No matching items</string>
+    <string name="lists">Lists</string>
 </resources>

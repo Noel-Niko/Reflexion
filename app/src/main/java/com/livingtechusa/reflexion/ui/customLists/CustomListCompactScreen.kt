@@ -62,7 +62,7 @@ fun CustomListCompactScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = stringResource(id = R.string.app_name),
+                        text =  stringResource(R.string.lists),
                         color = MaterialTheme.colors.onBackground
                     )
                 },
@@ -79,11 +79,13 @@ fun CustomListCompactScreen(
                             },
                         )
                         IconButton(
-                            onClick = { },
+                            onClick = {
+                                      viewModel.onTriggerEvent(CustomListEvent.Save)
+                            },
                             content = {
                                 androidx.compose.material.Icon(
-                                    imageVector = Icons.Default.Send,
-                                    contentDescription = "send",
+                                    imageVector = Icons.Default.Save,
+                                    contentDescription = "save",
                                     tint = MaterialTheme.colors.onBackground,
                                 )
                             },

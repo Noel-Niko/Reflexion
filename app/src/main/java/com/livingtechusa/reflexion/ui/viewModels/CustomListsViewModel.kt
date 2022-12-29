@@ -4,8 +4,11 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.livingtechusa.reflexion.data.entities.ListNode
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
+import com.livingtechusa.reflexion.data.toListNode
 import com.livingtechusa.reflexion.di.DefaultDispatcher
 import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
 import com.livingtechusa.reflexion.util.BaseApplication
@@ -45,9 +48,26 @@ class CustomListsViewModel @Inject constructor(
     val customList: StateFlow<ReflexionArrayItem> get() = _customList
 
 
-    private val _listOfLists = MutableStateFlow(listOf(customList.value))
-    val listOfLists: StateFlow<List<ReflexionArrayItem>> get() = _listOfLists
+    private val _listOfLists = MutableStateFlow<List<ListNode?>>(emptyList())
+    val listOfLists: StateFlow<List<ListNode?>> get() = _listOfLists
 
+    private var newList = true
+    private var topic: Long = -1L
+
+    suspend fun getTopic(pk: Long): Long? {
+        var key: Long? = pk
+        var parent: Long? = null
+        var hasParent = true
+        while (hasParent) {
+            key = key?.let { it -> localServiceImpl.selectParent(it) }
+            if (key != null) {
+                parent = key
+            } else {
+                hasParent = false
+            }
+        }
+        return parent
+    }
 
     val item1 = ReflexionArrayItem(
         itemPK = null,
@@ -93,6 +113,13 @@ class CustomListsViewModel @Inject constructor(
     fun onTriggerEvent(event: CustomListEvent) {
         try {
             when (event) {
+                is CustomListEvent.GetListsForTopic -> {
+                    viewModelScope.launch {
+                        val lists = localServiceImpl.selectNodeHeadsByTopic(topic)
+                        _listOfLists.value = lists
+                    }
+                }
+
                 is CustomListEvent.UpdateListName -> {
                     val newListItem = ReflexionArrayItem(
                         _customList.value.reflexionItemPk,
@@ -137,9 +164,19 @@ class CustomListsViewModel @Inject constructor(
                 }
 
                 is CustomListEvent.Save -> {
-                    val newListOfLists: MutableList<ReflexionArrayItem> = _listOfLists.value.toMutableList()
-                    newListOfLists.add(customList.value)
-                    _listOfLists.value = newListOfLists
+                    viewModelScope.launch {
+                        localServiceImpl.insertNewNodeList(customList.value, topic)
+//                        val listOfListsNodes: List<ListNode?> =
+//                            customList.value.toListNode(topic = topic)
+//                        listOfListsNodes.forEach() {
+//                            if (it != null) {
+//                                localServiceImpl.insertNewNode(it)
+//                            }
+//                        }
+                    }
+//                    val newListOfLists: MutableList<ReflexionArrayItem> = _listOfLists.value.toMutableList()
+//                    newListOfLists.add(customList.value)
+//                    _listOfLists.value = newListOfLists
                 }
 
                 else -> {}
@@ -192,6 +229,14 @@ class CustomListsViewModel @Inject constructor(
                 .not() && itemPk.equals("null").not()
         ) {
             viewModelScope.launch {
+                if(newList) {
+                    if (itemPk != null ) {
+                        if (getTopic(itemPk.toLong()) != null) {
+                            topic = getTopic(itemPk.toLong()) ?: -1L
+                            newList = false
+                        }
+                    }
+                }
                 val newListItem = ReflexionArrayItem(
                     _customList.value.reflexionItemPk,
                     _customList.value.reflexionItemName,

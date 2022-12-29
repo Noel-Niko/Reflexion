@@ -6,6 +6,7 @@ import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,6 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
+import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
+import com.livingtechusa.reflexion.util.Constants.NO_LISTS
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import kotlin.math.roundToInt
 
@@ -55,11 +58,11 @@ fun CustomListContent(
                     .padding(4.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                items(1) { index -> //customList.items?.size ?:
+                items(1) { index ->
                     Column(modifier = Modifier.background(Color.Transparent)) {
                         TextField(
+                            modifier = Modifier.height(IntrinsicSize.Min),
                             value = customList.reflexionItemName.toString(),
-
                             colors = TextFieldDefaults.textFieldColors(
                                 textColor = Color.Black,
                                 backgroundColor = Color.Transparent
@@ -75,7 +78,7 @@ fun CustomListContent(
                         )
                         Spacer(
                             modifier = Modifier
-                                .height(4.dp)
+                                .height(16.dp)
                                 .fillMaxWidth()
                         )
                         EditableHorizontalScrollableRowComponent(
@@ -87,7 +90,7 @@ fun CustomListContent(
             }
             Spacer(
                 modifier = Modifier
-                    .height(4.dp)
+                    .height(16.dp)
                     .fillMaxWidth()
             )
         }
@@ -98,7 +101,7 @@ fun CustomListContent(
                     .padding(4.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                items(1) { index -> //customList.items?.size ?:
+                items(listOfLists.size) { index ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -111,7 +114,7 @@ fun CustomListContent(
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = "THIS IS ANOTHER COLUMN", ///customList.reflexionItemName.toString()
+                                text = listOfLists[index]?.title ?: NO_LISTS,
                                 modifier = Modifier.padding(16.dp),
                                 style = MaterialTheme.typography.subtitle2
                             )

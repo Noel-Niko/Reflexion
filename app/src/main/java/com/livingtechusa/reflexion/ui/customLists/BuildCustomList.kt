@@ -204,12 +204,6 @@ fun CustomListsContent(
                             .fillMaxWidth()
                             .height(16.dp)
                     )
-                    Text(text = "Custom Lists")
-                    Spacer(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(16.dp)
-                    )
                 CustomListContent(navController = navController, viewModel = viewModel)
                 }
 

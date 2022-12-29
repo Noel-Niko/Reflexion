@@ -62,6 +62,6 @@ interface ReflexionItemDao {
 
     @Query("SELECT * FROM ReflexionItem WHERE parent = :parent order by name")
     suspend fun selectAllSiblings(parent: Long): List<ReflexionItem?>
-    @Query("SELECT * FROM ReflexionItem WHERE autogenPK = :parent order by name")
-    suspend fun getParent(parent: Long): ReflexionItem?
+    @Query("SELECT parent FROM ReflexionItem WHERE autogenPK = :itemPk")
+    suspend fun getParent(itemPk: Long): Long?
 }

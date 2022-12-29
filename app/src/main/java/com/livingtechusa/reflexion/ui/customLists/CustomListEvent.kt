@@ -1,7 +1,7 @@
 package com.livingtechusa.reflexion.ui.customLists
 
 sealed class CustomListEvent {
-    data class GetChildList(
+    data class GetListsForTopic(
         val pk: Long
     ) : CustomListEvent() {}
 

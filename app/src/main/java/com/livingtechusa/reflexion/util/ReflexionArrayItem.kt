@@ -8,7 +8,6 @@ class ReflexionArrayItem(itemPK: Long?, itemName: String?, children: MutableList
     var items: MutableList<ReflexionArrayItem>? = children ?: mutableListOf()
 
     companion object {
-
         fun traverseDepthFirst(
             rootNode: ReflexionArrayItem,
             action: (value: ReflexionArrayItem) -> Unit
