@@ -136,6 +136,12 @@ class CustomListsViewModel @Inject constructor(
                     _customList.value = newArrayList
                 }
 
+                is CustomListEvent.Save -> {
+                    val newListOfLists: MutableList<ReflexionArrayItem> = _listOfLists.value.toMutableList()
+                    newListOfLists.add(customList.value)
+                    _listOfLists.value = newListOfLists
+                }
+
                 else -> {}
             }
         } catch (e: Exception) {

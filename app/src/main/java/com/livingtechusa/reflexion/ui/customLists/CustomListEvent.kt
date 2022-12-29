@@ -21,4 +21,6 @@ sealed class CustomListEvent {
     data class Delete(
         val index: Int
     ) : CustomListEvent()
+
+    object Save: CustomListEvent()
 }

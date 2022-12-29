@@ -120,8 +120,6 @@ fun CustomListsContent(
     }
     Scaffold(
         modifier = Modifier.padding(paddingValues),
-        backgroundColor = Color.LightGray
-
     ) { innerPadding ->
         Spacer(Modifier.height(16.dp))
         Column(modifier = Modifier.fillMaxSize()) {
@@ -132,7 +130,7 @@ fun CustomListsContent(
                             Alignment.CenterVertically,
                         )
                         .padding(innerPadding)
-                        .background(color = MaterialTheme.colors.background)
+
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -197,32 +195,24 @@ fun CustomListsContent(
                     }
                 }
             }
-            Row(
-                Modifier
-                    .fillMaxSize()
-                    .background(Color.Red)
-            ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.Yellow)
                 ) {
                     Spacer(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(16.dp)
-                            .background(Color.Blue)
                     )
                     Text(text = "Custom Lists")
                     Spacer(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(16.dp)
-                            .background(Color.Green)
                     )
                 CustomListContent(navController = navController, viewModel = viewModel)
                 }
-            }
+
         }
 
 //        Spacer(Modifier.height(16.dp))
