@@ -45,3 +45,10 @@ fun AbridgedReflexionItem.toReflexionArrayItem() =
         itemName = name ?: Constants.EMPTY_STRING,
         children = mutableListOf()
     )
+
+fun ListNode.toReflexionArrayItem() =
+    ReflexionArrayItem(
+        itemPK = itemPK,
+        itemName = title,
+        children = mutableListOf()
+    )

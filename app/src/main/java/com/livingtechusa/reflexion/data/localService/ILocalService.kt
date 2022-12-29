@@ -41,6 +41,8 @@ interface ILocalService {
 
     suspend fun selectNodeHeadsByTopic(topicPk: Long): List<ListNode?>
 
+    suspend fun selectNodeListsByTopic(topicPk: Long): List<ReflexionArrayItem?>
+
     suspend fun selectChildNode(nodePk: Long): ListNode?
 
     suspend fun selectParentNode(parentPk: Long): ListNode?

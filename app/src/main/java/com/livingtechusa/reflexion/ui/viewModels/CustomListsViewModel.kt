@@ -166,6 +166,7 @@ class CustomListsViewModel @Inject constructor(
                 is CustomListEvent.Save -> {
                     viewModelScope.launch {
                         localServiceImpl.insertNewNodeList(customList.value, topic)
+                        _listOfLists.value = localServiceImpl.selectNodeHeadsByTopic(topic)
 //                        val listOfListsNodes: List<ListNode?> =
 //                            customList.value.toListNode(topic = topic)
 //                        listOfListsNodes.forEach() {
