@@ -10,13 +10,17 @@ import java.util.concurrent.atomic.AtomicLong
 
 fun ReflexionArrayItem.toListNode(topic: Long?): List<ListNode?> {
     val list = mutableListOf<ListNode>()
+    var child: Long? = null
+    if(items.isNullOrEmpty().not() && items?.get(0)?.reflexionItemPk != null) {
+        child = items?.get(0)?.reflexionItemPk
+    }
     list.add(ListNode(
         nodePk = 0L,
         topic = topic ?: -1L,
         title = reflexionItemName.toString(),
         itemPK = reflexionItemPk ?: -1L,
         parentPk = null,
-        childPk = items?.get(0)?.reflexionItemPk
+        childPk = child
     ) )
     items?.forEach {
         list.add(it.toAListNode( topic = topic, parentPk = reflexionItemPk))

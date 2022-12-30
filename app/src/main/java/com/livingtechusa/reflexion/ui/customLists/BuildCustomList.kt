@@ -224,7 +224,7 @@ fun getItems(
     newBuilder: DropDownMenuBuilder<String>,
     list: List<ImageVector>
 ): DropDownMenuBuilder<String> {
-    var next = list.random()
+    val next = list.random()
     newBuilder.item(
         reflexionArrayItem.reflexionItemPk.toString(),
         reflexionArrayItem.reflexionItemName.toString()

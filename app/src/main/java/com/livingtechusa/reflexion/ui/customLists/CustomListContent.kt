@@ -107,20 +107,22 @@ fun CustomListContent(
                             .fillMaxWidth()
                             .padding(4.dp)
                             .clickable {
-                                // TODO:    navigate to list details
+                                // TODO:    navigate to list details or make the working list or delete
                             },
                         elevation = 10.dp,
                         shape = RoundedCornerShape(20.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = listOfLists[index]?.title ?: NO_LISTS,
+                                text = listOfLists[index]?.reflexionItemName ?: NO_LISTS,
                                 modifier = Modifier.padding(16.dp),
                                 style = MaterialTheme.typography.subtitle2
                             )
-                            HorizontalScrollableRowComponent(
-                                customList = customList
-                            )
+                            listOfLists[index]?.let {
+                                HorizontalScrollableRowComponent(
+                                    customList = it
+                                )
+                            }
                         }
                     }
                 }

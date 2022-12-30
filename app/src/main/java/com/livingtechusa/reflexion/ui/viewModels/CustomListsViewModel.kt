@@ -2,13 +2,11 @@ package com.livingtechusa.reflexion.ui.viewModels
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.livingtechusa.reflexion.data.entities.ListNode
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
-import com.livingtechusa.reflexion.data.toListNode
 import com.livingtechusa.reflexion.di.DefaultDispatcher
 import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
 import com.livingtechusa.reflexion.util.BaseApplication
@@ -16,6 +14,7 @@ import com.livingtechusa.reflexion.util.Constants.EMPTY_PK_STRING
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -48,8 +47,8 @@ class CustomListsViewModel @Inject constructor(
     val customList: StateFlow<ReflexionArrayItem> get() = _customList
 
 
-    private val _listOfLists = MutableStateFlow<List<ListNode?>>(emptyList())
-    val listOfLists: StateFlow<List<ListNode?>> get() = _listOfLists
+    private val _listOfLists = MutableStateFlow<List<ReflexionArrayItem?>>(emptyList())
+    val listOfLists: StateFlow<List<ReflexionArrayItem?>> get() = _listOfLists
 
     private var newList = true
     private var topic: Long = -1L
@@ -115,7 +114,7 @@ class CustomListsViewModel @Inject constructor(
             when (event) {
                 is CustomListEvent.GetListsForTopic -> {
                     viewModelScope.launch {
-                        val lists = localServiceImpl.selectNodeHeadsByTopic(topic)
+                        val lists: List<ReflexionArrayItem> = localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic)
                         _listOfLists.value = lists
                     }
                 }
@@ -151,7 +150,7 @@ class CustomListsViewModel @Inject constructor(
                 is CustomListEvent.Delete -> {
                     val items = mutableListOf<ReflexionArrayItem>()
                     for (index in customList.value.items?.indices!!) {
-                        if(index != event.index) {
+                        if (index != event.index) {
                             items.add(customList.value.items!![index])
                         }
                     }
@@ -165,21 +164,13 @@ class CustomListsViewModel @Inject constructor(
 
                 is CustomListEvent.Save -> {
                     viewModelScope.launch {
-                        localServiceImpl.insertNewNodeList(customList.value, topic)
-                        _listOfLists.value = localServiceImpl.selectNodeHeadsByTopic(topic)
-//                        val listOfListsNodes: List<ListNode?> =
-//                            customList.value.toListNode(topic = topic)
-//                        listOfListsNodes.forEach() {
-//                            if (it != null) {
-//                                localServiceImpl.insertNewNode(it)
-//                            }
-//                        }
+                        withContext(Dispatchers.IO) {
+                            localServiceImpl.insertNewNodeList(customList.value, topic)
+                            _listOfLists.value =
+                                localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic)
+                        }
                     }
-//                    val newListOfLists: MutableList<ReflexionArrayItem> = _listOfLists.value.toMutableList()
-//                    newListOfLists.add(customList.value)
-//                    _listOfLists.value = newListOfLists
                 }
-
                 else -> {}
             }
         } catch (e: Exception) {
@@ -229,31 +220,37 @@ class CustomListsViewModel @Inject constructor(
         if (itemPk.isNullOrEmpty().not() && itemPk.equals(EMPTY_PK_STRING)
                 .not() && itemPk.equals("null").not()
         ) {
-            viewModelScope.launch {
-                if(newList) {
-                    if (itemPk != null ) {
-                        if (getTopic(itemPk.toLong()) != null) {
-                            topic = getTopic(itemPk.toLong()) ?: -1L
+            viewModelScope.launch() {
+                withContext(Dispatchers.IO) {
+                    if (newList) {
+                        if (itemPk != null) {
+                            topic = getTopic(itemPk.toLong()) ?: itemPk.toLong()
                             newList = false
+                            _listOfLists.value =
+                                localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic)
                         }
                     }
-                }
-                val newListItem = ReflexionArrayItem(
-                    _customList.value.reflexionItemPk,
-                    _customList.value.reflexionItemName,
-                    _customList.value.items
-                )
-                withContext(defaultDispatcher) {
+                    if (itemPk?.toLong()?.let { localServiceImpl.selectNodeTopic(it) } != topic) {
+                        newList = true
+                        topic = itemPk?.toLong()?.let { getTopic(it) } ?: -1L
+                        _listOfLists.value =
+                            localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic)
+                    }
+                    val newListItem = ReflexionArrayItem(
+                        _customList.value.reflexionItemPk,
+                        _customList.value.reflexionItemName,
+                        _customList.value.items
+                    )
+
                     if (itemPk.isNullOrEmpty().not() && itemPk.equals("null").not()) {
                         itemPk?.toLong()?.let { pk ->
                             localServiceImpl.selectReflexionArrayItemsByPk(pk)
                                 ?.let { newListItem.items?.add(it) }
                         }
                     }
+                    _customList.value = newListItem
                 }
-                _customList.value = newListItem
             }
-
         }
     }
 }

@@ -40,8 +40,9 @@ interface ILocalService {
     suspend fun insertNewNode(listNode: ListNode)
 
     suspend fun selectNodeHeadsByTopic(topicPk: Long): List<ListNode?>
+    suspend fun selectNodeTopic(itemPk: Long): Long?
 
-    suspend fun selectNodeListsByTopic(topicPk: Long): List<ReflexionArrayItem?>
+    suspend fun selectNodeListsAsArrayItemsByTopic(topicPk: Long): List<ReflexionArrayItem?>
 
     suspend fun selectChildNode(nodePk: Long): ListNode?
 

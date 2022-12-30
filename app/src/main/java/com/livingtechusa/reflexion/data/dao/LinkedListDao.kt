@@ -10,8 +10,14 @@ import com.livingtechusa.reflexion.data.entities.ListNode
 interface LinkedListDao{
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertNewNode(listNode: ListNode): Long
+    @Query("Select topic FROM LinkedList WHERE itemPK = :itemPk")
+    suspend fun selectNodeTopic(itemPk: Long): Long?
+
     @Query("Select * FROM LinkedList WHERE topic =:topicPk AND parentPk IS NULL")
     suspend fun selectNodeHeadsByTopic(topicPk: Long): List<ListNode?>
+
+    @Query("Select * FROM LinkedList WHERE topic =:topicPk ")
+    suspend fun selectAllNodesByTopic(topicPk: Long): List<ListNode?>
 
     @Query("Select * FROM LinkedList WHERE parentPk =:nodePk")
     suspend fun selectChildNode(nodePk: Long): ListNode?

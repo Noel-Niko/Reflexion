@@ -1,6 +1,5 @@
 package com.livingtechusa.reflexion.data.localService
 
-import android.util.Log
 import com.livingtechusa.reflexion.data.dao.KeyWordsDao
 import com.livingtechusa.reflexion.data.dao.LinkedListDao
 import com.livingtechusa.reflexion.data.dao.ReflexionItemDao
@@ -16,6 +15,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class LocalServiceImpl @Inject constructor(
@@ -26,6 +26,7 @@ class LocalServiceImpl @Inject constructor(
     companion object {
         val TAG = "LocalServiceImpl"
     }
+
     private val scope = CoroutineScope(Dispatchers.IO)
     override suspend fun setItem(item: ReflexionItem) {
         reflexionItemDao.setReflexionItem(item)
@@ -165,7 +166,7 @@ class LocalServiceImpl @Inject constructor(
 
     override suspend fun selectAllSiblings(parent: Long): List<ReflexionItem?> {
         val grandparent: Long = reflexionItemDao.getParent(parent) ?: -1L
-        if(grandparent == -1L) {
+        if (grandparent == -1L) {
             return reflexionItemDao.getReflexionItemTopics()
         } else {
             return reflexionItemDao.selectAllSiblings(grandparent)
@@ -216,53 +217,72 @@ class LocalServiceImpl @Inject constructor(
         return linkedListDao.selectNodeHeadsByTopic(topicPk)
     }
 
-    override suspend fun selectNodeListsByTopic(topicPk: Long): List<ReflexionArrayItem> {
-        val nList: MutableList<ListNode> = mutableListOf()
-        linkedListDao.selectNodeHeadsByTopic(topicPk = topicPk).forEach { listNode ->
-            listNode?.nodePk?.let { node -> linkedListDao.selectChildNode(node)}
-                ?.let { listNode1 -> nList.add(listNode1) }
-        }
-        val rList = mutableListOf<ReflexionArrayItem>()
-        nList.filter(){
-            it.parentPk == null
-        }.forEach(){
-            rList.add(it.toReflexionArrayItem())
-        }
-        fun getChild(itemPk: Long): ListNode? {
-            return nList.filter { it.parentPk == itemPk }.firstOrNull()
-        }
-        rList.forEach() { reflexionArrayItem ->
-            val children = mutableListOf<ListNode>()
-            var child: ListNode? = null
-            child = reflexionArrayItem.reflexionItemPk?.let { it1 -> getChild(it1) }
-            if (child != null) {
-                children.add(child)
-            }
-            val childrenSorted = children.sortedWith<ListNode>(object : Comparator <ListNode> {
-                override fun compare(o1: ListNode, o2: ListNode): Int {
-                    try {
-                        if (o1.itemPK > o2.parentPk!!) {
-                            return 0
-                        }
-                        if (o1.itemPK == o2.parentPk) {
-                            return 1
-                        }
-                        if (o1.itemPK < o2.parentPk) {
-                            return 0
-                        }
-                    } catch (e: Exception) {
-                        Log.e(TAG, "ERROR: " + e.message + " WITH CAUSE: " + e.cause)
-                    }
-                    return 0
+    override suspend fun selectNodeTopic(itemPk: Long): Long? {
+        return linkedListDao.selectNodeTopic(itemPk)
+    }
+
+    override suspend fun selectNodeListsAsArrayItemsByTopic(topicPk: Long): List<ReflexionArrayItem> {
+        // get all of the nodes by topic
+        val nodeList: MutableList<ListNode?> =
+            linkedListDao.selectAllNodesByTopic(topicPk = topicPk).toMutableList()
+        // sort them into lists by parent and child
+        val headNodeList = mutableListOf<ListNode>()
+        val reflexionArrayItems = mutableListOf<ReflexionArrayItem>()
+        val job = CoroutineScope(Dispatchers.IO).launch {
+            // identify all the list head nodes
+            nodeList.filter() {
+                it?.parentPk == null
+            }.forEach() { listNode ->
+                if (listNode != null) {
+                    headNodeList.add(listNode)
                 }
-            })
-            val reflexionArrayItems: MutableList<ReflexionArrayItem> = mutableListOf()
-            for (childNode in childrenSorted) {
-                reflexionArrayItems.add(childNode.toReflexionArrayItem())
             }
-            reflexionArrayItem.items = reflexionArrayItems
+
+            // recursive function
+            fun getChild(itemPk: Long): ListNode? {
+                return nodeList.filter { it?.parentPk == itemPk }.firstOrNull()
+            }
+            // get the children for each head node
+            headNodeList.forEach() { headNode ->
+                val children = mutableListOf<ListNode>()
+                var child: ListNode? = null
+                child = getChild(headNode.nodePk)
+                // recursively get all the children for each head node
+                while (child != null) {
+                    children.add(child)
+                    child = getChild(child.nodePk)
+                }
+                val reflexionArrayItem = headNode.toReflexionArrayItem()
+                children.forEach { node ->
+                    reflexionArrayItem.items?.add(node.toReflexionArrayItem())
+                }
+                reflexionArrayItems.add(reflexionArrayItem)
+//                val childrenSorted = children.sortedWith<ListNode>(object : Comparator<ListNode> {
+//                    override fun compare(o1: ListNode, o2: ListNode): Int {
+//                        try {
+//                            if (o1.itemPK > o2.parentPk!!) {
+//                                return 0
+//                            }
+//                            if (o1.itemPK == o2.parentPk) {
+//                                return 1
+//                            }
+//                            if (o1.itemPK < o2.parentPk) {
+//                                return 0
+//                            }
+//                        } catch (e: Exception) {
+//                            Log.e(TAG, "ERROR: " + e.message + " WITH CAUSE: " + e.cause)
+//                        }
+//                        return 0
+//                    }
+//                })
+//                val reflexionArrayItems: MutableList<ReflexionArrayItem> = mutableListOf()
+//                for (childNode in childrenSorted) {
+//                    reflexionArrayItems.add(childNode.toReflexionArrayItem())
+//                }
+            }
         }
-        return rList
+        job.join()
+        return reflexionArrayItems
     }
 
     override suspend fun selectChildNode(nodePk: Long): ListNode? {
