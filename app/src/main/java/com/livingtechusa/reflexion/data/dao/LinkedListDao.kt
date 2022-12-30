@@ -10,6 +10,7 @@ import com.livingtechusa.reflexion.data.entities.ListNode
 interface LinkedListDao{
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertNewNode(listNode: ListNode): Long
+
     @Query("Select topic FROM LinkedList WHERE itemPK = :itemPk")
     suspend fun selectNodeTopic(itemPk: Long): Long?
 

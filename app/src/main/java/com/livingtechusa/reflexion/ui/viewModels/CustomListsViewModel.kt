@@ -127,10 +127,10 @@ class CustomListsViewModel @Inject constructor(
 
                 is CustomListEvent.UpdateListName -> {
                     val newListItem = ReflexionArrayItem(
-                        _customList.value.itemPK,
-                        _customList.value.itemName,
-                        0L,
-                        _customList.value.children
+                        customList.value.itemPK,
+                        customList.value.itemName,
+                        customList.value.nodePk,
+                        customList.value.children
                     )
                     newListItem.itemName = event.text
                     _customList.value = newListItem
@@ -140,7 +140,7 @@ class CustomListsViewModel @Inject constructor(
                     val newArrayList = ReflexionArrayItem(
                         customList.value.itemPK,
                         customList.value.itemName,
-                        0L,
+                        customList.value.nodePk,
                         bubbleUp(_customList.value, event.index).toMutableList()
                     )
                     _customList.value = newArrayList
@@ -150,7 +150,7 @@ class CustomListsViewModel @Inject constructor(
                     val newArrayList = ReflexionArrayItem(
                         customList.value.itemPK,
                         customList.value.itemName,
-                        0L,
+                        customList.value.nodePk,
                         bubbleDown(_customList.value, event.index).toMutableList()
                     )
                     _customList.value = newArrayList
@@ -166,7 +166,7 @@ class CustomListsViewModel @Inject constructor(
                     val newArrayList = ReflexionArrayItem(
                         customList.value.itemPK,
                         customList.value.itemName,
-                        0L,
+                        customList.value.nodePk,
                         items
                     )
                     _customList.value = newArrayList

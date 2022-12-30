@@ -279,13 +279,13 @@ class LocalServiceImpl @Inject constructor(
 
         var reflexionArrayItem: ReflexionArrayItem? = null
         val children = mutableListOf<ListNode>()
-        val _result = CoroutineScope(Dispatchers.IO).launch {
+        val result = CoroutineScope(Dispatchers.IO).launch {
             withContext(Dispatchers.IO) {
                 // recursive function
-                if (nodePk != null) {
-                    linkedListDao.selectListNode(nodePk)?.let { children.add(it) }
-                }
-                var parent: ListNode? = children[0]
+//                if (nodePk != null) {
+//                    linkedListDao.selectListNode(nodePk)?.let { children.add(it) }
+//                }
+                var parent: ListNode? = node
                 suspend fun getChild(itemPk: Long): ListNode? {
                     val next: ListNode? = linkedListDao.selectChildNode(itemPk)
                     if (next != null) {
@@ -305,7 +305,7 @@ class LocalServiceImpl @Inject constructor(
                 reflexionArrayItem = nodeRAI
             }
         }
-        _result.join()
+        result.join()
     return reflexionArrayItem
 }
 
