@@ -3,6 +3,7 @@ package com.livingtechusa.reflexion.ui.customLists
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -111,10 +112,32 @@ fun CustomListContent(
                         elevation = 10.dp,
                         shape = RoundedCornerShape(20.dp)
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            modifier = Modifier
+                                .pointerInput(key1 = index) {
+                                    detectTapGestures(
+                                        onDoubleTap = {
+                                            viewModel.onTriggerEvent(
+                                                CustomListEvent.DeleteList(
+                                                    index
+                                                )
+                                            )
+                                        },
+                                        onLongPress = {
+                                            viewModel.onTriggerEvent(
+                                                CustomListEvent.MoveToEdit(
+                                                    index
+                                                )
+                                            )
+                                        }
+                                    )
+                                },
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Text(
                                 text = listOfLists[index]?.itemName ?: NO_LISTS,
-                                modifier = Modifier.padding(16.dp),
+                                modifier = Modifier
+                                    .padding(16.dp),
                                 style = MaterialTheme.typography.subtitle2
                             )
                             listOfLists[index]?.let {
@@ -211,7 +234,7 @@ fun EditableHorizontalScrollableRowComponent(
                                     ?.indexOf(item)
                                     ?.let { index ->
                                         viewModel.onTriggerEvent(
-                                            CustomListEvent.Delete(
+                                            CustomListEvent.DeleteItemInList(
                                                 index
                                             )
                                         )

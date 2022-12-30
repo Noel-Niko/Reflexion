@@ -286,7 +286,6 @@ class LocalServiceImpl @Inject constructor(
                     linkedListDao.selectListNode(nodePk)?.let { children.add(it) }
                 }
                 var parent: ListNode? = children[0]
-                // THE PROBLEM IS HERE is we "get child, but instead always return the grandparent
                 suspend fun getChild(itemPk: Long): ListNode? {
                     val next: ListNode? = linkedListDao.selectChildNode(itemPk)
                     if (next != null) {
@@ -295,9 +294,6 @@ class LocalServiceImpl @Inject constructor(
                     parent = next
                     return next
                 }
-                // get the children the head node
-
-
                 // recursively get all the children for each head node
                 while (parent?.nodePk != null) {
                         getChild(parent?.nodePk!!)
@@ -307,7 +303,6 @@ class LocalServiceImpl @Inject constructor(
                     nodeRAI?.children?.add(childNodes.toReflexionArrayItem())
                 }
                 reflexionArrayItem = nodeRAI
-
             }
         }
         _result.join()

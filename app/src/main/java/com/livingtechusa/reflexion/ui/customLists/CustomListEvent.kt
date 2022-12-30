@@ -18,9 +18,17 @@ sealed class CustomListEvent {
         val index: Int,
     ) : CustomListEvent() {}
 
-    data class Delete(
+    data class DeleteItemInList(
         val index: Int
     ) : CustomListEvent()
 
     object Save: CustomListEvent()
+
+    data class DeleteList(
+        val index: Int
+    ) : CustomListEvent()
+
+    data class MoveToEdit(
+        val index: Int
+        ): CustomListEvent()
 }
