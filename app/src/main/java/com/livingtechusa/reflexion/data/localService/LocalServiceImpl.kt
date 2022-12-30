@@ -16,6 +16,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class LocalServiceImpl @Inject constructor(
@@ -144,15 +145,22 @@ class LocalServiceImpl @Inject constructor(
         return reflexionItemDao.getParent(pk)
     }
 
-    override suspend fun insertNewOrUpdateNodeList(arrayItem: ReflexionArrayItem, topic: Long) {
-        val nodeList: List<ListNode?> = arrayItem.toListNode(topic)
+    override suspend fun insertNewOrUpdateNodeList(arrayItem: ReflexionArrayItem, topic: Long): Long? {
+        val nodeList: List<ListNode?> = arrayItem.toListNode(topic, arrayItem.nodePk)
         var parent: Long? = null
-        nodeList.forEach {
-            if (it != null) {
-                val updated = it.copy(parentPk = parent)
+        var headNodePk: Long? = null
+        var count = 0
+        nodeList.forEach { listNode ->
+            if (listNode != null) {
+                val updated = listNode.copy(parentPk = parent)
                 parent = linkedListDao.insertNewNode(updated)
+                if(count == 0) {
+                    headNodePk = parent
+                }
+                count++
             }
         }
+        return headNodePk
     }
 
     override suspend fun selectSingleAbridgedReflexionItemDataByParentPk(pk: Long): AbridgedReflexionItem {
@@ -257,6 +265,94 @@ class LocalServiceImpl @Inject constructor(
                     reflexionArrayItem.children?.add(node.toReflexionArrayItem())
                 }
                 reflexionArrayItems.add(reflexionArrayItem)
+
+            }
+        }
+        job.join()
+        return reflexionArrayItems
+    }
+
+    override suspend fun selectNodeListsAsArrayItemsByHeadNode(nodePk: Long?): ReflexionArrayItem? {
+        // get all of the nodes by topic
+        val node: ListNode? =
+            nodePk?.let { linkedListDao.selectListNode(it) }
+
+        var reflexionArrayItem: ReflexionArrayItem? = null
+        val children = mutableListOf<ListNode>()
+        val _result = CoroutineScope(Dispatchers.IO).launch {
+            withContext(Dispatchers.IO) {
+                // recursive function
+                if (nodePk != null) {
+                    linkedListDao.selectListNode(nodePk)?.let { children.add(it) }
+                }
+                var parent: ListNode? = children[0]
+                // THE PROBLEM IS HERE is we "get child, but instead always return the grandparent
+                suspend fun getChild(itemPk: Long): ListNode? {
+                    val next: ListNode? = linkedListDao.selectChildNode(itemPk)
+                    if (next != null) {
+                        children.add(next)
+                    }
+                    parent = next
+                    return next
+                }
+                // get the children the head node
+
+
+                // recursively get all the children for each head node
+                while (parent?.nodePk != null) {
+                        getChild(parent?.nodePk!!)
+                }
+                val nodeRAI = node?.toReflexionArrayItem()
+                children.forEach { childNodes ->
+                    nodeRAI?.children?.add(childNodes.toReflexionArrayItem())
+                }
+                reflexionArrayItem = nodeRAI
+
+            }
+        }
+        _result.join()
+    return reflexionArrayItem
+}
+
+override suspend fun selectChildNode(nodePk: Long): ListNode? {
+    return linkedListDao.selectChildNode(nodePk = nodePk)
+}
+
+override suspend fun selectParentNode(parentPk: Long): ListNode? {
+    return linkedListDao.selectParentNode(parentPk = parentPk)
+}
+
+override suspend fun updateListNode(
+    nodePk: Long,
+    title: String,
+    parentPK: Long,
+    childPk: Long
+) {
+    linkedListDao.updateListNode(
+        nodePk = nodePk,
+        title = title,
+        parentPK = parentPK,
+        childPk = childPk
+    )
+}
+
+override suspend fun getAllLinkedLists(): List<ListNode?> {
+    return linkedListDao.getAllLinkedLists()
+}
+
+override suspend fun deleteAllLinkedLists() {
+    linkedListDao.deleteAllLinkedLists()
+}
+
+override suspend fun deleteSelectedNode(nodePk: Long) {
+    linkedListDao.deleteSelectedNode(nodePk = nodePk)
+}
+
+override suspend fun selectReflexionItemByName(name: String): ReflexionItem {
+    return reflexionItemDao.selectReflexionItemByName(name)
+}
+}
+
 //                val childrenSorted = children.sortedWith<ListNode>(object : Comparator<ListNode> {
 //                    override fun compare(o1: ListNode, o2: ListNode): Int {
 //                        try {
@@ -279,47 +375,3 @@ class LocalServiceImpl @Inject constructor(
 //                for (childNode in childrenSorted) {
 //                    reflexionArrayItems.add(childNode.toReflexionArrayItem())
 //                }
-            }
-        }
-        job.join()
-        return reflexionArrayItems
-    }
-
-    override suspend fun selectChildNode(nodePk: Long): ListNode? {
-        return linkedListDao.selectChildNode(nodePk = nodePk)
-    }
-
-    override suspend fun selectParentNode(parentPk: Long): ListNode? {
-        return linkedListDao.selectParentNode(parentPk = parentPk)
-    }
-
-    override suspend fun updateListNode(
-        nodePk: Long,
-        title: String,
-        parentPK: Long,
-        childPk: Long
-    ) {
-        linkedListDao.updateListNode(
-            nodePk = nodePk,
-            title = title,
-            parentPK = parentPK,
-            childPk = childPk
-        )
-    }
-
-    override suspend fun getAllLinkedLists(): List<ListNode?> {
-        return linkedListDao.getAllLinkedLists()
-    }
-
-    override suspend fun deleteAllLinkedLists() {
-        linkedListDao.deleteAllLinkedLists()
-    }
-
-    override suspend fun deleteSelectedNode(nodePk: Long) {
-        linkedListDao.deleteSelectedNode(nodePk = nodePk)
-    }
-
-    override suspend fun selectReflexionItemByName(name: String): ReflexionItem {
-        return reflexionItemDao.selectReflexionItemByName(name)
-    }
-}

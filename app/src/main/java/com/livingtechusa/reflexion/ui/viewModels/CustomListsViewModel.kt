@@ -41,8 +41,14 @@ class CustomListsViewModel @Inject constructor(
     private val _selectedItem = MutableStateFlow(ReflexionItem())
     val selectedItem: StateFlow<ReflexionItem> get() = _selectedItem
 
-    private val _customList =
-        MutableStateFlow(ReflexionArrayItem(itemPK = 0L, itemName = "New List", nodePk = 0L, children = mutableListOf<ReflexionArrayItem>()))
+    private val emptyRai = ReflexionArrayItem(
+        itemPK = 0L,
+        itemName = "New List",
+        nodePk = 0L,
+        children = mutableListOf<ReflexionArrayItem>()
+    )
+
+    private val _customList = MutableStateFlow(emptyRai)
     val customList: StateFlow<ReflexionArrayItem> get() = _customList
 
 
@@ -116,7 +122,8 @@ class CustomListsViewModel @Inject constructor(
             when (event) {
                 is CustomListEvent.GetListsForTopic -> {
                     viewModelScope.launch {
-                        val lists: List<ReflexionArrayItem> = localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic)
+                        val lists: List<ReflexionArrayItem> =
+                            localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic)
                         _listOfLists.value = lists
                     }
                 }
@@ -169,18 +176,28 @@ class CustomListsViewModel @Inject constructor(
                 }
 
                 is CustomListEvent.Save -> {
-                    viewModelScope.launch {
+                    viewModelScope.launch(Dispatchers.IO) {
                         withContext(Dispatchers.IO) {
-                            localServiceImpl.insertNewOrUpdateNodeList(customList.value, topic)
-                            _listOfLists.value =
-                                localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic)
+                            val nodePk: Long? = localServiceImpl.insertNewOrUpdateNodeList(customList.value, topic)
+                            if (nodePk != null) {
+                                updateCustomList(nodePk)
+                            }
+                            _listOfLists.value = localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic)
                         }
                     }
                 }
+
                 else -> {}
             }
         } catch (e: Exception) {
             Log.e(TAG, "Exception: ${e.message}  with cause: ${e.cause}")
+        }
+    }
+
+    private fun updateCustomList(nodePk: Long) {
+        viewModelScope.launch {
+            val list = localServiceImpl.selectNodeListsAsArrayItemsByHeadNode(nodePk) ?: emptyRai
+            _customList.value = list
         }
     }
 

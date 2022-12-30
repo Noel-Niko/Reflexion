@@ -6,21 +6,21 @@ import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
 
 
-fun ReflexionArrayItem.toListNode(topic: Long?): List<ListNode?> {
+fun ReflexionArrayItem.toListNode(topic: Long?, headNodePk: Long?): List<ListNode?> {
     val list = mutableListOf<ListNode>()
     var child: Long? = null
-    if(children.isEmpty().not() && children.get(0).children!= null) {
+    if(children.isEmpty().not()) {
         child = children.get(0).itemPK
     }
     list.add(ListNode(
-        nodePk = 0L,
+        nodePk = headNodePk ?: 0L,
         topic = topic ?: -1L,
         title = itemName.toString(),
         itemPK = itemPK ?: -1L,
         parentPk = null,
         childPk = child
     ) )
-    children?.forEach {
+    children.forEach {
         list.add(it.toAListNode( topic = topic, parentPk = itemPK))
     }
     return list

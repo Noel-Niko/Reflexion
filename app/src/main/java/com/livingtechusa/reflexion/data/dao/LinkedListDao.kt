@@ -35,7 +35,7 @@ interface LinkedListDao{
     suspend fun deleteAllLinkedLists()
 
     @Query("Select * FROM LinkedList WHERE nodePk = :nodePk")
-    suspend fun selectLinkedList(nodePk: Long): ListNode?
+    suspend fun selectListNode(nodePk: Long): ListNode?
 
     @Query("Delete FROM LinkedList WHERE nodePk = :nodePk")
     suspend fun deleteSelectedNode(nodePk: Long)

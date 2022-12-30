@@ -43,6 +43,7 @@ interface ILocalService {
     suspend fun selectNodeTopic(itemPk: Long): Long?
 
     suspend fun selectNodeListsAsArrayItemsByTopic(topicPk: Long): List<ReflexionArrayItem?>
+    suspend fun selectNodeListsAsArrayItemsByHeadNode(topicPk: Long?): ReflexionArrayItem?
 
     suspend fun selectChildNode(nodePk: Long): ListNode?
 
@@ -59,5 +60,5 @@ interface ILocalService {
 
     suspend fun selectReflexionArrayItemsByPk(pk: Long): ReflexionArrayItem?
     suspend fun selectParent(pk: Long): Long?
-    suspend fun insertNewOrUpdateNodeList(arrayItem: ReflexionArrayItem, topic: Long)
+    suspend fun insertNewOrUpdateNodeList(arrayItem: ReflexionArrayItem, topic: Long): Long?
 }
