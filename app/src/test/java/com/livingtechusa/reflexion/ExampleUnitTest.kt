@@ -3,8 +3,6 @@ package com.livingtechusa.reflexion
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import org.junit.Test
 
-import org.junit.Assert.*
-
 /**
  * Example local unit test, which will execute on the development machine (host).
  *
@@ -45,7 +43,7 @@ class ExampleUnitTest {
         Rai: ReflexionArrayItem,
         list: MutableList<ReflexionArrayItem?>
     ): ReflexionArrayItem {
-        Rai.items = list
+        Rai.children = list
         return Rai
     }
 
@@ -59,7 +57,7 @@ class ExampleUnitTest {
 
         val list = getTwoMore()
         list.forEach() {
-            it?.items = getTwoMore()
+            it?.children = getTwoMore()
         }
         val result = newLevel(item1, list)
         println(result)

@@ -2,7 +2,6 @@ package com.livingtechusa.reflexion.ui.viewModels
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
@@ -43,7 +42,7 @@ class CustomListsViewModel @Inject constructor(
     val selectedItem: StateFlow<ReflexionItem> get() = _selectedItem
 
     private val _customList =
-        MutableStateFlow(ReflexionArrayItem(0L, "New List", mutableListOf<ReflexionArrayItem>()))
+        MutableStateFlow(ReflexionArrayItem(itemPK = 0L, itemName = "New List", nodePk = 0L, children = mutableListOf<ReflexionArrayItem>()))
     val customList: StateFlow<ReflexionArrayItem> get() = _customList
 
 
@@ -71,6 +70,7 @@ class CustomListsViewModel @Inject constructor(
     val item1 = ReflexionArrayItem(
         itemPK = null,
         itemName = "Topics",
+        0L,
         children = mutableListOf()
     )
     private val _itemTree = MutableStateFlow(item1)
@@ -82,7 +82,7 @@ class CustomListsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            _itemTree.value = newLevel(item1, getMore(item1.reflexionItemPk))
+            _itemTree.value = newLevel(item1, getMore(item1.itemPK))
         }
     }
 
@@ -90,7 +90,9 @@ class CustomListsViewModel @Inject constructor(
         Rai: ReflexionArrayItem,
         list: MutableList<ReflexionArrayItem>?
     ): ReflexionArrayItem {
-        Rai.items = list
+        if (list != null) {
+            Rai.children = list
+        }
         return Rai
     }
 
@@ -98,7 +100,7 @@ class CustomListsViewModel @Inject constructor(
         val _list = mutableListOf<ReflexionArrayItem>()
         val job = viewModelScope.async {
             localServiceImpl.selectReflexionArrayItemsByParentPk(pk).forEach() {
-                val list: MutableList<ReflexionArrayItem> = getMore(it?.reflexionItemPk)
+                val list: MutableList<ReflexionArrayItem> = getMore(it?.itemPK)
                 val subLevel = it?.let { it1 -> newLevel(it1, list) }
                 if (subLevel != null) {
                     _list.add(subLevel)
@@ -121,18 +123,20 @@ class CustomListsViewModel @Inject constructor(
 
                 is CustomListEvent.UpdateListName -> {
                     val newListItem = ReflexionArrayItem(
-                        _customList.value.reflexionItemPk,
-                        _customList.value.reflexionItemName,
-                        _customList.value.items
+                        _customList.value.itemPK,
+                        _customList.value.itemName,
+                        0L,
+                        _customList.value.children
                     )
-                    newListItem.reflexionItemName = event.text
+                    newListItem.itemName = event.text
                     _customList.value = newListItem
                 }
 
                 is CustomListEvent.MoveItemUp -> {
                     val newArrayList = ReflexionArrayItem(
-                        customList.value.reflexionItemPk,
-                        customList.value.reflexionItemName,
+                        customList.value.itemPK,
+                        customList.value.itemName,
+                        0L,
                         bubbleUp(_customList.value, event.index).toMutableList()
                     )
                     _customList.value = newArrayList
@@ -140,8 +144,9 @@ class CustomListsViewModel @Inject constructor(
 
                 is CustomListEvent.MoveItemDown -> {
                     val newArrayList = ReflexionArrayItem(
-                        customList.value.reflexionItemPk,
-                        customList.value.reflexionItemName,
+                        customList.value.itemPK,
+                        customList.value.itemName,
+                        0L,
                         bubbleDown(_customList.value, event.index).toMutableList()
                     )
                     _customList.value = newArrayList
@@ -149,14 +154,15 @@ class CustomListsViewModel @Inject constructor(
 
                 is CustomListEvent.Delete -> {
                     val items = mutableListOf<ReflexionArrayItem>()
-                    for (index in customList.value.items?.indices!!) {
+                    for (index in customList.value.children.indices) {
                         if (index != event.index) {
-                            items.add(customList.value.items!![index])
+                            items.add(customList.value.children[index])
                         }
                     }
                     val newArrayList = ReflexionArrayItem(
-                        customList.value.reflexionItemPk,
-                        customList.value.reflexionItemName,
+                        customList.value.itemPK,
+                        customList.value.itemName,
+                        0L,
                         items
                     )
                     _customList.value = newArrayList
@@ -165,7 +171,7 @@ class CustomListsViewModel @Inject constructor(
                 is CustomListEvent.Save -> {
                     viewModelScope.launch {
                         withContext(Dispatchers.IO) {
-                            localServiceImpl.insertNewNodeList(customList.value, topic)
+                            localServiceImpl.insertNewOrUpdateNodeList(customList.value, topic)
                             _listOfLists.value =
                                 localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic)
                         }
@@ -184,11 +190,11 @@ class CustomListsViewModel @Inject constructor(
     ): List<ReflexionArrayItem> {
         val newArrangement = mutableListOf<ReflexionArrayItem>()
         var temp: ReflexionArrayItem? = null
-        for (item in newArrayListItem.items?.indices!!) {
+        for (item in newArrayListItem.children.indices) {
             if (item == index) {
-                temp = newArrayListItem.items!![index]
+                temp = newArrayListItem.children[index]
             } else {
-                newArrangement.add(newArrayListItem.items!![item])
+                newArrangement.add(newArrayListItem.children[item])
                 temp?.let {
                     newArrangement.add(it)
                     temp = null
@@ -203,14 +209,14 @@ class CustomListsViewModel @Inject constructor(
         index: Int
     ): List<ReflexionArrayItem> {
         val newArrangement = mutableListOf<ReflexionArrayItem>()
-        for (item in newArrayListItem.items!!.indices) {
+        for (item in newArrayListItem.children.indices) {
             if (item == index) {
                 val temp = newArrangement.last()
                 newArrangement.removeLast()
-                newArrangement.add(newArrayListItem.items!![item])
+                newArrangement.add(newArrayListItem.children[item])
                 newArrangement.add(temp)
             } else {
-                newArrangement.add(newArrayListItem.items!![item])
+                newArrangement.add(newArrayListItem.children[item])
             }
         }
         return newArrangement
@@ -237,15 +243,16 @@ class CustomListsViewModel @Inject constructor(
                             localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic)
                     }
                     val newListItem = ReflexionArrayItem(
-                        _customList.value.reflexionItemPk,
-                        _customList.value.reflexionItemName,
-                        _customList.value.items
+                        _customList.value.itemPK,
+                        _customList.value.itemName,
+                        0L,
+                        _customList.value.children
                     )
 
                     if (itemPk.isNullOrEmpty().not() && itemPk.equals("null").not()) {
                         itemPk?.toLong()?.let { pk ->
                             localServiceImpl.selectReflexionArrayItemsByPk(pk)
-                                ?.let { newListItem.items?.add(it) }
+                                ?.let { newListItem.children.add(it) }
                         }
                     }
                     _customList.value = newListItem

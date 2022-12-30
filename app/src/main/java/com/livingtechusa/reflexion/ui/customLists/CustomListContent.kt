@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
-import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.NO_LISTS
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import kotlin.math.roundToInt
@@ -62,7 +61,7 @@ fun CustomListContent(
                     Column(modifier = Modifier.background(Color.Transparent)) {
                         TextField(
                             modifier = Modifier.height(IntrinsicSize.Min),
-                            value = customList.reflexionItemName.toString(),
+                            value = customList.itemName.toString(),
                             colors = TextFieldDefaults.textFieldColors(
                                 textColor = Color.Black,
                                 backgroundColor = Color.Transparent
@@ -114,7 +113,7 @@ fun CustomListContent(
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = listOfLists[index]?.reflexionItemName ?: NO_LISTS,
+                                text = listOfLists[index]?.itemName ?: NO_LISTS,
                                 modifier = Modifier.padding(16.dp),
                                 style = MaterialTheme.typography.subtitle2
                             )
@@ -145,8 +144,8 @@ fun EditableHorizontalScrollableRowComponent(
             .horizontalScroll(state = scrollState),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        if (customList.items.isNullOrEmpty().not()) {
-            customList.items?.forEach { item ->
+        if (customList.children.isNullOrEmpty().not()) {
+            customList.children?.forEach { item ->
                 var offsetX by remember { mutableStateOf(0f) }
                 var offsetY by remember { mutableStateOf(0f) }
                 var elevated by remember { mutableStateOf(0) }
@@ -154,7 +153,7 @@ fun EditableHorizontalScrollableRowComponent(
                 val b2 = MaterialTheme.typography.body2
                 var textStyle = b2
                 Text(
-                    text = item.reflexionItemName.toString() + ", ",
+                    text = item.itemName.toString() + ", ",
                     style = textStyle,
                     color = MaterialTheme.colors.primary,
                     modifier = Modifier
@@ -172,7 +171,7 @@ fun EditableHorizontalScrollableRowComponent(
                                 },
                                 onDragEnd = {
                                     if (offsetX <= 0) {
-                                        customList.items
+                                        customList.children
                                             ?.indexOf(item)
                                             ?.let { index ->
                                                 viewModel.onTriggerEvent(
@@ -186,7 +185,7 @@ fun EditableHorizontalScrollableRowComponent(
                                         elevated = 0
                                         textStyle = b2
                                     } else if (offsetX > 0) {
-                                        customList.items
+                                        customList.children
                                             ?.indexOf(item)
                                             ?.let { index ->
                                                 viewModel.onTriggerEvent(
@@ -208,7 +207,7 @@ fun EditableHorizontalScrollableRowComponent(
                         .clickable(
                             enabled = true,
                             onClick = {
-                                customList.items
+                                customList.children
                                     ?.indexOf(item)
                                     ?.let { index ->
                                         viewModel.onTriggerEvent(
@@ -237,10 +236,10 @@ fun HorizontalScrollableRowComponent(
             .horizontalScroll(state = scrollState),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        if (customList.items.isNullOrEmpty().not()) {
-            customList.items?.forEach { item ->
+        if (customList.children.isNullOrEmpty().not()) {
+            customList.children?.forEach { item ->
                 Text(
-                    text = item.reflexionItemName.toString() + ", ",
+                    text = item.itemName.toString() + ", ",
                     style = MaterialTheme.typography.body1,
                     color = MaterialTheme.colors.primary,
                     modifier = Modifier

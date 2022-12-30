@@ -1,43 +1,41 @@
 package com.livingtechusa.reflexion.data
 
 import com.livingtechusa.reflexion.data.entities.ListNode
-import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.data.models.AbridgedReflexionItem
 import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
-import java.util.concurrent.atomic.AtomicLong
 
 
 fun ReflexionArrayItem.toListNode(topic: Long?): List<ListNode?> {
     val list = mutableListOf<ListNode>()
     var child: Long? = null
-    if(items.isNullOrEmpty().not() && items?.get(0)?.reflexionItemPk != null) {
-        child = items?.get(0)?.reflexionItemPk
+    if(children.isEmpty().not() && children.get(0).children!= null) {
+        child = children.get(0).itemPK
     }
     list.add(ListNode(
         nodePk = 0L,
         topic = topic ?: -1L,
-        title = reflexionItemName.toString(),
-        itemPK = reflexionItemPk ?: -1L,
+        title = itemName.toString(),
+        itemPK = itemPK ?: -1L,
         parentPk = null,
         childPk = child
     ) )
-    items?.forEach {
-        list.add(it.toAListNode( topic = topic, parentPk = reflexionItemPk))
+    children?.forEach {
+        list.add(it.toAListNode( topic = topic, parentPk = itemPK))
     }
     return list
 }
 
 fun ReflexionArrayItem.toAListNode(topic: Long?, parentPk: Long?): ListNode {
     var child: Long? = null
-    if(items.isNullOrEmpty().not() && items?.get(0)?.reflexionItemPk != null) {
-        child = items?.get(0)?.reflexionItemPk
+    if(children.isNullOrEmpty().not() && children.get(0).itemPK != null) {
+        child = children.get(0).itemPK
     }
     return ListNode(
         nodePk = 0L,
         topic = topic ?: -1L,
-        title = reflexionItemName.toString(),
-        itemPK = reflexionItemPk ?: -1L,
+        title = itemName.toString(),
+        itemPK = itemPK ?: -1L,
         parentPk = parentPk ?: -1L,  // FK - ITEM.autogenPK
         childPk = child
     )
@@ -47,6 +45,7 @@ fun AbridgedReflexionItem.toReflexionArrayItem() =
     ReflexionArrayItem(
         itemPK = autogenPK ?: 0L,
         itemName = name ?: Constants.EMPTY_STRING,
+        nodePk = 0L,
         children = mutableListOf()
     )
 
@@ -54,5 +53,6 @@ fun ListNode.toReflexionArrayItem() =
     ReflexionArrayItem(
         itemPK = itemPK,
         itemName = title,
+        nodePk = nodePk,
         children = mutableListOf()
     )

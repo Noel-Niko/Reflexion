@@ -111,11 +111,10 @@ class LocalServiceImpl @Inject constructor(
                 val Rai = ReflexionArrayItem(
                     itemPK = it?.autogenPK ?: 0L,
                     itemName = it?.name ?: EMPTY_STRING,
+                    nodePk = 0L,
                     children = mutableListOf()
                 )
-                if (Rai != null) {
-                    result.add(Rai)
-                }
+                result.add(Rai)
             }
             return result
         } else {
@@ -125,6 +124,7 @@ class LocalServiceImpl @Inject constructor(
                     ReflexionArrayItem(
                         itemPK = it?.autogenPK ?: 0L,
                         itemName = it?.name ?: EMPTY_STRING,
+                        nodePk = 0L,
                         children = mutableListOf()
                     )
                 result.add(Rai)
@@ -144,7 +144,7 @@ class LocalServiceImpl @Inject constructor(
         return reflexionItemDao.getParent(pk)
     }
 
-    override suspend fun insertNewNodeList(arrayItem: ReflexionArrayItem, topic: Long) {
+    override suspend fun insertNewOrUpdateNodeList(arrayItem: ReflexionArrayItem, topic: Long) {
         val nodeList: List<ListNode?> = arrayItem.toListNode(topic)
         var parent: Long? = null
         nodeList.forEach {
@@ -254,7 +254,7 @@ class LocalServiceImpl @Inject constructor(
                 }
                 val reflexionArrayItem = headNode.toReflexionArrayItem()
                 children.forEach { node ->
-                    reflexionArrayItem.items?.add(node.toReflexionArrayItem())
+                    reflexionArrayItem.children?.add(node.toReflexionArrayItem())
                 }
                 reflexionArrayItems.add(reflexionArrayItem)
 //                val childrenSorted = children.sortedWith<ListNode>(object : Comparator<ListNode> {

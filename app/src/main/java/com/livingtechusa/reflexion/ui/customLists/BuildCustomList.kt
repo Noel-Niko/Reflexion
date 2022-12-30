@@ -1,8 +1,6 @@
 package com.livingtechusa.reflexion.ui.customLists
 
-import android.widget.Toast
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExposedDropdownMenuBox
 import androidx.compose.material.ExposedDropdownMenuDefaults
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -226,11 +223,11 @@ fun getItems(
 ): DropDownMenuBuilder<String> {
     val next = list.random()
     newBuilder.item(
-        reflexionArrayItem.reflexionItemPk.toString(),
-        reflexionArrayItem.reflexionItemName.toString()
+        reflexionArrayItem.itemPK.toString(),
+        reflexionArrayItem.itemName.toString()
     ) {
         icon(next)
-        reflexionArrayItem.items?.forEach {
+        reflexionArrayItem.children?.forEach {
             getItems(it, this, list)
         }
     }

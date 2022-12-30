@@ -1,11 +1,7 @@
 package com.livingtechusa.reflexion.util
 
-import com.livingtechusa.reflexion.data.entities.ReflexionItem
+class ReflexionArrayItem(var itemPK: Long?, var itemName: String?, var nodePk: Long?, var children: MutableList<ReflexionArrayItem> = mutableListOf()) {
 
-class ReflexionArrayItem(itemPK: Long?, itemName: String?, children: MutableList<ReflexionArrayItem>?) {
-    var reflexionItemPk: Long? =  itemPK
-    var reflexionItemName: String? = itemName
-    var items: MutableList<ReflexionArrayItem>? = children ?: mutableListOf()
 
     companion object {
         fun traverseDepthFirst(
@@ -20,8 +16,8 @@ class ReflexionArrayItem(itemPK: Long?, itemName: String?, children: MutableList
 
                 action.invoke(currentNode)
 
-                for(index in (currentNode.items?.size?.minus(1) ?: 0) downTo 0) {
-                    stack.addFirst(currentNode.items?.get(index) ?: ReflexionArrayItem(null, null, null))
+                for(index in (currentNode.children.size.minus(1) ?: 0) downTo 0) {
+                    stack.addFirst(currentNode.children.get(index) ?: ReflexionArrayItem(null, null, null))
                 }
             }
         }
@@ -37,7 +33,7 @@ class ReflexionArrayItem(itemPK: Long?, itemName: String?, children: MutableList
 
                 action.invoke(currentNode)
 
-                currentNode.items?.forEach(){
+                currentNode.children.forEach(){
                     queue.addFirst(it)
                 }
             }
