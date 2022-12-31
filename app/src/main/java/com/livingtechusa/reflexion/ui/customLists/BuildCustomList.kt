@@ -212,21 +212,23 @@ fun CustomListsContent(
                 }
                 if (filteringOptions.isNotEmpty()) {
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        
                     ) {
                         items(filteringOptions.size) {
                             Text(
                                 text = filteringOptions[it].itemName
                                     ?: "No Match Found",
                                 modifier = Modifier
-                                    .background(MaterialTheme.colors.primary)
                                     .clickable {
                                         viewModel.selectItem(filteringOptions[it].itemPK.toString())
                                         searchText = ""
                                     },
-                                color = MaterialTheme.colors.onPrimary,
+                                style = MaterialTheme.typography.subtitle1
                             )
+                            Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
                 } else {

@@ -186,7 +186,7 @@ fun EditableHorizontalScrollableRowComponent(
                         .pointerInput(Unit) {
                             detectDragGesturesAfterLongPress(
                                 onDragStart = {
-                                    offsetY = -25f
+                                    offsetY = -50f
                                     elevated = 10
                                     textStyle = h2
                                 },
