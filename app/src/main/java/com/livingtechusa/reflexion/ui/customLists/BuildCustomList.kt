@@ -173,45 +173,6 @@ fun CustomListsContent(
                                     backgroundColor = Color.Transparent
                                 )
                             )
-
-                            // filter options based on text field value
-                            val filteringOptions: MutableList<ReflexionArrayItem> = mutableListOf()
-                            if(searchText != "") {
-                                itemTree.value.let { abridgedParent ->
-                                    // Breadth first Search for search item
-                                    traverseBreadthFirst(itemTree.value) { RAI ->
-                                        if (RAI.itemName?.contains(
-                                                searchText,
-                                                ignoreCase = true
-                                            ) == true
-                                        ) {
-                                            filteringOptions.add(RAI)
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (filteringOptions.isNotEmpty()) {
-                                LazyColumn(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                ) {
-                                    items(filteringOptions.size) {
-                                        Text(
-                                            text = filteringOptions[it].itemName
-                                                ?: "No Match Found",
-                                            modifier = Modifier
-                                                .background(MaterialTheme.colors.primary)
-                                                .clickable {
-                                                viewModel.selectItem(filteringOptions[it].itemPK.toString())
-                                                searchText = ""
-                                            },
-                                            color = MaterialTheme.colors.onPrimary,
-                                        )
-                                    }
-                                }
-                            }
-
                             CustomDropDownMenu(
                                 isOpen = expanded,
                                 setIsOpen = {
@@ -233,7 +194,44 @@ fun CustomListsContent(
                         .fillMaxWidth()
                         .height(16.dp)
                 )
-                CustomListContent(navController = navController, viewModel = viewModel)
+                // filter options based on text field value
+                val filteringOptions: MutableList<ReflexionArrayItem> = mutableListOf()
+                if(searchText != "") {
+                    itemTree.value.let { abridgedParent ->
+                        // Breadth first Search for search item
+                        traverseBreadthFirst(itemTree.value) { RAI ->
+                            if (RAI.itemName?.contains(
+                                    searchText,
+                                    ignoreCase = true
+                                ) == true
+                            ) {
+                                filteringOptions.add(RAI)
+                            }
+                        }
+                    }
+                }
+                if (filteringOptions.isNotEmpty()) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        items(filteringOptions.size) {
+                            Text(
+                                text = filteringOptions[it].itemName
+                                    ?: "No Match Found",
+                                modifier = Modifier
+                                    .background(MaterialTheme.colors.primary)
+                                    .clickable {
+                                        viewModel.selectItem(filteringOptions[it].itemPK.toString())
+                                        searchText = ""
+                                    },
+                                color = MaterialTheme.colors.onPrimary,
+                            )
+                        }
+                    }
+                } else {
+                    CustomListContent(navController = navController, viewModel = viewModel)
+                }
             }
 
         }
