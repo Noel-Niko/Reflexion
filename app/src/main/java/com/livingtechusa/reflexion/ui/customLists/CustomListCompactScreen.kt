@@ -12,6 +12,14 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Autorenew
+import androidx.compose.material.icons.filled.CleaningServices
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.FormatClear
+import androidx.compose.material.icons.filled.LayersClear
+import androidx.compose.material.icons.filled.NewLabel
+import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material.icons.filled.PhonelinkErase
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.SendToMobile
@@ -90,23 +98,18 @@ fun CustomListCompactScreen(
                                 )
                             },
                         )
-//                        IconButton(
-//                            onClick = {
-//                                Toast.makeText(
-//                                    context,
-//                                    resource.getString(R.string.changes_saved),
-//                                    Toast.LENGTH_SHORT
-//                                ).show()
-//                                viewModel.onTriggerEvent(BuildEvent.SaveFromTopBar)
-//                            },
-//                            content = {
-//                                androidx.compose.material.Icon(
-//                                    imageVector = Icons.Default.Save,
-//                                    contentDescription = "save",
-//                                    tint = MaterialTheme.colors.onBackground
-//                                )
-//                            },
-//                        )
+                        IconButton(
+                            onClick = {
+                                viewModel.onTriggerEvent(CustomListEvent.ReSet)
+                            },
+                            content = {
+                                androidx.compose.material.Icon(
+                                    imageVector = Icons.Default.Autorenew,
+                                    contentDescription = "reset list",
+                                    tint = MaterialTheme.colors.onBackground,
+                                )
+                            },
+                        )
                     }
                 },
                 backgroundColor = MaterialTheme.colors.background,

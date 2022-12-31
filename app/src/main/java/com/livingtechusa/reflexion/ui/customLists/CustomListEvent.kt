@@ -1,9 +1,6 @@
 package com.livingtechusa.reflexion.ui.customLists
 
 sealed class CustomListEvent {
-    data class GetListsForTopic(
-        val pk: Long
-    ) : CustomListEvent() {}
 
     data class UpdateListName(
         val index: Int,
@@ -22,7 +19,7 @@ sealed class CustomListEvent {
         val index: Int
     ) : CustomListEvent()
 
-    object Save: CustomListEvent()
+    object Save : CustomListEvent()
 
     data class DeleteList(
         val index: Int
@@ -30,5 +27,8 @@ sealed class CustomListEvent {
 
     data class MoveToEdit(
         val index: Int
-        ): CustomListEvent()
+    ) : CustomListEvent()
+
+    object ReSet : CustomListEvent()
+
 }

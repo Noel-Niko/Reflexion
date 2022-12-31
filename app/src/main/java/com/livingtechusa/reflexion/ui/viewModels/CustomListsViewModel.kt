@@ -124,13 +124,6 @@ class CustomListsViewModel @Inject constructor(
     fun onTriggerEvent(event: CustomListEvent) {
         try {
             when (event) {
-                is CustomListEvent.GetListsForTopic -> {
-                    viewModelScope.launch {
-                        val lists: List<ReflexionArrayItem> =
-                            localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic)
-                        _listOfLists.value = lists
-                    }
-                }
 
                 is CustomListEvent.UpdateListName -> {
                     val newListItem = ReflexionArrayItem(
@@ -207,6 +200,12 @@ class CustomListsViewModel @Inject constructor(
 
                 is CustomListEvent.MoveToEdit -> {
                     _customList.value = listOfLists.value[event.index] ?: emptyRai
+                }
+
+                is CustomListEvent.ReSet -> {
+                    newList = true
+                    _customList.value.children = mutableListOf()
+                    _customList.value = emptyRai
                 }
 
                 else -> {}

@@ -77,16 +77,16 @@ fun CustomListContent(
                                 )
                             }
                         )
-                        Divider()
                         Spacer(
                             modifier = Modifier
-                                .height(16.dp)
+                                .height(12.dp)
                                 .fillMaxWidth()
                         )
                         EditableHorizontalScrollableRowComponent(
                             viewModel = viewModel,
                             customList = customList
                         )
+                        Divider(modifier = Modifier.height(16.dp).background(MaterialTheme.colors.background))
                     }
                 }
             }
