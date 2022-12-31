@@ -149,6 +149,7 @@ class LocalServiceImpl @Inject constructor(
         val nodeList: List<ListNode?> = arrayItem.toListNode(topic, arrayItem.nodePk)
         var parent: Long? = null
         var headNodePk: Long? = null
+        var tailNode: Long? = null
         var count = 0
         nodeList.forEach { listNode ->
             if (listNode != null) {
@@ -157,9 +158,11 @@ class LocalServiceImpl @Inject constructor(
                 if(count == 0) {
                     headNodePk = parent
                 }
+                tailNode = listNode.nodePk
                 count++
             }
         }
+        tailNode?.let { deleteAllChildNodes(it) }
         return headNodePk
     }
 

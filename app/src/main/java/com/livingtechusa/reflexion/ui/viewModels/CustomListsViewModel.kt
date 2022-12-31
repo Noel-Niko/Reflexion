@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.di.DefaultDispatcher
 import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
@@ -45,7 +44,14 @@ class CustomListsViewModel @Inject constructor(
         children = mutableListOf<ReflexionArrayItem>()
     )
 
-    private val _customList = MutableStateFlow(emptyRai)
+    private val _customList = MutableStateFlow(
+        ReflexionArrayItem(
+            null,
+            " List Title",
+            null,
+            mutableListOf<ReflexionArrayItem>()
+        )
+    )
     val customList: StateFlow<ReflexionArrayItem> get() = _customList
 
 
@@ -56,13 +62,14 @@ class CustomListsViewModel @Inject constructor(
     private var topic: Long = -1L
 
     suspend fun getTopic(pk: Long): Long? {
-        var key: Long? = pk
-        var parent: Long? = null
+        var childPk: Long? = pk
+        // If pk is a topic, it's own pk should be returned.
+        var parent = pk
         var hasParent = true
         while (hasParent) {
-            key = key?.let { it -> localServiceImpl.selectParent(it) }
-            if (key != null) {
-                parent = key
+            childPk = childPk?.let { pKey -> localServiceImpl.selectParent(pKey) }
+            if (childPk != null) {
+                parent = childPk
             } else {
                 hasParent = false
             }
@@ -193,103 +200,127 @@ class CustomListsViewModel @Inject constructor(
                         reflexionArrayItem?.children?.forEach() { rai ->
                             rai.nodePk?.let { localServiceImpl.deleteSelectedNode(it) }
                         }
-                        _listOfLists.value = localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic)
+                        _listOfLists.value =
+                            localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic)
                     }
                 }
 
-                is CustomListEvent.MoveToEdit-> {
+                is CustomListEvent.MoveToEdit -> {
                     _customList.value = listOfLists.value[event.index] ?: emptyRai
                 }
 
                 else -> {}
             }
-    } catch (e: Exception)
-    {
-        Log.e(TAG, "Exception: ${e.message}  with cause: ${e.cause}")
+        } catch (e: Exception) {
+            Log.e(TAG, "Exception: ${e.message}  with cause: ${e.cause}")
+        }
     }
-}
 
-private fun updateCustomList(nodePk: Long) {
-    viewModelScope.launch {
-        val list = localServiceImpl.selectNodeListsAsArrayItemsByHeadNode(nodePk) ?: emptyRai
-        _customList.value = list
+    private fun updateCustomList(nodePk: Long) {
+        viewModelScope.launch {
+            val list = localServiceImpl.selectNodeListsAsArrayItemsByHeadNode(nodePk) ?: emptyRai
+            _customList.value = list
+        }
     }
-}
 
-private fun bubbleDown(
-    newArrayListItem: ReflexionArrayItem,
-    index: Int
-): List<ReflexionArrayItem> {
-    val newArrangement = mutableListOf<ReflexionArrayItem>()
-    var temp: ReflexionArrayItem? = null
-    for (item in newArrayListItem.children.indices) {
-        if (item == index) {
-            temp = newArrayListItem.children[index]
-        } else {
-            newArrangement.add(newArrayListItem.children[item])
-            temp?.let {
-                newArrangement.add(it)
-                temp = null
+    private fun bubbleDown(
+        newArrayListItem: ReflexionArrayItem,
+        index: Int
+    ): List<ReflexionArrayItem> {
+        val newArrangement = mutableListOf<ReflexionArrayItem>()
+        var temp: ReflexionArrayItem? = null
+        for (item in newArrayListItem.children.indices) {
+            if (item == index) {
+                temp = newArrayListItem.children[index]
+            } else {
+                newArrangement.add(newArrayListItem.children[item])
+                temp?.let {
+                    newArrangement.add(it)
+                    temp = null
+                }
             }
         }
+        return newArrangement
     }
-    return newArrangement
-}
 
-private fun bubbleUp(
-    newArrayListItem: ReflexionArrayItem,
-    index: Int
-): List<ReflexionArrayItem> {
-    val newArrangement = mutableListOf<ReflexionArrayItem>()
-    for (item in newArrayListItem.children.indices) {
-        if (item == index) {
-            val temp = newArrangement.last()
-            newArrangement.removeLast()
-            newArrangement.add(newArrayListItem.children[item])
-            newArrangement.add(temp)
-        } else {
-            newArrangement.add(newArrayListItem.children[item])
+    private fun bubbleUp(
+        newArrayListItem: ReflexionArrayItem,
+        index: Int
+    ): List<ReflexionArrayItem> {
+        val newArrangement = mutableListOf<ReflexionArrayItem>()
+        for (item in newArrayListItem.children.indices) {
+            if (item == index) {
+                val temp = newArrangement.last()
+                newArrangement.removeLast()
+                newArrangement.add(newArrayListItem.children[item])
+                newArrangement.add(temp)
+            } else {
+                newArrangement.add(newArrayListItem.children[item])
+            }
         }
+        return newArrangement
     }
-    return newArrangement
-}
 
-fun selectItem(itemPk: String?) {
-    if (itemPk.isNullOrEmpty().not() && itemPk.equals(EMPTY_PK_STRING)
-            .not() && itemPk.equals("null").not()
-    ) {
-        viewModelScope.launch() {
-            withContext(Dispatchers.IO) {
-                if (newList) {
-                    if (itemPk != null) {
-                        topic = getTopic(itemPk.toLong()) ?: itemPk.toLong()
+    fun selectItem(itemPk: String?) {
+        // Ignore the empty Topic label
+        if (itemPk.isNullOrEmpty().not() && itemPk.equals(EMPTY_PK_STRING)
+                .not() && itemPk.equals("null").not()
+        ) {
+            viewModelScope.launch() {
+                withContext(Dispatchers.IO) {
+
+                    // First item selected in new topic in new list. Set Topic, and add selection and load topic lists
+                    if (topic == -1L || newList) {
+                        if (itemPk != null) {
+                            // Set the topic
+                            topic = getTopic(itemPk.toLong()) ?: itemPk.toLong()
+                            // Add the first list item
+                            addItemToList(itemPk)
+                            newList = false
+                            val newList =
+                                async { localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic) }
+                            _listOfLists.value = newList.await()
+
+                        }
+
+                        // A new topic item has been selected, create new list with selected first item, and load related lists.
+                    } else if (itemPk?.toLong()?.let { getTopic(it) } != topic) {
+                        topic = itemPk?.toLong()?.let { getTopic(it) } ?: -1L
+                        // Reset the UI with the new list item
+                        withContext(Dispatchers.Main) { _customList.value = emptyRai }
+                        addItemToList(itemPk)
+                        // Get that topic's lists
+                        val newList =
+                            async { localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic) }
+                        _listOfLists.value = newList.await()
+
+                        /* If we are adding to an existing list, only allowing items under the same topic,
+                        we copy to list and add the newly selected child.
+                         */
+                    } else {
                         newList = false
-                        _listOfLists.value =
-                            localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic)
+                        addItemToList(itemPk)
                     }
                 }
-                if (itemPk?.toLong()?.let { localServiceImpl.selectNodeTopic(it) } != topic) {
-                    newList = true
-                    topic = itemPk?.toLong()?.let { getTopic(it) } ?: -1L
-                    _listOfLists.value =
-                        localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic)
-                }
-                val newListItem = ReflexionArrayItem(
-                    _customList.value.itemPK,
-                    _customList.value.itemName,
-                    0L,
-                    _customList.value.children
-                )
-
-                if (itemPk.isNullOrEmpty().not() && itemPk.equals("null").not()) {
-                    itemPk?.toLong()?.let { pk ->
-                        localServiceImpl.selectReflexionArrayItemsByPk(pk)
-                            ?.let { newListItem.children.add(it) }
-                    }
-                }
-                _customList.value = newListItem
             }
         }
     }
-}
+
+    private suspend fun addItemToList(itemPk: String?) {
+        val newListItem = ReflexionArrayItem(
+            customList.value.itemPK,
+            customList.value.itemName,
+            customList.value.nodePk,
+            customList.value.children
+        )
+        if (itemPk != null) {
+            if (itemPk.isEmpty().not() && (itemPk == "null").not()) {
+                itemPk.toLong().let { pk ->
+                    localServiceImpl.selectReflexionArrayItemsByPk(pk)
+                        ?.let { newListItem.children.add(it) }
+                }
+            }
+        }
+        _customList.value = newListItem
+    }
 }
