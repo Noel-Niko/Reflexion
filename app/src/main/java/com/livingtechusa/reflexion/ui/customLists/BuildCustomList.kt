@@ -1,7 +1,9 @@
 package com.livingtechusa.reflexion.ui.customLists
 
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,9 +13,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExposedDropdownMenuBox
 import androidx.compose.material.ExposedDropdownMenuDefaults
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -54,6 +58,7 @@ import com.livingtechusa.reflexion.ui.components.cascade.rememberCascadeState
 import com.livingtechusa.reflexion.ui.components.menu.CustomDropDownMenu
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
+import com.livingtechusa.reflexion.util.ReflexionArrayItem.Companion.traverseBreadthFirst
 import com.livingtechusa.reflexion.util.ReflexionArrayItem.Companion.traverseDepthFirst
 import com.livingtechusa.reflexion.util.extensions.findActivity
 
@@ -105,11 +110,9 @@ fun CustomListsContent(
     val scope = rememberCoroutineScope()
     val itemTree = viewModel.itemTree.collectAsState()
     val traversedList = mutableListOf<ReflexionArrayItem>()
-    traverseDepthFirst(itemTree.value) { RAI ->
-        traversedList.add(RAI)
-    }
+
     val state = rememberCascadeState()
-    var selectedItem by remember {
+    var searchText by remember {
         mutableStateOf("")
     }
     var expanded by remember {
@@ -151,11 +154,13 @@ fun CustomListsContent(
                             TextField(
                                 modifier = Modifier
                                     .align(Alignment.CenterHorizontally),
-                                value = selectedItem,
-                                onValueChange = { selectedItem = it },
+                                value = searchText,
+                                onValueChange = {
+                                    searchText = it
+                                },
                                 label = {
                                     Text(
-                                        text = "Topic"
+                                        text = "Search"
                                     )
                                 },
                                 trailingIcon = {
@@ -169,16 +174,43 @@ fun CustomListsContent(
                                 )
                             )
 
-//                        // filter options based on text field value
-//                        val filteringOptions =
-//                            itemTree.value.filter { abridgedParent ->
-//                                abridgedParent?.name?.contains(
-//                                    selectedItem,
-//                                    ignoreCase = true
-//                                ) ?: true
-//                            }
-//
-//                        if (filteringOptions.isNotEmpty()) {
+                            // filter options based on text field value
+                            val filteringOptions: MutableList<ReflexionArrayItem> = mutableListOf()
+                            if(searchText != "") {
+                                itemTree.value.let { abridgedParent ->
+                                    // Breadth first Search for search item
+                                    traverseBreadthFirst(itemTree.value) { RAI ->
+                                        if (RAI.itemName?.contains(
+                                                searchText,
+                                                ignoreCase = true
+                                            ) == true
+                                        ) {
+                                            filteringOptions.add(RAI)
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (filteringOptions.isNotEmpty()) {
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                ) {
+                                    items(filteringOptions.size) {
+                                        Text(
+                                            text = filteringOptions[it].itemName
+                                                ?: "No Match Found",
+                                            modifier = Modifier
+                                                .background(MaterialTheme.colors.primary)
+                                                .clickable {
+                                                viewModel.selectItem(filteringOptions[it].itemPK.toString())
+                                                searchText = ""
+                                            },
+                                            color = MaterialTheme.colors.onPrimary,
+                                        )
+                                    }
+                                }
+                            }
 
                             CustomDropDownMenu(
                                 isOpen = expanded,
@@ -192,17 +224,17 @@ fun CustomListsContent(
                     }
                 }
             }
-                Column(
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                Spacer(
                     modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    Spacer(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(16.dp)
-                    )
+                        .fillMaxWidth()
+                        .height(16.dp)
+                )
                 CustomListContent(navController = navController, viewModel = viewModel)
-                }
+            }
 
         }
 
