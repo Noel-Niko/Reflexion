@@ -199,7 +199,8 @@ class CustomListsViewModel @Inject constructor(
                 }
 
                 is CustomListEvent.MoveToEdit -> {
-                    _customList.value = listOfLists.value[event.index] ?: emptyRai
+                    val editList = listOfLists.value[event.index]
+                    _customList.value = editList ?: emptyRai
                 }
 
                 is CustomListEvent.ReSet -> {

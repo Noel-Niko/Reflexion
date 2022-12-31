@@ -109,7 +109,7 @@ fun CustomListContent(
                             .fillMaxWidth()
                             .padding(4.dp)
                             .clickable {
-                                // TODO:    navigate to list details or make the working list or delete
+                                // TODO:    navigate to list details
                             },
                         elevation = 10.dp,
                         shape = RoundedCornerShape(20.dp)
@@ -144,7 +144,7 @@ fun CustomListContent(
                             )
                             listOfLists[index]?.let {
                                 HorizontalScrollableRowComponent(
-                                    customList = it
+                                    list = it
                                 )
                             }
                         }
@@ -233,8 +233,8 @@ fun EditableHorizontalScrollableRowComponent(
                             enabled = true,
                             onClick = {
                                 customList.children
-                                    ?.indexOf(item)
-                                    ?.let { index ->
+                                    .indexOf(item)
+                                    .let { index ->
                                         viewModel.onTriggerEvent(
                                             CustomListEvent.DeleteItemInList(
                                                 index
@@ -251,7 +251,7 @@ fun EditableHorizontalScrollableRowComponent(
 
 @Composable
 fun HorizontalScrollableRowComponent(
-    customList: ReflexionArrayItem
+    list: ReflexionArrayItem
 ) {
     val scrollState = rememberScrollState()
     Row(
@@ -261,8 +261,8 @@ fun HorizontalScrollableRowComponent(
             .horizontalScroll(state = scrollState),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        if (customList.children.isNullOrEmpty().not()) {
-            customList.children?.forEach { item ->
+        if (list.children.isEmpty().not()) {
+            list.children.forEach { item ->
                 Text(
                     text = item.itemName.toString() + ", ",
                     style = MaterialTheme.typography.body1,
