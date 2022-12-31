@@ -37,4 +37,6 @@
     <string name="toggle_drawer">Toggle Drawer</string>
     <string name="no_matching_items">No matching items</string>
     <string name="lists">Lists</string>
+    <string name="search">Search</string>
+    <string name="no_match_found">No Match Found</string>
 </resources>

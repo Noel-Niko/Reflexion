@@ -10,6 +10,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.ContentAlpha
@@ -82,7 +84,8 @@ public fun <T : Any> CustomDropdown(
 ) {
     DropdownMenu(
         modifier = modifier
-            .width(MAX_WIDTH)
+            .fillMaxWidth()
+            .padding(16.dp)
             .background(colors.backgroundColor),
         expanded = isOpen,
         onDismissRequest = onDismiss,
@@ -135,7 +138,7 @@ public fun <T : Any> DropdownContent(
     colors: DropDownMenuColors,
     onTitleSelected: (T) -> Unit
 ) {
-    Column(modifier = Modifier.width(192.dp)) {
+    Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
         if (targetMenu.hasParent()) {
             CascadeHeaderItem(
                 title = targetMenu.title,

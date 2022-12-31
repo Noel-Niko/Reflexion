@@ -65,7 +65,7 @@ fun CustomListContent(
                             modifier = Modifier.height(IntrinsicSize.Min),
                             value = customList.itemName.toString(),
                             colors = TextFieldDefaults.textFieldColors(
-                                textColor = Color.Black,
+                                //textColor = MaterialTheme.colors.primary,
                                 backgroundColor = Color.Transparent
                             ),
                             onValueChange = {
@@ -77,26 +77,15 @@ fun CustomListContent(
                                 )
                             }
                         )
-                        Spacer(
-                            modifier = Modifier
-                                .height(12.dp)
-                                .fillMaxWidth()
-                        )
                         EditableHorizontalScrollableRowComponent(
                             viewModel = viewModel,
                             customList = customList
                         )
-                        Divider(modifier = Modifier.height(16.dp).background(MaterialTheme.colors.background))
                     }
                 }
             }
-            Spacer(
-                modifier = Modifier
-                    .height(16.dp)
-                    .fillMaxWidth()
-            )
         }
-        Row() {
+        Row(modifier = Modifier.padding(4.dp, 16.dp)) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize(5F)
@@ -180,7 +169,7 @@ fun EditableHorizontalScrollableRowComponent(
                 Text(
                     text = item.itemName.toString() + ", ",
                     style = textStyle,
-                    color = MaterialTheme.colors.primary,
+                    //color = MaterialTheme.colors.primary,
                     modifier = Modifier
                         .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
                         .pointerInput(Unit) {
@@ -266,7 +255,7 @@ fun HorizontalScrollableRowComponent(
                 Text(
                     text = item.itemName.toString() + ", ",
                     style = MaterialTheme.typography.body1,
-                    color = MaterialTheme.colors.primary,
+                   // color = MaterialTheme.colors.primary,
                     modifier = Modifier
                         .fillMaxSize()
                 )

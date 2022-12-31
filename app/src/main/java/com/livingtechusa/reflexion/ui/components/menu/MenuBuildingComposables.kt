@@ -1,6 +1,7 @@
 package com.livingtechusa.reflexion.ui.components.menu
 
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.twotone.Close
 import androidx.compose.material.icons.twotone.DeleteSweep
@@ -9,6 +10,8 @@ import androidx.compose.material.icons.twotone.FileCopy
 import androidx.compose.material.icons.twotone.Language
 import androidx.compose.material.icons.twotone.Share
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.androidpoet.dropdown.Easing
@@ -59,6 +62,7 @@ fun getMenu(): MenuItem<String> {
 @Composable
 fun CustomDropDownMenu(isOpen: Boolean = false, setIsOpen: (Boolean) -> Unit, itemSelected: (String) -> Unit, menu: MenuItem<String> ) {
     CustomDropdown(
+        modifier = Modifier.padding(24.dp).shadow(8.dp),
         isOpen = isOpen,
         menu = menu,
         colors = dropDownMenuColors(),

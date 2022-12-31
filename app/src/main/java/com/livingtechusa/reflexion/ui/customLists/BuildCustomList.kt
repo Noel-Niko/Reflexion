@@ -42,10 +42,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -53,10 +55,12 @@ import androidx.window.core.layout.WindowWidthSizeClass
 import com.androidpoet.dropdown.DropDownMenuBuilder
 import com.androidpoet.dropdown.MenuItem
 import com.androidpoet.dropdown.dropDownMenu
+import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.NavBarItems
 import com.livingtechusa.reflexion.ui.components.cascade.rememberCascadeState
 import com.livingtechusa.reflexion.ui.components.menu.CustomDropDownMenu
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
+import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import com.livingtechusa.reflexion.util.ReflexionArrayItem.Companion.traverseBreadthFirst
 import com.livingtechusa.reflexion.util.ReflexionArrayItem.Companion.traverseDepthFirst
@@ -122,26 +126,20 @@ fun CustomListsContent(
         modifier = Modifier.padding(paddingValues),
     ) { innerPadding ->
         Spacer(Modifier.height(16.dp))
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             Row(Modifier.fillMaxWidth()) {
                 Box(
                     modifier = Modifier
                         .align(
                             Alignment.CenterVertically,
                         )
-                        .padding(innerPadding)
 
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
-                            .border(
-                                1.dp,
-                                Color.Black,
-                                RectangleShape
-                            )
                             .fillMaxWidth()
-                            .padding(20.dp)
+                            .padding(20.dp),
                     ) {
                         ExposedDropdownMenuBox(
                             modifier = Modifier
@@ -153,14 +151,16 @@ fun CustomListsContent(
                         ) {
                             TextField(
                                 modifier = Modifier
-                                    .align(Alignment.CenterHorizontally),
+                                    .align(Alignment.CenterHorizontally)
+                                    .shadow(20.dp)
+                                    .fillMaxWidth(),
                                 value = searchText,
                                 onValueChange = {
                                     searchText = it
                                 },
                                 label = {
                                     Text(
-                                        text = "Search"
+                                        text = stringResource(R.string.search)
                                     )
                                 },
                                 trailingIcon = {
@@ -169,8 +169,8 @@ fun CustomListsContent(
                                     )
                                 },
                                 colors = ExposedDropdownMenuDefaults.textFieldColors(
-                                    textColor = Color.Black,
-                                    backgroundColor = Color.Transparent
+                                    textColor = MaterialTheme.colors.onSurface,
+                                    backgroundColor = MaterialTheme.colors.surface
                                 )
                             )
                             CustomDropDownMenu(
@@ -189,14 +189,9 @@ fun CustomListsContent(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(16.dp)
-                )
                 // filter options based on text field value
                 val filteringOptions: MutableList<ReflexionArrayItem> = mutableListOf()
-                if(searchText != "") {
+                if(searchText != EMPTY_STRING) {
                     itemTree.value.let { abridgedParent ->
                         // Breadth first Search for search item
                         traverseBreadthFirst(itemTree.value) { RAI ->
@@ -220,13 +215,15 @@ fun CustomListsContent(
                         items(filteringOptions.size) {
                             Text(
                                 text = filteringOptions[it].itemName
-                                    ?: "No Match Found",
+                                    ?: stringResource(R.string.no_match_found),
                                 modifier = Modifier
                                     .clickable {
                                         viewModel.selectItem(filteringOptions[it].itemPK.toString())
-                                        searchText = ""
+                                        searchText = EMPTY_STRING
                                     },
-                                style = MaterialTheme.typography.subtitle1
+                                style = MaterialTheme.typography.subtitle1,
+                                color = MaterialTheme.colors.onSurface,
+
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                         }
