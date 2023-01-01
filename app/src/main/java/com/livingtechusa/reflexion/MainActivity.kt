@@ -28,6 +28,8 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildItemScreen
+import com.livingtechusa.reflexion.ui.components.CONFIRM_DELETE
+import com.livingtechusa.reflexion.ui.components.ConfirmDeleteDialog
 import com.livingtechusa.reflexion.ui.list.ListDisplay
 import com.livingtechusa.reflexion.ui.components.ConfirmSaveAlertDialog
 import com.livingtechusa.reflexion.ui.components.PasteAndSaveDialog
@@ -35,11 +37,14 @@ import com.livingtechusa.reflexion.ui.components.VideoPlayer
 import com.livingtechusa.reflexion.ui.customLists.BuildCustomListsScreen
 import com.livingtechusa.reflexion.ui.home.HomeScreen
 import com.livingtechusa.reflexion.ui.theme.ReflexionTheme
+import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
+import com.livingtechusa.reflexion.util.Constants.INDEX
+import com.livingtechusa.reflexion.util.Constants.LIST_NAME
 import com.livingtechusa.reflexion.util.Constants.REFLEXION_ITEM_PK
 import com.livingtechusa.reflexion.util.Constants.SOURCE
 import com.livingtechusa.reflexion.util.MediaUtil
@@ -203,6 +208,29 @@ class MainActivity : ComponentActivity() {
                         BuildCustomListsScreen(
                             navController = navController,
                             windowSize = windowSize
+                        )
+                    }
+
+                    composable(
+                        route = Screen.ConfirmDeleteScreen.route+ "/{index}/{listName}",
+                        arguments = listOf(
+                            navArgument(INDEX) {
+                                type = NavType.IntType
+                            },
+                            navArgument(LIST_NAME) {
+                                type = androidx.navigation.NavType.StringType
+                            }
+                        )
+                    ) { navBackStackEntry ->
+                        val parentEntry = remember(navBackStackEntry) {
+                            navController.getBackStackEntry(Screen.CustomLists.route)
+                        }
+                        val parentViewModel: CustomListsViewModel = hiltViewModel(parentEntry)
+                        ConfirmDeleteDialog(
+                            viewModel = parentViewModel,
+                            navController = navController,
+                            index = navBackStackEntry.arguments?.getInt(INDEX),
+                            listName = navBackStackEntry.arguments?.getString(LIST_NAME)
                         )
                     }
                 }

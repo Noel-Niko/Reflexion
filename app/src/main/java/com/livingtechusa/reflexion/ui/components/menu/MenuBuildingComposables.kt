@@ -12,6 +12,7 @@ import androidx.compose.material.icons.twotone.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.androidpoet.dropdown.Easing
@@ -60,15 +61,16 @@ fun getMenu(): MenuItem<String> {
 
 @ExperimentalAnimationApi
 @Composable
-fun CustomDropDownMenu(isOpen: Boolean = false, setIsOpen: (Boolean) -> Unit, itemSelected: (String) -> Unit, menu: MenuItem<String> ) {
+fun CustomDropDownMenu(modifier: Modifier, isOpen: Boolean = false, setIsOpen: (Boolean) -> Unit, itemSelected: (String) -> Unit, menu: MenuItem<String> ) {
+    val width = LocalConfiguration.current.screenWidthDp
     CustomDropdown(
-        modifier = Modifier.padding(24.dp).shadow(8.dp),
+        modifier = modifier,
         isOpen = isOpen,
         menu = menu,
         colors = dropDownMenuColors(),
         onItemSelected = itemSelected,
         onDismiss = { setIsOpen(false) },
-        offset = DpOffset(8.dp, 0.dp),
+        offset = DpOffset((width * .5).dp, 4.dp),
         enter = EnterAnimation.ElevationScale,
         exit = ExitAnimation.ElevationScale,
         easing = Easing.FastOutSlowInEasing,

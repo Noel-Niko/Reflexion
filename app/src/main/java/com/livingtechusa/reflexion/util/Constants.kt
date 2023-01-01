@@ -18,6 +18,8 @@ object Constants {
     const val EMPTY_PK_STRING = "-1"
     const val DO_NOT_UPDATE = -2L
     const val NO_LISTS = "No lists found for selected topic."
+    const val INDEX = "index"
+    const val LIST_NAME = "listName"
 }
 
 object Temporary {

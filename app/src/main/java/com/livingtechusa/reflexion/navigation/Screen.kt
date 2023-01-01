@@ -2,6 +2,7 @@ package com.livingtechusa.reflexion.navigation
 
 import com.livingtechusa.reflexion.Main_Activity
 import com.livingtechusa.reflexion.ui.build.BuildRoute
+import com.livingtechusa.reflexion.ui.components.CONFIRM_DELETE
 import com.livingtechusa.reflexion.ui.list.ListRoute
 import com.livingtechusa.reflexion.ui.components.CONFIRM_SAVE
 import com.livingtechusa.reflexion.ui.components.PASTE_SAVE
@@ -17,6 +18,8 @@ sealed class Screen(val route: String) {
     object MainActivity: Screen(Main_Activity)
     object ConfirmSaveScreen: Screen(CONFIRM_SAVE)
     object PasteAndSaveScreen: Screen(PASTE_SAVE)
+
+    object ConfirmDeleteScreen: Screen(CONFIRM_DELETE)
     object ListScreen: Screen(ListRoute)
 
     object CustomLists: Screen(BuildCustomList)

@@ -2,7 +2,6 @@ package com.livingtechusa.reflexion.ui.customLists
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,7 +43,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -63,7 +61,6 @@ import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import com.livingtechusa.reflexion.util.ReflexionArrayItem.Companion.traverseBreadthFirst
-import com.livingtechusa.reflexion.util.ReflexionArrayItem.Companion.traverseDepthFirst
 import com.livingtechusa.reflexion.util.extensions.findActivity
 
 const val BuildCustomList = "build_custom_lists"
@@ -126,14 +123,15 @@ fun CustomListsContent(
         modifier = Modifier.padding(paddingValues),
     ) { innerPadding ->
         Spacer(Modifier.height(16.dp))
-        Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)) {
             Row(Modifier.fillMaxWidth()) {
                 Box(
                     modifier = Modifier
                         .align(
                             Alignment.CenterVertically,
                         )
-
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -173,14 +171,16 @@ fun CustomListsContent(
                                     backgroundColor = MaterialTheme.colors.surface
                                 )
                             )
-                            CustomDropDownMenu(
-                                isOpen = expanded,
-                                setIsOpen = {
-                                    expanded = !expanded
-                                },
-                                itemSelected = viewModel::selectItem,
-                                menu = getMenu(itemTree.value)
-                            )
+                                CustomDropDownMenu(
+                                    modifier = Modifier
+                                        .fillMaxWidth(.75f),
+                                    isOpen = expanded,
+                                    setIsOpen = {
+                                        expanded = !expanded
+                                    },
+                                    itemSelected = viewModel::selectItem,
+                                    menu = getMenu(itemTree.value)
+                                )
                         }
                     }
                 }

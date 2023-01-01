@@ -85,7 +85,6 @@ public fun <T : Any> CustomDropdown(
     DropdownMenu(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp)
             .background(colors.backgroundColor),
         expanded = isOpen,
         onDismissRequest = onDismiss,

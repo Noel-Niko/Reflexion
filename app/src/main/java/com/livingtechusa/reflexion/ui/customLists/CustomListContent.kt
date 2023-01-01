@@ -1,5 +1,6 @@
 package com.livingtechusa.reflexion.ui.customLists
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
@@ -29,6 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,7 +41,10 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.get
+import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
+import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.Constants.NO_LISTS
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import kotlin.math.roundToInt
@@ -92,14 +97,12 @@ fun CustomListContent(
                     .padding(4.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
+
                 items(listOfLists.size) { index ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(4.dp)
-                            .clickable {
-                                // TODO:    navigate to list details
-                            },
+                            .padding(4.dp),
                         elevation = 10.dp,
                         shape = RoundedCornerShape(20.dp)
                     ) {
@@ -108,11 +111,8 @@ fun CustomListContent(
                                 .pointerInput(key1 = index) {
                                     detectTapGestures(
                                         onDoubleTap = {
-                                            viewModel.onTriggerEvent(
-                                                CustomListEvent.DeleteList(
-                                                    index
-                                                )
-                                            )
+                                            // Launch dialog
+                                            navController.navigate(Screen.ConfirmDeleteScreen.route + "/" + index + "/" + listOfLists[index]?.itemName)
                                         },
                                         onLongPress = {
                                             viewModel.onTriggerEvent(
@@ -120,6 +120,11 @@ fun CustomListContent(
                                                     index
                                                 )
                                             )
+                                        },
+                                        onTap = {
+                                            navController.navigate(Screen.ListScreen.route + "/" + Constants.EMPTY_PK){
+                                               // Save State to restore??
+                                            }
                                         }
                                     )
                                 },

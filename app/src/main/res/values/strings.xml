@@ -22,6 +22,7 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="confirm_to_add_content_link">Confirm to add content link</string>
+    <string name="confirm_to_delete_list">Confirm to delete list.</string>
     <string name="changes_saved">Changes Saved</string>
     <string name="save">Save</string>
     <string name="close">Close</string>
@@ -41,4 +42,5 @@
     <string name="no_match_found">No Match Found</string>
     <string name="topics">Topics</string>
     <string name="list_title">List Title</string>
+    <string name="cancel">Cancel</string>
 </resources>
