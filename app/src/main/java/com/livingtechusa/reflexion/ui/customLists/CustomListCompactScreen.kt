@@ -77,16 +77,6 @@ fun CustomListCompactScreen(
                 actions = {
                     Row() {
                         IconButton(
-                            onClick = {},//viewModel.onTriggerEvent(BuildEvent.SendText),
-                            content = {
-                                androidx.compose.material.Icon(
-                                    imageVector = Icons.Default.SendToMobile,
-                                    contentDescription = "send",
-                                    tint = MaterialTheme.colors.onBackground,
-                                )
-                            },
-                        )
-                        IconButton(
                             onClick = {
                                       viewModel.onTriggerEvent(CustomListEvent.Save)
                             },
@@ -114,18 +104,7 @@ fun CustomListCompactScreen(
                 },
                 backgroundColor = MaterialTheme.colors.background,
                 elevation = 4.dp,
-                navigationIcon = {
-                    androidx.compose.material.Icon(
-                        painter = painterResource(R.drawable.baseline_menu_24),
-                        contentDescription = "Toggle Drawer",
-                        modifier = Modifier.clickable(onClick = {
-                            scope.launch {
-                                if (state.drawerState.isClosed) state.drawerState.open() else state.drawerState.close()
-                            }
-                        }),
-                        tint = MaterialTheme.colors.onBackground
-                    )
-                })
+            )
         },
         containerColor = MaterialTheme.colors.background,
         bottomBar = {

@@ -39,4 +39,6 @@
     <string name="lists">Lists</string>
     <string name="search">Search</string>
     <string name="no_match_found">No Match Found</string>
+    <string name="topics">Topics</string>
+    <string name="list_title">List Title</string>
 </resources>

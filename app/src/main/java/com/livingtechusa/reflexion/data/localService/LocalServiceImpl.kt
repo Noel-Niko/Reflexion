@@ -147,6 +147,8 @@ class LocalServiceImpl @Inject constructor(
 
     override suspend fun insertNewOrUpdateNodeList(arrayItem: ReflexionArrayItem, topic: Long): Long? {
         val nodeList: List<ListNode?> = arrayItem.toListNode(topic, arrayItem.nodePk)
+        // Delete prior children
+        arrayItem.nodePk?.let { deleteAllChildNodes(it) }
         var parent: Long? = null
         var headNodePk: Long? = null
         var tailNode: Long? = null
@@ -162,7 +164,6 @@ class LocalServiceImpl @Inject constructor(
                 count++
             }
         }
-        tailNode?.let { deleteAllChildNodes(it) }
         return headNodePk
     }
 
@@ -212,11 +213,12 @@ class LocalServiceImpl @Inject constructor(
     override suspend fun deleteAllChildNodes(nodePk: Long) {
         var child = linkedListDao.selectChildNode(nodePk = nodePk)
         do {
-            val parent: Long? = child?.nodePk
-            if (parent != null) {
-                linkedListDao.deleteSelectedNode(parent)
+            val grandChild: ListNode? = child?.nodePk?.let { linkedListDao.selectChildNode(nodePk = it) }
+           // val parent: Long? = child?.nodePk
+            if (child?.nodePk != null) {
+                linkedListDao.deleteSelectedNode(child.nodePk)
             }
-            child = parent?.let { linkedListDao.selectChildNode(nodePk = it) }
+            child = grandChild
         } while (child != null)
     }
 

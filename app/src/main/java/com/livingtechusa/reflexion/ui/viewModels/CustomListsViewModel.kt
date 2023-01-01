@@ -2,8 +2,10 @@ package com.livingtechusa.reflexion.ui.viewModels
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.di.DefaultDispatcher
 import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
@@ -47,7 +49,7 @@ class CustomListsViewModel @Inject constructor(
     private val _customList = MutableStateFlow(
         ReflexionArrayItem(
             null,
-            " List Title",
+            context.getString(R.string.list_title),
             null,
             mutableListOf<ReflexionArrayItem>()
         )
@@ -79,7 +81,7 @@ class CustomListsViewModel @Inject constructor(
 
     val item1 = ReflexionArrayItem(
         itemPK = null,
-        itemName = "Topics",
+        itemName = context.getString(R.string.topics),
         0L,
         children = mutableListOf()
     )
@@ -178,7 +180,8 @@ class CustomListsViewModel @Inject constructor(
                             val nodePk: Long? =
                                 localServiceImpl.insertNewOrUpdateNodeList(customList.value, topic)
                             if (nodePk != null) {
-                                updateCustomList(nodePk)
+                                val job = launch {  updateCustomList(nodePk) }
+                                job.join()
                             }
                             _listOfLists.value =
                                 localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic)
@@ -205,8 +208,8 @@ class CustomListsViewModel @Inject constructor(
 
                 is CustomListEvent.ReSet -> {
                     newList = true
-                    _customList.value.children = mutableListOf()
-                    _customList.value = emptyRai
+                    val newListItem = ReflexionArrayItem(null, context.getString(R.string.list_title), null, mutableListOf<ReflexionArrayItem>())
+                    _customList.value = newListItem
                 }
 
                 else -> {}
@@ -216,12 +219,10 @@ class CustomListsViewModel @Inject constructor(
         }
     }
 
-    private fun updateCustomList(nodePk: Long) {
-        viewModelScope.launch {
+    private suspend fun updateCustomList(nodePk: Long) {
             val list = localServiceImpl.selectNodeListsAsArrayItemsByHeadNode(nodePk) ?: emptyRai
             _customList.value = list
         }
-    }
 
     private fun bubbleDown(
         newArrayListItem: ReflexionArrayItem,
