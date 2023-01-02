@@ -8,10 +8,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
@@ -65,9 +68,9 @@ fun homeContent() {
     Row(Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
-                .align(
-                Alignment.CenterVertically,
-                )
+                .align(Alignment.CenterVertically,)
+                .padding(16.dp)
+                .shadow(elevation = 12.dp,  shape = RoundedCornerShape(8.dp))
                 .background(color = MaterialTheme.colors.background)
         ) {
             Column(
@@ -76,14 +79,14 @@ fun homeContent() {
                     .border(
                         1.dp,
                         Color.Black,
-                        RectangleShape
+                        RoundedCornerShape(8.dp)
                     )
                     .fillMaxWidth()
                     .padding(20.dp)
             ) {
-                androidx.compose.material3.Text(
+                Text(
                     fontSize = 30.sp,
-                    fontStyle = FontStyle.Italic,
+                    fontStyle = MaterialTheme.typography.h6.fontStyle,
                     fontWeight = FontWeight.Bold,
                     text = stringResource(R.string.welcome_to_reflexion),
                     color = MaterialTheme.colors.onBackground
