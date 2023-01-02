@@ -33,6 +33,7 @@ import com.livingtechusa.reflexion.ui.topics.ListDisplay
 import com.livingtechusa.reflexion.ui.components.ConfirmSaveAlertDialog
 import com.livingtechusa.reflexion.ui.components.PasteAndSaveDialog
 import com.livingtechusa.reflexion.ui.components.VideoPlayer
+import com.livingtechusa.reflexion.ui.customListDisplay.CustomListDisplayScreen
 import com.livingtechusa.reflexion.ui.customLists.BuildCustomListsScreen
 import com.livingtechusa.reflexion.ui.home.HomeScreen
 import com.livingtechusa.reflexion.ui.theme.ReflexionTheme
@@ -44,6 +45,7 @@ import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.INDEX
 import com.livingtechusa.reflexion.util.Constants.LIST_NAME
+import com.livingtechusa.reflexion.util.Constants.HEAD_NODE_PK
 import com.livingtechusa.reflexion.util.Constants.REFLEXION_ITEM_PK
 import com.livingtechusa.reflexion.util.Constants.SOURCE
 import com.livingtechusa.reflexion.util.MediaUtil
@@ -188,7 +190,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable(
-                        route = Screen.ListScreen.route + "/{reflexion_item_pk}",
+                        route = Screen.TopicScreen.route + "/{reflexion_item_pk}",
                         arguments = listOf(
                             navArgument(REFLEXION_ITEM_PK) {
                                 type = NavType.LongType
@@ -230,6 +232,25 @@ class MainActivity : ComponentActivity() {
                             navController = navController,
                             index = navBackStackEntry.arguments?.getInt(INDEX),
                             listName = navBackStackEntry.arguments?.getString(LIST_NAME)
+                        )
+                    }
+                    composable(
+                        route = Screen.CustomListDisplay.route + "/{headNodePk}",
+                        arguments = listOf(
+                            navArgument(HEAD_NODE_PK) {
+                                type = NavType.LongType
+                            }
+                        )
+                    ) { navBackStackEntry ->
+                        val parentEntry = remember(navBackStackEntry) {
+                            navController.getBackStackEntry(Screen.CustomLists.route)
+                        }
+                        val parentViewModel: CustomListsViewModel = hiltViewModel(parentEntry)
+                        CustomListDisplayScreen(
+                            viewModel = parentViewModel,
+                            navController = navController,
+                            headNodePk = navBackStackEntry.arguments?.getLong(HEAD_NODE_PK) ?: -1L,
+                            windowSize = windowSize
                         )
                     }
                 }

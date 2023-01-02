@@ -77,7 +77,7 @@ fun drawerNavContent(
                                     reflexionItem.parent ?: 0L
                                 )
                             if (reflexionItem.parent != null || hasNoSiblings.not()) {
-                                navHostController.navigate(Screen.ListScreen.route + "/" + reflexionItem.parent) {
+                                navHostController.navigate(Screen.TopicScreen.route + "/" + reflexionItem.parent) {
                                     popUpTo(navHostController.graph.findStartDestination().id) {
                                     }
                                     launchSingleTop = true
@@ -110,7 +110,7 @@ fun drawerNavContent(
                                 ).show()
 
                             } else {
-                                navHostController.navigate(Screen.ListScreen.route + "/" + reflexionItem.autogenPK) {
+                                navHostController.navigate(Screen.TopicScreen.route + "/" + reflexionItem.autogenPK) {
                                     popUpTo(navHostController.graph.findStartDestination().id) { }
                                     launchSingleTop = true
                                 }

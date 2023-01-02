@@ -7,11 +7,14 @@ import com.livingtechusa.reflexion.ui.topics.ListRoute
 import com.livingtechusa.reflexion.ui.components.CONFIRM_SAVE
 import com.livingtechusa.reflexion.ui.components.PASTE_SAVE
 import com.livingtechusa.reflexion.ui.components.VideoScreenRoute
+import com.livingtechusa.reflexion.ui.customListDisplay.CUSTOM_LIST_DISPLAY
 import com.livingtechusa.reflexion.ui.customLists.BuildCustomList
 import com.livingtechusa.reflexion.ui.home.HOME
 
 
 sealed class Screen(val route: String) {
+    object CustomListDisplay : Screen(CUSTOM_LIST_DISPLAY)
+
     object HomeScreen : Screen(HOME)
     object BuildItemScreen : Screen(BuildRoute)
     object VideoView : Screen(VideoScreenRoute)
@@ -20,7 +23,7 @@ sealed class Screen(val route: String) {
     object PasteAndSaveScreen: Screen(PASTE_SAVE)
 
     object ConfirmDeleteScreen: Screen(CONFIRM_DELETE)
-    object ListScreen: Screen(ListRoute)
+    object TopicScreen: Screen(ListRoute)
 
     object CustomLists: Screen(BuildCustomList)
 

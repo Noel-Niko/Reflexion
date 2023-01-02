@@ -4,13 +4,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddHome
 import androidx.compose.material.icons.filled.AddLink
 import androidx.compose.material.icons.filled.DataArray
-import androidx.compose.material.icons.filled.Desk
-import androidx.compose.material.icons.filled.DesktopWindows
 import androidx.compose.material.icons.filled.DeveloperMode
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.ViewList
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
-import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 
 object NavBarItems {
     val HomeBarItems = listOf(
@@ -22,7 +18,7 @@ object NavBarItems {
         BarItem(
             title = "Topics",
             image = Icons.Filled.DataArray,
-            route = Screen.ListScreen.route + "/" + EMPTY_PK
+            route = Screen.TopicScreen.route + "/" + EMPTY_PK
         ),
         BarItem(
             title = "CustomLists",
@@ -40,7 +36,7 @@ object NavBarItems {
         BarItem(
             title = "Topics",
             image = Icons.Filled.DataArray,
-            route = Screen.ListScreen.route + "/" + EMPTY_PK
+            route = Screen.TopicScreen.route + "/" + EMPTY_PK
         ),
         BarItem(
             title = "CustomLists",
@@ -76,12 +72,35 @@ object NavBarItems {
         BarItem(
             title = "Topics",
             image = Icons.Filled.DataArray,
-            route = Screen.ListScreen.route + "/" + EMPTY_PK
+            route = Screen.TopicScreen.route + "/" + EMPTY_PK
+        ),
+        BarItem(
+            title = "New",
+            image = Icons.Filled.DeveloperMode,
+            route = Screen.BuildItemScreen.route + "/" + EMPTY_PK
+        )
+    )
+
+    val CustomListsDisplayBarItems = listOf(
+        BarItem(
+            title = "CustomLists",
+            image = Icons.Filled.AddLink,
+            route = Screen.CustomLists.route
+        ),
+        BarItem(
+            title = "Topics",
+            image = Icons.Filled.DataArray,
+            route = Screen.TopicScreen.route + "/" + EMPTY_PK
         ),
         BarItem(
             title = "New",
             image = Icons.Filled.DeveloperMode,
             route = Screen.BuildItemScreen.route + "/" + EMPTY_PK
         ),
+        BarItem(
+            title = "Home",
+            image = Icons.Filled.AddHome,
+            route = Screen.HomeScreen.route
+        )
     )
 }

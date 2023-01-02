@@ -20,6 +20,7 @@ object Constants {
     const val NO_LISTS = "No lists found for selected topic."
     const val INDEX = "index"
     const val LIST_NAME = "listName"
+    const val HEAD_NODE_PK = "headNodePk"
 }
 
 object Temporary {
