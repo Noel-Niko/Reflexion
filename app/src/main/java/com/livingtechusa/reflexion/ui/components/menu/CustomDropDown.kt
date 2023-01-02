@@ -38,10 +38,8 @@ import com.androidpoet.dropdown.Easing
 import com.androidpoet.dropdown.EnterAnimation
 import com.androidpoet.dropdown.ExitAnimation
 import com.androidpoet.dropdown.MenuItem
-import com.androidpoet.dropdown.MenuItemIcon
 import com.androidpoet.dropdown.MenuState
 import com.androidpoet.dropdown.dropDownMenuColors
-import com.livingtechusa.reflexion.util.Constants.EMPTY_PK_STRING
 
 public val MAX_WIDTH: Dp = 192.dp
 
@@ -120,9 +118,8 @@ public fun <T : Any> CustomDropdown(
             DropdownContent(
                 state = state,
                 targetMenu = targetMenu,
-                onItemSelected = onItemSelected,
                 colors = colors,
-                onTitleSelected = onItemSelected
+                onClickText = onItemSelected
             )
         }
     }
@@ -133,9 +130,8 @@ public fun <T : Any> CustomDropdown(
 public fun <T : Any> DropdownContent(
     state: MenuState<T>,
     targetMenu: MenuItem<T>,
-    onItemSelected: (T) -> Unit,
     colors: DropDownMenuColors,
-    onTitleSelected: (T) -> Unit
+    onClickText: (T) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
         if (targetMenu.hasParent()) {
@@ -154,7 +150,7 @@ public fun <T : Any> DropdownContent(
                         title = item.title,
                         icon = item.icon,
                         contentColor = colors.contentColor,
-                        onClick = onTitleSelected
+                        onClickText = onClickText
                     ) {  id ->
                         val child = targetMenu.getChild(id)
                         if (child != null) {
@@ -169,7 +165,7 @@ public fun <T : Any> DropdownContent(
                         title = item.title,
                         icon =  item.icon,
                         contentColor =  colors.contentColor,
-                        onClick = onItemSelected
+                        onClick = onClickText
                     )
                 }
             }
@@ -256,17 +252,22 @@ public fun <T> ParentItem(
     title: String,
     icon: ImageVector?,
     contentColor: Color,
-    onClick: (T) -> Unit,
-    onTitleSelected: (T) -> Unit
+    onClickText: (T) -> Unit,
+    onClickIcon: (T) -> Unit
 ) {
     CustomMenuItem(
-        onClick = { onClick(id) }) {
+        onClick = {
+            onClickIcon(id)
+        }) {
         if (icon != null) {
             CustomMenuItemIcon(icon = icon, tint = contentColor)
             Space()
         }
         MenuItemText(
-            modifier = Modifier.weight(1f).clickable(onClick = { onTitleSelected(id) }),
+            modifier = Modifier.weight(1f).clickable(
+                onClick = {
+                    onClickText(id)
+                }),
             text = title,
             color = contentColor,
         )

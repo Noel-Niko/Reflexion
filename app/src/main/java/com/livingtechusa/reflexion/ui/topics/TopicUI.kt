@@ -17,14 +17,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
-import com.livingtechusa.reflexion.di.DefaultDispatcher
 import com.livingtechusa.reflexion.navigation.Screen
-import com.livingtechusa.reflexion.ui.list.ListEvent
+import com.livingtechusa.reflexion.ui.topics.ListEvent
 import com.livingtechusa.reflexion.ui.viewModels.ListViewModel
-import kotlinx.coroutines.CoroutineDispatcher
+import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,7 +38,7 @@ fun ReflexionItemListUI(
     viewModel: ListViewModel
 ) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
+    val resource = ResourceProviderSingleton
     val reflexionItemList by viewModel.list.collectAsState()
     Scaffold(
         content = {
@@ -51,7 +52,7 @@ fun ReflexionItemListUI(
                 onLongPress = { reflexionItem ->
                     CoroutineScope(Dispatchers.Main).launch {
                         if (viewModel.hasNoChildren(reflexionItem.autogenPK)) {
-                            Toast.makeText(context, "No child items found.", Toast.LENGTH_SHORT)
+                            Toast.makeText(context, resource.getString(R.string.no_child_items_found), Toast.LENGTH_SHORT)
                                 .show()
                         } else {
                                 viewModel.onTriggerEvent(ListEvent.GetList(reflexionItem.autogenPK))

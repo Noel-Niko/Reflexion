@@ -114,7 +114,7 @@ fun CustomListsContent(
 
     val state = rememberCascadeState()
     var searchText by remember {
-        mutableStateOf("")
+        mutableStateOf(EMPTY_STRING)
     }
     var expanded by remember {
         mutableStateOf(false)

@@ -1,4 +1,4 @@
-package com.livingtechusa.reflexion.ui.list
+package com.livingtechusa.reflexion.ui.topics
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect

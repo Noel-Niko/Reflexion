@@ -1,4 +1,4 @@
-package com.livingtechusa.reflexion.ui.list
+package com.livingtechusa.reflexion.ui.topics
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer

@@ -43,4 +43,5 @@
     <string name="topics">Topics</string>
     <string name="list_title">List Title</string>
     <string name="cancel">Cancel</string>
+    <string name="no_child_items_found">No child items found.</string>
 </resources>
