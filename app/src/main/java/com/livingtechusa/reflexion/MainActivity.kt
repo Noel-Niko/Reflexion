@@ -43,9 +43,9 @@ import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
+import com.livingtechusa.reflexion.util.Constants.HEAD_NODE_PK
 import com.livingtechusa.reflexion.util.Constants.INDEX
 import com.livingtechusa.reflexion.util.Constants.LIST_NAME
-import com.livingtechusa.reflexion.util.Constants.HEAD_NODE_PK
 import com.livingtechusa.reflexion.util.Constants.REFLEXION_ITEM_PK
 import com.livingtechusa.reflexion.util.Constants.SOURCE
 import com.livingtechusa.reflexion.util.MediaUtil
@@ -247,9 +247,9 @@ class MainActivity : ComponentActivity() {
                         }
                         val parentViewModel: CustomListsViewModel = hiltViewModel(parentEntry)
                         CustomListDisplayScreen(
-                            viewModel = parentViewModel,
+//                            viewModel = parentViewModel,
                             navController = navController,
-                            headNodePk = navBackStackEntry.arguments?.getLong(HEAD_NODE_PK) ?: -1L,
+                            headNodePk = navBackStackEntry.arguments?.getLong(HEAD_NODE_PK) ?: -1,
                             windowSize = windowSize
                         )
                     }

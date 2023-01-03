@@ -29,6 +29,10 @@ sealed class CustomListEvent {
         val index: Int
     ) : CustomListEvent()
 
+    data class GetDisplayList(
+        val headNodePk: Long
+    ) : CustomListEvent()
+
     object ReSet : CustomListEvent()
 
 }

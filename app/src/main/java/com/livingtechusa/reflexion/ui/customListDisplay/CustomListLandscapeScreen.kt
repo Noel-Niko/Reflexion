@@ -9,21 +9,27 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.livingtechusa.reflexion.navigation.BarItem
 import com.livingtechusa.reflexion.navigation.NavBarItems
+import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
+import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 
 
 @Composable
-fun Landscape(navController: NavHostController, icons: List<BarItem>) {
+fun Landscape(navController: NavHostController, headNodePk: Long, viewModel: CustomListsViewModel = hiltViewModel()  ) {
     val icons = NavBarItems.CustomListsDisplayBarItems
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
+    viewModel.onTriggerEvent(CustomListEvent.GetDisplayList(headNodePk))
+
+    val selectedList by viewModel.customList.collectAsState()
     Row(modifier = Modifier.fillMaxSize()) {
         NavigationRail(
             containerColor = MaterialTheme.colors.background,
@@ -44,9 +50,10 @@ fun Landscape(navController: NavHostController, icons: List<BarItem>) {
                             contentDescription = navItem.title,
                             tint = MaterialTheme.colors.onBackground
                         )
-                    })
+                    }
+                )
             }
         }
-        CustomListDisplayContent()
+        CustomListDisplayContent(paddingValues = null)
     }
 }

@@ -35,7 +35,7 @@ import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 fun CustomListCompactScreen(
     navController: NavHostController,
     icons: List<BarItem>,
-    viewModel: CustomListsViewModel,
+    viewModel: CustomListsViewModel ,
 ) {
     val scope = rememberCoroutineScope()
     val state = rememberScaffoldState()

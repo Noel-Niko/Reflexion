@@ -83,7 +83,7 @@ object NavBarItems {
 
     val CustomListsDisplayBarItems = listOf(
         BarItem(
-            title = "CustomLists",
+            title = "Lists",
             image = Icons.Filled.AddLink,
             route = Screen.CustomLists.route
         ),
