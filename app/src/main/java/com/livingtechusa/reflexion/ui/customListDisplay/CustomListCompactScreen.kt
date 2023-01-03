@@ -124,7 +124,7 @@ fun CompactScreen(
             }
         }
     ) { paddingValues ->
-        CustomListDisplayContent(paddingValues = paddingValues)
+        CustomListDisplayContent(paddingValues = paddingValues, navController = navController)
     }
 }
 

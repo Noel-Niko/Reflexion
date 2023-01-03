@@ -54,6 +54,6 @@ fun Landscape(navController: NavHostController, headNodePk: Long, viewModel: Cus
                 )
             }
         }
-        CustomListDisplayContent(paddingValues = null)
+        CustomListDisplayContent(paddingValues = null, navController = navController)
     }
 }

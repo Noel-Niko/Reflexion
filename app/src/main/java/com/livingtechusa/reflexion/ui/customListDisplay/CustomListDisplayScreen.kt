@@ -1,5 +1,6 @@
 package com.livingtechusa.reflexion.ui.customListDisplay
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,10 +40,13 @@ import androidx.window.core.layout.WindowWidthSizeClass
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.NavBarItems
+import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
+import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
+import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import com.livingtechusa.reflexion.util.extensions.findActivity
 import kotlinx.coroutines.launch
 
@@ -79,11 +83,14 @@ fun CustomListDisplayScreen(
 @Composable
 fun CustomListDisplayContent(
     paddingValues: PaddingValues?,
-    viewModel: CustomListsViewModel = hiltViewModel()
+    viewModel: CustomListsViewModel = hiltViewModel(),
+    navController: NavHostController
 ) {
 
     val selectedList by viewModel.customList.collectAsState()
     val children by viewModel.children.collectAsState()
+    val context = LocalContext.current
+    val resource = ResourceProviderSingleton
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -92,7 +99,9 @@ fun CustomListDisplayContent(
         Row(modifier = Modifier.fillMaxWidth()) {
             /* TITLE */
             Row(
-                modifier = Modifier.padding(12.dp).fillMaxWidth()
+                modifier = Modifier
+                    .padding(12.dp)
+                    .fillMaxWidth()
             ) {
                 Column(
                     Modifier
@@ -119,7 +128,8 @@ fun CustomListDisplayContent(
         // Row of Cards
         LazyRow(
             modifier = Modifier
-                .padding(4.dp).fillMaxSize(),
+                .padding(4.dp)
+                .fillMaxSize(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(children.size) { childItemIndex ->
@@ -146,7 +156,9 @@ fun CustomListDisplayContent(
                         Spacer(Modifier.height(16.dp))
                         /* DESCRIPTION */
                         Row(
-                            modifier = Modifier.padding(12.dp).fillMaxWidth()
+                            modifier = Modifier
+                                .padding(12.dp)
+                                .fillMaxWidth()
                         ) {
                             Column(
                                 Modifier
@@ -169,7 +181,9 @@ fun CustomListDisplayContent(
                         Spacer(Modifier.height(16.dp))
                         /* DETAILS */
                         Row(
-                            modifier = Modifier.padding(12.dp).fillMaxWidth()
+                            modifier = Modifier
+                                .padding(12.dp)
+                                .fillMaxWidth()
                         ) {
                             Column(
                                 Modifier
@@ -203,18 +217,19 @@ fun CustomListDisplayContent(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable {
-//                                    if (reflexionItem.videoUri.isNullOrEmpty()) {
-//                                        Toast
-//                                            .makeText(
-//                                                context,
-//                                                resource.getString(R.string.is_saved),
-//                                                Toast.LENGTH_SHORT
-//                                            )
-//                                            .show()
-//                                    } else {
-//                                        val route: String = Screen.VideoView.route + URI
-//                                        navHostController.navigate(route)
-//                                    }
+                                            if (children[childItemIndex].videoUri.isNullOrEmpty()) {
+                                                Toast
+                                                    .makeText(
+                                                        context,
+                                                        resource.getString(R.string.is_saved),
+                                                        Toast.LENGTH_SHORT
+                                                    )
+                                                    .show()
+                                            } else {
+                                                val route: String =
+                                                    Screen.VideoView.route + children[childItemIndex].videoUri
+                                                navController.navigate(route)
+                                            }
                                         },
                                     text = AnnotatedString(stringResource(R.string.saved_video)),
                                     color = Color.Blue
@@ -234,13 +249,19 @@ fun CustomListDisplayContent(
                                         .fillMaxWidth()
                                         .clickable(
                                             onClick = {
-//                                        if (reflexionItem.videoUrl == Constants.EMPTY_STRING) {
-//                                            navHostController.navigate(Screen.PasteAndSaveScreen.route)
-//                                        } else {
-//                                            val route: String =
-//                                                Screen.VideoView.route + URL
-//                                            navHostController.navigate(route)
-//                                        }
+                                                if (children[childItemIndex].videoUrl == Constants.EMPTY_STRING) {
+                                                    Toast
+                                                        .makeText(
+                                                            context,
+                                                            resource.getString(R.string.did_you_add_a_video_link),
+                                                            Toast.LENGTH_SHORT
+                                                        )
+                                                        .show()
+                                                } else {
+                                                    val route: String =
+                                                        Screen.VideoView.route + children[childItemIndex].videoUrl
+                                                    navController.navigate(route)
+                                                }
                                             },
                                         ),
                                     text = AnnotatedString(stringResource(R.string.video_link)),

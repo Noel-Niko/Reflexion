@@ -45,4 +45,5 @@
     <string name="cancel">Cancel</string>
     <string name="no_child_items_found">No child items found.</string>
     <string name="custom_list_display">Custom List Display</string>
+    <string name="did_you_add_a_video_link">Did you add a video link?</string>
 </resources>
