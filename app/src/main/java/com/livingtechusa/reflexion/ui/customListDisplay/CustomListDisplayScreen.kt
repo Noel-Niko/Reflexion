@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -81,8 +82,6 @@ fun CustomListDisplayContent(
     viewModel: CustomListsViewModel = hiltViewModel()
 ) {
 
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
     val selectedList by viewModel.customList.collectAsState()
     val children by viewModel.children.collectAsState()
     Column(
@@ -90,10 +89,10 @@ fun CustomListDisplayContent(
             .fillMaxSize()
             .padding(paddingValues = paddingValues ?: PaddingValues(8.dp))
     ) {
-        Row() {
+        Row(modifier = Modifier.fillMaxWidth()) {
             /* TITLE */
             Row(
-                modifier = Modifier.padding(12.dp)
+                modifier = Modifier.padding(12.dp).fillMaxWidth()
             ) {
                 Column(
                     Modifier
@@ -120,100 +119,90 @@ fun CustomListDisplayContent(
         // Row of Cards
         LazyRow(
             modifier = Modifier
-                .padding(4.dp),
+                .padding(4.dp).fillMaxSize(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(children.size) { childItemIndex ->
                 Card(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillParentMaxSize()
                         .padding(4.dp),
                     elevation = 10.dp,
                     shape = RoundedCornerShape(20.dp)
                 ) {
                     /* TITLE */
-                    Row(
-                        modifier = Modifier.padding(12.dp)
+                    Column(
+                        modifier = Modifier
+                            .padding(12.dp)
+                            .fillMaxWidth()
                     ) {
-                        Column(
-                            Modifier
-                                .align(Alignment.CenterVertically)
-                        ) {
-                            androidx.compose.material3.Text(text = stringResource(R.string.title))
-                        }
-                        Column(
-                            Modifier
-                                .weight(1f)
-                                .align(Alignment.CenterVertically)
-                        ) {
+                        Row(modifier = Modifier.fillMaxWidth()) {
                             Text(
                                 color = Color.Black,
                                 style = MaterialTheme.typography.h6,
                                 text = children[childItemIndex].name,
                             )
                         }
-                    }
-                }
-                Spacer(Modifier.height(16.dp))
-                /* DESCRIPTION */
-                Row(
-                    modifier = Modifier.padding(12.dp)
-                ) {
-                    Column(
-                        Modifier
-                            .align(Alignment.CenterVertically)
-                    ) {
-                        androidx.compose.material3.Text(text = stringResource(R.string.description))
-                    }
-                    Column(
-                        Modifier
-                            .weight(1f)
-                            .align(Alignment.CenterVertically)
-                    ) {
-                        Text(
-                            color = Color.Black,
-                            style = MaterialTheme.typography.h6,
-                            text = children[childItemIndex].description.toString(),
-                        )
-                    }
-                }
-                Spacer(Modifier.height(16.dp))
-                /* DETAILS */
-                Row(
-                    modifier = Modifier.padding(12.dp)
-                ) {
-                    Column(
-                        Modifier
-                            .align(Alignment.CenterVertically)
-                    ) {
-                        androidx.compose.material3.Text(text = stringResource(R.string.detailedDescription))
-                    }
-                    Column(
-                        Modifier
-                            .weight(1f)
-                            .align(Alignment.CenterVertically)
-                    ) {
-                        Text(
-                            color = Color.Black,
-                            style = MaterialTheme.typography.h6,
-                            text = children[childItemIndex]?.detailedDescription.toString(),
-                        )
-                    }
-                }
-                Spacer(Modifier.height(16.dp))
-                /* SAVED VIDEO */
-                Row(
-                    modifier = Modifier.padding(8.dp)
-                ) {
-                    Column(
-                        Modifier
-                            .weight(1f)
-                            .align(Alignment.CenterVertically)
-                    ) {
-                        androidx.compose.material3.Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
+                        Spacer(Modifier.height(16.dp))
+                        /* DESCRIPTION */
+                        Row(
+                            modifier = Modifier.padding(12.dp).fillMaxWidth()
+                        ) {
+                            Column(
+                                Modifier
+
+                            ) {
+                                androidx.compose.material3.Text(text = stringResource(R.string.description))
+                            }
+                            Column(
+                                Modifier
+                                    .weight(1f)
+
+                            ) {
+                                Text(
+                                    color = Color.Black,
+                                    style = MaterialTheme.typography.h6,
+                                    text = children[childItemIndex].description.toString(),
+                                )
+                            }
+                        }
+                        Spacer(Modifier.height(16.dp))
+                        /* DETAILS */
+                        Row(
+                            modifier = Modifier.padding(12.dp).fillMaxWidth()
+                        ) {
+                            Column(
+                                Modifier
+
+                            ) {
+                                androidx.compose.material3.Text(text = stringResource(R.string.detailedDescription))
+                            }
+                            Column(
+                                Modifier
+                                    .weight(1f)
+
+                            ) {
+                                Text(
+                                    color = Color.Black,
+                                    style = MaterialTheme.typography.h6,
+                                    text = children[childItemIndex].detailedDescription.toString(),
+                                )
+                            }
+                        }
+                        Spacer(Modifier.height(16.dp))
+                        /* SAVED VIDEO */
+                        Row(
+                            modifier = Modifier.padding(8.dp)
+                        ) {
+                            Column(
+                                Modifier
+                                    .weight(1f)
+
+                            ) {
+                                androidx.compose.material3.Text(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
 //                                    if (reflexionItem.videoUri.isNullOrEmpty()) {
 //                                        Toast
 //                                            .makeText(
@@ -226,25 +215,25 @@ fun CustomListDisplayContent(
 //                                        val route: String = Screen.VideoView.route + URI
 //                                        navHostController.navigate(route)
 //                                    }
-                                },
-                            text = AnnotatedString(stringResource(R.string.saved_video)),
-                            color = Color.Blue
+                                        },
+                                    text = AnnotatedString(stringResource(R.string.saved_video)),
+                                    color = Color.Blue
 
-                        )
-                    }
+                                )
+                            }
 
 
-                    /* VIDEO URL */
-                    Column(
-                        Modifier
-                            .weight(1f)
-                            .align(Alignment.CenterVertically)
-                    ) {
-                        androidx.compose.material3.Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable(
-                                    onClick = {
+                            /* VIDEO URL */
+                            Column(
+                                Modifier
+                                    .weight(1f)
+
+                            ) {
+                                androidx.compose.material3.Text(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable(
+                                            onClick = {
 //                                        if (reflexionItem.videoUrl == Constants.EMPTY_STRING) {
 //                                            navHostController.navigate(Screen.PasteAndSaveScreen.route)
 //                                        } else {
@@ -252,52 +241,16 @@ fun CustomListDisplayContent(
 //                                                Screen.VideoView.route + URL
 //                                            navHostController.navigate(route)
 //                                        }
-                                    },
-                                ),
-                            text = AnnotatedString(stringResource(R.string.video_link)),
-                            color = Color.Blue
-                        )
+                                            },
+                                        ),
+                                    text = AnnotatedString(stringResource(R.string.video_link)),
+                                    color = Color.Blue
+                                )
+                            }
+                        }
                     }
                 }
             }
         }
     }
 }
-
-
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    Row(Modifier.fillMaxSize()) {
-//        Box(
-//            modifier = Modifier
-//                .align(Alignment.CenterVertically,)
-//                .padding(16.dp)
-//                .shadow(elevation = 12.dp, shape = RoundedCornerShape(8.dp))
-//                .background(color = MaterialTheme.colors.background)
-//        ) {
-//            Column(
-//                horizontalAlignment = Alignment.CenterHorizontally,
-//                modifier = Modifier
-//                    .border(
-//                        1.dp,
-//                        Color.Black,
-//                        RoundedCornerShape(8.dp)
-//                    )
-//                    .fillMaxWidth()
-//                    .padding(20.dp)
-//            ) {
-//                Text(
-//                    fontSize = 30.sp,
-//                    fontStyle = MaterialTheme.typography.h6.fontStyle,
-//                    fontWeight = FontWeight.Bold,
-//                    text = stringResource(R.string.welcome_to_reflexion),
-//                    color = MaterialTheme.colors.onBackground
-//                )
-//            }
-//        }
-//    }
-//}
