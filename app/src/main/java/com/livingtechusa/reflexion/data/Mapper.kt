@@ -3,6 +3,7 @@ package com.livingtechusa.reflexion.data
 import com.livingtechusa.reflexion.data.entities.ListNode
 import com.livingtechusa.reflexion.data.models.AbridgedReflexionItem
 import com.livingtechusa.reflexion.util.Constants
+import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
 
 
@@ -14,9 +15,9 @@ fun ReflexionArrayItem.toListNode(topic: Long?, headNodePk: Long?): List<ListNod
     }
     list.add(ListNode(
         nodePk = headNodePk ?: 0L,
-        topic = topic ?: -1L,
+        topic = topic ?: EMPTY_PK,
         title = itemName.toString(),
-        itemPK = itemPK ?: -1L,
+        itemPK = itemPK ?: EMPTY_PK,
         parentPk = null,
         childPk = child
     ) )
@@ -33,10 +34,10 @@ fun ReflexionArrayItem.toAListNode(topic: Long?, parentPk: Long?): ListNode {
     }
     return ListNode(
         nodePk = 0L,
-        topic = topic ?: -1L,
+        topic = topic ?: EMPTY_PK,
         title = itemName.toString(),
-        itemPK = itemPK ?: -1L,
-        parentPk = parentPk ?: -1L,  // FK - ITEM.autogenPK
+        itemPK = itemPK ?: EMPTY_PK,
+        parentPk = parentPk ?: EMPTY_PK,  // FK - ITEM.autogenPK
         childPk = child
     )
 }

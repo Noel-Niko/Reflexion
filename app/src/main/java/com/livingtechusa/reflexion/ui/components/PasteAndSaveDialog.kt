@@ -23,6 +23,8 @@ import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.build.BuildRoute
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import com.livingtechusa.reflexion.util.Constants.DO_NOT_UPDATE
+import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 
 const val PASTE_SAVE = "PasteAndSaveDialog"
@@ -64,7 +66,9 @@ fun PasteAndSaveDialog(
                             onClick = {
                                 viewModel.onTriggerEvent( BuildEvent.UpdateVideoURL(webAddress.value))
                                 openDialog.value = false
-                                navController.navigate(Screen.BuildItemScreen.route + "/" + -1L)
+                                navController.navigate(Screen.BuildItemScreen.route + "/" + DO_NOT_UPDATE) {
+                                    launchSingleTop = true
+                                }
                             }) {
                             Text(stringResource(R.string.save))
                         }
@@ -73,7 +77,9 @@ fun PasteAndSaveDialog(
                         Button(
                             onClick = {
                                 openDialog.value = false
-                                navController.navigate(Screen.BuildItemScreen.route + "/" + -1L)
+                                navController.navigate(Screen.BuildItemScreen.route + "/" + DO_NOT_UPDATE) {
+                                    launchSingleTop = true
+                                }
                             }) {
                             Text(stringResource(R.string.close))
                         }

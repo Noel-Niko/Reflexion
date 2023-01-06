@@ -85,7 +85,7 @@ fun homeContent() {
                     .padding(20.dp)
             ) {
                 Text(
-                    fontSize = 30.sp,
+                    fontSize = MaterialTheme.typography.h6.fontSize,
                     fontStyle = MaterialTheme.typography.h6.fontStyle,
                     fontWeight = FontWeight.Bold,
                     text = stringResource(R.string.welcome_to_reflexion),

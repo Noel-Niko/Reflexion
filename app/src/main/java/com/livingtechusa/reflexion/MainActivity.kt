@@ -41,6 +41,7 @@ import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants
+import com.livingtechusa.reflexion.util.Constants.DO_NOT_UPDATE
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.HEAD_NODE_PK
@@ -145,10 +146,13 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable(
-                        route = Screen.VideoView.route + "/{sourceType}", // "/{required arg}/{required arg} ?not_required_arg = {arg}"
+                        route = Screen.VideoView.route + "/{sourceType}/{reflexion_item_pk}", // "/{required arg}/{required arg} ?not_required_arg = {arg}"
                         arguments = listOf(
                             navArgument(SOURCE) {
                                 type = NavType.StringType
+                            },
+                            navArgument(REFLEXION_ITEM_PK) {
+                                type = NavType.LongType
                             }
                         )
                     ) { navBackStackEntry ->
@@ -157,8 +161,9 @@ class MainActivity : ComponentActivity() {
                         }
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         VideoPlayer(
-                            navBackStackEntry.arguments?.getString(SOURCE) ?: Constants.URL,
-                            parentViewModel,
+                            sourceType = navBackStackEntry.arguments?.getString(SOURCE) ?: Constants.URL,
+                            pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK) ?: DO_NOT_UPDATE,
+                            viewModel =  parentViewModel,
                             navController = navController
                         )
                     }
@@ -203,6 +208,7 @@ class MainActivity : ComponentActivity() {
                             windowSize = windowSize,
                         )
                     }
+
                     composable(
                         route = Screen.CustomLists.route,
                     ) {
@@ -234,6 +240,7 @@ class MainActivity : ComponentActivity() {
                             listName = navBackStackEntry.arguments?.getString(LIST_NAME)
                         )
                     }
+
                     composable(
                         route = Screen.CustomListDisplay.route + "/{headNodePk}",
                         arguments = listOf(
@@ -247,7 +254,7 @@ class MainActivity : ComponentActivity() {
                         }
                         val parentViewModel: CustomListsViewModel = hiltViewModel(parentEntry)
                         CustomListDisplayScreen(
-//                            viewModel = parentViewModel,
+                            viewModel = parentViewModel,
                             navController = navController,
                             headNodePk = navBackStackEntry.arguments?.getLong(HEAD_NODE_PK) ?: -1,
                             windowSize = windowSize

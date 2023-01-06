@@ -68,8 +68,8 @@ import kotlin.math.roundToInt
 @Composable
 fun BuildContentV2(pk: Long, navHostController: NavHostController, viewModel: ItemViewModel, paddingValues: PaddingValues
 ) {
-    val URI = "/Uri"
-    val URL = "/Url"
+    val URI = "Uri"
+    val URL = "Url"
     val context = LocalContext.current
 //    val scaffoldState = rememberScaffoldState()
 
@@ -359,7 +359,7 @@ fun BuildContentV2(pk: Long, navHostController: NavHostController, viewModel: It
                                                 )
                                                 .show()
                                         } else {
-                                            val route: String = Screen.VideoView.route + URI
+                                            val route: String = Screen.VideoView.route + "/" + URI
                                             navHostController.navigate(route)
                                         }
                                     },
@@ -410,7 +410,7 @@ fun BuildContentV2(pk: Long, navHostController: NavHostController, viewModel: It
                                             if (reflexionItem.videoUrl == Constants.EMPTY_STRING) {
                                                 navHostController.navigate(Screen.PasteAndSaveScreen.route)
                                             } else {
-                                                val route: String = Screen.VideoView.route + URL
+                                                val route: String = Screen.VideoView.route + "/"  + URL + "/" + reflexionItem.autogenPK
                                                 navHostController.navigate(route)
                                             }
                                         },

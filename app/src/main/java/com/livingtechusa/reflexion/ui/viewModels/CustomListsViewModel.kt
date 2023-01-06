@@ -13,6 +13,7 @@ import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.di.DefaultDispatcher
 import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
 import com.livingtechusa.reflexion.util.BaseApplication
+import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK_STRING
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -60,7 +61,7 @@ class CustomListsViewModel @Inject constructor(
     val listOfLists: StateFlow<List<ReflexionArrayItem?>> get() = _listOfLists
 
     private var newList = true
-    private var topic: Long = -1L
+    private var topic: Long = EMPTY_PK
 
     suspend fun getTopic(pk: Long): Long? {
         var childPk: Long? = pk
@@ -286,7 +287,7 @@ class CustomListsViewModel @Inject constructor(
                 withContext(Dispatchers.IO) {
 
                     // First item selected in new topic in new list. Set Topic, and add selection and load topic lists
-                    if (topic == -1L || newList) {
+                    if (topic == EMPTY_PK || newList) {
                         if (itemPk != null) {
                             // Set the topic
                             topic = getTopic(itemPk.toLong()) ?: itemPk.toLong()
@@ -301,7 +302,7 @@ class CustomListsViewModel @Inject constructor(
 
                         // A new topic item has been selected, create new list with selected first item, and load related lists.
                     } else if (itemPk?.toLong()?.let { getTopic(it) } != topic) {
-                        topic = itemPk?.toLong()?.let { getTopic(it) } ?: -1L
+                        topic = itemPk?.toLong()?.let { getTopic(it) } ?: EMPTY_PK
                         // Reset the UI with the new list item
                         withContext(Dispatchers.Main) { _customList.value = emptyRai }
                         addItemToList(itemPk)

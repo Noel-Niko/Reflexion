@@ -21,6 +21,8 @@ import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.build.BuildRoute
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import com.livingtechusa.reflexion.util.Constants.DO_NOT_UPDATE
+import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Temporary
 
@@ -54,7 +56,9 @@ fun ConfirmSaveAlertDialog(
                             onClick = {
                                 viewModel.onTriggerEvent(BuildEvent.UpdateVideoURL(url ?: EMPTY_STRING))
                                 openDialog.value = false
-                                navController.navigate(Screen.BuildItemScreen.route + "/" + -2L)
+                                navController.navigate(Screen.BuildItemScreen.route + "/" + DO_NOT_UPDATE) {
+                                    launchSingleTop = true
+                                }
                             }) {
                             Text(stringResource(R.string.yes))
                         }
@@ -64,7 +68,9 @@ fun ConfirmSaveAlertDialog(
                             onClick = {
                                 Temporary.url = EMPTY_STRING
                                 openDialog.value = false
-                                navController.navigate(Screen.BuildItemScreen.route + "/" + -1L)
+                                navController.navigate(Screen.BuildItemScreen.route + "/" + DO_NOT_UPDATE) {
+                                    launchSingleTop = true
+                                }
                             }) {
                             Text(stringResource(R.string.no))
                         }

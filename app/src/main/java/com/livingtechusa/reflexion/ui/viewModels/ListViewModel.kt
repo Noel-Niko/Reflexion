@@ -83,8 +83,8 @@ class ListViewModel @Inject constructor(
 //                    }
                 is ListEvent.UpOneLevel -> {
                     viewModelScope.launch {
-                        val parent: Long = list.value?.get(0)?.parent ?: -1L
-                        if (parent == -1L) {
+                        val parent: Long = list.value?.get(0)?.parent ?: EMPTY_PK
+                        if (parent == EMPTY_PK) {
                             val newList =  localServiceImpl.getAllTopics() as List<ReflexionItem>
                             _list.value = newList
                         } else {
@@ -123,7 +123,7 @@ class ListViewModel @Inject constructor(
     }
 
     fun onUp() {
-        if (list.value?.get(0)?.parent == null || list.value?.get(0)?.parent == -1L) {
+        if (list.value?.get(0)?.parent == null || list.value?.get(0)?.parent == EMPTY_PK) {
             Toast.makeText(context, R.string.no_parent_found, Toast.LENGTH_SHORT).show()
         } else {
             onTriggerEvent(ListEvent.UpOneLevel)

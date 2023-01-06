@@ -54,6 +54,7 @@ const val CUSTOM_LIST_DISPLAY = "customListDisplay"
 
 @Composable
 fun CustomListDisplayScreen(
+    viewModel: CustomListsViewModel,
     navController: NavHostController,
     windowSize: WindowWidthSizeClass,
     headNodePk: Long
@@ -63,11 +64,11 @@ fun CustomListDisplayScreen(
     if (context.findActivity() != null) {
         when (windowSize) {
             WindowWidthSizeClass.COMPACT -> {
-                CompactScreen(navController, headNodePk)
+                CompactScreen(navController = navController, headNodePk =headNodePk, viewModel = viewModel)
             }
 
             WindowWidthSizeClass.MEDIUM -> {
-                Landscape(navController, headNodePk)
+                Landscape(navController = navController, headNodePk =headNodePk, viewModel = viewModel)
             }
 
 //            WindowWidthSizeClass.EXPANDED -> {
@@ -75,7 +76,7 @@ fun CustomListDisplayScreen(
 //                viewModel.navigationType = ReflexionNavigationType.PERMANENT_NAVIGATION_DRAWER
 //            }
 
-            else -> CompactScreen(navController, headNodePk = headNodePk)
+            else -> CompactScreen(navController = navController, headNodePk = headNodePk, viewModel = viewModel)
         }
     }
 }
@@ -83,7 +84,7 @@ fun CustomListDisplayScreen(
 @Composable
 fun CustomListDisplayContent(
     paddingValues: PaddingValues?,
-    viewModel: CustomListsViewModel = hiltViewModel(),
+    viewModel: CustomListsViewModel,
     navController: NavHostController
 ) {
 
@@ -227,7 +228,7 @@ fun CustomListDisplayContent(
                                                     .show()
                                             } else {
                                                 val route: String =
-                                                    Screen.VideoView.route + children[childItemIndex].videoUri
+                                                    Screen.VideoView.route + "/" + children[childItemIndex].videoUri
                                                 navController.navigate(route)
                                             }
                                         },
@@ -259,7 +260,7 @@ fun CustomListDisplayContent(
                                                         .show()
                                                 } else {
                                                     val route: String =
-                                                        Screen.VideoView.route + children[childItemIndex].videoUrl
+                                                        Screen.VideoView.route + "/" + children[childItemIndex].videoUrl
                                                     navController.navigate(route)
                                                 }
                                             },

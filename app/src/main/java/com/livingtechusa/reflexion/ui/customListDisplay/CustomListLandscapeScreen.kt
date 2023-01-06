@@ -23,12 +23,12 @@ import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 
 
 @Composable
-fun Landscape(navController: NavHostController, headNodePk: Long, viewModel: CustomListsViewModel = hiltViewModel()  ) {
+fun Landscape(navController: NavHostController, headNodePk: Long, viewModel: CustomListsViewModel) {
     val icons = NavBarItems.CustomListsDisplayBarItems
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
     viewModel.onTriggerEvent(CustomListEvent.GetDisplayList(headNodePk))
-
+    // TO DO:
     val selectedList by viewModel.customList.collectAsState()
     Row(modifier = Modifier.fillMaxSize()) {
         NavigationRail(
@@ -54,6 +54,6 @@ fun Landscape(navController: NavHostController, headNodePk: Long, viewModel: Cus
                 )
             }
         }
-        CustomListDisplayContent(paddingValues = null, navController = navController)
+        CustomListDisplayContent(paddingValues = null, navController = navController, viewModel = viewModel)
     }
 }

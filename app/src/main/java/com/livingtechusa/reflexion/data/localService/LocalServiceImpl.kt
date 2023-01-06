@@ -9,6 +9,7 @@ import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.models.AbridgedReflexionItem
 import com.livingtechusa.reflexion.data.toListNode
 import com.livingtechusa.reflexion.data.toReflexionArrayItem
+import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import kotlinx.coroutines.CoroutineScope
@@ -177,8 +178,8 @@ class LocalServiceImpl @Inject constructor(
     }
 
     override suspend fun selectAllSiblings(parent: Long): List<ReflexionItem?> {
-        val grandparent: Long = reflexionItemDao.getParent(parent) ?: -1L
-        if (grandparent == -1L) {
+        val grandparent: Long = reflexionItemDao.getParent(parent) ?: EMPTY_PK
+        if (grandparent == EMPTY_PK) {
             return reflexionItemDao.getReflexionItemTopics()
         } else {
             return reflexionItemDao.selectAllSiblings(grandparent)

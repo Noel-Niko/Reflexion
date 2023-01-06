@@ -16,7 +16,7 @@ fun BuildItemScreen(
     pk: Long,
     navHostController: NavHostController,
     windowSize: WindowWidthSizeClass,
-    viewModel: ItemViewModel = hiltViewModel(),
+    viewModel: ItemViewModel,
 ) {
     val context = LocalContext.current
     val icons = NavBarItems.BuildBarItems

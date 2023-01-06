@@ -33,7 +33,7 @@ import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 fun CompactScreen(
     navController: NavHostController,
     headNodePk: Long,
-    viewModel: CustomListsViewModel = hiltViewModel()
+    viewModel: CustomListsViewModel
 ) {
     viewModel.onTriggerEvent(CustomListEvent.GetDisplayList(headNodePk))
 
@@ -124,7 +124,7 @@ fun CompactScreen(
             }
         }
     ) { paddingValues ->
-        CustomListDisplayContent(paddingValues = paddingValues, navController = navController)
+        CustomListDisplayContent(paddingValues = paddingValues, navController = navController, viewModel = viewModel)
     }
 }
 

@@ -9,20 +9,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavHostController
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.StyledPlayerView
-import com.livingtechusa.reflexion.ui.build.BuildRoute
+import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
-import com.livingtechusa.reflexion.util.Constants
-import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
-import com.livingtechusa.reflexion.util.Constants.URI
+import com.livingtechusa.reflexion.util.Constants.DO_NOT_UPDATE
 import com.livingtechusa.reflexion.util.Constants.URL
 import com.livingtechusa.reflexion.util.Temporary
-import kotlinx.coroutines.launch
 
 const val VideoScreenRoute = "view_video_screen"
 
@@ -30,12 +26,13 @@ const val VideoScreenRoute = "view_video_screen"
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 fun VideoPlayer(
     sourceType: String,
-    itemViewModel: ItemViewModel,
+    pk: Long,
+    viewModel: ItemViewModel,
     navController: NavHostController
 ) {
     val context = LocalContext.current
 
-    val savedReflexionItem by itemViewModel.reflexionItem.collectAsState()
+    val savedReflexionItem by viewModel.reflexionItem.collectAsState()
 
     if (sourceType == URL) {
         if(!savedReflexionItem.videoUrl.isNullOrEmpty()) {
@@ -43,9 +40,10 @@ fun VideoPlayer(
                 Intent.ACTION_VIEW, Uri.parse(savedReflexionItem.videoUrl)
             )
             startActivity(context, intent, null)
-            navController.popBackStack(BuildRoute, false )
+            navController.clearBackStack(Screen.BuildItemScreen.route + "/" + pk)//      BuildItemScreen.route + "/" + DO_NOT_UPDATE, true )
+            navController.popBackStack(Screen.BuildItemScreen.route + "/" + pk, true)
         } else {
-            navController.popBackStack(BuildRoute, false )
+            navController.popBackStack(Screen.BuildItemScreen.route + "/" + DO_NOT_UPDATE, true )
         }
     } else {
         val tempUri = Temporary.tempReflexionItem.videoUri
