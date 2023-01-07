@@ -2,9 +2,11 @@ package com.livingtechusa.reflexion.ui.build
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
@@ -68,6 +70,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import java.io.InputStream
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun BuildContentV2(
     pk: Long,
@@ -104,6 +107,7 @@ fun BuildContentV2(
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
+
     var targetVideoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     val selectVideo =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(),
@@ -218,7 +222,8 @@ fun BuildContentV2(
                     .padding(paddingValues)
             ) {
                 item {
-                    Spacer(Modifier.height(16.dp))/* TOPIC */
+                    Spacer(Modifier.height(16.dp))
+                    /* TOPIC */
                     if (reflexionItem.parent == null) {
                         /* TOPIC */
                         Row(
@@ -474,7 +479,7 @@ fun BuildContentV2(
                     Row(modifier = Modifier.fillMaxWidth()) {
                         Column(
                             Modifier
-                                .weight(1f)
+                                .weight(4f)
                                 .padding(16.dp)
                                 .align(Alignment.CenterVertically)
                         ) {
@@ -497,7 +502,6 @@ fun BuildContentV2(
                                     contentDescription = null
                                 )
                             }
-
                             IconButton(onClick = {
                                 scope.launch {
                                     viewModel.createImageUri()?.let { uri ->

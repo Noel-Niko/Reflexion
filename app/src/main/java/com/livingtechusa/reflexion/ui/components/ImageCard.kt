@@ -3,11 +3,11 @@ package com.livingtechusa.reflexion.ui.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
@@ -26,12 +26,10 @@ fun ImageCard(image: ByteArray?) {
                 allowHardware(false)
             }
         )
-
         OutlinedCard(
             shape = MaterialTheme.shapes.medium,
             modifier = Modifier
-                .height(100.dp)
-                .width(100.dp)
+                .height(400.dp)
                 .padding(4.dp)
                 .background(Color.Red),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)

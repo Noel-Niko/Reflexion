@@ -238,11 +238,10 @@ object MediaStoreUtils {
 
         if (inputStream != null) {
             // Now creating byte array of same length as file
-            val arr = inputStream?.readAllBytes()?.size?.let { ByteArray(it) }
+            val arr = inputStream.readAllBytes()
 
             // Reading file content to byte array
             // using standard read() method
-            inputStream?.read(arr)
 
             // lastly closing an instance of file input stream
             // to avoid memory leakage
