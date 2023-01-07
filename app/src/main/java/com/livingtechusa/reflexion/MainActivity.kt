@@ -146,13 +146,10 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable(
-                        route = Screen.VideoView.route + "/{sourceType}/{reflexion_item_pk}", // "/{required arg}/{required arg} ?not_required_arg = {arg}"
+                        route = Screen.VideoView.route + "/{sourceType}", // "/{required arg}/{required arg} ?not_required_arg = {arg}"
                         arguments = listOf(
                             navArgument(SOURCE) {
                                 type = NavType.StringType
-                            },
-                            navArgument(REFLEXION_ITEM_PK) {
-                                type = NavType.LongType
                             }
                         )
                     ) { navBackStackEntry ->
@@ -161,10 +158,7 @@ class MainActivity : ComponentActivity() {
                         }
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         VideoPlayer(
-                            sourceType = navBackStackEntry.arguments?.getString(SOURCE) ?: Constants.URL,
-                            pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK) ?: DO_NOT_UPDATE,
-                            viewModel =  parentViewModel,
-                            navController = navController
+                            viewModel =  parentViewModel
                         )
                     }
 

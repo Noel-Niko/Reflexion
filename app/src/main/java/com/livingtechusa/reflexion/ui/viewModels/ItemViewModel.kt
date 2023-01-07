@@ -258,7 +258,19 @@ class ItemViewModel @Inject constructor(
         return if (uri != null) {
             uri
         } else {
-            Toast.makeText(context, "Could not create a video Uri\n$filename", Toast.LENGTH_SHORT)
+            Toast.makeText(context, "Could not create video Uri\n$filename", Toast.LENGTH_SHORT)
+                .show()
+            null
+        }
+    }
+
+    suspend fun createImageUri(): Uri? {
+        val filename = context.getString(R.string.app_name) + "${System.currentTimeMillis()}.jpg"
+        val uri = MediaStoreUtils.createImageUri(context, filename)
+        return if (uri != null) {
+            uri
+        } else {
+            Toast.makeText(context, "Could not create image Uri\n$filename", Toast.LENGTH_SHORT)
                 .show()
             null
         }

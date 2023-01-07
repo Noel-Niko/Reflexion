@@ -16,6 +16,7 @@ import com.livingtechusa.reflexion.data.models.FileType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import kotlin.coroutines.resume
 
 object MediaStoreUtils {
@@ -225,6 +226,32 @@ object MediaStoreUtils {
                     path = cursor.getString(dataColumn),
                 )
             }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    @Throws(IOException::class)
+    fun uriToByteArray(uri: Uri, context: Context): ByteArray? {
+        // Creating an object of FileInputStream to
+        // read from a file
+        val inputStream = context.contentResolver.openInputStream(uri)
+
+        if (inputStream != null) {
+            // Now creating byte array of same length as file
+            val arr = inputStream?.readAllBytes()?.size?.let { ByteArray(it) }
+
+            // Reading file content to byte array
+            // using standard read() method
+            inputStream?.read(arr)
+
+            // lastly closing an instance of file input stream
+            // to avoid memory leakage
+            inputStream?.close()
+
+            // Returning above byte array
+            return arr
+        } else {
+            return null
         }
     }
 }

@@ -37,7 +37,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.BlendMode.Companion.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.graphics.Color.Companion.Transparent
@@ -56,17 +55,25 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.R
+import com.livingtechusa.reflexion.data.entities.Converters
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.Constants
+import com.livingtechusa.reflexion.util.MediaStoreUtils
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import com.livingtechusa.reflexion.util.Temporary
+import com.livingtechusa.reflexion.ui.components.ImageCard
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+import java.io.InputStream
 
 @Composable
-fun BuildContentV2(pk: Long, navHostController: NavHostController, viewModel: ItemViewModel, paddingValues: PaddingValues
+fun BuildContentV2(
+    pk: Long,
+    navHostController: NavHostController,
+    viewModel: ItemViewModel,
+    paddingValues: PaddingValues
 ) {
     val URI = "Uri"
     val URL = "Url"
@@ -79,13 +86,12 @@ fun BuildContentV2(pk: Long, navHostController: NavHostController, viewModel: It
     val saveNow by itemViewModel.saveNow.collectAsState()
     val resource = ResourceProviderSingleton
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
-
     // If `lifecycleOwner` changes, dispose and reset the effect
     DisposableEffect(lifecycleOwner) {
         // Create an observer that triggers our remembered callbacks
         // for sending analytics events
         val observer = LifecycleEventObserver { owner, event ->
-            if(event == Lifecycle.Event.ON_CREATE) {
+            if (event == Lifecycle.Event.ON_CREATE) {
                 viewModel.onTriggerEvent(BuildEvent.GetSelectedReflexionItem(pk))
             }
         }
@@ -115,6 +121,28 @@ fun BuildContentV2(pk: Long, navHostController: NavHostController, viewModel: It
         }
     }
 
+    var targetImageUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+
+    val selectImage =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(),
+            onResult = { uri ->
+                val iStream: InputStream? = context.contentResolver.openInputStream(uri ?: Uri.EMPTY)
+                if(iStream != null) {
+                    val copy = reflexionItem.copy(image = Converters().getBytes(inputStream = iStream))
+                    itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
+                }
+                iStream?.close()
+            })
+
+    val takeImage = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { _ ->
+        targetImageUri?.let { uri ->
+            targetImageUri = null
+            val copy = reflexionItem.copy(image = MediaStoreUtils.uriToByteArray(uri, context = context))
+            itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
+        }
+    }
 
     val offsetX = remember { mutableStateOf(0f) }
     val offsetY = remember { mutableStateOf(0f) }
@@ -410,8 +438,11 @@ fun BuildContentV2(pk: Long, navHostController: NavHostController, viewModel: It
                                             if (reflexionItem.videoUrl == Constants.EMPTY_STRING) {
                                                 navHostController.navigate(Screen.PasteAndSaveScreen.route)
                                             } else {
-                                                val route: String = Screen.VideoView.route + "/"  + URL + "/" + reflexionItem.autogenPK
-                                                navHostController.navigate(route)
+                                                val intent = Intent(
+                                                    Intent.ACTION_VIEW,
+                                                    Uri.parse(reflexionItem.videoUrl)
+                                                )
+                                                ContextCompat.startActivity(context, intent, null)
                                             }
                                         },
                                     ),
@@ -433,6 +464,50 @@ fun BuildContentV2(pk: Long, navHostController: NavHostController, viewModel: It
                             }) {
                                 Icon(
                                     painter = painterResource(R.drawable.baseline_youtube_searched_for_24),
+                                    contentDescription = null
+                                )
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(16.dp))
+                    // Display Image
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Column(
+                            Modifier
+                                .weight(1f)
+                                .padding(16.dp)
+                                .align(Alignment.CenterVertically)
+                        ) {
+                            if(reflexionItem.image != null) {
+                                ImageCard(reflexionItem.image)
+                            } else {
+                                Text(text = stringResource(R.string.add_an_image_here))
+                            }
+                        }
+                        Column(
+                            Modifier
+                                .weight(1f)
+                                .align(Alignment.CenterVertically)
+                        ) {
+                            IconButton(onClick = {
+                                selectImage.launch(Constants.IMAGE)
+                            }) {
+                                Icon(
+                                    painter = painterResource(R.drawable.baseline_video_library_24),
+                                    contentDescription = null
+                                )
+                            }
+
+                            IconButton(onClick = {
+                                scope.launch {
+                                    viewModel.createImageUri()?.let { uri ->
+                                        targetImageUri = uri
+                                        takeImage.launch(uri)
+                                    }
+                                }
+                            }) {
+                                Icon(
+                                    painter = painterResource(R.drawable.baseline_photo_camera_24),
                                     contentDescription = null
                                 )
                             }
