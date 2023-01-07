@@ -79,16 +79,14 @@ fun BuildContentV2(
     paddingValues: PaddingValues
 ) {
     val URI = "Uri"
-    val URL = "Url"
     val context = LocalContext.current
-//    val scaffoldState = rememberScaffoldState()
-
     val itemViewModel: ItemViewModel = viewModel
     val scope = rememberCoroutineScope()
     val reflexionItem by itemViewModel.reflexionItem.collectAsState()
     val saveNow by itemViewModel.saveNow.collectAsState()
     val resource = ResourceProviderSingleton
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
+
     // If `lifecycleOwner` changes, dispose and reset the effect
     DisposableEffect(lifecycleOwner) {
         // Create an observer that triggers our remembered callbacks
