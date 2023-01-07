@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -44,6 +47,7 @@ import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
@@ -67,6 +71,7 @@ import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import com.livingtechusa.reflexion.util.Temporary
 import com.livingtechusa.reflexion.ui.components.ImageCard
 import kotlinx.coroutines.launch
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import kotlin.math.roundToInt
 import java.io.InputStream
 
@@ -482,7 +487,64 @@ fun BuildContentV2(
                                 .align(Alignment.CenterVertically)
                         ) {
                             if(reflexionItem.image != null) {
-                                ImageCard(reflexionItem.image)
+//                                val imageLoader = ImageLoader.Builder(context)
+//                                    .components {
+//                                        add(VideoFrameDecoder.Factory())
+//                                    }
+//                                    .build()
+//                                val painter = rememberImagePainter(
+//                                    data = reflexionItem.videoUrl,
+//                                    builder = {
+//                                        imageLoader
+//                                        placeholder(R.drawable.baseline_videocam_24)
+//                                        crossfade(true)
+//                                    }
+//                                )
+//
+//                                Image(
+//                                    painter = painter,
+//                                    contentDescription = null,
+//                                    modifier = Modifier.size(256.dp),
+//                                    contentScale = ContentScale.Crop
+//                                )
+
+
+//                                YouTubeThumbnailView.OnInitializedListener
+//
+//
+                               ImageCard(reflexionItem.image)
+//
+//                                val imageLoader = ImageLoader.Builder(context)
+//                                    .components {
+//                                        add(VideoFrameDecoder.Factory())
+//                                    }
+//                                    .build()
+//
+//
+//                                imageView.load(reflexionItem.videoUrl) {
+//                                    videoFrameMillis(1000)
+//                                }
+
+//                                val painter = rememberAsyncImagePainter(
+//                                    model = ImageRequest.Builder(LocalContext.current)
+//                                        .data(reflexionItem.videoUrl)
+//                                        .fetcherFactory<Any> { data, options, imageLoader ->
+//                                            imageLoader.components.newBuilder()
+//                                                .add(VideoFrameDecoder.Factory())
+//                                                .build()
+//                                                .newFetcher(data, options, imageLoader)?.first
+//                                        }
+//                                        .videoFrameMillis(1000)
+//                                        .build(),
+//                                )
+//                                Image(
+//                                    painter = painter,
+//                                    modifier = Modifier.width(100.dp).height(100.dp),
+//                                    contentDescription = null
+//                                )
+
+
+
                             } else {
                                 Text(text = stringResource(R.string.add_an_image_here))
                             }

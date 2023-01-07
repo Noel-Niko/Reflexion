@@ -5,6 +5,8 @@ import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.content.ContentValues
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.media.MediaMetadataRetriever
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
@@ -18,6 +20,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import kotlin.coroutines.resume
+
 
 object MediaStoreUtils {
 
@@ -252,5 +255,27 @@ object MediaStoreUtils {
         } else {
             return null
         }
+    }
+
+
+    @Throws(Throwable::class)
+    fun retriveVideoFrameFromVideo(videoPath: String?): Bitmap? {
+        var bitmap: Bitmap? = null
+        var mediaMetadataRetriever: MediaMetadataRetriever? = null
+        try {
+            mediaMetadataRetriever = MediaMetadataRetriever()
+            if (Build.VERSION.SDK_INT >= 14) mediaMetadataRetriever.setDataSource(
+                videoPath,
+                HashMap()
+            ) else mediaMetadataRetriever.setDataSource(videoPath)
+            //   mediaMetadataRetriever.setDataSource(videoPath);
+            bitmap = mediaMetadataRetriever.getFrameAtTime(1, MediaMetadataRetriever.OPTION_CLOSEST)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw Throwable("Exception in retrieveVideoFrameFromVideo(String videoPath)" + e.message)
+        } finally {
+            mediaMetadataRetriever?.release()
+        }
+        return bitmap
     }
 }

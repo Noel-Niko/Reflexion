@@ -81,17 +81,17 @@ fun ReflexionItemListUI(
 @Composable
 private fun ReflexionItemColumnItem(
     reflexionItem: ReflexionItem,
-    onDoubleTap: () -> Unit,
-    onLongPress: () -> Unit
+//    onDoubleTap: () -> Unit,
+//    onLongPress: () -> Unit
 ) {
     Row(
-        modifier = Modifier
-            .pointerInput(key1 = reflexionItem) {
-            detectTapGestures(
-                onDoubleTap = { onDoubleTap() },
-                onLongPress = { onLongPress() }
-            )
-        }
+//        modifier = Modifier
+//            .pointerInput(key1 = reflexionItem) {
+//            detectTapGestures(
+//                onDoubleTap = { onDoubleTap() },
+//                onLongPress = { onLongPress() }
+//            )
+//        }
     ) {
         Text(
             modifier = Modifier.padding(16.dp),
@@ -122,7 +122,13 @@ private fun ReflexionItemsContent(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(4.dp),
+                        .padding(4.dp)
+                        .pointerInput(key1 = reflexionItem) {
+                            detectTapGestures(
+                                onDoubleTap = { onDoubleTap(reflexionItem) },
+                                onLongPress = { onLongPress(reflexionItem) }
+                            )
+                        },
                     elevation = 10.dp,
                     shape = RoundedCornerShape(20.dp)
                 ) {
@@ -139,8 +145,8 @@ private fun ReflexionItemsContent(
                         Spacer(modifier = Modifier.width(4.dp))
                         ReflexionItemColumnItem(
                             reflexionItem = reflexionItem,
-                            onDoubleTap = { onDoubleTap(reflexionItem) },
-                            onLongPress = { onLongPress(reflexionItem) }
+//                            onDoubleTap = { onDoubleTap(reflexionItem) },
+//                            onLongPress = { onLongPress(reflexionItem) }
                         )
                     }
                 }
