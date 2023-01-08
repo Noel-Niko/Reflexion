@@ -7,6 +7,8 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
@@ -19,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -44,6 +47,7 @@ import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
@@ -56,19 +60,24 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.VideoFrameDecoder
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.Converters
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.Constants
-import com.livingtechusa.reflexion.util.MediaStoreUtils
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import com.livingtechusa.reflexion.util.Temporary
 import com.livingtechusa.reflexion.ui.components.ImageCard
+import com.livingtechusa.reflexion.util.scopedStorageUtils.MediaStoreUtils
+import com.livingtechusa.reflexion.util.scopedStorageUtils.DocumentFilePreviewCard
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import java.io.InputStream
+import androidx.compose.ui.graphics.Color
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
@@ -86,7 +95,12 @@ fun BuildContentV2(
     val saveNow by itemViewModel.saveNow.collectAsState()
     val resource = ResourceProviderSingleton
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
+    val selectedFile by viewModel.selectedFile.collectAsState()
 
+//    val selectFile =
+//        rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+//            uri?.let { viewModel.onFileSelect(it) }
+//        }
     // If `lifecycleOwner` changes, dispose and reset the effect
     DisposableEffect(lifecycleOwner) {
         // Create an observer that triggers our remembered callbacks
@@ -108,7 +122,7 @@ fun BuildContentV2(
 
     var targetVideoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     val selectVideo =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(),
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument(),
             onResult = { uri ->
                 val copy = reflexionItem.copy(videoUri = uri.toString())
                 itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
@@ -370,34 +384,59 @@ fun BuildContentV2(
                     Spacer(Modifier.height(16.dp))
                     /* SAVED VIDEO */
                     Row(
-                        modifier = Modifier.padding(8.dp)
+                        modifier = Modifier.padding(8.dp).fillMaxSize()
                     ) {
                         Column(
                             Modifier
                                 .weight(1f)
                                 .align(Alignment.CenterVertically)
                         ) {
-                            Text(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        if (reflexionItem.videoUri.isNullOrEmpty()) {
-                                            Toast
-                                                .makeText(
-                                                    context,
-                                                    resource.getString(R.string.is_saved),
-                                                    Toast.LENGTH_SHORT
-                                                )
-                                                .show()
-                                        } else {
-                                            val route: String = Screen.VideoView.route + "/" + URI
-                                            navController.navigate(route)
-                                        }
-                                    },
-                                text = AnnotatedString(stringResource(R.string.saved_video)),
-                                color = Blue
-
-                            )
+                            Row(modifier = Modifier.height(100.dp).width(100.dp)) {
+//                                Text(
+//                                    modifier = Modifier
+//                                        .fillMaxWidth()
+//                                        .clickable {
+//                                            if (reflexionItem.videoUri.isNullOrEmpty()) {
+//                                                Toast
+//                                                    .makeText(
+//                                                        context,
+//                                                        resource.getString(R.string.is_saved),
+//                                                        Toast.LENGTH_SHORT
+//                                                    )
+//                                                    .show()
+//                                            } else {
+//                                                val route: String =
+//                                                    Screen.VideoView.route + "/" + URI
+//                                                navController.navigate(route)
+//                                            }
+//                                        },
+//                                    text = AnnotatedString(stringResource(R.string.saved_video)),
+//                                    color = Blue
+//                                )
+                                if (reflexionItem.videoUri.isNullOrEmpty().not()) {
+//                                    val imageLoader = ImageLoader.Builder(context)
+//                                        .components {
+//                                            add(VideoFrameDecoder.Factory())
+//                                        }.crossfade(true)
+//                                        .build()
+//
+//                                    val videoPainter = rememberAsyncImagePainter(
+//                                        model = reflexionItem.videoUri,
+//                                        imageLoader = imageLoader
+//                                    )
+//                                    Image(
+//                                        painter = videoPainter,
+//                                        contentDescription = "Selected Video Thumbnail",
+//                                        contentScale = ContentScale.FillBounds,
+//                                        alignment = Alignment.Center,
+//                                        modifier = Modifier.fillMaxSize().background(Color.Red)
+//                                    )
+                                    viewModel.getSelectedFile()
+                                    if (selectedFile != null) {
+                                        DocumentFilePreviewCard(selectedFile!!)
+                                    }
+                                }
+                            }
                         }
                         Column(
                             Modifier
@@ -405,7 +444,7 @@ fun BuildContentV2(
                                 .align(Alignment.CenterVertically)
                         ) {
                             IconButton(onClick = {
-                                selectVideo.launch(Constants.VIDEO_TYPE)
+                                selectVideo.launch(arrayOf<String>(Constants.VIDEO_TYPE))
                             }) {
                                 Icon(
                                     painter = painterResource(R.drawable.baseline_video_library_24),

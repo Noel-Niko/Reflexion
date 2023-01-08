@@ -48,4 +48,5 @@
     <string name="did_you_add_a_video_link">Did you add a video link?</string>
     <string name="add_an_image_here">Add an Image Here.</string>
     <string name="do_you_want_to_delete">"Do you want to delete %1s?"</string>
+    <string name="empty_state">Empty State</string>
 </resources>

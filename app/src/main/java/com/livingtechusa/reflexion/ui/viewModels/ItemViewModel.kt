@@ -3,10 +3,14 @@ package com.livingtechusa.reflexion.ui.viewModels
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.ParcelFileDescriptor
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,12 +30,15 @@ import com.livingtechusa.reflexion.util.Constants.NAME
 import com.livingtechusa.reflexion.util.Constants.PARENT
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URI
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URL
-import com.livingtechusa.reflexion.util.MediaStoreUtils
+import com.livingtechusa.reflexion.util.scopedStorageUtils.FileResource
+import com.livingtechusa.reflexion.util.scopedStorageUtils.MediaStoreUtils
+import com.livingtechusa.reflexion.util.scopedStorageUtils.SafUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.io.FileDescriptor
 import javax.inject.Inject
 
 
@@ -42,11 +49,12 @@ enum class ApiStatus { PRE_INIT, LOADING, ERROR, DONE }
 
 @HiltViewModel
 class ItemViewModel @Inject constructor(
-    private val localServiceImpl: LocalServiceImpl,
-    private val state: SavedStateHandle
+    private val localServiceImpl: LocalServiceImpl
 ) : ViewModel() {
 
-    private val TAG = "ItemViewModel"
+    companion object {
+        private val TAG = this::class.java.simpleName
+    }
 
     // The active item being viewed in build or selected from a list to be viewed in build
     private val _reflexionItem = MutableStateFlow(ReflexionItem())
@@ -79,6 +87,36 @@ class ItemViewModel @Inject constructor(
 
     suspend fun hasNoSiblings(pk: Long, parentPk: Long): Boolean {
         return localServiceImpl.selectSiblings(pk, parentPk).isEmpty()
+    }
+
+    /**
+     * We keep the current media [Uri] in the savedStateHandle to re-render it if there is a
+     * configuration change and we expose it as a [LiveData] to the UI
+     */
+//    val selectedFile: LiveData<FileResource?> =
+//        savedStateHandle.getLiveData<FileResource?>(SELECTED_FILE_KEY)
+//    private val uri: Uri? = reflexionItem.value.videoUri?.let { Converters().convertStringToUri(it)}
+    private val _selectedFile: MutableStateFlow<FileResource?> = MutableStateFlow(null)
+    val selectedFile get() = _selectedFile
+
+    fun getSelectedFile() {
+        try {
+            val uri: Uri? =
+                reflexionItem.value.videoUri?.let { Converters().convertStringToUri(it) }
+            if(uri != null) {
+                viewModelScope.launch {
+//                    val parcelFileDescriptor: ParcelFileDescriptor? =
+//                        context.applicationContext.contentResolver.openFileDescriptor(uri, "r")
+//                    val fileDescriptor: FileDescriptor = parcelFileDescriptor?.fileDescriptor
+//                    val image: Bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor)
+//                    parcelFileDescriptor?.close()
+                    _selectedFile.value = SafUtils.getResourceByUri(context = context, uri = uri)
+                }
+            }
+
+        } catch(e: java.lang.Exception) {
+            Log.e(TAG, "Unable to get File Resource")
+        }
     }
 
     fun onTriggerEvent(event: BuildEvent) {
