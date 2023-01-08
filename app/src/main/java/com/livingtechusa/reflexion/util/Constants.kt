@@ -7,8 +7,8 @@ import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 object Constants {
     const val DATABASE_NAME: String = "Reflexion_Database"
     const val EMPTY_STRING: String = ""
-    const val VIDEO = "video/*"
-    const val IMAGE = "image/*"
+    const val VIDEO_TYPE = "video/*"
+    const val IMAGE_TYPE = "image/*"
     const val URI = "Uri"
     const val URL = "Url"
     const val SEARCH_YOUTUBE = "https://www.youtube.com/results?search_query="
@@ -22,6 +22,15 @@ object Constants {
     const val INDEX = "index"
     const val LIST_NAME = "listName"
     const val HEAD_NODE_PK = "headNodePk"
+    const val SUB_ITEM = "subItem"
+    // REFLEXION ITEM SUB ITEMS
+    const val NAME = "name"
+    const val DESCRIPTION = "description"
+    const val DETAILED_DESCRIPTION = "detailedDescription"
+    const val IMAGE = "image"
+    const val VIDEO_URI = "videoUri"
+    const val VIDEO_URL = "videoUrl"
+    const val PARENT = "parent"
 }
 
 object Temporary {

@@ -39,7 +39,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
-import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.Constants.NO_LISTS
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import kotlin.math.roundToInt
@@ -107,7 +106,7 @@ fun CustomListContent(
                                     detectTapGestures(
                                         onDoubleTap = {
                                             // Launch dialog
-                                            navController.navigate(Screen.ConfirmDeleteScreen.route + "/" + index + "/" + listOfLists[index]?.itemName)
+                                            navController.navigate(Screen.ConfirmDeleteListScreen.route + "/" + index + "/" + listOfLists[index]?.itemName)
                                         },
                                         onLongPress = {
                                             viewModel.onTriggerEvent(

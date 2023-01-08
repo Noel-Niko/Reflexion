@@ -22,7 +22,7 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="confirm_to_add_content_link">Confirm to add content link</string>
-    <string name="confirm_to_delete_list">Confirm to delete list.</string>
+    <string name="confirm_to_delete">Confirm to delete</string>
     <string name="changes_saved">Changes Saved</string>
     <string name="save">Save</string>
     <string name="close">Close</string>
@@ -47,4 +47,5 @@
     <string name="custom_list_display">Custom List Display</string>
     <string name="did_you_add_a_video_link">Did you add a video link?</string>
     <string name="add_an_image_here">Add an Image Here.</string>
+    <string name="do_you_want_to_delete">"Do you want to delete %1s?"</string>
 </resources>

@@ -12,6 +12,10 @@ sealed class BuildEvent {
         val reflexionItem: ReflexionItem
     ) : BuildEvent()
 
+    data class DeleteReflexionItemSubItemByName(
+        val subItem: String
+    ) : BuildEvent()
+
     data class UpdateDisplayedReflexionItem(
         val reflexionItem: ReflexionItem
     ) : BuildEvent()

@@ -4,7 +4,6 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.provider.DocumentsProvider
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
@@ -17,8 +16,16 @@ import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.util.BaseApplication
+import com.livingtechusa.reflexion.util.Constants.DESCRIPTION
+import com.livingtechusa.reflexion.util.Constants.DETAILED_DESCRIPTION
 import com.livingtechusa.reflexion.util.Constants.DO_NOT_UPDATE
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
+import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
+import com.livingtechusa.reflexion.util.Constants.IMAGE
+import com.livingtechusa.reflexion.util.Constants.NAME
+import com.livingtechusa.reflexion.util.Constants.PARENT
+import com.livingtechusa.reflexion.util.Constants.VIDEO_URI
+import com.livingtechusa.reflexion.util.Constants.VIDEO_URL
 import com.livingtechusa.reflexion.util.MediaStoreUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -84,7 +91,36 @@ class ItemViewModel @Inject constructor(
                             localServiceImpl.updateReflexionItem(event.reflexionItem)
                         }
                     }
-
+                    is BuildEvent.DeleteReflexionItemSubItemByName -> {
+                        viewModelScope.launch {
+                            val updatedReflexionItem = reflexionItem.value
+                            when(event.subItem) {
+                                NAME -> {
+                                    updatedReflexionItem.name = EMPTY_STRING
+                                }
+                                DESCRIPTION -> {
+                                    updatedReflexionItem.description = EMPTY_STRING
+                                }
+                                DETAILED_DESCRIPTION -> {
+                                    updatedReflexionItem.detailedDescription = EMPTY_STRING
+                                }
+                                IMAGE -> {
+                                    updatedReflexionItem.image = null
+                                }
+                                VIDEO_URI -> {
+                                    updatedReflexionItem.videoUri = EMPTY_STRING
+                                }
+                                VIDEO_URL -> {
+                                    updatedReflexionItem.videoUrl = EMPTY_STRING
+                                }
+                                PARENT -> {
+                                    updatedReflexionItem.parent = null
+                                }
+                            }
+                            _reflexionItem.value = updatedReflexionItem
+                            localServiceImpl.updateReflexionItem(reflexionItem.value)
+                        }
+                    }
                     is BuildEvent.SaveNew -> {
                         viewModelScope.launch {
                             localServiceImpl.setItem(event.reflexionItem)

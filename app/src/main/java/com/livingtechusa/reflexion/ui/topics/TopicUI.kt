@@ -81,18 +81,8 @@ fun ReflexionItemListUI(
 @Composable
 private fun ReflexionItemColumnItem(
     reflexionItem: ReflexionItem,
-//    onDoubleTap: () -> Unit,
-//    onLongPress: () -> Unit
 ) {
-    Row(
-//        modifier = Modifier
-//            .pointerInput(key1 = reflexionItem) {
-//            detectTapGestures(
-//                onDoubleTap = { onDoubleTap() },
-//                onLongPress = { onLongPress() }
-//            )
-//        }
-    ) {
+    Row() {
         Text(
             modifier = Modifier.padding(16.dp),
             text = reflexionItem.name,
@@ -145,8 +135,6 @@ private fun ReflexionItemsContent(
                         Spacer(modifier = Modifier.width(4.dp))
                         ReflexionItemColumnItem(
                             reflexionItem = reflexionItem,
-//                            onDoubleTap = { onDoubleTap(reflexionItem) },
-//                            onLongPress = { onLongPress(reflexionItem) }
                         )
                     }
                 }

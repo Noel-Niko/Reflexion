@@ -28,7 +28,8 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildItemScreen
-import com.livingtechusa.reflexion.ui.components.ConfirmDeleteDialog
+import com.livingtechusa.reflexion.ui.components.ConfirmDeleteListDialog
+import com.livingtechusa.reflexion.ui.components.ConfirmDeleteSubItemDialog
 import com.livingtechusa.reflexion.ui.topics.ListDisplay
 import com.livingtechusa.reflexion.ui.components.ConfirmSaveAlertDialog
 import com.livingtechusa.reflexion.ui.components.PasteAndSaveDialog
@@ -40,15 +41,16 @@ import com.livingtechusa.reflexion.ui.theme.ReflexionTheme
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.BaseApplication
-import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.Constants.DO_NOT_UPDATE
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.HEAD_NODE_PK
+import com.livingtechusa.reflexion.util.Constants.IMAGE
 import com.livingtechusa.reflexion.util.Constants.INDEX
 import com.livingtechusa.reflexion.util.Constants.LIST_NAME
 import com.livingtechusa.reflexion.util.Constants.REFLEXION_ITEM_PK
 import com.livingtechusa.reflexion.util.Constants.SOURCE
+import com.livingtechusa.reflexion.util.Constants.SUB_ITEM
 import com.livingtechusa.reflexion.util.MediaUtil
 import com.livingtechusa.reflexion.util.Temporary
 import dagger.hilt.android.AndroidEntryPoint
@@ -213,7 +215,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable(
-                        route = Screen.ConfirmDeleteScreen.route+ "/{index}/{listName}",
+                        route = Screen.ConfirmDeleteListScreen.route+ "/{index}/{listName}",
                         arguments = listOf(
                             navArgument(INDEX) {
                                 type = NavType.IntType
@@ -227,11 +229,30 @@ class MainActivity : ComponentActivity() {
                             navController.getBackStackEntry(Screen.CustomLists.route)
                         }
                         val parentViewModel: CustomListsViewModel = hiltViewModel(parentEntry)
-                        ConfirmDeleteDialog(
+                        ConfirmDeleteListDialog(
                             viewModel = parentViewModel,
                             navController = navController,
                             index = navBackStackEntry.arguments?.getInt(INDEX),
-                            listName = navBackStackEntry.arguments?.getString(LIST_NAME)
+                            itemToDelete = navBackStackEntry.arguments?.getString(LIST_NAME)
+                        )
+                    }
+
+                    composable(
+                        route = Screen.ConfirmDeleteSubItemScreen.route + "/{subItem}",
+                        arguments = listOf(
+                            navArgument(SUB_ITEM) {
+                                type = NavType.StringType
+                            }
+                        )
+                    ) { navBackStackEntry ->
+                        val parentEntry = remember(navBackStackEntry) {
+                            navController.getBackStackEntry(Screen.HomeScreen.route)
+                        }
+                        val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
+                        ConfirmDeleteSubItemDialog(
+                            viewModel = parentViewModel,
+                            navController = navController,
+                            subItem = navBackStackEntry.arguments?.getString(SUB_ITEM) ?: EMPTY_STRING
                         )
                     }
 

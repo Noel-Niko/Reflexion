@@ -3,7 +3,6 @@ package com.livingtechusa.reflexion.ui.components
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -12,17 +11,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.R
-import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
+import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
+import com.livingtechusa.reflexion.util.ResourceProviderSingleton.getString
 
-const val CONFIRM_DELETE = "ConfirmDeleteDialog"
+const val CONFIRM_DELETE_LIST = "ConfirmDeleteListDialog"
 @Composable
-fun ConfirmDeleteDialog(
+fun ConfirmDeleteListDialog(
     viewModel: CustomListsViewModel = hiltViewModel(),
     navController: NavHostController,
     index: Int?,
-    listName: String?
+    itemToDelete: String?
 ) {
     //MaterialTheme {
         Column {
@@ -31,10 +31,10 @@ fun ConfirmDeleteDialog(
                 AlertDialog(
                     onDismissRequest = { openDialog.value = false },
                     title = {
-                        Text(text = stringResource(R.string.confirm_to_delete_list))
+                        Text(text = stringResource(R.string.confirm_to_delete))
                     },
                     text = {
-                        Text("Do you want to delete $listName")
+                        Text(text = getString(R.string.do_you_want_to_delete, itemToDelete ?: EMPTY_STRING))
                     },
                     confirmButton = {
                         Button(
