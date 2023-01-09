@@ -1,14 +1,16 @@
 package com.livingtechusa.reflexion.ui.build
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.media.ThumbnailUtils
 import android.net.Uri
 import android.os.Build
+import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
@@ -78,6 +80,14 @@ import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import java.io.InputStream
 import androidx.compose.ui.graphics.Color
+import androidx.core.graphics.drawable.toAdaptiveIcon
+import androidx.core.net.toFile
+import coil.size.Size
+import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
+import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils.getThumbnail
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import java.io.ByteArrayInputStream
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
@@ -142,10 +152,52 @@ fun BuildContentV2(
     val selectImage =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(),
             onResult = { uri ->
+
+////                val takeFlags : Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+////                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+////                if (uri != null) {
+////                    context.contentResolver.takePersistableUriPermission(uri, takeFlags)
+////                }
+//                CoroutineScope(Dispatchers.IO).launch {
+//                    if (uri != null) {
+//                        val bitMap: Bitmap? = SafeUtils.getThumbnail(context, uri)
+//                        if(bitMap != null) {
+//                            val copy = reflexionItem.copy(image = Converters().convertBitMapToByteArray(bitmap = bitMap))
+//                            itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
+//                        }
+//                    }
+//                }
+
+//                val size = android.util.Size(200, 300)
+//                val bitMap: Bitmap? = uri?.let {
+//                    context.contentResolver.loadThumbnail(it, size, null)
+//                }
+//
+//                if(bitMap != null) {
+//                    val copy = reflexionItem.copy(image = Converters().convertBitMapToByteArray(bitmap = bitMap))
+//                    itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
+//                }
                 val iStream: InputStream? = context.contentResolver.openInputStream(uri ?: Uri.EMPTY)
+//                val takeFlags : Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+//                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+//                if (uri != null) {
+//                    context.contentResolver.takePersistableUriPermission(uri, takeFlags)
+//                }
                 if(iStream != null) {
-                    val copy = reflexionItem.copy(image = Converters().getBytes(inputStream = iStream))
-                    itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
+                   //Reduce the image to a thumbnail
+                    val bitmap = BitmapFactory.decodeStream(iStream)
+                    val thumbNail = ThumbnailUtils.extractThumbnail(bitmap, 200, 300)
+
+
+//                    val thumb = uri?.toString()
+//                        ?.let { ThumbnailUtils.createImageThumbnail(it,  MediaStore.Images.Thumbnails.MINI_KIND) }
+                    if (thumbNail != null) {
+                        val copy = reflexionItem.copy(image = Converters().convertBitMapToByteArray(thumbNail))
+                        itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
+                    }
+
+//                    val copy = reflexionItem.copy(image = Converters().getBytes(inputStream = iStream))
+//                    itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
                 }
                 iStream?.close()
             })
@@ -384,63 +436,48 @@ fun BuildContentV2(
                     Spacer(Modifier.height(16.dp))
                     /* SAVED VIDEO */
                     Row(
-                        modifier = Modifier.padding(8.dp).fillMaxSize()
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxSize()
                     ) {
                         Column(
                             Modifier
                                 .weight(1f)
                                 .align(Alignment.CenterVertically)
                         ) {
-                            Row(modifier = Modifier.height(100.dp).width(100.dp)) {
-//                                Text(
-//                                    modifier = Modifier
-//                                        .fillMaxWidth()
-//                                        .clickable {
-//                                            if (reflexionItem.videoUri.isNullOrEmpty()) {
-//                                                Toast
-//                                                    .makeText(
-//                                                        context,
-//                                                        resource.getString(R.string.is_saved),
-//                                                        Toast.LENGTH_SHORT
-//                                                    )
-//                                                    .show()
-//                                            } else {
-//                                                val route: String =
-//                                                    Screen.VideoView.route + "/" + URI
-//                                                navController.navigate(route)
-//                                            }
-//                                        },
-//                                    text = AnnotatedString(stringResource(R.string.saved_video)),
-//                                    color = Blue
-//                                )
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                Text(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            if (reflexionItem.videoUri.isNullOrEmpty()) {
+                                                Toast
+                                                    .makeText(
+                                                        context,
+                                                        resource.getString(R.string.is_saved),
+                                                        Toast.LENGTH_SHORT
+                                                    )
+                                                    .show()
+                                            } else {
+                                                val route: String =
+                                                    Screen.VideoView.route + "/" + URI
+                                                navController.navigate(route)
+                                            }
+                                        },
+                                    text = AnnotatedString(stringResource(R.string.saved_video)),
+                                    color = Blue
+                                )
                                 if (reflexionItem.videoUri.isNullOrEmpty().not()) {
-//                                    val imageLoader = ImageLoader.Builder(context)
-//                                        .components {
-//                                            add(VideoFrameDecoder.Factory())
-//                                        }.crossfade(true)
-//                                        .build()
-//
-//                                    val videoPainter = rememberAsyncImagePainter(
-//                                        model = reflexionItem.videoUri,
-//                                        imageLoader = imageLoader
-//                                    )
-//                                    Image(
-//                                        painter = videoPainter,
-//                                        contentDescription = "Selected Video Thumbnail",
-//                                        contentScale = ContentScale.FillBounds,
-//                                        alignment = Alignment.Center,
-//                                        modifier = Modifier.fillMaxSize().background(Color.Red)
-//                                    )
                                     viewModel.getSelectedFile()
                                     if (selectedFile != null) {
-                                        DocumentFilePreviewCard(selectedFile!!)
+                                        DocumentFilePreviewCard(resource = selectedFile!!, navController = navController)
                                     }
                                 }
                             }
                         }
                         Column(
                             Modifier
-                                .weight(1f)
+                                .weight(.5f)
                                 .align(Alignment.CenterVertically)
                         ) {
                             IconButton(onClick = {
@@ -494,7 +531,7 @@ fun BuildContentV2(
                         }
                         Column(
                             Modifier
-                                .weight(1f)
+                                .weight(0.5f)
                                 .align(Alignment.CenterVertically)
                         ) {
                             IconButton(onClick = {

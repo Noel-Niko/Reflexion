@@ -10,7 +10,7 @@ import android.provider.DocumentsContract
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-object SafUtils {
+object SafeUtils {
     /**
      * Returns a [FileResource] if it finds its related DocumentsProvider
      */
@@ -58,20 +58,13 @@ object SafUtils {
 
     suspend fun getResourceByUriPersistently(context: Context, uri: Uri): FileResource {
         return withContext(Dispatchers.IO) {
-
             val projection = arrayOf(
                 DocumentsContract.Document.COLUMN_DISPLAY_NAME,
                 DocumentsContract.Document.COLUMN_SIZE,
                 DocumentsContract.Document.COLUMN_MIME_TYPE,
             )
 
-
-            val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-            // Check for the freshest data.
-            context.contentResolver.takePersistableUriPermission(uri, takeFlags)
-
-            query(
+            val cursor = context.contentResolver.query(
                 uri,
                 projection,
                 null,
@@ -90,6 +83,9 @@ object SafUtils {
                     cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_SIZE)
                 val mimeTypeColumn =
                     cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_MIME_TYPE)
+                val takeFlags : Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                context.contentResolver.takePersistableUriPermission(uri, takeFlags)
 
                 FileResource(
                     uri = uri,
@@ -99,17 +95,18 @@ object SafUtils {
                     mimeType = cursor.getString(mimeTypeColumn),
                     path = null,
                 )
+
             }
         }
     }
 
     suspend fun getThumbnail(context: Context, uri: Uri): Bitmap? {
         return withContext(Dispatchers.IO) {
-            val takeFlags : Int = Intent . FLAG_GRANT_READ_URI_PERMISSION
-//                    or
-//            Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            val takeFlags : Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            context.contentResolver.takePersistableUriPermission(uri, takeFlags)
             return@withContext DocumentsContract.getDocumentThumbnail(
-            context.contentResolver.takePersistableUriPermission(uri, takeFlags),
+            context.contentResolver,
             uri,
             Point(512, 512),
             null

@@ -3,15 +3,11 @@ package com.livingtechusa.reflexion.ui.viewModels
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.ParcelFileDescriptor
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.livingtechusa.reflexion.R
@@ -32,13 +28,14 @@ import com.livingtechusa.reflexion.util.Constants.VIDEO_URI
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URL
 import com.livingtechusa.reflexion.util.scopedStorageUtils.FileResource
 import com.livingtechusa.reflexion.util.scopedStorageUtils.MediaStoreUtils
-import com.livingtechusa.reflexion.util.scopedStorageUtils.SafUtils
+import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.io.FileDescriptor
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -105,12 +102,7 @@ class ItemViewModel @Inject constructor(
                 reflexionItem.value.videoUri?.let { Converters().convertStringToUri(it) }
             if(uri != null) {
                 viewModelScope.launch {
-//                    val parcelFileDescriptor: ParcelFileDescriptor? =
-//                        context.applicationContext.contentResolver.openFileDescriptor(uri, "r")
-//                    val fileDescriptor: FileDescriptor = parcelFileDescriptor?.fileDescriptor
-//                    val image: Bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor)
-//                    parcelFileDescriptor?.close()
-                    _selectedFile.value = SafUtils.getResourceByUri(context = context, uri = uri)
+                    _selectedFile.value = SafeUtils.getResourceByUriPersistently(context = context, uri = uri)
                 }
             }
 
@@ -124,9 +116,11 @@ class ItemViewModel @Inject constructor(
             try {
                 when (event) {
                     is BuildEvent.UpdateReflexionItem -> {
-                        viewModelScope.launch {
-                            _reflexionItem.value = event.reflexionItem
-                            localServiceImpl.updateReflexionItem(event.reflexionItem)
+                        viewModelScope.launch() {
+                            withContext(Dispatchers.IO) {
+                                _reflexionItem.value = event.reflexionItem
+                                localServiceImpl.updateReflexionItem(event.reflexionItem)
+                            }
                         }
                     }
                     is BuildEvent.DeleteReflexionItemSubItemByName -> {
@@ -275,56 +269,6 @@ class ItemViewModel @Inject constructor(
             }
         }
     }
-//
-//    fun onTriggerEvent(event: ListEvent) {
-//        viewModelScope.launch {
-//            try {
-//                when (event) {
-//                    is ListEvent.GetList -> {
-//                        if (event.pk == null || event.pk == EMPTY_PK) {
-//                            _list.value = localServiceImpl.getAllTopics() as List<ReflexionItem>
-//                        } else {
-//                            _list.value =
-//                                localServiceImpl.selectChildren(event.pk) as List<ReflexionItem>
-//                        }
-//                    }
-//
-//                    is ListEvent.Search -> {
-//                        if (event.pk == EMPTY_PK) {
-//                            if (event.search.isNullOrEmpty()) {
-//                                _list.value = localServiceImpl.getAllTopics() as List<ReflexionItem>
-//                            } else {
-//                                // Topic key work search
-//                                _list.value =
-//                                    localServiceImpl.getAllTopicsContainingString(event.search) as List<ReflexionItem>
-//                            }
-//                        } else {
-//                            // Children keyword search
-//                            _list.value =
-//                                localServiceImpl.selectChildrenContainingString(
-//                                    event.pk,
-//                                    event.search
-//                                ) as List<ReflexionItem>
-//                        }
-//                    }
-//
-//                    is ListEvent.ClearList -> {
-//                        _list.value = emptyList()
-//                    }
-//
-//                    else -> {
-//                        Toast.makeText(context, "No matching items", Toast.LENGTH_SHORT).show()
-//                    }
-//
-//                }
-//            } catch (e: Exception) {
-//                Log.e(
-//                    TAG,
-//                    "Exception: ${e.message}  with cause: ${e.cause}"
-//                )
-//            }
-//        }
-//    }
 
     suspend fun createVideoUri(): Uri? {
         val filename = context.getString(R.string.app_name) + "${System.currentTimeMillis()}.mp4"

@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.text.format.Formatter
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +22,8 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.livingtechusa.reflexion.navigation.Screen
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 
@@ -58,13 +61,16 @@ fun MediaFilePreviewCard(resource: FileResource) {
 }
 
 @Composable
-fun DocumentFilePreviewCard(resource: FileResource) {
+fun DocumentFilePreviewCard(resource: FileResource, navController: NavHostController) {
     val context = LocalContext.current
     val formattedFileSize = Formatter.formatShortFileSize(context, resource.size)
+    val URI = "Uri"
+    val route: String =
+        Screen.VideoView.route + "/" + URI
     val fileMetadata = "${resource.mimeType} - $formattedFileSize"
 
     val thumbnail by produceState<Bitmap?>(null, resource.uri) {
-        value = SafUtils.getThumbnail(context, resource.uri)
+        value = SafeUtils.getThumbnail(context, resource.uri)
     }
 
 
@@ -74,17 +80,21 @@ fun DocumentFilePreviewCard(resource: FileResource) {
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth()
+            .clickable {
+                Screen.VideoView.route + "/" + URI
+                navController.navigate(route)
+            }
     ) {
         Column {
             thumbnail?.let { Image(bitmap = it.asImageBitmap(), contentDescription = null) }
 
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = resource.filename, style = MaterialTheme.typography.subtitle2)
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = fileMetadata, style = MaterialTheme.typography.caption)
-                Spacer(modifier = Modifier.height(12.dp))
-                resource.path?.let { Text(text = it, style = MaterialTheme.typography.caption) }
-            }
+//            Column(modifier = Modifier.padding(16.dp)) {
+//                Text(text = resource.filename, style = MaterialTheme.typography.subtitle2)
+//                Spacer(modifier = Modifier.height(4.dp))
+//                Text(text = fileMetadata, style = MaterialTheme.typography.caption)
+//                Spacer(modifier = Modifier.height(12.dp))
+//                resource.path?.let { Text(text = it, style = MaterialTheme.typography.caption) }
+//            }
         }
     }
 }

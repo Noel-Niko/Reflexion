@@ -1,14 +1,13 @@
 package com.livingtechusa.reflexion.data.entities
 
+import android.graphics.Bitmap
+import android.media.Image
 import android.net.Uri
 import androidx.room.TypeConverter
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-
 import java.io.IOException
-
 import java.io.InputStream
-
-
 
 
 class Converters {
@@ -34,4 +33,11 @@ class Converters {
         inputStream.close()
         return byteBuffer.toByteArray()
     }
+
+    fun convertBitMapToByteArray(bitmap: Bitmap):  ByteArray {
+        val bos: ByteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50 /*ignored for PNG*/, bos);
+        return bos.toByteArray();
+    }
+
 }

@@ -21,6 +21,9 @@ class ModifyMediaRequest : ActivityResultContract<Uri, Uri?>() {
 
     override fun createIntent(context: Context, input: Uri): Intent {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val takeFlags : Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+
             Intent(ActivityResultContracts.StartIntentSenderForResult.ACTION_INTENT_SENDER_REQUEST)
                 .putExtra(
                     ActivityResultContracts.StartIntentSenderForResult.EXTRA_INTENT_SENDER_REQUEST,
