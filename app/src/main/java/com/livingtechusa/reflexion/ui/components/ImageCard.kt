@@ -36,8 +36,8 @@ fun ImageCard(
         OutlinedCard(
             shape = MaterialTheme.shapes.medium,
             modifier = Modifier
-                .height(200.dp)
-                .width(300.dp)
+                .height(150.dp)
+                .width(100.dp)
                 .padding(4.dp)
                 .background(Color.White),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -45,7 +45,7 @@ fun ImageCard(
             Image(
                 painter = imagePainter,
                 contentDescription = "Your Image",
-                contentScale = ContentScale.Inside,
+                contentScale = ContentScale.FillBounds,
                 modifier = Modifier
                     .fillMaxSize()
                     .clickable(

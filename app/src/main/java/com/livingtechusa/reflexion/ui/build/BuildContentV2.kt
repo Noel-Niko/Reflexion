@@ -146,7 +146,7 @@ fun BuildContentV2(
                 if (iStream != null) {
                     //Reduce the image to a thumbnail & save
                     val bitmap = BitmapFactory.decodeStream(iStream)
-                    val thumbNail = ThumbnailUtils.extractThumbnail(bitmap, 200, 300)
+                    val thumbNail = ThumbnailUtils.extractThumbnail(bitmap, 100, 150)
                     if (thumbNail != null) {
                         val copy = reflexionItem.copy(
                             image = Converters().convertBitMapToByteArray(thumbNail)
@@ -254,10 +254,9 @@ fun BuildContentV2(
                                 arrayOf(Pair(10f, Color.Black), Pair(5f, Color.Red))
                             Box(
                                 modifier = Modifier
-                                    .fillMaxWidth()
                                     .padding(32.dp, 0.dp, 32.dp, 0.dp)
                                     .border(
-                                        2.dp, verticalGradient(colorStops = colorStops),
+                                        1.dp, verticalGradient(colorStops = colorStops),
                                         TextFieldDefaults.OutlinedTextFieldShape
                                     )
                                     .align(Alignment.CenterHorizontally)
