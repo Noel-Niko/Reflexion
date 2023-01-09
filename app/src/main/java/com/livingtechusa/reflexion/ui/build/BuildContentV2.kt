@@ -1,8 +1,6 @@
 package com.livingtechusa.reflexion.ui.build
 
 import android.content.Intent
-import android.graphics.BitmapFactory
-import android.media.ThumbnailUtils
 import android.net.Uri
 import android.os.Build
 import android.widget.Toast
@@ -22,7 +20,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -64,7 +61,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.R
-import com.livingtechusa.reflexion.data.entities.Converters
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.components.ImageCard
@@ -75,8 +71,8 @@ import com.livingtechusa.reflexion.util.Temporary
 import com.livingtechusa.reflexion.util.scopedStorageUtils.DocumentFilePreviewCard
 import com.livingtechusa.reflexion.util.scopedStorageUtils.MediaStoreUtils
 import kotlinx.coroutines.launch
-import java.io.InputStream
 import kotlin.math.roundToInt
+
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
@@ -141,21 +137,8 @@ fun BuildContentV2(
     val selectImage =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(),
             onResult = { uri ->
-                val iStream: InputStream? =
-                    context.contentResolver.openInputStream(uri ?: Uri.EMPTY)
-                if (iStream != null) {
-                    //Reduce the image to a thumbnail & save
-                    val bitmap = BitmapFactory.decodeStream(iStream)
-                    val thumbNail = ThumbnailUtils.extractThumbnail(bitmap, 100, 150)
-                    if (thumbNail != null) {
-                        val copy = reflexionItem.copy(
-                            image = Converters().convertBitMapToByteArray(thumbNail)
-                        )
-                        itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
-                    }
-                }
-                iStream?.close()
-            })
+                viewModel.onTriggerEvent(BuildEvent.CreateThumbnailImage(uri))
+                })
 
     val takeImage = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()

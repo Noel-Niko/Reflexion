@@ -3,6 +3,7 @@ package com.livingtechusa.reflexion.ui.viewModels
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -27,6 +28,8 @@ import com.livingtechusa.reflexion.util.Constants.PARENT
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URI
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URL
 import com.livingtechusa.reflexion.util.scopedStorageUtils.FileResource
+import com.livingtechusa.reflexion.util.scopedStorageUtils.ImageUtils
+import com.livingtechusa.reflexion.util.scopedStorageUtils.ImageUtils.rotateImage
 import com.livingtechusa.reflexion.util.scopedStorageUtils.MediaStoreUtils
 import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,6 +39,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.InputStream
 import javax.inject.Inject
 
 
@@ -100,13 +104,14 @@ class ItemViewModel @Inject constructor(
         try {
             val uri: Uri? =
                 reflexionItem.value.videoUri?.let { Converters().convertStringToUri(it) }
-            if(uri != null) {
+            if (uri != null) {
                 viewModelScope.launch {
-                    _selectedFile.value = SafeUtils.getResourceByUriPersistently(context = context, uri = uri)
+                    _selectedFile.value =
+                        SafeUtils.getResourceByUriPersistently(context = context, uri = uri)
                 }
             }
 
-        } catch(e: java.lang.Exception) {
+        } catch (e: java.lang.Exception) {
             Log.e(TAG, "Unable to get File Resource")
         }
     }
@@ -123,28 +128,35 @@ class ItemViewModel @Inject constructor(
                             }
                         }
                     }
+
                     is BuildEvent.DeleteReflexionItemSubItemByName -> {
                         viewModelScope.launch {
                             val updatedReflexionItem = reflexionItem.value
-                            when(event.subItem) {
+                            when (event.subItem) {
                                 NAME -> {
                                     updatedReflexionItem.name = EMPTY_STRING
                                 }
+
                                 DESCRIPTION -> {
                                     updatedReflexionItem.description = EMPTY_STRING
                                 }
+
                                 DETAILED_DESCRIPTION -> {
                                     updatedReflexionItem.detailedDescription = EMPTY_STRING
                                 }
+
                                 IMAGE -> {
                                     updatedReflexionItem.image = null
                                 }
+
                                 VIDEO_URI -> {
                                     updatedReflexionItem.videoUri = EMPTY_STRING
                                 }
+
                                 VIDEO_URL -> {
                                     updatedReflexionItem.videoUrl = EMPTY_STRING
                                 }
+
                                 PARENT -> {
                                     updatedReflexionItem.parent = null
                                 }
@@ -153,6 +165,7 @@ class ItemViewModel @Inject constructor(
                             localServiceImpl.updateReflexionItem(reflexionItem.value)
                         }
                     }
+
                     is BuildEvent.SaveNew -> {
                         viewModelScope.launch {
                             localServiceImpl.setItem(event.reflexionItem)
@@ -257,8 +270,31 @@ class ItemViewModel @Inject constructor(
                         _SaveNow.value = true
                     }
 
-                    else -> {
+                    is BuildEvent.CreateThumbnailImage -> {
+                        val iStream: InputStream? =
+                            context.contentResolver.openInputStream(event.uri ?: Uri.EMPTY)
+                        if (iStream != null) {
+                            //Reduce the image to a thumbnail & save
+                            val bitmap = BitmapFactory.decodeStream(iStream)
+                            var thumbNail = ImageUtils.extractThumbnail(bitmap, 100, 100)
+                            if (thumbNail != null) {
+                                thumbNail = rotateImage(thumbNail, 90f)
+                                val copy = reflexionItem.value.copy(
+                                    image = thumbNail?.let {
+                                        com.livingtechusa.reflexion.data.entities.Converters()
+                                            .convertBitMapToByteArray(it)
+                                    }
+                                )
+                                _reflexionItem.value = copy
+                                //localServiceImpl.updateReflexionItem(copy)
+                            }
+                        }
+                        withContext(Dispatchers.IO) {
+                            iStream?.close()
+                        }
+                    }
 
+                    else -> {
                     }
                 }
             } catch (e: Exception) {
@@ -269,6 +305,7 @@ class ItemViewModel @Inject constructor(
             }
         }
     }
+
 
     suspend fun createVideoUri(): Uri? {
         val filename = context.getString(R.string.app_name) + "${System.currentTimeMillis()}.mp4"

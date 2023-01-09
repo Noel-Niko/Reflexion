@@ -1,5 +1,6 @@
 package com.livingtechusa.reflexion.ui.build
 
+import android.net.Uri
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 
 sealed class BuildEvent {
@@ -40,6 +41,7 @@ sealed class BuildEvent {
     ): BuildEvent()
 
     data class SetParent(val parent: Long): BuildEvent()
+    data class CreateThumbnailImage(val uri: Uri?) : BuildEvent()
 
     object BluetoothSend : BuildEvent()
     object SendText : BuildEvent()

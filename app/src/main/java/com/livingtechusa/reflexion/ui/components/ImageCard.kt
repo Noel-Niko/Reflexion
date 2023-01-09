@@ -12,6 +12,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -36,7 +37,7 @@ fun ImageCard(
         OutlinedCard(
             shape = MaterialTheme.shapes.medium,
             modifier = Modifier
-                .height(150.dp)
+                .height(100.dp)
                 .width(100.dp)
                 .padding(4.dp)
                 .background(Color.White),
@@ -48,6 +49,7 @@ fun ImageCard(
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier
                     .fillMaxSize()
+                    //.rotate(90f)
                     .clickable(
                         onClick = {
                             navController.navigate(Screen.ConfirmDeleteSubItemScreen.route + "/" + IMAGE )
