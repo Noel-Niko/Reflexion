@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedCard
@@ -35,9 +36,10 @@ fun ImageCard(
         OutlinedCard(
             shape = MaterialTheme.shapes.medium,
             modifier = Modifier
-                .height(400.dp)
+                .height(200.dp)
+                .width(300.dp)
                 .padding(4.dp)
-                .background(Color.Red),
+                .background(Color.White),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             Image(
