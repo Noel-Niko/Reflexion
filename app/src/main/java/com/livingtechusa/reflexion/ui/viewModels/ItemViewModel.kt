@@ -220,7 +220,11 @@ class ItemViewModel @Inject constructor(
                     }
 
                     is BuildEvent.SetParent -> {
-                        _reflexionItem.value.parent = event.parent
+                        viewModelScope.launch {
+                            val item = ReflexionItem(parent = event.parent)
+                            item.image = localServiceImpl.selectItem(event.parent)?.image
+                            _reflexionItem.value = item
+                        }
                     }
 
                     is BuildEvent.BluetoothSend -> {
@@ -286,7 +290,6 @@ class ItemViewModel @Inject constructor(
                                     }
                                 )
                                 _reflexionItem.value = copy
-                                //localServiceImpl.updateReflexionItem(copy)
                             }
                         }
                         withContext(Dispatchers.IO) {

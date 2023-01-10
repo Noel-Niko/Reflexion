@@ -5,6 +5,7 @@ import android.text.format.Formatter
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,11 +20,14 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.navigation.Screen
+import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
+import com.livingtechusa.reflexion.util.Constants.VIDEO_URI
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 
@@ -61,9 +65,12 @@ fun MediaFilePreviewCard(resource: FileResource) {
 }
 
 @Composable
-fun DocumentFilePreviewCard(resource: FileResource, navController: NavHostController) {
+fun DocumentFilePreviewCard(resource: FileResource, navController: NavHostController, docType: String) {
     val context = LocalContext.current
     val formattedFileSize = Formatter.formatShortFileSize(context, resource.size)
+
+     // modify to handle play for both both saved and linked video... to delete on long or double tap...
+
     val URI = "Uri"
     val route: String =
         Screen.VideoView.route + "/" + URI
@@ -78,6 +85,25 @@ fun DocumentFilePreviewCard(resource: FileResource, navController: NavHostContro
         elevation = 0.dp,
         border = BorderStroke(width = 1.dp, color = compositeBorderColor()),
         modifier = Modifier
+            .pointerInput(key1 = resource) {
+                detectTapGestures(
+                    onLongPress  = {
+                        // Launch dialog
+                        navController.navigate(Screen.ConfirmDeleteSubItemScreen.route + "/" + docType)
+                    },
+//                    onDoubleTap = {
+//                        viewModel.onTriggerEvent(
+//                            CustomListEvent.MoveToEdit(
+//                                index
+//                            )
+//                        )
+//                    },
+                    onTap = {
+                        Screen.VideoView.route + "/" + URI
+                        navController.navigate(route)
+                    }
+                )
+            }
             .padding(16.dp)
             .fillMaxWidth()
             .clickable {

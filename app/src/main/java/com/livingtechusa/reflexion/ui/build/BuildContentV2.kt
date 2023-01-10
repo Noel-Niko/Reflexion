@@ -66,6 +66,8 @@ import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.components.ImageCard
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.Constants
+import com.livingtechusa.reflexion.util.Constants.VIDEO_URI
+import com.livingtechusa.reflexion.util.Constants.VIDEO_URL
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import com.livingtechusa.reflexion.util.Temporary
 import com.livingtechusa.reflexion.util.scopedStorageUtils.DocumentFilePreviewCard
@@ -464,7 +466,8 @@ fun BuildContentV2(
                                     if (selectedFile != null) {
                                         DocumentFilePreviewCard(
                                             resource = selectedFile!!,
-                                            navController = navController
+                                            navController = navController,
+                                            VIDEO_URI
                                         )
                                     }
                                 }
@@ -523,6 +526,16 @@ fun BuildContentV2(
                                 text = AnnotatedString(stringResource(R.string.video_link)),
                                 color = Blue
                             )
+                            if (reflexionItem.videoUrl.isNullOrEmpty().not()) {
+                                viewModel.getSelectedFile()
+                                if (selectedFile != null) {
+                                    DocumentFilePreviewCard(
+                                        resource = selectedFile!!,
+                                        navController = navController,
+                                        VIDEO_URL
+                                    )
+                                }
+                            }
                         }
                         Column(
                             Modifier
