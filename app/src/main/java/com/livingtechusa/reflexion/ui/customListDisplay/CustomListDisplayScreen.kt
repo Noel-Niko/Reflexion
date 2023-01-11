@@ -251,7 +251,7 @@ fun CustomListDisplayContent(
                                                     .show()
                                             } else {
                                                 val route: String =
-                                                    Screen.VideoViewCustomList.route + "/" + childItemIndex
+                                                    Screen.VideoViewCustomList.route //+ "/" + childItemIndex
                                                 navController.navigate(route)
                                             }
                                         },

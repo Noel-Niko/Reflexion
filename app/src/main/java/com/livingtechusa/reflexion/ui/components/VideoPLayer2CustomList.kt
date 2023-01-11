@@ -26,26 +26,29 @@ fun VideoPlayer2CustomList(
 ) {
     val childList by viewModel.children.collectAsState()
     val context = LocalContext.current
-    val uri: String = index?.let { childList[it].videoUri } ?: EMPTY_STRING
-    if (uri != EMPTY_STRING) {
-        val exoPlayer = ExoPlayer.Builder(LocalContext.current)
-            .build()
-            .also { exoPlayer ->
-                val mediaItem = MediaItem.Builder()
-                    .setUri(uri)
-                    .build()
-                exoPlayer.setMediaItem(mediaItem)
-                exoPlayer.prepare()
-            }
 
-        DisposableEffect(
-            AndroidView(factory = {
-                StyledPlayerView(context).apply {
-                    player = exoPlayer
+    if (childList.isNullOrEmpty().not()) {
+        val uri: String = index?.let { childList[it].videoUri } ?: EMPTY_STRING
+        if (uri != EMPTY_STRING) {
+            val exoPlayer = ExoPlayer.Builder(LocalContext.current)
+                .build()
+                .also { exoPlayer ->
+                    val mediaItem = MediaItem.Builder()
+                        .setUri(uri)
+                        .build()
+                    exoPlayer.setMediaItem(mediaItem)
+                    exoPlayer.prepare()
                 }
-            })
-        ) {
-            onDispose { exoPlayer.release() }
+
+            DisposableEffect(
+                AndroidView(factory = {
+                    StyledPlayerView(context).apply {
+                        player = exoPlayer
+                    }
+                })
+            ) {
+                onDispose { exoPlayer.release() }
+            }
         }
     }
 }

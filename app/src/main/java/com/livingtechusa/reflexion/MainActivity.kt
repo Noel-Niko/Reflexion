@@ -285,7 +285,7 @@ class MainActivity : ComponentActivity() {
 //                        )
                     ) { navBackStackEntry ->
                         val parentEntry = remember(navBackStackEntry) {
-                            navController.getBackStackEntry(Screen.HomeScreen.route)
+                            navController.getBackStackEntry(Screen.CustomLists.route)
                         }
                         val parentViewModel: CustomListsViewModel = hiltViewModel(parentEntry)
                         VideoPlayer2CustomList(
