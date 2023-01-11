@@ -59,6 +59,9 @@ class CustomListsViewModel @Inject constructor(
     private val _listOfLists = MutableStateFlow<List<ReflexionArrayItem?>>(emptyList())
     val listOfLists: StateFlow<List<ReflexionArrayItem?>> get() = _listOfLists
 
+    private val _listImages = MutableStateFlow<List<Bitmap>>(emptyList())
+    val listImages: StateFlow<List<Bitmap?>> get() = _listImages
+
     private var newList = true
     private var topic: Long = EMPTY_PK
 
@@ -76,6 +79,20 @@ class CustomListsViewModel @Inject constructor(
             }
         }
         return parent
+    }
+
+    fun getListImages() {
+        viewModelScope.launch {
+            val bitmaps: MutableList<Bitmap> = mutableListOf()
+            val job = async {
+                listOfLists.value.forEach { topicItem ->
+                    topicItem?.children?.get(0)?.itemPK?.let { localServiceImpl.selectImage(it) }
+                        ?.let { bitmaps.add(it) }
+                }
+            }
+            job.join()
+            _listImages.value = bitmaps
+        }
     }
 
     val item1 = ReflexionArrayItem(
@@ -306,7 +323,7 @@ class CustomListsViewModel @Inject constructor(
                             val newList =
                                 async { localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic) }
                             _listOfLists.value = newList.await()
-
+                            getListImages()
                         }
 
                         // A new topic item has been selected, create new list with selected first item, and load related lists.
@@ -319,7 +336,7 @@ class CustomListsViewModel @Inject constructor(
                         val newList =
                             async { localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic) }
                         _listOfLists.value = newList.await()
-
+                        getListImages()
                         /* If we are adding to an existing list, only allowing items under the same topic,
                         we copy to list and add the newly selected child.
                          */

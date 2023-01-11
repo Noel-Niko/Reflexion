@@ -8,6 +8,7 @@ import android.graphics.Point
 import android.net.Uri
 import android.provider.DocumentsContract
 import android.util.Log
+import com.livingtechusa.reflexion.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -91,7 +92,7 @@ object SafeUtils {
                                 Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                         context.contentResolver.takePersistableUriPermission(uri, takeFlags)
                     } catch (e: Exception) {
-                        Log.e(TAG, "No persistable flags present to take.")
+                        Log.e(TAG, context.getString(R.string.no_persistable_flags_present_to_take))
                     }
 
                     FileResource(
@@ -117,7 +118,7 @@ object SafeUtils {
                 Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                 context.contentResolver.takePersistableUriPermission(uri, takeFlags)
             } catch (e: Exception) {
-                Log.e(TAG, "No persistable flags present to take.")
+                Log.e(TAG, context.getString(R.string.no_persistable_flags_present_to_take))
             }
             return@withContext DocumentsContract.getDocumentThumbnail(
             context.contentResolver,

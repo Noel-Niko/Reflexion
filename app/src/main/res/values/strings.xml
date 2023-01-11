@@ -52,4 +52,5 @@
     <string name="youtube_image_prepend">https://i3.ytimg.com/vi/</string>
     <string name="youtube_image_postpend">/maxresdefault.jpg</string>
     <string name="unable_to_obtain_video_link_preview">Unable to obtain video link preview.</string>
+    <string name="no_persistable_flags_present_to_take">No persistable flags present to take.</string>
 </resources>

@@ -27,6 +27,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,13 +39,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.livingtechusa.reflexion.navigation.Screen
+import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.util.Constants.NO_LISTS
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
@@ -59,9 +65,11 @@ fun CustomListContent(
     navController: NavHostController,
     viewModel: CustomListsViewModel = hiltViewModel()
 ) {
+    val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
     val customList by viewModel.customList.collectAsState()
     val listOfLists by viewModel.listOfLists.collectAsState()
-    val context = LocalContext.current
+    val listimages by viewModel.listImages.collectAsState()
+
     Column(modifier = Modifier.fillMaxSize()) {
         Row() {
             LazyColumn(
@@ -104,76 +112,69 @@ fun CustomListContent(
             ) {
 
                 items(listOfLists.size) { index ->
-//                    val painter = rememberAsyncImagePainter(
-//                        CoroutineScope(Dispatchers.IO).launch {
-//                            withContext(Dispatchers.IO) {
-//                                {
-//                                    listOfLists[index]?.itemPK?.let { viewModel.getImage(it) }
-//                                }
-//                            }
-//                                )
-//                                val imagePainter = rememberImagePainter(
-//                                    data = painter,
-//                                    builder = {
-//                                        allowHardware(false)
-//                                    }
-//                                )
-                                Box {
-                                    Card(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(4.dp),
-                                        elevation = 10.dp,
-                                        shape = RoundedCornerShape(20.dp)
-                                    ) {
-                                        Row(
-                                            modifier = Modifier
-                                                .pointerInput(key1 = index) {
-                                                    detectTapGestures(
-                                                        onDoubleTap = {
-                                                            // Launch dialog
-                                                            navController.navigate(Screen.ConfirmDeleteListScreen.route + "/" + index + "/" + listOfLists[index]?.itemName)
-                                                        },
-                                                        onLongPress = {
-                                                            viewModel.onTriggerEvent(
-                                                                CustomListEvent.MoveToEdit(
-                                                                    index
-                                                                )
-                                                            )
-                                                        },
-                                                        onTap = {
-                                                            navController.navigate(Screen.CustomListDisplay.route + "/" + listOfLists[index]?.nodePk)
-                                                        }
+                    Box {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp),
+                            elevation = 10.dp,
+                            shape = RoundedCornerShape(20.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .pointerInput(key1 = index) {
+                                        detectTapGestures(
+                                            onDoubleTap = {
+                                                // Launch dialog
+                                                navController.navigate(Screen.ConfirmDeleteListScreen.route + "/" + index + "/" + listOfLists[index]?.itemName)
+                                            },
+                                            onLongPress = {
+                                                viewModel.onTriggerEvent(
+                                                    CustomListEvent.MoveToEdit(
+                                                        index
                                                     )
-                                                },
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-//                                            Image(
-//                                                painter = imagePainter,
-//                                                contentDescription = "Your Image",
-//                                                contentScale = ContentScale.FillBounds,
-//                                                modifier = Modifier
-//                                                    .width(50.dp)
-//                                                    .height(50.dp)
-//
-//                                            )
-//                                            Spacer(modifier = Modifier.width(4.dp))
-                                            Text(
-                                                text = listOfLists[index]?.itemName ?: NO_LISTS,
-                                                modifier = Modifier
-                                                    .padding(16.dp),
-                                                style = MaterialTheme.typography.subtitle2
-                                            )
-                                            listOfLists[index]?.let {
-                                                HorizontalScrollableRowComponent(
-                                                    list = it
                                                 )
+                                            },
+                                            onTap = {
+                                                navController.navigate(Screen.CustomListDisplay.route + "/" + listOfLists[index]?.nodePk)
                                             }
+                                        )
+                                    },
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                if(listimages.isNullOrEmpty().not()) {
+                                    val imagePainter = rememberImagePainter(
+                                        data = listimages[index],
+                                        builder = {
+                                            allowHardware(false)
                                         }
-                                    }
+                                    )
+                                    Image(
+                                        painter = imagePainter,
+                                        contentDescription = "Your Image",
+                                        contentScale = ContentScale.FillBounds,
+                                        modifier = Modifier
+                                            .width(50.dp)
+                                            .height(50.dp)
+
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                }
+                                Text(
+                                    text = listOfLists[index]?.itemName ?: NO_LISTS,
+                                    modifier = Modifier
+                                        .padding(16.dp),
+                                    style = MaterialTheme.typography.subtitle2
+                                )
+                                listOfLists[index]?.let {
+                                    HorizontalScrollableRowComponent(
+                                        list = it
+                                    )
                                 }
                             }
-//                        }
+                        }
+                    }
+                }
             }
         }
     }
@@ -290,7 +291,7 @@ fun HorizontalScrollableRowComponent(
                 Text(
                     text = item.itemName.toString() + ", ",
                     style = MaterialTheme.typography.body1,
-                   // color = MaterialTheme.colors.primary,
+                    // color = MaterialTheme.colors.primary,
                     modifier = Modifier
                         .fillMaxSize()
                 )
