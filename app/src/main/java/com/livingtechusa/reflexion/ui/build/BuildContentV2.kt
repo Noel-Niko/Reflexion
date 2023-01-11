@@ -3,10 +3,12 @@ package com.livingtechusa.reflexion.ui.build
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -20,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -47,6 +50,7 @@ import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
@@ -60,19 +64,26 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
+import coil.decode.VideoFrameDecoder
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.components.ImageCard
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.Constants
+import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URI
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URL
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import com.livingtechusa.reflexion.util.Temporary
 import com.livingtechusa.reflexion.util.scopedStorageUtils.DocumentFilePreviewCard
 import com.livingtechusa.reflexion.util.scopedStorageUtils.MediaStoreUtils
+import com.livingtechusa.reflexion.util.scopedStorageUtils.videoImagePreviewCard
 import kotlinx.coroutines.launch
+import java.lang.Exception
 import kotlin.math.roundToInt
 
 
@@ -93,6 +104,8 @@ fun BuildContentV2(
     val resource = ResourceProviderSingleton
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
     val selectedFile by viewModel.selectedFile.collectAsState()
+    val colorStops: Array<out Pair<Float, Color>> =
+        arrayOf(Pair(10f, Color.Black), Pair(5f, Color.Red))
 
 //    val selectFile =
 //        rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -235,16 +248,14 @@ fun BuildContentV2(
                                 .weight(3f)
                                 .align(Alignment.CenterVertically)
                         ) {
-                            val colorStops: Array<out Pair<Float, Color>> =
-                                arrayOf(Pair(10f, Color.Black), Pair(5f, Color.Red))
                             Box(
                                 modifier = Modifier
-                                    .padding(32.dp, 0.dp, 32.dp, 0.dp)
+                                    .padding(0.dp, 0.dp, 32.dp, 0.dp)
                                     .border(
                                         1.dp, verticalGradient(colorStops = colorStops),
                                         TextFieldDefaults.OutlinedTextFieldShape
                                     )
-                                    .align(Alignment.CenterHorizontally)
+                                    .align(Alignment.End)
                             ) {
                                 if (reflexionItem.image != null) {
                                     ImageCard(reflexionItem.image, navController)
@@ -527,14 +538,11 @@ fun BuildContentV2(
                                 color = Blue
                             )
                             if (reflexionItem.videoUrl.isNullOrEmpty().not()) {
-                                viewModel.getSelectedFile()
-                                if (selectedFile != null) {
-                                    DocumentFilePreviewCard(
-                                        resource = selectedFile!!,
-                                        navController = navController,
-                                        VIDEO_URL
-                                    )
-                                }
+                                videoImagePreviewCard(
+                                    urlString = reflexionItem.videoUrl,
+                                    navController = navController,
+                                    docType = VIDEO_URL
+                                )
                             }
                         }
                         Column(

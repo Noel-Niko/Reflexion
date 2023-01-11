@@ -49,4 +49,7 @@
     <string name="add_an_image_here">Add an Image Here.</string>
     <string name="do_you_want_to_delete">"Do you want to delete %1s?"</string>
     <string name="empty_state">Empty State</string>
+    <string name="youtube_image_prepend">https://i3.ytimg.com/vi/</string>
+    <string name="youtube_image_postpend">/maxresdefault.jpg</string>
+    <string name="unable_to_obtain_video_link_preview">Unable to obtain video link preview.</string>
 </resources>
