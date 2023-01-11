@@ -9,7 +9,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -29,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -40,9 +38,6 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.Screen
-import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
-import com.livingtechusa.reflexion.util.Constants.URL
-import com.livingtechusa.reflexion.util.Constants.VIDEO_URI
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
@@ -165,9 +160,11 @@ val resource = ResourceProviderSingleton
             val urlArray = imageUrl.split("//", "/").map { it.trim() }
             imageUrl =
                 resource.getString(R.string.youtube_image_prepend) + urlArray[2] + resource.getString(R.string.youtube_image_postpend)
+        } else {
+            Toast.makeText(context, resource.getString(R.string.unable_to_obtain_youtube_link_preview), Toast.LENGTH_SHORT).show()
         }
     } catch (e: Exception) {
-        Toast.makeText(context, stringResource(R.string.unable_to_obtain_video_link_preview), Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, stringResource(R.string.unable_to_preview_non_youtube_videos), Toast.LENGTH_SHORT).show()
     }
 
     val painter = rememberImagePainter(data = imageUrl)

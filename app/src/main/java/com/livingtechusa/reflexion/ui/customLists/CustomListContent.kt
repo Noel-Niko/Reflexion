@@ -156,7 +156,6 @@ fun CustomListContent(
                                         modifier = Modifier
                                             .width(50.dp)
                                             .height(50.dp)
-
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                 }
