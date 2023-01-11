@@ -119,7 +119,7 @@ fun DocumentFilePreviewCard(resource: FileResource, navController: NavHostContro
                 )
             }
             .padding(0.dp)
-            .fillMaxWidth()
+            //.fillMaxWidth()
 //            .clickable {
 //                Screen.VideoView.route + "/" + URI
 //                navController.navigate(route)
@@ -196,7 +196,7 @@ val resource = ResourceProviderSingleton
                 )
             }
             .padding(0.dp)
-            .fillMaxWidth()
+//            .fillMaxWidth()
             .background(Color.Transparent)
 //            .clickable {
 //                val intent = Intent(

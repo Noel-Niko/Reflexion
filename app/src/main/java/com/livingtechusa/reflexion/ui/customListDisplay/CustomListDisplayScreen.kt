@@ -3,6 +3,7 @@ package com.livingtechusa.reflexion.ui.customListDisplay
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -228,10 +229,10 @@ fun CustomListDisplayContent(
                             }
                         }
                         Spacer(Modifier.height(16.dp))
-                        /* SAVED VIDEO */
                         Row(
                             modifier = Modifier.padding(8.dp)
                         ) {
+                            /* SAVED VIDEO */
                             Column(
                                 Modifier
                                     .weight(1f)
@@ -251,7 +252,7 @@ fun CustomListDisplayContent(
                                                     .show()
                                             } else {
                                                 val route: String =
-                                                    Screen.VideoViewCustomList.route //+ "/" + childItemIndex
+                                                    Screen.VideoViewCustomList.route + "/" + childItemIndex
                                                 navController.navigate(route)
                                             }
                                         },

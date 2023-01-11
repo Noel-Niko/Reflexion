@@ -277,7 +277,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable(
-                        route = Screen.VideoViewCustomList.route, // + "/{Index}",
+                        route = Screen.VideoViewCustomList.route + "/{Index}",
 //                        arguments = listOf(
 //                            navArgument(INDEX) {
 //                                type = NavType.IntType
