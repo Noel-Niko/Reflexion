@@ -119,7 +119,6 @@ object SafeUtils {
             } catch (e: Exception) {
                 Log.e(TAG, "No persistable flags present to take.")
             }
-
             return@withContext DocumentsContract.getDocumentThumbnail(
             context.contentResolver,
             uri,
