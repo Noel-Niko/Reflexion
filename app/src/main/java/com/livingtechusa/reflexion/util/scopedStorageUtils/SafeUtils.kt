@@ -86,9 +86,13 @@ object SafeUtils {
                         cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_SIZE)
                     val mimeTypeColumn =
                         cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_MIME_TYPE)
-                    val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                    context.contentResolver.takePersistableUriPermission(uri, takeFlags)
+                    try {
+                        val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                                Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                        context.contentResolver.takePersistableUriPermission(uri, takeFlags)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "No persistable flags present to take.")
+                    }
 
                     FileResource(
                         uri = uri,
@@ -108,9 +112,14 @@ object SafeUtils {
 
     suspend fun getThumbnail(context: Context, uri: Uri): Bitmap? {
         return withContext(Dispatchers.IO) {
-            val takeFlags : Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-            context.contentResolver.takePersistableUriPermission(uri, takeFlags)
+            try {
+                val takeFlags : Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                context.contentResolver.takePersistableUriPermission(uri, takeFlags)
+            } catch (e: Exception) {
+                Log.e(TAG, "No persistable flags present to take.")
+            }
+
             return@withContext DocumentsContract.getDocumentThumbnail(
             context.contentResolver,
             uri,
