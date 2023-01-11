@@ -42,6 +42,7 @@ sealed class BuildEvent {
 
     data class SetParent(val parent: Long): BuildEvent()
     data class CreateThumbnailImage(val uri: Uri?) : BuildEvent()
+    object RotateImage : BuildEvent()
 
     object BluetoothSend : BuildEvent()
     object SendText : BuildEvent()

@@ -275,6 +275,24 @@ class ItemViewModel @Inject constructor(
                         _SaveNow.value = true
                     }
 
+                    is BuildEvent.RotateImage -> {
+                        var image = _reflexionItem.value.image?.let {
+                            Converters().getBitmapFromByteArray(
+                                it
+                            )
+                        }
+                        if (image != null) {
+                            image = rotateImage(image, -90f)
+                            val copy = reflexionItem.value.copy(
+                                image = image?.let {
+                                    com.livingtechusa.reflexion.data.entities.Converters()
+                                        .convertBitMapToByteArray(it)
+                                }
+                            )
+                            _reflexionItem.value = copy
+                        }
+                    }
+
                     is BuildEvent.CreateThumbnailImage -> {
                         val iStream: InputStream? =
                             context.contentResolver.openInputStream(event.uri ?: Uri.EMPTY)

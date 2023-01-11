@@ -281,6 +281,14 @@ fun BuildItemContent(
                                     contentDescription = null
                                 )
                             }
+                            IconButton(onClick = {
+                                    viewModel.onTriggerEvent(BuildEvent.RotateImage)
+                            }) {
+                                Icon(
+                                    painter = painterResource(R.drawable.baseline_rotate_90_degrees_ccw_24),
+                                    contentDescription = null
+                                )
+                            }
                         }
                     }
                     /* TOPIC */
