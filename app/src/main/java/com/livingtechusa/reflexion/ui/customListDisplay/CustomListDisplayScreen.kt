@@ -1,8 +1,10 @@
 package com.livingtechusa.reflexion.ui.customListDisplay
 
 import android.widget.Toast
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -17,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -25,11 +28,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -42,6 +47,7 @@ import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.NavBarItems
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildEvent
+import com.livingtechusa.reflexion.ui.components.ImageCard
 import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.util.Constants
@@ -90,8 +96,12 @@ fun CustomListDisplayContent(
 
     val selectedList by viewModel.customList.collectAsState()
     val children by viewModel.children.collectAsState()
+    val childImageList by viewModel.childListImages.collectAsState()
     val context = LocalContext.current
     val resource = ResourceProviderSingleton
+    val colorStops: Array<out Pair<Float, Color>> =
+        arrayOf(Pair(10f, Color.Black), Pair(5f, Color.Red))
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -141,12 +151,35 @@ fun CustomListDisplayContent(
                     elevation = 10.dp,
                     shape = RoundedCornerShape(20.dp)
                 ) {
-                    /* TITLE */
                     Column(
                         modifier = Modifier
                             .padding(12.dp)
                             .fillMaxWidth()
                     ) {
+                        /* IMAGE */
+                        Row(modifier = Modifier.fillMaxWidth()) {
+                            Column(
+                                modifier = Modifier
+                                    .weight(3f)
+                                    .align(Alignment.CenterVertically)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(0.dp, 0.dp, 32.dp, 0.dp)
+                                        .border(
+                                            1.dp, Brush.verticalGradient(colorStops = colorStops),
+                                            TextFieldDefaults.OutlinedTextFieldShape
+                                        )
+                                        .align(Alignment.End)
+                                ) {
+                                    if (childImageList.isNullOrEmpty().not()) {
+                                        ImageCard(childImageList[childItemIndex], navController)
+                                    }
+                                }
+                            }
+                        }
+                        Spacer(Modifier.height(16.dp))
+                        /* TITLE */
                         Row(modifier = Modifier.fillMaxWidth()) {
                             Text(
                                 color = Color.Black,

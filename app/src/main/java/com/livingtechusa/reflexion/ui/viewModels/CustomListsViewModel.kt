@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.livingtechusa.reflexion.R
+import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.di.DefaultDispatcher
@@ -31,6 +32,7 @@ class CustomListsViewModel @Inject constructor(
     private val localServiceImpl: LocalServiceImpl,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
+
 
     private val TAG = "CustomListsViewModel"
     private val context: Context
@@ -62,6 +64,9 @@ class CustomListsViewModel @Inject constructor(
     private val _listImages = MutableStateFlow<List<Bitmap>>(emptyList())
     val listImages: StateFlow<List<Bitmap?>> get() = _listImages
 
+    private val _childListImages = MutableStateFlow<List<Bitmap>>(emptyList())
+    val childListImages: StateFlow<List<Bitmap?>> get() = _childListImages
+
     private var newList = true
     private var topic: Long = EMPTY_PK
 
@@ -92,6 +97,22 @@ class CustomListsViewModel @Inject constructor(
             }
             job.join()
             _listImages.value = bitmaps
+        }
+    }
+
+    fun getChildListImages() {
+        viewModelScope.launch {
+            val bitmaps: MutableList<Bitmap> = mutableListOf()
+            val job = async {
+                _children.value.forEach { childReflexionItem ->
+                    childReflexionItem.image?.let { bytes ->
+                        Converters().getBitmapFromByteArray(bytes)
+                            .let { bitmaps.add(it) }
+                    }
+                }
+            }
+            job.join()
+            _childListImages.value = bitmaps
         }
     }
 
@@ -250,6 +271,10 @@ class CustomListsViewModel @Inject constructor(
                                 }
                             }
                             _children.value = newReflexionItemList
+                            val job = async {
+                                getChildListImages()
+                            }
+                            job.join()
                         }
                     }
                 }

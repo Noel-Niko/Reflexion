@@ -69,6 +69,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import coil.decode.VideoFrameDecoder
 import com.livingtechusa.reflexion.R
+import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.components.ImageCard
@@ -258,7 +259,7 @@ fun BuildContentV2(
                                     .align(Alignment.End)
                             ) {
                                 if (reflexionItem.image != null) {
-                                    ImageCard(reflexionItem.image, navController)
+                                    ImageCard(Converters().getBitmapFromByteArray(reflexionItem.image!!), navController)
                                 } else {
                                     Text(
                                         modifier = Modifier.padding(12.dp),

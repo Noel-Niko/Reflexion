@@ -36,6 +36,7 @@ fun CompactScreen(
     viewModel: CustomListsViewModel
 ) {
     viewModel.onTriggerEvent(CustomListEvent.GetDisplayList(headNodePk))
+    viewModel.onTriggerEvent(CustomListEvent.GetDisplayListImages(headNodePk))
 
     val icons = NavBarItems.CustomListsDisplayBarItems
     Scaffold(
