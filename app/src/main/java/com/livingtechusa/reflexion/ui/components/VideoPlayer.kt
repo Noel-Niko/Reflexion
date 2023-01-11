@@ -1,29 +1,16 @@
 package com.livingtechusa.reflexion.ui.components
 
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat.startActivity
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
-import androidx.navigation.NavHostController
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.StyledPlayerView
-import com.livingtechusa.reflexion.navigation.Screen
-import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
-import com.livingtechusa.reflexion.util.Constants.DO_NOT_UPDATE
-import com.livingtechusa.reflexion.util.Constants.URL
-import com.livingtechusa.reflexion.util.Temporary
 
 const val VideoScreenRoute = "view_video_screen"
 
@@ -36,19 +23,16 @@ fun VideoPlayer(
 
     val savedReflexionItem by viewModel.reflexionItem.collectAsState()
 
-    val tempUri = Temporary.tempReflexionItem.videoUri
-    val videoSource: String = if (tempUri.isNullOrEmpty().not()) {
-        tempUri.toString()
-    } else {
-        savedReflexionItem.videoUri.toString()
-    }
+    savedReflexionItem.videoUri.toString()
+
     val exoPlayer = ExoPlayer.Builder(LocalContext.current)
         .build()
         .also { exoPlayer ->
             val mediaItem = MediaItem.Builder()
-                .setUri(videoSource)
+                .setUri(savedReflexionItem.videoUri.toString())
                 .build()
-            exoPlayer.setMediaItem(mediaItem)
+            exoPlayer
+                .setMediaItem(mediaItem)
             exoPlayer.prepare()
         }
 

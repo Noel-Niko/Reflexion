@@ -463,6 +463,7 @@ fun BuildItemContent(
                                                     )
                                                     .show()
                                             } else {
+                                                viewModel.onTriggerEvent(BuildEvent.SaveFromTopBar)
                                                 val route: String =
                                                     Screen.VideoView.route + "/" + URI
                                                 navController.navigate(route)

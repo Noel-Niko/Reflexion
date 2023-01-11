@@ -176,6 +176,7 @@ class ItemViewModel @Inject constructor(
                     }
 
                     is BuildEvent.UpdateDisplayedReflexionItem -> {
+                        ///  here we are updating the image every time and that's why it flickers.
                         _reflexionItem.value = event.reflexionItem
                     }
 
