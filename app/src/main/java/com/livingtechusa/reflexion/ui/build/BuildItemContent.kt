@@ -3,12 +3,10 @@ package com.livingtechusa.reflexion.ui.build
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -22,7 +20,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -50,7 +47,6 @@ import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
@@ -64,10 +60,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
-import coil.ImageLoader
-import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
-import coil.decode.VideoFrameDecoder
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
@@ -75,7 +67,6 @@ import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.components.ImageCard
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.Constants
-import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URI
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URL
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
@@ -84,13 +75,12 @@ import com.livingtechusa.reflexion.util.scopedStorageUtils.DocumentFilePreviewCa
 import com.livingtechusa.reflexion.util.scopedStorageUtils.MediaStoreUtils
 import com.livingtechusa.reflexion.util.scopedStorageUtils.videoImagePreviewCard
 import kotlinx.coroutines.launch
-import java.lang.Exception
 import kotlin.math.roundToInt
 
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-fun BuildContentV2(
+fun BuildItemContent(
     pk: Long,
     navController: NavHostController,
     viewModel: ItemViewModel,

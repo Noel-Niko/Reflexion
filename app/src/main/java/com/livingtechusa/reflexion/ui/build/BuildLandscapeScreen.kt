@@ -105,7 +105,7 @@ fun MediumScreen(
                         })
                     }
                 }
-                BuildContentV2(pk, navController, viewModel, it)
+                BuildItemContent(pk, navController, viewModel, it)
             }
         }
 

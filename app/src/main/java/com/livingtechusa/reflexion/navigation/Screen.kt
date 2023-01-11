@@ -7,6 +7,7 @@ import com.livingtechusa.reflexion.ui.components.CONFIRM_DELETE_SUBITEM
 import com.livingtechusa.reflexion.ui.topics.ListRoute
 import com.livingtechusa.reflexion.ui.components.CONFIRM_SAVE
 import com.livingtechusa.reflexion.ui.components.PASTE_SAVE
+import com.livingtechusa.reflexion.ui.components.VideoCustomListScreenRoute
 import com.livingtechusa.reflexion.ui.components.VideoScreenRoute
 import com.livingtechusa.reflexion.ui.customListDisplay.CUSTOM_LIST_DISPLAY
 import com.livingtechusa.reflexion.ui.customLists.BuildCustomList
@@ -19,6 +20,8 @@ sealed class Screen(val route: String) {
     object HomeScreen : Screen(HOME)
     object BuildItemScreen : Screen(BuildRoute)
     object VideoView : Screen(VideoScreenRoute)
+
+    object VideoViewCustomList : Screen(VideoCustomListScreenRoute)
     object MainActivity: Screen(Main_Activity)
     object ConfirmSaveScreen: Screen(CONFIRM_SAVE)
     object PasteAndSaveScreen: Screen(PASTE_SAVE)

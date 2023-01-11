@@ -1,5 +1,7 @@
 package com.livingtechusa.reflexion.ui.customListDisplay
 
+import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -21,40 +22,28 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.livingtechusa.reflexion.R
-import com.livingtechusa.reflexion.data.entities.ReflexionItem
-import com.livingtechusa.reflexion.navigation.NavBarItems
 import com.livingtechusa.reflexion.navigation.Screen
-import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.components.ImageCard
-import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.util.Constants
-import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import com.livingtechusa.reflexion.util.extensions.findActivity
-import kotlinx.coroutines.launch
+import com.livingtechusa.reflexion.util.scopedStorageUtils.DocumentFilePreviewCard
+import com.livingtechusa.reflexion.util.scopedStorageUtils.videoImagePreviewCard
 
 const val CUSTOM_LIST_DISPLAY = "customListDisplay"
 
@@ -97,6 +86,7 @@ fun CustomListDisplayContent(
     val selectedList by viewModel.customList.collectAsState()
     val children by viewModel.children.collectAsState()
     val childImageList by viewModel.childListImages.collectAsState()
+    val childVideoUriList by viewModel.childVideoUriResourceList.collectAsState()
     val context = LocalContext.current
     val resource = ResourceProviderSingleton
     val colorStops: Array<out Pair<Float, Color>> =
@@ -261,22 +251,30 @@ fun CustomListDisplayContent(
                                                     .show()
                                             } else {
                                                 val route: String =
-                                                    Screen.VideoView.route + "/" + children[childItemIndex].videoUri
+                                                    Screen.VideoViewCustomList.route + "/" + childItemIndex
                                                 navController.navigate(route)
                                             }
                                         },
                                     text = AnnotatedString(stringResource(R.string.saved_video)),
                                     color = Color.Blue
-
                                 )
+                                if (children[childItemIndex].videoUri.isNullOrEmpty().not()) {
+                                    if (childVideoUriList.isNullOrEmpty().not()) {
+                                        if (childVideoUriList[childItemIndex] != null) {
+                                            DocumentFilePreviewCard(
+                                                resource = childVideoUriList[childItemIndex]!!,
+                                                navController = navController,
+                                                Constants.VIDEO_URI
+                                            )
+                                        }
+                                    }
+                                }
                             }
-
 
                             /* VIDEO URL */
                             Column(
                                 Modifier
                                     .weight(1f)
-
                             ) {
                                 androidx.compose.material3.Text(
                                     modifier = Modifier
@@ -292,15 +290,24 @@ fun CustomListDisplayContent(
                                                         )
                                                         .show()
                                                 } else {
-                                                    val route: String =
-                                                        Screen.VideoView.route + "/" + children[childItemIndex].videoUrl
-                                                    navController.navigate(route)
+                                                    val intent = Intent(
+                                                        Intent.ACTION_VIEW,
+                                                        Uri.parse(children[childItemIndex].videoUrl)
+                                                    )
+                                                    ContextCompat.startActivity(context, intent, null)
                                                 }
                                             },
                                         ),
                                     text = AnnotatedString(stringResource(R.string.video_link)),
                                     color = Color.Blue
                                 )
+                                if (children[childItemIndex].videoUrl.isNullOrEmpty().not()) {
+                                    videoImagePreviewCard(
+                                        urlString = children[childItemIndex].videoUrl,
+                                        navController = navController,
+                                        docType = Constants.VIDEO_URL
+                                    )
+                                }
                             }
                         }
                     }

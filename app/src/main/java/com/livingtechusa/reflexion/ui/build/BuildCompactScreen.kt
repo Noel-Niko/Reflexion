@@ -147,6 +147,6 @@ fun CompactScreen(
                 }
             }
         }) { paddingValues ->
-        BuildContentV2(pk, navController, viewModel, paddingValues)
+        BuildItemContent(pk, navController, viewModel, paddingValues)
     }
 }

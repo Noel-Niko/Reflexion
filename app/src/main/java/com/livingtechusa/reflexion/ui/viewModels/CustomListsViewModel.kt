@@ -2,6 +2,7 @@ package com.livingtechusa.reflexion.ui.viewModels
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,6 +16,8 @@ import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK_STRING
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
+import com.livingtechusa.reflexion.util.scopedStorageUtils.FileResource
+import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Deferred
@@ -32,7 +35,9 @@ class CustomListsViewModel @Inject constructor(
     private val localServiceImpl: LocalServiceImpl,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
-
+    companion object {
+        private val TAG = this::class.java.simpleName
+    }
 
     private val TAG = "CustomListsViewModel"
     private val context: Context
@@ -66,6 +71,10 @@ class CustomListsViewModel @Inject constructor(
 
     private val _childListImages = MutableStateFlow<List<Bitmap>>(emptyList())
     val childListImages: StateFlow<List<Bitmap?>> get() = _childListImages
+
+
+    private val _childVideoUriResourceList = MutableStateFlow<List<FileResource>>(emptyList())
+    val childVideoUriResourceList: StateFlow<List<FileResource?>> get() = _childVideoUriResourceList
 
     private var newList = true
     private var topic: Long = EMPTY_PK
@@ -113,6 +122,29 @@ class CustomListsViewModel @Inject constructor(
             }
             job.join()
             _childListImages.value = bitmaps
+        }
+    }
+
+    fun getVideoResource() {
+        viewModelScope.launch {
+            val resources: MutableList<FileResource> = mutableListOf()
+            val job = async {
+                try {
+                    _children.value.forEach { reflexionItem ->
+                        reflexionItem.videoUri?.let { s ->
+                            Converters().convertStringToUri(s)?.let { uri ->
+                                SafeUtils.getResourceByUriPersistently(context = context, uri = uri)
+                            }
+                        }
+                            ?.let { fileResource -> resources.add(fileResource) }
+                    }
+
+                } catch (e: java.lang.Exception) {
+                    Log.e(TAG, "Unable to get File Resource")
+                }
+            }
+            job.join()
+            _childVideoUriResourceList.value = resources
         }
     }
 
@@ -272,7 +304,9 @@ class CustomListsViewModel @Inject constructor(
                             }
                             _children.value = newReflexionItemList
                             val job = async {
-                                getChildListImages()
+                                val job2 = async { getChildListImages() }
+                                job2.join()
+                                getVideoResource()
                             }
                             job.join()
                         }
