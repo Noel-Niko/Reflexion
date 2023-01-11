@@ -43,6 +43,7 @@ import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
 import com.livingtechusa.reflexion.util.Constants.URL
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URI
+import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
 import java.lang.Exception
@@ -155,7 +156,7 @@ fun DocumentFilePreviewCard(resource: FileResource, navController: NavHostContro
 @Composable
 fun videoImagePreviewCard(urlString: String?, navController: NavHostController, docType: String) {
     val context = LocalContext.current
-
+val resource = ResourceProviderSingleton
     // get url thumbnail...
     // for Youtube
     var imageUrl = urlString
@@ -163,7 +164,7 @@ fun videoImagePreviewCard(urlString: String?, navController: NavHostController, 
         if (imageUrl?.contains("youtu") == true) {
             val urlArray = imageUrl.split("//", "/").map { it.trim() }
             imageUrl =
-                stringResource(R.string.youtube_image_prepend) + urlArray[2] + stringResource(R.string.youtube_image_postpend)
+                resource.getString(R.string.youtube_image_prepend) + urlArray[2] + resource.getString(R.string.youtube_image_postpend)
         }
     } catch (e: Exception) {
         Toast.makeText(context, stringResource(R.string.unable_to_obtain_video_link_preview), Toast.LENGTH_SHORT).show()

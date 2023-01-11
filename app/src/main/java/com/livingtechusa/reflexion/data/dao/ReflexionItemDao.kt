@@ -64,4 +64,6 @@ interface ReflexionItemDao {
     suspend fun selectAllSiblings(parent: Long): List<ReflexionItem?>
     @Query("SELECT parent FROM ReflexionItem WHERE autogenPK = :itemPk")
     suspend fun getParent(itemPk: Long): Long?
+    @Query("SELECT image FROM ReflexionItem WHERE autogenPK = :itemPk")
+    suspend fun selectImage(itemPk: Long): ByteArray
 }

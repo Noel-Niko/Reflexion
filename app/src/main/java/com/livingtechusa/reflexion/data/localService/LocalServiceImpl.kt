@@ -1,5 +1,7 @@
 package com.livingtechusa.reflexion.data.localService
 
+import android.graphics.Bitmap
+import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.dao.KeyWordsDao
 import com.livingtechusa.reflexion.data.dao.LinkedListDao
 import com.livingtechusa.reflexion.data.dao.ReflexionItemDao
@@ -166,6 +168,11 @@ class LocalServiceImpl @Inject constructor(
             }
         }
         return headNodePk
+    }
+
+    override suspend fun selectImage(itemPk: Long): Bitmap {
+        val byteArray: ByteArray = reflexionItemDao.selectImage(itemPk)
+        return Converters().getBitmapFromByteArray(byteArray = byteArray)
     }
 
     override suspend fun selectSingleAbridgedReflexionItemDataByParentPk(pk: Long): AbridgedReflexionItem {

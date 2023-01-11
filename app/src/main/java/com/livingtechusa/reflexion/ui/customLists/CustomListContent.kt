@@ -1,19 +1,23 @@
 package com.livingtechusa.reflexion.ui.customLists
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,15 +36,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.util.Constants.NO_LISTS
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
 @Composable
@@ -93,49 +104,76 @@ fun CustomListContent(
             ) {
 
                 items(listOfLists.size) { index ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(4.dp),
-                        elevation = 10.dp,
-                        shape = RoundedCornerShape(20.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .pointerInput(key1 = index) {
-                                    detectTapGestures(
-                                        onDoubleTap = {
-                                            // Launch dialog
-                                            navController.navigate(Screen.ConfirmDeleteListScreen.route + "/" + index + "/" + listOfLists[index]?.itemName)
-                                        },
-                                        onLongPress = {
-                                            viewModel.onTriggerEvent(
-                                                CustomListEvent.MoveToEdit(
-                                                    index
-                                                )
+//                    val painter = rememberAsyncImagePainter(
+//                        CoroutineScope(Dispatchers.IO).launch {
+//                            withContext(Dispatchers.IO) {
+//                                {
+//                                    listOfLists[index]?.itemPK?.let { viewModel.getImage(it) }
+//                                }
+//                            }
+//                                )
+//                                val imagePainter = rememberImagePainter(
+//                                    data = painter,
+//                                    builder = {
+//                                        allowHardware(false)
+//                                    }
+//                                )
+                                Box {
+                                    Card(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(4.dp),
+                                        elevation = 10.dp,
+                                        shape = RoundedCornerShape(20.dp)
+                                    ) {
+                                        Row(
+                                            modifier = Modifier
+                                                .pointerInput(key1 = index) {
+                                                    detectTapGestures(
+                                                        onDoubleTap = {
+                                                            // Launch dialog
+                                                            navController.navigate(Screen.ConfirmDeleteListScreen.route + "/" + index + "/" + listOfLists[index]?.itemName)
+                                                        },
+                                                        onLongPress = {
+                                                            viewModel.onTriggerEvent(
+                                                                CustomListEvent.MoveToEdit(
+                                                                    index
+                                                                )
+                                                            )
+                                                        },
+                                                        onTap = {
+                                                            navController.navigate(Screen.CustomListDisplay.route + "/" + listOfLists[index]?.nodePk)
+                                                        }
+                                                    )
+                                                },
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+//                                            Image(
+//                                                painter = imagePainter,
+//                                                contentDescription = "Your Image",
+//                                                contentScale = ContentScale.FillBounds,
+//                                                modifier = Modifier
+//                                                    .width(50.dp)
+//                                                    .height(50.dp)
+//
+//                                            )
+//                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text(
+                                                text = listOfLists[index]?.itemName ?: NO_LISTS,
+                                                modifier = Modifier
+                                                    .padding(16.dp),
+                                                style = MaterialTheme.typography.subtitle2
                                             )
-                                        },
-                                        onTap = {
-                                            navController.navigate(Screen.CustomListDisplay.route + "/" + listOfLists[index]?.nodePk)
+                                            listOfLists[index]?.let {
+                                                HorizontalScrollableRowComponent(
+                                                    list = it
+                                                )
+                                            }
                                         }
-                                    )
-                                },
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = listOfLists[index]?.itemName ?: NO_LISTS,
-                                modifier = Modifier
-                                    .padding(16.dp),
-                                style = MaterialTheme.typography.subtitle2
-                            )
-                            listOfLists[index]?.let {
-                                HorizontalScrollableRowComponent(
-                                    list = it
-                                )
+                                    }
+                                }
                             }
-                        }
-                    }
-                }
+//                        }
             }
         }
     }

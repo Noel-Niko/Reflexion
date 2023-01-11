@@ -1,12 +1,10 @@
 package com.livingtechusa.reflexion.ui.viewModels
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.util.Log
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
@@ -18,6 +16,7 @@ import com.livingtechusa.reflexion.util.Constants.EMPTY_PK_STRING
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -180,7 +179,7 @@ class CustomListsViewModel @Inject constructor(
                             val nodePk: Long? =
                                 localServiceImpl.insertNewOrUpdateNodeList(customList.value, topic)
                             if (nodePk != null) {
-                                val job = launch {  updateCustomList(nodePk) }
+                                val job = launch { updateCustomList(nodePk) }
                                 job.join()
                             }
                             _listOfLists.value =
@@ -207,7 +206,12 @@ class CustomListsViewModel @Inject constructor(
                 }
 
                 is CustomListEvent.ReSet -> {
-                    val newListItem = ReflexionArrayItem(null, context.getString(R.string.list_title), null, mutableListOf<ReflexionArrayItem>())
+                    val newListItem = ReflexionArrayItem(
+                        null,
+                        context.getString(R.string.list_title),
+                        null,
+                        mutableListOf<ReflexionArrayItem>()
+                    )
                     _customList.value = newListItem
                 }
 
@@ -221,13 +225,18 @@ class CustomListsViewModel @Inject constructor(
                             newListItem.children.forEach() { reflexionArrayItem ->
                                 reflexionArrayItem.itemPK?.let { pk ->
                                     localServiceImpl.selectItem(pk)
-                                        ?.let { reflexionItem -> newReflexionItemList.add(reflexionItem) }
+                                        ?.let { reflexionItem ->
+                                            newReflexionItemList.add(
+                                                reflexionItem
+                                            )
+                                        }
                                 }
                             }
                             _children.value = newReflexionItemList
                         }
                     }
                 }
+
                 else -> {}
             }
         } catch (e: Exception) {
@@ -236,9 +245,9 @@ class CustomListsViewModel @Inject constructor(
     }
 
     private suspend fun updateCustomList(nodePk: Long) {
-            val list = localServiceImpl.selectNodeListsAsArrayItemsByHeadNode(nodePk) ?: emptyRai
-            _customList.value = list
-        }
+        val list = localServiceImpl.selectNodeListsAsArrayItemsByHeadNode(nodePk) ?: emptyRai
+        _customList.value = list
+    }
 
     private fun bubbleDown(
         newArrayListItem: ReflexionArrayItem,
@@ -342,9 +351,17 @@ class CustomListsViewModel @Inject constructor(
     }
 
     suspend fun getReflextionItem(reflexionItemPK: Long): ReflexionItem? {
-            val item = viewModelScope.async {
-                localServiceImpl.selectItem(reflexionItemPK)
-            }
+        val item = viewModelScope.async {
+            localServiceImpl.selectItem(reflexionItemPK)
+        }
         return item.await()
+    }
+
+    suspend fun getImage(itemPk: Long): Bitmap? {
+        val bitmap: Deferred<Bitmap> =
+            viewModelScope.async {
+                localServiceImpl.selectImage(itemPk)
+            }
+        return bitmap.await()
     }
 }

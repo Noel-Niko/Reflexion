@@ -1,5 +1,6 @@
 package com.livingtechusa.reflexion.data.localService
 
+import android.graphics.Bitmap
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.entities.KeyWords
 import com.livingtechusa.reflexion.data.entities.ListNode
@@ -61,4 +62,5 @@ interface ILocalService {
     suspend fun selectReflexionArrayItemsByPk(pk: Long): ReflexionArrayItem?
     suspend fun selectParent(pk: Long): Long?
     suspend fun insertNewOrUpdateNodeList(arrayItem: ReflexionArrayItem, topic: Long): Long?
+    suspend fun selectImage(itemPk: Long): Bitmap
 }
