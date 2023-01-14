@@ -38,6 +38,7 @@ import androidx.navigation.NavHostController
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.Screen
+import com.livingtechusa.reflexion.ui.build.showImage
 import com.livingtechusa.reflexion.ui.components.ImageCard
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.util.Constants
@@ -163,8 +164,8 @@ fun CustomListDisplayContent(
                                         )
                                         .align(Alignment.End)
                                 ) {
-                                    if (childImageList.isNullOrEmpty().not()) {
-                                        ImageCard(childImageList[childItemIndex], navController)
+                                    if (childImageList.isEmpty().not() && childImageList[childItemIndex] != null) {
+                                        ImageCard({ childImageList[childItemIndex]!! }, navController)
                                     }
                                 }
                             }

@@ -1,6 +1,7 @@
 package com.livingtechusa.reflexion.ui.build
 
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.widget.Toast
@@ -59,6 +60,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.Converters
@@ -101,7 +103,7 @@ fun BuildItemContent(
     val name by itemViewModel.name.collectAsState()
     val description by itemViewModel.description.collectAsState()
     val detailedDescription by itemViewModel.detailedDescription.collectAsState()
-    val image by  itemViewModel.image.collectAsState()
+    val image by  itemViewModel.image.collectAsStateWithLifecycle()
 
     val videoUri by itemViewModel.videoUri.collectAsState()
     val videoUrl by itemViewModel.videoUrl.collectAsState()
@@ -279,10 +281,8 @@ fun BuildItemContent(
                                 )
                                 .align(Alignment.End)
                         ) {
-                            var displayImage by rememberSaveable { mutableStateOf(image) }
-                            if(!image.contentEquals(displayImage)) {displayImage = image}
-                            if (displayImage?.isNotEmpty() == true && (displayImage?.size!! >= 1)) {
-                             showImage(displayImage!!, navController )
+                            if (image != null) {
+                             showImage(image!!, navController)
                             } else {
                                 Text(
                                     modifier = Modifier.padding(12.dp),
@@ -598,9 +598,10 @@ fun BuildItemContent(
 }
 
 @Composable
-fun showImage(image: ByteArray,navController: NavHostController) {
+fun showImage(image: Bitmap, navController: NavHostController) {
+    val currentImage  = rememberSaveable(key =  image.generationId.toString()) { mutableStateOf(image) }
     ImageCard(
-        Converters().getBitmapFromByteArray(image),
+        { currentImage.value },
         navController
     )
 }

@@ -3,6 +3,7 @@ package com.livingtechusa.reflexion.ui.viewModels
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
@@ -39,6 +40,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.InputStream
@@ -78,8 +80,9 @@ class ItemViewModel @Inject constructor(
     private val _detailedDescription = MutableStateFlow(EMPTY_STRING)
     val detailedDescription: StateFlow<String?> get() = _detailedDescription
 
-    private val _image = MutableStateFlow(ByteArray(0))
-    val image: StateFlow<ByteArray?> get() = _image
+    private val _image = MutableStateFlow<Bitmap?>(null)
+    val image: StateFlow<Bitmap?> get() = _image.asStateFlow()
+
 
     private val _videoUri = MutableStateFlow(EMPTY_STRING)
     val videoUri: StateFlow<String?> get() = _videoUri
@@ -150,7 +153,11 @@ class ItemViewModel @Inject constructor(
                                     name = name.value,
                                     description = description.value,
                                     detailedDescription = detailedDescription.value,
-                                    image = image.value,
+                                    image = image.value?.let {
+                                        Converters().getByteArrayFromBitmap(
+                                            it
+                                        )
+                                    },
                                     videoUri = videoUri.value,
                                     videoUrl = videoUrl.value,
                                     parent = parent.value
@@ -207,7 +214,11 @@ class ItemViewModel @Inject constructor(
                                 name = name.value,
                                 description = description.value,
                                 detailedDescription = detailedDescription.value,
-                                image = image.value,
+                                image = image.value?.let {
+                                    Converters().getByteArrayFromBitmap(
+                                        it
+                                    )
+                                },
                                 videoUri = videoUri.value,
                                 videoUrl = videoUrl.value,
                                 parent = parent.value
@@ -237,7 +248,11 @@ class ItemViewModel @Inject constructor(
                             }
 
                             IMAGE -> {
-                                _image.value = event.newVal as ByteArray
+                                _image.value = event.newVal.let {
+                                    Converters().getBitmapFromByteArray(
+                                        it as ByteArray
+                                    )
+                                }
                             }
 
                             VIDEO_URI -> {
@@ -379,17 +394,10 @@ class ItemViewModel @Inject constructor(
                     }
 
                     is BuildEvent.RotateImage -> {
-                        var image = image.value?.let {
-                            Converters().getBitmapFromByteArray(
-                                it
-                            )
-                        }
+                        var image = image.value
                         if (image != null) {
                             image = rotateImage(image, -90f)
-                            _image.value = image?.let {
-                                com.livingtechusa.reflexion.data.entities.Converters()
-                                    .convertBitMapToByteArray(it)
-                            } ?: ByteArray(0)
+                            _image.value = image
                         }
                     }
 
@@ -435,7 +443,11 @@ class ItemViewModel @Inject constructor(
         _name.value = reflexionItem.name
         _description.value = reflexionItem.description ?: EMPTY_STRING
         _detailedDescription.value = reflexionItem.detailedDescription ?: EMPTY_STRING
-        _image.value = reflexionItem.image ?: ByteArray(0)
+        _image.value = reflexionItem.image?.let {
+            Converters().getBitmapFromByteArray(
+                it
+            )
+        }
         _videoUri.value = reflexionItem.videoUri ?: EMPTY_STRING
         _videoUrl.value = reflexionItem.videoUrl ?: EMPTY_STRING
         _parent.value = reflexionItem.parent
