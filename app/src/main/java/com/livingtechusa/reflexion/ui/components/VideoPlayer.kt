@@ -21,15 +21,13 @@ fun VideoPlayer(
 ) {
     val context = LocalContext.current
 
-    val savedReflexionItem by viewModel.reflexionItem.collectAsState()
-
-    savedReflexionItem.videoUri.toString()
+    val videoUri = viewModel.videoUri
 
     val exoPlayer = ExoPlayer.Builder(LocalContext.current)
         .build()
         .also { exoPlayer ->
             val mediaItem = MediaItem.Builder()
-                .setUri(savedReflexionItem.videoUri.toString())
+                .setUri(videoUri.toString())
                 .build()
             exoPlayer
                 .setMediaItem(mediaItem)

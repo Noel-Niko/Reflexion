@@ -74,7 +74,7 @@ fun MediumScreen(
             drawerNavContent(
                 navController,
                 viewModel,
-                viewModel.reflexionItem.collectAsState().value,
+                viewModel.reflexionItemState.collectAsState().value,
                 state
             )
         },

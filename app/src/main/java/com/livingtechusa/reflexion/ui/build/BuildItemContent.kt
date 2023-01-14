@@ -79,6 +79,7 @@ import com.livingtechusa.reflexion.util.Temporary
 import com.livingtechusa.reflexion.util.scopedStorageUtils.DocumentFilePreviewCard
 import com.livingtechusa.reflexion.util.scopedStorageUtils.MediaStoreUtils
 import com.livingtechusa.reflexion.util.scopedStorageUtils.videoImagePreviewCard
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -100,11 +101,11 @@ fun BuildItemContent(
     val name by itemViewModel.name.collectAsState()
     val description by itemViewModel.description.collectAsState()
     val detailedDescription by itemViewModel.detailedDescription.collectAsState()
-    val image by itemViewModel.image.collectAsState()
+    val image by  itemViewModel.image.collectAsState()
+
     val videoUri by itemViewModel.videoUri.collectAsState()
     val videoUrl by itemViewModel.videoUrl.collectAsState()
     val parent by itemViewModel.parent.collectAsState()
-
 
 
     val saveNow by itemViewModel.saveNowFromTopBar.collectAsState()
@@ -206,10 +207,10 @@ fun BuildItemContent(
             )
             if (autogenPK != 0L) {
                 itemViewModel.onTriggerEvent(BuildEvent.UpdateReflexionItem)
-                Temporary.tempReflexionItem = ReflexionItem()
+                //Temporary.tempReflexionItem = ReflexionItem()
             } else {
                 itemViewModel.onTriggerEvent(BuildEvent.SaveNew)
-                Temporary.tempReflexionItem = ReflexionItem()
+                //Temporary.tempReflexionItem = ReflexionItem()
             }
             itemViewModel.setSaveNowFromTopBar(false)
         }
@@ -255,341 +256,339 @@ fun BuildItemContent(
                     )
                 }
             }) { paddingValues ->
-            LazyColumn(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                item {
-                    Spacer(Modifier.height(16.dp))
-                    // Image
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        Column(
-                            modifier = Modifier
-                                .weight(3f)
-                                .align(Alignment.CenterVertically)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .padding(0.dp, 0.dp, 32.dp, 0.dp)
-                                    .border(
-                                        1.dp, verticalGradient(colorStops = colorStops),
-                                        TextFieldDefaults.OutlinedTextFieldShape
-                                    )
-                                    .align(Alignment.End)
-                            ) {
-                                if (image != null) {
-                                    ImageCard(
-                                        Converters().getBitmapFromByteArray(image!!),
-                                        navController
-                                    )
-                                } else {
-                                    Text(
-                                        modifier = Modifier.padding(12.dp),
-                                        textAlign = TextAlign.Center,
-                                        text = stringResource(R.string.add_an_image_here)
-                                    )
-                                }
-                            }
-                        }
-                        Column(Modifier.weight(1f)) {
-                            IconButton(onClick = {
-                                selectImage.launch(Constants.IMAGE_TYPE)
-                            }) {
-                                Icon(
-                                    painter = painterResource(R.drawable.baseline_video_library_24),
-                                    contentDescription = null
-                                )
-                            }
-                            IconButton(onClick = {
-                                scope.launch {
-                                    viewModel.createImageUri()?.let { uri ->
-                                        targetImageUri = uri
-                                        takeImage.launch(uri)
-                                    }
-                                }
-                            }) {
-                                Icon(
-                                    painter = painterResource(R.drawable.baseline_photo_camera_24),
-                                    contentDescription = null
-                                )
-                            }
-                            IconButton(onClick = {
-                                viewModel.onTriggerEvent(BuildEvent.RotateImage)
-                            }) {
-                                Icon(
-                                    painter = painterResource(R.drawable.baseline_rotate_90_degrees_ccw_24),
-                                    contentDescription = null
-                                )
-                            }
-                        }
-                    }
-                    /* TOPIC */
-                    if (parent == null) {
-                        /* TOPIC */
-                        Row(
-                            modifier = Modifier.padding(12.dp)
-                        ) {
-                            Column(
-                                Modifier
-                                    .align(Alignment.CenterVertically)
-                            ) {
-                                Text(text = stringResource(R.string.topic))
-                            }
-                            Column(
-                                Modifier
-                                    .weight(1f)
-                                    .align(Alignment.CenterVertically)
-                            ) {
-                                TextField(
-                                    colors = TextFieldDefaults.textFieldColors(
-                                        textColor = Black,
-                                        backgroundColor = Transparent
-                                    ),
-                                    textStyle = MaterialTheme.typography.h6,
-                                    modifier = Modifier.fillMaxWidth(),
-                                    value = if (name == Constants.EMPTY_ITEM) {
-                                        EMPTY_STRING
-                                    } else {
-                                        name
-                                    },
-                                    onValueChange = { name ->
-                                        itemViewModel.onTriggerEvent(
-                                            BuildEvent.UpdateDisplayedReflexionItem(
-                                                subItem = NAME, newVal = name
-                                            )
-                                        )
-                                    })
-                            }
-                        }
-                    } else {
-                        /* TITLE */
-                        Row(
-                            modifier = Modifier.padding(12.dp)
-                        ) {
-                            Column(
-                                Modifier
-                                    .align(Alignment.CenterVertically)
-                            ) {
-                                Text(text = stringResource(R.string.title))
-                            }
-                            Column(
-                                Modifier
-                                    .weight(1f)
-                                    .align(Alignment.CenterVertically)
-                            ) {
-                                TextField(
-                                    colors = TextFieldDefaults.textFieldColors(
-                                        textColor = Black,
-                                        backgroundColor = Transparent
-                                    ),
-                                    textStyle = MaterialTheme.typography.h6,
-                                    value = if (name == Constants.EMPTY_ITEM) {
-                                        EMPTY_STRING
-                                    } else {
-                                        name
-                                    },
-                                    onValueChange = { name ->
-                                        itemViewModel.onTriggerEvent(
-                                            BuildEvent.UpdateDisplayedReflexionItem(
-                                                subItem = NAME, newVal = name
-                                            )
-                                        )
-                                    })
-                            }
-                        }
-                    }
-                    Spacer(Modifier.height(16.dp))
-                    /* DESCRIPTION */
-                    Row(
-                        modifier = Modifier.padding(12.dp)
-                    ) {
-                        Column(
-                            Modifier
-                                .align(Alignment.CenterVertically)
-                        ) {
-                            Text(text = stringResource(R.string.description))
-                        }
-                        Column(
-                            Modifier
-                                .weight(1f)
-                                .align(Alignment.CenterVertically)
-                        ) {
-                            TextField(
-                                colors = TextFieldDefaults.textFieldColors(
-                                    textColor = Black,
-                                    backgroundColor = Transparent
-                                ),
-                                textStyle = MaterialTheme.typography.h6,
-                                modifier = Modifier.fillMaxWidth(),
-                                value = description ?: EMPTY_STRING,
-                                onValueChange = { description ->
-                                    itemViewModel.onTriggerEvent(
-                                        BuildEvent.UpdateDisplayedReflexionItem(
-                                            subItem = DESCRIPTION, newVal = description
-                                        )
-                                    )
-                                })
-                        }
-                    }
-                    Spacer(Modifier.height(16.dp))
-                    /* DETAILS */
-                    Row(
-                        modifier = Modifier.padding(12.dp)
-                    ) {
-                        Column(
-                            Modifier
-                                .align(Alignment.CenterVertically)
-                        ) {
-                            Text(text = stringResource(R.string.detailedDescription))
-                        }
-                        Column(
-                            Modifier
-                                .weight(1f)
-                                .align(Alignment.CenterVertically)
-                        ) {
-                            TextField(
-                                colors = TextFieldDefaults.textFieldColors(
-                                    textColor = Black,
-                                    backgroundColor = Transparent
-                                ),
-                                textStyle = MaterialTheme.typography.h6,
-                                modifier = Modifier.fillMaxWidth(),
-                                value = detailedDescription ?: EMPTY_STRING,
-                                onValueChange = { detailedDescription ->
-                                    itemViewModel.onTriggerEvent(
-                                        BuildEvent.UpdateDisplayedReflexionItem(
-                                            subItem = DETAILED_DESCRIPTION, newVal = detailedDescription
-                                        )
-                                    )
-                                })
-                        }
-                    }
-                    Spacer(Modifier.height(16.dp))
-                    /* SAVED VIDEO */
-                    Row(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxSize()
-                    ) {
-                        Column(
-                            Modifier
-                                .weight(1f)
-                                .align(Alignment.CenterVertically)
-                        ) {
-                            Column(modifier = Modifier.fillMaxWidth()) {
-                                Text(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable {
-                                            if (videoUri.isNullOrEmpty()) {
-                                                Toast
-                                                    .makeText(
-                                                        context,
-                                                        resource.getString(R.string.is_saved),
-                                                        Toast.LENGTH_SHORT
-                                                    )
-                                                    .show()
-                                            } else {
-                                                viewModel.onTriggerEvent(BuildEvent.SaveFromTopBar)
-                                                val route: String =
-                                                    Screen.VideoView.route + "/" + URI
-                                                navController.navigate(route)
-                                            }
-                                        },
-                                    text = AnnotatedString(stringResource(R.string.saved_video)),
-                                    color = Blue
-                                )
-                                if (videoUri.isNullOrEmpty().not()) {
-                                    viewModel.getSelectedFile()
-                                    if (selectedFile != null) {
-                                        DocumentFilePreviewCard(
-                                            resource = selectedFile!!,
-                                            navController = navController,
-                                            VIDEO_URI
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                        Column(
-                            Modifier
-                                .weight(.5f)
-                                .align(Alignment.CenterVertically)
-                        ) {
-                            IconButton(onClick = {
-                                selectVideo.launch(arrayOf<String>(Constants.VIDEO_TYPE))
-                            }) {
-                                Icon(
-                                    painter = painterResource(R.drawable.baseline_video_library_24),
-                                    contentDescription = null
-                                )
-                            }
 
-                            IconButton(onClick = {
-                                scope.launch {
-                                    viewModel.createVideoUri()?.let { uri ->
-                                        targetVideoUri = uri
-                                        takeVideo.launch(uri)
-                                    }
-                                }
-                            }) {
-                                Icon(
-                                    painter = painterResource(R.drawable.baseline_videocam_24),
-                                    contentDescription = null
+                Spacer(Modifier.height(16.dp))
+                // Image
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Column(
+                        modifier = Modifier
+                            .weight(3f)
+                            .align(Alignment.CenterVertically)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .padding(0.dp, 0.dp, 32.dp, 0.dp)
+                                .border(
+                                    1.dp, verticalGradient(colorStops = colorStops),
+                                    TextFieldDefaults.OutlinedTextFieldShape
+                                )
+                                .align(Alignment.End)
+                        ) {
+                            var displayImage by rememberSaveable { mutableStateOf(image) }
+                            if(!image.contentEquals(displayImage)) {displayImage = image}
+                            if (displayImage?.isNotEmpty() == true && (displayImage?.size!! >= 1)) {
+                             showImage(displayImage!!, navController )
+                            } else {
+                                Text(
+                                    modifier = Modifier.padding(12.dp),
+                                    textAlign = TextAlign.Center,
+                                    text = stringResource(R.string.add_an_image_here)
                                 )
                             }
                         }
-                        /* VIDEO URL */
+                    }
+                    Column(Modifier.weight(1f)) {
+                        IconButton(onClick = {
+                            selectImage.launch(Constants.IMAGE_TYPE)
+                        }) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_video_library_24),
+                                contentDescription = null
+                            )
+                        }
+                        IconButton(onClick = {
+                            scope.launch {
+                                viewModel.createImageUri()?.let { uri ->
+                                    targetImageUri = uri
+                                    takeImage.launch(uri)
+                                }
+                            }
+                        }) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_photo_camera_24),
+                                contentDescription = null
+                            )
+                        }
+                        IconButton(onClick = {
+                            viewModel.onTriggerEvent(BuildEvent.RotateImage)
+                        }) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_rotate_90_degrees_ccw_24),
+                                contentDescription = null
+                            )
+                        }
+                    }
+                }
+                /* TOPIC */
+                if (parent == null) {
+                    /* TOPIC */
+                    Row(
+                        modifier = Modifier.padding(12.dp)
+                    ) {
+                        Column(
+                            Modifier
+                                .align(Alignment.CenterVertically)
+                        ) {
+                            Text(text = stringResource(R.string.topic))
+                        }
                         Column(
                             Modifier
                                 .weight(1f)
                                 .align(Alignment.CenterVertically)
                         ) {
+                            TextField(
+                                colors = TextFieldDefaults.textFieldColors(
+                                    textColor = Black,
+                                    backgroundColor = Transparent
+                                ),
+                                textStyle = MaterialTheme.typography.h6,
+                                modifier = Modifier.fillMaxWidth(),
+                                value = if (name == Constants.EMPTY_ITEM) {
+                                    EMPTY_STRING
+                                } else {
+                                    name
+                                },
+                                onValueChange = { name ->
+                                    itemViewModel.onTriggerEvent(
+                                        BuildEvent.UpdateDisplayedReflexionItem(
+                                            subItem = NAME, newVal = name
+                                        )
+                                    )
+                                })
+                        }
+                    }
+                } else {
+                    /* TITLE */
+                    Row(
+                        modifier = Modifier.padding(12.dp)
+                    ) {
+                        Column(
+                            Modifier
+                                .align(Alignment.CenterVertically)
+                        ) {
+                            Text(text = stringResource(R.string.title))
+                        }
+                        Column(
+                            Modifier
+                                .weight(1f)
+                                .align(Alignment.CenterVertically)
+                        ) {
+                            TextField(
+                                colors = TextFieldDefaults.textFieldColors(
+                                    textColor = Black,
+                                    backgroundColor = Transparent
+                                ),
+                                textStyle = MaterialTheme.typography.h6,
+                                value = if (name == Constants.EMPTY_ITEM) {
+                                    EMPTY_STRING
+                                } else {
+                                    name
+                                },
+                                onValueChange = { name ->
+                                    itemViewModel.onTriggerEvent(
+                                        BuildEvent.UpdateDisplayedReflexionItem(
+                                            subItem = NAME, newVal = name
+                                        )
+                                    )
+                                })
+                        }
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
+                /* DESCRIPTION */
+                Row(
+                    modifier = Modifier.padding(12.dp)
+                ) {
+                    Column(
+                        Modifier
+                            .align(Alignment.CenterVertically)
+                    ) {
+                        Text(text = stringResource(R.string.description))
+                    }
+                    Column(
+                        Modifier
+                            .weight(1f)
+                            .align(Alignment.CenterVertically)
+                    ) {
+                        TextField(
+                            colors = TextFieldDefaults.textFieldColors(
+                                textColor = Black,
+                                backgroundColor = Transparent
+                            ),
+                            textStyle = MaterialTheme.typography.h6,
+                            modifier = Modifier.fillMaxWidth(),
+                            value = description ?: EMPTY_STRING,
+                            onValueChange = { description ->
+                                itemViewModel.onTriggerEvent(
+                                    BuildEvent.UpdateDisplayedReflexionItem(
+                                        subItem = DESCRIPTION, newVal = description
+                                    )
+                                )
+                            })
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
+                /* DETAILS */
+                Row(
+                    modifier = Modifier.padding(12.dp)
+                ) {
+                    Column(
+                        Modifier
+                            .align(Alignment.CenterVertically)
+                    ) {
+                        Text(text = stringResource(R.string.detailedDescription))
+                    }
+                    Column(
+                        Modifier
+                            .weight(1f)
+                            .align(Alignment.CenterVertically)
+                    ) {
+                        TextField(
+                            colors = TextFieldDefaults.textFieldColors(
+                                textColor = Black,
+                                backgroundColor = Transparent
+                            ),
+                            textStyle = MaterialTheme.typography.h6,
+                            modifier = Modifier.fillMaxWidth(),
+                            value = detailedDescription ?: EMPTY_STRING,
+                            onValueChange = { detailedDescription ->
+                                itemViewModel.onTriggerEvent(
+                                    BuildEvent.UpdateDisplayedReflexionItem(
+                                        subItem = DETAILED_DESCRIPTION, newVal = detailedDescription
+                                    )
+                                )
+                            })
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
+                /* SAVED VIDEO */
+                Row(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxSize()
+                ) {
+                    Column(
+                        Modifier
+                            .weight(1f)
+                            .align(Alignment.CenterVertically)
+                    ) {
+                        Column(modifier = Modifier.fillMaxWidth()) {
                             Text(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clickable(
-                                        onClick = {
-                                            if (videoUrl == EMPTY_STRING) {
-                                                navController.navigate(Screen.PasteAndSaveScreen.route)
-                                            } else {
-                                                val intent = Intent(
-                                                    Intent.ACTION_VIEW,
-                                                    Uri.parse(videoUrl)
+                                    .clickable {
+                                        if (videoUri.isNullOrEmpty()) {
+                                            Toast
+                                                .makeText(
+                                                    context,
+                                                    resource.getString(R.string.is_saved),
+                                                    Toast.LENGTH_SHORT
                                                 )
-                                                ContextCompat.startActivity(context, intent, null)
-                                            }
-                                        },
-                                    ),
-                                text = AnnotatedString(stringResource(R.string.video_link)),
+                                                .show()
+                                        } else {
+                                            viewModel.onTriggerEvent(BuildEvent.SaveFromTopBar)
+                                            val route: String =
+                                                Screen.VideoView.route + "/" + URI
+                                            navController.navigate(route)
+                                        }
+                                    },
+                                text = AnnotatedString(stringResource(R.string.saved_video)),
                                 color = Blue
                             )
-                            if (videoUrl.isNullOrEmpty().not()) {
-                                videoImagePreviewCard(
-                                    urlString = videoUrl,
-                                    navController = navController,
-                                    docType = VIDEO_URL
-                                )
+                            if (videoUri.isNullOrEmpty().not()) {
+                                viewModel.getSelectedFile()
+                                if (selectedFile != null) {
+                                    DocumentFilePreviewCard(
+                                        resource = selectedFile!!,
+                                        navController = navController,
+                                        VIDEO_URI
+                                    )
+                                }
                             }
                         }
-                        Column(
-                            Modifier
-                                .weight(0.5f)
-                                .align(Alignment.CenterVertically)
-                        ) {
-                            IconButton(onClick = {
-                                val query = Constants.SEARCH_YOUTUBE + name
-                                val intent = Intent(
-                                    Intent.ACTION_VIEW, Uri.parse(query)
-                                )
-                                ContextCompat.startActivity(context, intent, null)
-                            }) {
-                                Icon(
-                                    painter = painterResource(R.drawable.baseline_youtube_searched_for_24),
-                                    contentDescription = null
-                                )
+                    }
+                    Column(
+                        Modifier
+                            .weight(.5f)
+                            .align(Alignment.CenterVertically)
+                    ) {
+                        IconButton(onClick = {
+                            selectVideo.launch(arrayOf<String>(Constants.VIDEO_TYPE))
+                        }) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_video_library_24),
+                                contentDescription = null
+                            )
+                        }
+
+                        IconButton(onClick = {
+                            scope.launch {
+                                viewModel.createVideoUri()?.let { uri ->
+                                    targetVideoUri = uri
+                                    takeVideo.launch(uri)
+                                }
                             }
+                        }) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_videocam_24),
+                                contentDescription = null
+                            )
+                        }
+                    }
+                    /* VIDEO URL */
+                    Column(
+                        Modifier
+                            .weight(1f)
+                            .align(Alignment.CenterVertically)
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable(
+                                    onClick = {
+                                        if (videoUrl == EMPTY_STRING) {
+                                            navController.navigate(Screen.PasteAndSaveScreen.route)
+                                        } else {
+                                            val intent = Intent(
+                                                Intent.ACTION_VIEW,
+                                                Uri.parse(videoUrl)
+                                            )
+                                            ContextCompat.startActivity(context, intent, null)
+                                        }
+                                    },
+                                ),
+                            text = AnnotatedString(stringResource(R.string.video_link)),
+                            color = Blue
+                        )
+                        if (videoUrl.isNullOrEmpty().not()) {
+                            videoImagePreviewCard(
+                                urlString = videoUrl,
+                                navController = navController,
+                                docType = VIDEO_URL
+                            )
+                        }
+                    }
+                    Column(
+                        Modifier
+                            .weight(0.5f)
+                            .align(Alignment.CenterVertically)
+                    ) {
+                        IconButton(onClick = {
+                            val query = Constants.SEARCH_YOUTUBE + name
+                            val intent = Intent(
+                                Intent.ACTION_VIEW, Uri.parse(query)
+                            )
+                            ContextCompat.startActivity(context, intent, null)
+                        }) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_youtube_searched_for_24),
+                                contentDescription = null
+                            )
                         }
                     }
                 }
@@ -597,3 +596,12 @@ fun BuildItemContent(
         }
     }
 }
+
+@Composable
+fun showImage(image: ByteArray,navController: NavHostController) {
+    ImageCard(
+        Converters().getBitmapFromByteArray(image),
+        navController
+    )
+}
+

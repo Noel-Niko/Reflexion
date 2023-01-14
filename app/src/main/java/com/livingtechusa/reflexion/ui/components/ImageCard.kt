@@ -26,7 +26,7 @@ import com.livingtechusa.reflexion.util.Constants.IMAGE
 @Composable
 fun ImageCard(
     image: Bitmap?,
-    navController: NavController,
+    navController: NavController
 ) {
     if (image != null) {
         val imagePainter = rememberImagePainter(
@@ -42,7 +42,7 @@ fun ImageCard(
                 .width(100.dp)
                 .padding(4.dp)
                 .background(Color.White),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         ) {
             Image(
                 painter = imagePainter,

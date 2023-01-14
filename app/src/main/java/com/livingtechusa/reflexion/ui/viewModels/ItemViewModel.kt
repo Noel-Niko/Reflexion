@@ -7,6 +7,8 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
@@ -56,33 +58,36 @@ class ItemViewModel @Inject constructor(
     companion object {
         private val TAG = this::class.java.simpleName
     }
+    // Used in Nav Drawer to ensure the most up-to-date-state provided
+    private var _reflexionItemState = MutableStateFlow(ReflexionItem())
+    val reflexionItemState: StateFlow<ReflexionItem> get() = _reflexionItemState
 
-    // The active item being viewed in build or selected from a list to be viewed in build
-    private val _reflexionItem = MutableStateFlow(ReflexionItem())
-    val reflexionItem: StateFlow<ReflexionItem> get() = _reflexionItem
+    // Used to provide initial UI and for saving updated UI values to the DB.
+    private var _reflexionItem = ReflexionItem()
+    val reflexionItem: ReflexionItem get() = _reflexionItem
 
-    private val _autogenPK = MutableStateFlow(reflexionItem.value.autogenPK)
+    private val _autogenPK = MutableStateFlow(0L)
     val autogenPK: StateFlow<Long> get() = _autogenPK
 
-    private val _name = MutableStateFlow(reflexionItem.value.name)
+    private val _name = MutableStateFlow(EMPTY_STRING)
     val name: StateFlow<String> get() = _name
 
-    private val _description = MutableStateFlow(reflexionItem.value.description)
+    private val _description = MutableStateFlow(EMPTY_STRING)
     val description: StateFlow<String?> get() = _description
 
-    private val _detailedDescription = MutableStateFlow(reflexionItem.value.detailedDescription)
+    private val _detailedDescription = MutableStateFlow(EMPTY_STRING)
     val detailedDescription: StateFlow<String?> get() = _detailedDescription
 
-    private val _image = MutableStateFlow(reflexionItem.value.image)
+    private val _image = MutableStateFlow(ByteArray(0))
     val image: StateFlow<ByteArray?> get() = _image
 
-    private val _videoUri = MutableStateFlow(reflexionItem.value.videoUri)
+    private val _videoUri = MutableStateFlow(EMPTY_STRING)
     val videoUri: StateFlow<String?> get() = _videoUri
 
-    private val _videoUrl = MutableStateFlow(reflexionItem.value.videoUrl)
+    private val _videoUrl = MutableStateFlow(EMPTY_STRING)
     val videoUrl: StateFlow<String?> get() = _videoUrl
 
-    private val _parent = MutableStateFlow(reflexionItem.value.parent)
+    private val _parent: MutableStateFlow<Long?> = MutableStateFlow(null)
     val parent: StateFlow<Long?> get() = _parent
 
 
@@ -150,7 +155,8 @@ class ItemViewModel @Inject constructor(
                                     videoUrl = videoUrl.value,
                                     parent = parent.value
                                 )
-                                _reflexionItem.value = updates
+                                _reflexionItem = updates
+                                _reflexionItemState.value = updates
                                 localServiceImpl.updateReflexionItem(updates)
                             }
                         }
@@ -158,7 +164,7 @@ class ItemViewModel @Inject constructor(
 
                     is BuildEvent.DeleteReflexionItemSubItemByName -> {
                         viewModelScope.launch {
-                            val updatedReflexionItem = reflexionItem.value
+                            val updatedReflexionItem = reflexionItem
                             when (event.subItem) {
                                 NAME -> {
                                     updatedReflexionItem.name = EMPTY_STRING
@@ -188,8 +194,9 @@ class ItemViewModel @Inject constructor(
                                     updatedReflexionItem.parent = null
                                 }
                             }
-                            _reflexionItem.value = updatedReflexionItem
-                            localServiceImpl.updateReflexionItem(reflexionItem.value)
+                            _reflexionItem = updatedReflexionItem
+                            _reflexionItemState.value = updatedReflexionItem
+                            localServiceImpl.updateReflexionItem(reflexionItem)
                         }
                     }
 
@@ -206,8 +213,9 @@ class ItemViewModel @Inject constructor(
                                 parent = parent.value
                             )
                             localServiceImpl.setItem(newItem)
-                            _reflexionItem.value =
+                            _reflexionItem =
                                 localServiceImpl.selectReflexionItemByName(name.value)
+                            _reflexionItemState.value = _reflexionItem
                         }
                     }
 
@@ -241,7 +249,7 @@ class ItemViewModel @Inject constructor(
                             }
 
                             PARENT -> {
-                                _parent.value = event.newVal as Long
+                                _parent.value = event.newVal as Long?
                             }
                         }
 
@@ -252,14 +260,18 @@ class ItemViewModel @Inject constructor(
                         viewModelScope.launch {
                             when (event.pk) {
                                 EMPTY_PK -> {
-                                    _reflexionItem.value = ReflexionItem()
+                                    _reflexionItem = ReflexionItem()
+                                    _reflexionItemState.value = _reflexionItem
                                 }
 
                                 DO_NOT_UPDATE -> {}
-                                else ->
-                                    _reflexionItem.value =
+                                else -> {
+                                    _reflexionItem =
                                         event.pk?.let { localServiceImpl.selectItem(it) }
                                             ?: ReflexionItem()
+                                    updateAllDisplayedSubItems()
+                                    _reflexionItemState.value = _reflexionItem
+                                }
                             }
                         }
                     }
@@ -267,42 +279,50 @@ class ItemViewModel @Inject constructor(
                     is BuildEvent.Delete -> {
                         viewModelScope.launch {
                             localServiceImpl.deleteReflexionItem(
-                                _reflexionItem.value.autogenPK,
-                                _reflexionItem.value.name
+                                _reflexionItem.autogenPK,
+                                _reflexionItem.name
                             )
-                            _reflexionItem.value = ReflexionItem()
+                            _reflexionItem = ReflexionItem()
+                            updateAllDisplayedSubItems()
+                            _reflexionItemState.value = _reflexionItem
                         }
                     }
 
-                    is BuildEvent.ShowVideo -> {
-                        if (event.uri.isNullOrEmpty().not()) {
-                            event.uri?.let {
-                            }
-                        }
-                    }
+//                    is BuildEvent.ShowVideo -> {
+//                        if (event.uri.isNullOrEmpty().not()) {
+//                            event.uri?.let {
+//
+//                            }
+//                        }
+//                    }
 
                     is BuildEvent.ClearReflexionItem -> {
-                        _reflexionItem.value = ReflexionItem()
+                        _reflexionItem = ReflexionItem()
+                        _reflexionItemState.value = _reflexionItem
+                        updateAllDisplayedSubItems()
+
                     }
 
-                    is BuildEvent.UpdateVideoURL -> { // no longer needed use above update displayed
-                        _videoUrl.value = event.videoUrl
-                    }
+//                    is BuildEvent.UpdateVideoURL -> { // no longer needed use above update displayed
+//                        _videoUrl.value = event.videoUrl
+//                    }
 
                     is BuildEvent.SetParent -> {
                         viewModelScope.launch {
                             val item = ReflexionItem(parent = event.parent)
                             item.image = localServiceImpl.selectItem(event.parent)?.image
-                            _reflexionItem.value = item
+                            _reflexionItem = item
+                            _reflexionItemState.value = _reflexionItem
+                            updateAllDisplayedSubItems()
                         }
                     }
 
                     is BuildEvent.BluetoothSend -> {
                         val text =
-                            reflexionItem.value.name + "\n" + reflexionItem.value.description +
-                                    " \n" + reflexionItem.value.detailedDescription + "\n" + reflexionItem.value.videoUrl
+                            name.value + "\n" + description.value +
+                                    " \n" + detailedDescription.value + "\n" + videoUrl.value
 
-                        val video = reflexionItem.value.videoUri?.let {
+                        val video = videoUri.value?.let {
                             Converters().convertStringToUri(
                                 it
                             )
@@ -323,10 +343,10 @@ class ItemViewModel @Inject constructor(
 
                     is BuildEvent.SendText -> {
                         val text =
-                            reflexionItem.value.name + "\n" + reflexionItem.value.description +
-                                    " \n" + reflexionItem.value.detailedDescription + "\n" + reflexionItem.value.videoUrl
+                            name.value + "\n" + description.value +
+                                    " \n" + detailedDescription.value + "\n" + videoUrl.value
 
-                        val video = reflexionItem.value.videoUri?.let {
+                        val video = videoUri.value?.let {
                             Converters().convertStringToUri(
                                 it
                             )
@@ -338,6 +358,20 @@ class ItemViewModel @Inject constructor(
                         shareIntent.putExtra(Intent.EXTRA_TEXT, text)
                         shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         startActivity(context, shareIntent, null)
+                        try {
+                            val resolver: ContentResolver = context.contentResolver
+                            val videoShareIntent = Intent()
+                            videoShareIntent.action = Intent.ACTION_OPEN_DOCUMENT
+                            videoShareIntent.type = "video/*"
+                            videoShareIntent.setDataAndType(video, video?.let { resolver.getType(it) })
+                            videoShareIntent.putExtra(Intent.EXTRA_STREAM, video)
+                            videoShareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            videoShareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            videoShareIntent.action = Intent.ACTION_SEND
+                            startActivity(context, videoShareIntent, null)
+                        } catch (e: Exception) {
+                            Toast.makeText(context, context.getString(R.string.unable_to_send_saved_video_file), Toast.LENGTH_SHORT).show()
+                        }
                     }
 
                     is BuildEvent.SaveFromTopBar -> {
@@ -345,20 +379,17 @@ class ItemViewModel @Inject constructor(
                     }
 
                     is BuildEvent.RotateImage -> {
-                        var image = _reflexionItem.value.image?.let {
+                        var image = image.value?.let {
                             Converters().getBitmapFromByteArray(
                                 it
                             )
                         }
                         if (image != null) {
                             image = rotateImage(image, -90f)
-                            val copy = reflexionItem.value.copy(
-                                image = image?.let {
-                                    com.livingtechusa.reflexion.data.entities.Converters()
-                                        .convertBitMapToByteArray(it)
-                                }
-                            )
-                            _reflexionItem.value = copy
+                            _image.value = image?.let {
+                                com.livingtechusa.reflexion.data.entities.Converters()
+                                    .convertBitMapToByteArray(it)
+                            } ?: ByteArray(0)
                         }
                     }
 
@@ -371,13 +402,15 @@ class ItemViewModel @Inject constructor(
                             var thumbNail = ImageUtils.extractThumbnail(bitmap, 100, 100)
                             if (thumbNail != null) {
                                 thumbNail = rotateImage(thumbNail, 90f)
-                                val copy = reflexionItem.value.copy(
+                                val copy = reflexionItem.copy(
                                     image = thumbNail?.let {
                                         com.livingtechusa.reflexion.data.entities.Converters()
                                             .convertBitMapToByteArray(it)
                                     }
                                 )
-                                _reflexionItem.value = copy
+                                _reflexionItem = copy
+                                _reflexionItemState.value = _reflexionItem
+                                updateAllDisplayedSubItems()
                             }
                         }
                         withContext(Dispatchers.IO) {
@@ -395,6 +428,17 @@ class ItemViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    private fun updateAllDisplayedSubItems() {
+        _autogenPK.value = reflexionItem.autogenPK
+        _name.value = reflexionItem.name
+        _description.value = reflexionItem.description ?: EMPTY_STRING
+        _detailedDescription.value = reflexionItem.detailedDescription ?: EMPTY_STRING
+        _image.value = reflexionItem.image ?: ByteArray(0)
+        _videoUri.value = reflexionItem.videoUri ?: EMPTY_STRING
+        _videoUrl.value = reflexionItem.videoUrl ?: EMPTY_STRING
+        _parent.value = reflexionItem.parent
     }
 
 

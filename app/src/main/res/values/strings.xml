@@ -54,4 +54,5 @@
     <string name="unable_to_obtain_youtube_link_preview">Unable to obtain YouTube link preview.</string>
     <string name="unable_to_preview_non_youtube_videos">Unable to generate previews for non-YouTube video links.</string>
     <string name="no_persistable_flags_present_to_take">No persistable flags present to take.</string>
+    <string name="unable_to_send_saved_video_file">Unable to send saved video file.</string>
 </resources>

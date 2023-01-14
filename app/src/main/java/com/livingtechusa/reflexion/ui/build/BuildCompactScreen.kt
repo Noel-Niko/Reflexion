@@ -1,6 +1,8 @@
 package com.livingtechusa.reflexion.ui.build
 
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -37,6 +39,7 @@ import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import kotlinx.coroutines.launch
 
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CompactScreen(
@@ -121,7 +124,7 @@ fun CompactScreen(
             drawerNavContent(
                 navController,
                 viewModel,
-                viewModel.reflexionItem.collectAsState().value,
+                viewModel.reflexionItemState.collectAsState().value,
                 state
             )
         },
