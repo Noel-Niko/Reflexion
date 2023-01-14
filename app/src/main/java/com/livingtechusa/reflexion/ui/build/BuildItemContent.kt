@@ -104,7 +104,7 @@ fun BuildItemContent(
     val description by itemViewModel.description.collectAsState()
     val detailedDescription by itemViewModel.detailedDescription.collectAsState()
     val image by  itemViewModel.image.collectAsStateWithLifecycle()
-
+    val id = rememberSaveable() { image?.generationId ?: -1 }
     val videoUri by itemViewModel.videoUri.collectAsState()
     val videoUrl by itemViewModel.videoUrl.collectAsState()
     val parent by itemViewModel.parent.collectAsState()
@@ -281,8 +281,8 @@ fun BuildItemContent(
                                 )
                                 .align(Alignment.End)
                         ) {
-                            if (image != null) {
-                             showImage(image!!, navController)
+                            if (image != null && image?.generationId != id) {
+                                showImage(image!!, navController)
                             } else {
                                 Text(
                                     modifier = Modifier.padding(12.dp),
@@ -599,10 +599,12 @@ fun BuildItemContent(
 
 @Composable
 fun showImage(image: Bitmap, navController: NavHostController) {
-    val currentImage  = rememberSaveable(key =  image.generationId.toString()) { mutableStateOf(image) }
-    ImageCard(
-        { currentImage.value },
-        navController
-    )
+
+//        val currentImage =
+//            rememberSaveable(key = image.generationId.toString()) { mutableStateOf(image) }
+        ImageCard(
+            { image },
+            navController
+        )
 }
 
