@@ -11,7 +11,6 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import coil.compose.rememberImagePainter
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
@@ -62,13 +61,30 @@ class ItemViewModel @Inject constructor(
     private val _reflexionItem = MutableStateFlow(ReflexionItem())
     val reflexionItem: StateFlow<ReflexionItem> get() = _reflexionItem
 
-//    // Currently displayed list of items in the list
-//    private val _list = MutableStateFlow(emptyList<ReflexionItem>())
-//    val list: StateFlow<List<ReflexionItem>> get() = _list
+    private val _autogenPK = MutableStateFlow(reflexionItem.value.autogenPK)
+    val autogenPK: StateFlow<Long> get() = _autogenPK
 
-//    // Term for query
-//    private val _search = MutableStateFlow(null as String?)
-//    val search: StateFlow<String?> = _search
+    private val _name = MutableStateFlow(reflexionItem.value.name)
+    val name: StateFlow<String> get() = _name
+
+    private val _description = MutableStateFlow(reflexionItem.value.description)
+    val description: StateFlow<String?> get() = _description
+
+    private val _detailedDescription = MutableStateFlow(reflexionItem.value.detailedDescription)
+    val detailedDescription: StateFlow<String?> get() = _detailedDescription
+
+    private val _image = MutableStateFlow(reflexionItem.value.image)
+    val image: StateFlow<ByteArray?> get() = _image
+
+    private val _videoUri = MutableStateFlow(reflexionItem.value.videoUri)
+    val videoUri: StateFlow<String?> get() = _videoUri
+
+    private val _videoUrl = MutableStateFlow(reflexionItem.value.videoUrl)
+    val videoUrl: StateFlow<String?> get() = _videoUrl
+
+    private val _parent = MutableStateFlow(reflexionItem.value.parent)
+    val parent: StateFlow<Long?> get() = _parent
+
 
     private val context: Context
         get() = BaseApplication.getInstance()
@@ -78,8 +94,8 @@ class ItemViewModel @Inject constructor(
         throwable.printStackTrace()
     }
 
-    private val _SaveNow = MutableStateFlow(false)
-    val saveNow: StateFlow<Boolean> get() = _SaveNow
+    private val _saveNowFromTopBar = MutableStateFlow(false)
+    val saveNowFromTopBar: StateFlow<Boolean> get() = _saveNowFromTopBar
 
 //    var listPK = 0L
 
@@ -104,7 +120,7 @@ class ItemViewModel @Inject constructor(
     fun getSelectedFile() {
         try {
             val uri: Uri? =
-                reflexionItem.value.videoUri?.let { Converters().convertStringToUri(it) }
+                videoUri.value?.let { Converters().convertStringToUri(it) }
             if (uri != null) {
                 viewModelScope.launch {
                     _selectedFile.value =
@@ -124,8 +140,18 @@ class ItemViewModel @Inject constructor(
                     is BuildEvent.UpdateReflexionItem -> {
                         viewModelScope.launch() {
                             withContext(Dispatchers.IO) {
-                                _reflexionItem.value = event.reflexionItem
-                                localServiceImpl.updateReflexionItem(event.reflexionItem)
+                                val updates = ReflexionItem(
+                                    autogenPK = autogenPK.value,
+                                    name = name.value,
+                                    description = description.value,
+                                    detailedDescription = detailedDescription.value,
+                                    image = image.value,
+                                    videoUri = videoUri.value,
+                                    videoUrl = videoUrl.value,
+                                    parent = parent.value
+                                )
+                                _reflexionItem.value = updates
+                                localServiceImpl.updateReflexionItem(updates)
                             }
                         }
                     }
@@ -169,15 +195,57 @@ class ItemViewModel @Inject constructor(
 
                     is BuildEvent.SaveNew -> {
                         viewModelScope.launch {
-                            localServiceImpl.setItem(event.reflexionItem)
+                            val newItem = ReflexionItem(
+                                autogenPK = autogenPK.value,
+                                name = name.value,
+                                description = description.value,
+                                detailedDescription = detailedDescription.value,
+                                image = image.value,
+                                videoUri = videoUri.value,
+                                videoUrl = videoUrl.value,
+                                parent = parent.value
+                            )
+                            localServiceImpl.setItem(newItem)
                             _reflexionItem.value =
-                                localServiceImpl.selectReflexionItemByName(event.reflexionItem.name)
+                                localServiceImpl.selectReflexionItemByName(name.value)
                         }
                     }
 
                     is BuildEvent.UpdateDisplayedReflexionItem -> {
                         ///  here we are updating the image every time and that's why it flickers.
-                        _reflexionItem.value = event.reflexionItem
+                        //switch to updating juast the specific part by name
+                        //_reflexionItem.value = event.reflexionItem
+                        when (event.subItem) {
+                            NAME -> {
+                                _name.value = event.newVal as String
+                            }
+
+                            DESCRIPTION -> {
+                                _description.value = event.newVal as String
+                            }
+
+                            DETAILED_DESCRIPTION -> {
+                                _detailedDescription.value = event.newVal as String
+                            }
+
+                            IMAGE -> {
+                                _image.value = event.newVal as ByteArray
+                            }
+
+                            VIDEO_URI -> {
+                                _videoUri.value = event.newVal as String
+                            }
+
+                            VIDEO_URL -> {
+                                _videoUrl.value = event.newVal as String
+                            }
+
+                            PARENT -> {
+                                _parent.value = event.newVal as Long
+                            }
+                        }
+
+
                     }
 
                     is BuildEvent.GetSelectedReflexionItem -> {
@@ -217,8 +285,8 @@ class ItemViewModel @Inject constructor(
                         _reflexionItem.value = ReflexionItem()
                     }
 
-                    is BuildEvent.UpdateVideoURL -> {
-                        _reflexionItem.value.videoUrl = event.videoUrl
+                    is BuildEvent.UpdateVideoURL -> { // no longer needed use above update displayed
+                        _videoUrl.value = event.videoUrl
                     }
 
                     is BuildEvent.SetParent -> {
@@ -273,7 +341,7 @@ class ItemViewModel @Inject constructor(
                     }
 
                     is BuildEvent.SaveFromTopBar -> {
-                        _SaveNow.value = true
+                        _saveNowFromTopBar.value = true
                     }
 
                     is BuildEvent.RotateImage -> {
@@ -366,7 +434,7 @@ class ItemViewModel @Inject constructor(
 //        }
 //    }
 
-    fun setSaveNow(saveNow: Boolean) {
-        _SaveNow.value = saveNow
+    fun setSaveNowFromTopBar(saveNow: Boolean) {
+        _saveNowFromTopBar.value = saveNow
     }
 }

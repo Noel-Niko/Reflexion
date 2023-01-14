@@ -5,20 +5,17 @@ import com.livingtechusa.reflexion.data.entities.ReflexionItem
 
 sealed class BuildEvent {
 
-    data class SaveNew(
-        val reflexionItem: ReflexionItem
-    ) : BuildEvent()
+    object SaveNew : BuildEvent()
 
-    data class UpdateReflexionItem(
-        val reflexionItem: ReflexionItem
-    ) : BuildEvent()
+    object UpdateReflexionItem : BuildEvent()
 
     data class DeleteReflexionItemSubItemByName(
         val subItem: String
     ) : BuildEvent()
 
     data class UpdateDisplayedReflexionItem(
-        val reflexionItem: ReflexionItem
+        val subItem: String,
+        val newVal: Any
     ) : BuildEvent()
 
     data class ShowVideo(

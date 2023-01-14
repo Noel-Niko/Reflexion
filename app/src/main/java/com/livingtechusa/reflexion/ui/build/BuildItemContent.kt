@@ -67,6 +67,11 @@ import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.components.ImageCard
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.Constants
+import com.livingtechusa.reflexion.util.Constants.DESCRIPTION
+import com.livingtechusa.reflexion.util.Constants.DETAILED_DESCRIPTION
+import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
+import com.livingtechusa.reflexion.util.Constants.IMAGE
+import com.livingtechusa.reflexion.util.Constants.NAME
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URI
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URL
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
@@ -90,8 +95,19 @@ fun BuildItemContent(
     val context = LocalContext.current
     val itemViewModel: ItemViewModel = viewModel
     val scope = rememberCoroutineScope()
-    val reflexionItem by itemViewModel.reflexionItem.collectAsState()
-    val saveNow by itemViewModel.saveNow.collectAsState()
+//    val reflexionItem by itemViewModel.reflexionItem.collectAsState()
+    val autogenPK by itemViewModel.autogenPK.collectAsState()
+    val name by itemViewModel.name.collectAsState()
+    val description by itemViewModel.description.collectAsState()
+    val detailedDescription by itemViewModel.detailedDescription.collectAsState()
+    val image by itemViewModel.image.collectAsState()
+    val videoUri by itemViewModel.videoUri.collectAsState()
+    val videoUrl by itemViewModel.videoUrl.collectAsState()
+    val parent by itemViewModel.parent.collectAsState()
+
+
+
+    val saveNow by itemViewModel.saveNowFromTopBar.collectAsState()
     val resource = ResourceProviderSingleton
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
     val selectedFile by viewModel.selectedFile.collectAsState()
@@ -125,16 +141,24 @@ fun BuildItemContent(
     val selectVideo =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument(),
             onResult = { uri ->
-                val copy = reflexionItem.copy(videoUri = uri.toString())
-                itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
+                itemViewModel.onTriggerEvent(
+                    BuildEvent.UpdateDisplayedReflexionItem(
+                        subItem = VIDEO_URI,
+                        newVal = uri.toString()
+                    )
+                )
             })
     val takeVideo = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CaptureVideo()
     ) { _ ->
         targetVideoUri?.let { uri ->
             targetVideoUri = null
-            val copy = reflexionItem.copy(videoUri = uri.toString())
-            itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
+            itemViewModel.onTriggerEvent(
+                BuildEvent.UpdateDisplayedReflexionItem(
+                    subItem = VIDEO_URI,
+                    newVal = uri.toString()
+                )
+            )
         }
     }
 
@@ -144,16 +168,21 @@ fun BuildItemContent(
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(),
             onResult = { uri ->
                 viewModel.onTriggerEvent(BuildEvent.CreateThumbnailImage(uri))
-                })
+            })
 
     val takeImage = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { _ ->
         targetImageUri?.let { uri ->
             targetImageUri = null
-            val copy =
-                reflexionItem.copy(image = MediaStoreUtils.uriToByteArray(uri, context = context))
-            itemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(copy))
+            val newVal =
+                MediaStoreUtils.uriToByteArray(uri, context = context) ?: emptyArray<Byte>()
+            itemViewModel.onTriggerEvent(
+                BuildEvent.UpdateDisplayedReflexionItem(
+                    subItem = IMAGE,
+                    newVal = newVal
+                )
+            )
         }
     }
 
@@ -169,19 +198,20 @@ fun BuildItemContent(
             Toast.makeText(
                 context, resource.getString(R.string.changes_saved), Toast.LENGTH_SHORT
             ).show()
-            if (reflexionItem.autogenPK != 0L) {
-                reflexionItem.name = reflexionItem.name.trim()
-                itemViewModel.onTriggerEvent(
-                    BuildEvent.UpdateReflexionItem(
-                        reflexionItem
-                    )
+            val trimmedName = name.trim()
+            itemViewModel.onTriggerEvent(
+                BuildEvent.UpdateDisplayedReflexionItem(
+                    subItem = NAME, newVal = trimmedName
                 )
+            )
+            if (autogenPK != 0L) {
+                itemViewModel.onTriggerEvent(BuildEvent.UpdateReflexionItem)
                 Temporary.tempReflexionItem = ReflexionItem()
             } else {
-                itemViewModel.onTriggerEvent(BuildEvent.SaveNew(reflexionItem))
+                itemViewModel.onTriggerEvent(BuildEvent.SaveNew)
                 Temporary.tempReflexionItem = ReflexionItem()
             }
-            itemViewModel.setSaveNow(false)
+            itemViewModel.setSaveNowFromTopBar(false)
         }
         Scaffold(
             floatingActionButton = {
@@ -204,17 +234,17 @@ fun BuildItemContent(
                         Toast.makeText(
                             context, resource.getString(R.string.changes_saved), Toast.LENGTH_SHORT
                         ).show()
-                        if (reflexionItem.autogenPK != 0L) {
-                            reflexionItem.autogenPK = reflexionItem.autogenPK
-                            reflexionItem.name = reflexionItem.name.trim()
-                            itemViewModel.onTriggerEvent(
-                                BuildEvent.UpdateReflexionItem(
-                                    reflexionItem
-                                )
+                        val trimmedName = name.trim()
+                        itemViewModel.onTriggerEvent(
+                            BuildEvent.UpdateDisplayedReflexionItem(
+                                subItem = NAME, newVal = trimmedName
                             )
+                        )
+                        if (autogenPK != 0L) {
+                            itemViewModel.onTriggerEvent(BuildEvent.UpdateReflexionItem)
                             Temporary.tempReflexionItem = ReflexionItem()
                         } else {
-                            itemViewModel.onTriggerEvent(BuildEvent.SaveNew(reflexionItem))
+                            itemViewModel.onTriggerEvent(BuildEvent.SaveNew)
                             Temporary.tempReflexionItem = ReflexionItem()
                         }
                     }
@@ -248,8 +278,11 @@ fun BuildItemContent(
                                     )
                                     .align(Alignment.End)
                             ) {
-                                if (reflexionItem.image != null) {
-                                    ImageCard(Converters().getBitmapFromByteArray(reflexionItem.image!!), navController)
+                                if (image != null) {
+                                    ImageCard(
+                                        Converters().getBitmapFromByteArray(image!!),
+                                        navController
+                                    )
                                 } else {
                                     Text(
                                         modifier = Modifier.padding(12.dp),
@@ -282,7 +315,7 @@ fun BuildItemContent(
                                 )
                             }
                             IconButton(onClick = {
-                                    viewModel.onTriggerEvent(BuildEvent.RotateImage)
+                                viewModel.onTriggerEvent(BuildEvent.RotateImage)
                             }) {
                                 Icon(
                                     painter = painterResource(R.drawable.baseline_rotate_90_degrees_ccw_24),
@@ -292,7 +325,7 @@ fun BuildItemContent(
                         }
                     }
                     /* TOPIC */
-                    if (reflexionItem.parent == null) {
+                    if (parent == null) {
                         /* TOPIC */
                         Row(
                             modifier = Modifier.padding(12.dp)
@@ -315,16 +348,15 @@ fun BuildItemContent(
                                     ),
                                     textStyle = MaterialTheme.typography.h6,
                                     modifier = Modifier.fillMaxWidth(),
-                                    value = if (reflexionItem.name == Constants.EMPTY_ITEM) {
-                                        ""
+                                    value = if (name == Constants.EMPTY_ITEM) {
+                                        EMPTY_STRING
                                     } else {
-                                        reflexionItem.name
+                                        name
                                     },
                                     onValueChange = { name ->
-                                        val copy = reflexionItem.copy(name = name)
                                         itemViewModel.onTriggerEvent(
                                             BuildEvent.UpdateDisplayedReflexionItem(
-                                                copy
+                                                subItem = NAME, newVal = name
                                             )
                                         )
                                     })
@@ -352,16 +384,15 @@ fun BuildItemContent(
                                         backgroundColor = Transparent
                                     ),
                                     textStyle = MaterialTheme.typography.h6,
-                                    value = if (reflexionItem.name == Constants.EMPTY_ITEM) {
-                                        ""
+                                    value = if (name == Constants.EMPTY_ITEM) {
+                                        EMPTY_STRING
                                     } else {
-                                        reflexionItem.name
+                                        name
                                     },
                                     onValueChange = { name ->
-                                        val copy = reflexionItem.copy(name = name)
                                         itemViewModel.onTriggerEvent(
                                             BuildEvent.UpdateDisplayedReflexionItem(
-                                                copy
+                                                subItem = NAME, newVal = name
                                             )
                                         )
                                     })
@@ -391,12 +422,11 @@ fun BuildItemContent(
                                 ),
                                 textStyle = MaterialTheme.typography.h6,
                                 modifier = Modifier.fillMaxWidth(),
-                                value = reflexionItem.description ?: Constants.EMPTY_STRING,
+                                value = description ?: EMPTY_STRING,
                                 onValueChange = { description ->
-                                    val copy = reflexionItem.copy(description = description)
                                     itemViewModel.onTriggerEvent(
                                         BuildEvent.UpdateDisplayedReflexionItem(
-                                            copy
+                                            subItem = DESCRIPTION, newVal = description
                                         )
                                     )
                                 })
@@ -425,13 +455,11 @@ fun BuildItemContent(
                                 ),
                                 textStyle = MaterialTheme.typography.h6,
                                 modifier = Modifier.fillMaxWidth(),
-                                value = reflexionItem.detailedDescription ?: Constants.EMPTY_STRING,
+                                value = detailedDescription ?: EMPTY_STRING,
                                 onValueChange = { detailedDescription ->
-                                    val copy =
-                                        reflexionItem.copy(detailedDescription = detailedDescription)
                                     itemViewModel.onTriggerEvent(
                                         BuildEvent.UpdateDisplayedReflexionItem(
-                                            copy
+                                            subItem = DETAILED_DESCRIPTION, newVal = detailedDescription
                                         )
                                     )
                                 })
@@ -454,7 +482,7 @@ fun BuildItemContent(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable {
-                                            if (reflexionItem.videoUri.isNullOrEmpty()) {
+                                            if (videoUri.isNullOrEmpty()) {
                                                 Toast
                                                     .makeText(
                                                         context,
@@ -472,7 +500,7 @@ fun BuildItemContent(
                                     text = AnnotatedString(stringResource(R.string.saved_video)),
                                     color = Blue
                                 )
-                                if (reflexionItem.videoUri.isNullOrEmpty().not()) {
+                                if (videoUri.isNullOrEmpty().not()) {
                                     viewModel.getSelectedFile()
                                     if (selectedFile != null) {
                                         DocumentFilePreviewCard(
@@ -523,12 +551,12 @@ fun BuildItemContent(
                                     .fillMaxWidth()
                                     .clickable(
                                         onClick = {
-                                            if (reflexionItem.videoUrl == Constants.EMPTY_STRING) {
+                                            if (videoUrl == EMPTY_STRING) {
                                                 navController.navigate(Screen.PasteAndSaveScreen.route)
                                             } else {
                                                 val intent = Intent(
                                                     Intent.ACTION_VIEW,
-                                                    Uri.parse(reflexionItem.videoUrl)
+                                                    Uri.parse(videoUrl)
                                                 )
                                                 ContextCompat.startActivity(context, intent, null)
                                             }
@@ -537,9 +565,9 @@ fun BuildItemContent(
                                 text = AnnotatedString(stringResource(R.string.video_link)),
                                 color = Blue
                             )
-                            if (reflexionItem.videoUrl.isNullOrEmpty().not()) {
+                            if (videoUrl.isNullOrEmpty().not()) {
                                 videoImagePreviewCard(
-                                    urlString = reflexionItem.videoUrl,
+                                    urlString = videoUrl,
                                     navController = navController,
                                     docType = VIDEO_URL
                                 )
@@ -551,7 +579,7 @@ fun BuildItemContent(
                                 .align(Alignment.CenterVertically)
                         ) {
                             IconButton(onClick = {
-                                val query = Constants.SEARCH_YOUTUBE + reflexionItem.name
+                                val query = Constants.SEARCH_YOUTUBE + name
                                 val intent = Intent(
                                     Intent.ACTION_VIEW, Uri.parse(query)
                                 )
