@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -63,7 +62,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.R
-import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.components.ImageCard
@@ -81,7 +79,6 @@ import com.livingtechusa.reflexion.util.Temporary
 import com.livingtechusa.reflexion.util.scopedStorageUtils.DocumentFilePreviewCard
 import com.livingtechusa.reflexion.util.scopedStorageUtils.MediaStoreUtils
 import com.livingtechusa.reflexion.util.scopedStorageUtils.videoImagePreviewCard
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -602,12 +599,9 @@ fun BuildItemContent(
 
 @Composable
 fun showImage(image: Bitmap, navController: NavHostController) {
-
-//        val currentImage =
-//            rememberSaveable(key = image.generationId.toString()) { mutableStateOf(image) }
-        ImageCard(
-             image ,
-            navController
-        )
+    ImageCard(
+        image,
+        navController
+    )
 }
 
