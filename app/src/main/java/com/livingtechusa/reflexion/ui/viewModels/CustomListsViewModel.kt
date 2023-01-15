@@ -426,18 +426,18 @@ class CustomListsViewModel @Inject constructor(
         _customList.value = newListItem
     }
 
-    suspend fun getReflextionItem(reflexionItemPK: Long): ReflexionItem? {
-        val item = viewModelScope.async {
-            localServiceImpl.selectItem(reflexionItemPK)
-        }
-        return item.await()
-    }
+//    suspend fun getReflextionItem(reflexionItemPK: Long): ReflexionItem? {
+//        val item = viewModelScope.async {
+//            localServiceImpl.selectItem(reflexionItemPK)
+//        }
+//        return item.await()
+//    }
 
-    suspend fun getImage(itemPk: Long): Bitmap? {
-        val bitmap: Deferred<Bitmap> =
-            viewModelScope.async {
-                localServiceImpl.selectImage(itemPk)
-            }
-        return bitmap.await()
-    }
+//    suspend fun getImage(itemPk: Long): Bitmap? {
+//        val bitmap: Deferred<Bitmap?> =
+//            viewModelScope.async {
+//                localServiceImpl.selectImage(itemPk)
+//            }
+//        return bitmap.await()
+//    }
 }

@@ -26,6 +26,7 @@ import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.Constants.DO_NOT_UPDATE
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
+import com.livingtechusa.reflexion.util.Constants.VIDEO_URL
 
 const val PASTE_SAVE = "PasteAndSaveDialog"
 
@@ -64,7 +65,8 @@ fun PasteAndSaveDialog(
                     confirmButton = {
                         Button(
                             onClick = {
-                                viewModel.onTriggerEvent( BuildEvent.UpdateVideoURL(webAddress.value))
+                                viewModel.onTriggerEvent( BuildEvent.UpdateDisplayedReflexionItem(
+                                    subItem = VIDEO_URL, newVal = webAddress.value))
                                 openDialog.value = false
                                 navController.navigate(Screen.BuildItemScreen.route + "/" + DO_NOT_UPDATE) {
                                     launchSingleTop = true

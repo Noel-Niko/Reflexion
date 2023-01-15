@@ -18,18 +18,18 @@ sealed class BuildEvent {
         val newVal: Any
     ) : BuildEvent()
 
-    data class ShowVideo(
-        val uri: String?,
-        val Url: String?
-    ) : BuildEvent()
+//    data class ShowVideo(
+//        val uri: String?,
+//        val Url: String?
+//    ) : BuildEvent()
 
     object Delete : BuildEvent()
 
     object ClearReflexionItem : BuildEvent()
 
-    data class UpdateVideoURL(
-        val videoUrl: String
-    ) : BuildEvent()
+//    data class UpdateVideoURL(
+//        val videoUrl: String
+//    ) : BuildEvent()
 
     data class GetSelectedReflexionItem(
         val pk: Long?

@@ -1,5 +1,6 @@
 package com.livingtechusa.reflexion.ui.customLists
 
+import android.graphics.Bitmap
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,6 +30,7 @@ import androidx.compose.material.icons.twotone.Archive
 import androidx.compose.material.icons.twotone.Circle
 import androidx.compose.material.icons.twotone.Done
 import androidx.compose.material.icons.twotone.FileCopy
+import androidx.compose.material.icons.twotone.FormatListBulleted
 import androidx.compose.material.icons.twotone.Lan
 import androidx.compose.material.icons.twotone.Language
 import androidx.compose.material.icons.twotone.Share
@@ -48,6 +50,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.androidpoet.dropdown.DropDownMenuBuilder
@@ -248,16 +251,15 @@ fun CustomListsContent(
 fun getItems(
     reflexionArrayItem: ReflexionArrayItem,
     newBuilder: DropDownMenuBuilder<String>,
-    list: List<ImageVector>
+//    list: List<ImageVector>
 ): DropDownMenuBuilder<String> {
-    val next = list.random()
     newBuilder.item(
         reflexionArrayItem.itemPK.toString(),
         reflexionArrayItem.itemName.toString()
     ) {
-        icon(next)
-        reflexionArrayItem.children?.forEach {
-            getItems(it, this, list)
+        icon(Icons.TwoTone.Lan)
+        reflexionArrayItem.children?.forEach { reflexionArrayItem ->
+            getItems(reflexionArrayItem, this) //, list)
         }
     }
     return newBuilder
@@ -267,21 +269,22 @@ fun getItems(
 fun getMenu(
     tree: ReflexionArrayItem
 ): MenuItem<String> {
-    val list: MutableList<ImageVector> = mutableListOf(
-        Icons.TwoTone.Language,
-        Icons.TwoTone.FileCopy,
-        Icons.TwoTone.Share,
-        Icons.TwoTone.Done,
-        Icons.TwoTone.AirlineStops,
-        Icons.TwoTone.Lan,
-        Icons.TwoTone.AddCard,
-        Icons.TwoTone.Circle,
-        Icons.TwoTone.Anchor,
-        Icons.TwoTone.Architecture,
-        Icons.TwoTone.Archive
-    )
+//    val list: MutableList<ImageVector> = mutableListOf(
+//        Icons.TwoTone.Language,
+//        Icons.TwoTone.FileCopy,
+//        Icons.TwoTone.Share,
+//        Icons.TwoTone.Done,
+//        Icons.TwoTone.AirlineStops,
+//        Icons.TwoTone.Lan,
+//        Icons.TwoTone.AddCard,
+//        Icons.TwoTone.Circle,
+//        Icons.TwoTone.FormatListBulleted,
+//        Icons.TwoTone.Anchor,
+//        Icons.TwoTone.Architecture,
+//        Icons.TwoTone.Archive
+//    )
     val menu = dropDownMenu<String> {
-        getItems(tree, this, list)
+        getItems(tree, this) //, list)
     }
     return menu
 }

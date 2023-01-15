@@ -62,5 +62,5 @@ interface ILocalService {
     suspend fun selectReflexionArrayItemsByPk(pk: Long): ReflexionArrayItem?
     suspend fun selectParent(pk: Long): Long?
     suspend fun insertNewOrUpdateNodeList(arrayItem: ReflexionArrayItem, topic: Long): Long?
-    suspend fun selectImage(itemPk: Long): Bitmap
+    suspend fun selectImage(itemPk: Long): Bitmap?
 }

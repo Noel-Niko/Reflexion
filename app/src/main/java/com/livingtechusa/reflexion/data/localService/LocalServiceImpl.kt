@@ -170,9 +170,13 @@ class LocalServiceImpl @Inject constructor(
         return headNodePk
     }
 
-    override suspend fun selectImage(itemPk: Long): Bitmap {
-        val byteArray: ByteArray = reflexionItemDao.selectImage(itemPk)
-        return Converters().getBitmapFromByteArray(byteArray = byteArray)
+    override suspend fun selectImage(itemPk: Long): Bitmap? {
+        val byteArray: ByteArray? = reflexionItemDao.selectImage(itemPk)
+        return if(byteArray != null) {
+            Converters().getBitmapFromByteArray(byteArray = byteArray)
+        } else {
+            null
+        }
     }
 
     override suspend fun selectSingleAbridgedReflexionItemDataByParentPk(pk: Long): AbridgedReflexionItem {

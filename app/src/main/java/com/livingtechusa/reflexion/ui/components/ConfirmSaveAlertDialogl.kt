@@ -24,6 +24,7 @@ import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.Constants.DO_NOT_UPDATE
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
+import com.livingtechusa.reflexion.util.Constants.VIDEO_URL
 import com.livingtechusa.reflexion.util.Temporary
 
 const val CONFIRM_SAVE = "ConfirmSaveAlertDialog"
@@ -54,7 +55,8 @@ fun ConfirmSaveAlertDialog(
                     confirmButton = {
                         Button(
                             onClick = {
-                                viewModel.onTriggerEvent(BuildEvent.UpdateVideoURL(url ?: EMPTY_STRING))
+                                viewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(
+                                    subItem = VIDEO_URL, newVal = url))
                                 openDialog.value = false
                                 navController.navigate(Screen.BuildItemScreen.route + "/" + DO_NOT_UPDATE) {
                                     launchSingleTop = true
