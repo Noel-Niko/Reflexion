@@ -8,8 +8,6 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
@@ -284,7 +282,7 @@ class ItemViewModel @Inject constructor(
                                     _reflexionItem =
                                         event.pk?.let { localServiceImpl.selectItem(it) }
                                             ?: ReflexionItem()
-                                    updateAllDisplayedSubItems()
+                                    resetAllDisplayedSubItemsToDBVersion()
                                     _reflexionItemState.value = _reflexionItem
                                 }
                             }
@@ -298,7 +296,7 @@ class ItemViewModel @Inject constructor(
                                 _reflexionItem.name
                             )
                             _reflexionItem = ReflexionItem()
-                            updateAllDisplayedSubItems()
+                            resetAllDisplayedSubItemsToDBVersion()
                             _reflexionItemState.value = _reflexionItem
                         }
                     }
@@ -314,7 +312,7 @@ class ItemViewModel @Inject constructor(
                     is BuildEvent.ClearReflexionItem -> {
                         _reflexionItem = ReflexionItem()
                         _reflexionItemState.value = _reflexionItem
-                        updateAllDisplayedSubItems()
+                        resetAllDisplayedSubItemsToDBVersion()
 
                     }
 
@@ -328,7 +326,7 @@ class ItemViewModel @Inject constructor(
                             item.image = localServiceImpl.selectItem(event.parent)?.image
                             _reflexionItem = item
                             _reflexionItemState.value = _reflexionItem
-                            updateAllDisplayedSubItems()
+                            resetAllDisplayedSubItemsToDBVersion()
                         }
                     }
 
@@ -418,7 +416,7 @@ class ItemViewModel @Inject constructor(
                                 )
                                 _reflexionItem = copy
                                 _reflexionItemState.value = _reflexionItem
-                                updateAllDisplayedSubItems()
+                                resetAllDisplayedSubItemsToDBVersion()
                             }
                         }
                         withContext(Dispatchers.IO) {
@@ -438,7 +436,7 @@ class ItemViewModel @Inject constructor(
         }
     }
 
-    private fun updateAllDisplayedSubItems() {
+    private fun resetAllDisplayedSubItemsToDBVersion() {
         _autogenPK.value = reflexionItem.autogenPK
         _name.value = reflexionItem.name
         _description.value = reflexionItem.description ?: EMPTY_STRING
@@ -452,7 +450,6 @@ class ItemViewModel @Inject constructor(
         _videoUrl.value = reflexionItem.videoUrl ?: EMPTY_STRING
         _parent.value = reflexionItem.parent
     }
-
 
     suspend fun createVideoUri(): Uri? {
         val filename = context.getString(R.string.app_name) + "${System.currentTimeMillis()}.mp4"

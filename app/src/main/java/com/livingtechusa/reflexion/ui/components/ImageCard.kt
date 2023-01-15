@@ -23,7 +23,7 @@ import com.livingtechusa.reflexion.util.Constants.IMAGE
 
 @Composable
 fun ImageCard(
-    image: () -> Bitmap,
+    image: Bitmap,
     navController: NavController,
 ) {
     val imagePainter = rememberImagePainter(

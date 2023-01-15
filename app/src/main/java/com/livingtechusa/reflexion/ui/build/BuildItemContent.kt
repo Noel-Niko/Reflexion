@@ -104,7 +104,6 @@ fun BuildItemContent(
     val description by itemViewModel.description.collectAsState()
     val detailedDescription by itemViewModel.detailedDescription.collectAsState()
     val image by  itemViewModel.image.collectAsStateWithLifecycle()
-    val id = rememberSaveable() { image?.generationId ?: -1 }
     val videoUri by itemViewModel.videoUri.collectAsState()
     val videoUrl by itemViewModel.videoUrl.collectAsState()
     val parent by itemViewModel.parent.collectAsState()
@@ -281,7 +280,7 @@ fun BuildItemContent(
                                 )
                                 .align(Alignment.End)
                         ) {
-                            if (image != null && image?.generationId != id) {
+                            if (image != null) {
                                 showImage(image!!, navController)
                             } else {
                                 Text(
@@ -294,6 +293,7 @@ fun BuildItemContent(
                     }
                     Column(Modifier.weight(1f)) {
                         IconButton(onClick = {
+                            viewModel.onTriggerEvent(BuildEvent.SaveFromTopBar)
                             selectImage.launch(Constants.IMAGE_TYPE)
                         }) {
                             Icon(
@@ -302,6 +302,7 @@ fun BuildItemContent(
                             )
                         }
                         IconButton(onClick = {
+                            viewModel.onTriggerEvent(BuildEvent.SaveFromTopBar)
                             scope.launch {
                                 viewModel.createImageUri()?.let { uri ->
                                     targetImageUri = uri
@@ -518,6 +519,7 @@ fun BuildItemContent(
                             .align(Alignment.CenterVertically)
                     ) {
                         IconButton(onClick = {
+                            viewModel.onTriggerEvent(BuildEvent.SaveFromTopBar)
                             selectVideo.launch(arrayOf<String>(Constants.VIDEO_TYPE))
                         }) {
                             Icon(
@@ -527,6 +529,7 @@ fun BuildItemContent(
                         }
 
                         IconButton(onClick = {
+                            viewModel.onTriggerEvent(BuildEvent.SaveFromTopBar)
                             scope.launch {
                                 viewModel.createVideoUri()?.let { uri ->
                                     targetVideoUri = uri
@@ -603,7 +606,7 @@ fun showImage(image: Bitmap, navController: NavHostController) {
 //        val currentImage =
 //            rememberSaveable(key = image.generationId.toString()) { mutableStateOf(image) }
         ImageCard(
-            { image },
+             image ,
             navController
         )
 }

@@ -165,7 +165,7 @@ fun CustomListDisplayContent(
                                         .align(Alignment.End)
                                 ) {
                                     if (childImageList.isEmpty().not() && childImageList[childItemIndex] != null) {
-                                        ImageCard({ childImageList[childItemIndex]!! }, navController)
+                                        ImageCard(childImageList[childItemIndex]!! , navController)
                                     }
                                 }
                             }

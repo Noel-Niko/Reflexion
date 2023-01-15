@@ -31,8 +31,6 @@ sealed class BuildEvent {
         val videoUrl: String
     ) : BuildEvent()
 
-    object ShowSiblings : BuildEvent()
-
     data class GetSelectedReflexionItem(
         val pk: Long?
     ): BuildEvent()
@@ -45,6 +43,4 @@ sealed class BuildEvent {
     object SendText : BuildEvent()
 
     object SaveFromTopBar : BuildEvent()
-
-
 }
