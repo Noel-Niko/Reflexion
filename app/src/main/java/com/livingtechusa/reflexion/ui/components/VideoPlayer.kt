@@ -5,11 +5,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.StyledPlayerView
+import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 
 const val VideoScreenRoute = "view_video_screen"
@@ -21,13 +23,14 @@ fun VideoPlayer(
 ) {
     val context = LocalContext.current
 
-    val videoUri = viewModel.videoUri
+    val videoUri by viewModel.videoUri.collectAsState()
+    val uri = videoUri?.let { Converters().convertStringToUri(it) }
 
     val exoPlayer = ExoPlayer.Builder(LocalContext.current)
         .build()
         .also { exoPlayer ->
             val mediaItem = MediaItem.Builder()
-                .setUri(videoUri.toString())
+                .setUri(uri)
                 .build()
             exoPlayer
                 .setMediaItem(mediaItem)

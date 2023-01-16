@@ -258,7 +258,7 @@ fun getItems(
         reflexionArrayItem.itemName.toString()
     ) {
         icon(Icons.TwoTone.Lan)
-        reflexionArrayItem.children?.forEach { reflexionArrayItem ->
+        reflexionArrayItem.children.forEach { reflexionArrayItem ->
             getItems(reflexionArrayItem, this) //, list)
         }
     }

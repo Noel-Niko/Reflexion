@@ -70,6 +70,7 @@ import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.Constants.DESCRIPTION
 import com.livingtechusa.reflexion.util.Constants.DETAILED_DESCRIPTION
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
+import com.livingtechusa.reflexion.util.Constants.EMPTY_ITEM
 import com.livingtechusa.reflexion.util.Constants.IMAGE
 import com.livingtechusa.reflexion.util.Constants.NAME
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URI
@@ -290,7 +291,6 @@ fun BuildItemContent(
                     }
                     Column(Modifier.weight(1f)) {
                         IconButton(onClick = {
-                            viewModel.onTriggerEvent(BuildEvent.SaveFromTopBar)
                             selectImage.launch(Constants.IMAGE_TYPE)
                         }) {
                             Icon(
@@ -299,7 +299,6 @@ fun BuildItemContent(
                             )
                         }
                         IconButton(onClick = {
-                            viewModel.onTriggerEvent(BuildEvent.SaveFromTopBar)
                             scope.launch {
                                 viewModel.createImageUri()?.let { uri ->
                                     targetImageUri = uri
@@ -489,7 +488,7 @@ fun BuildItemContent(
                                                 )
                                                 .show()
                                         } else {
-                                            viewModel.onTriggerEvent(BuildEvent.SaveFromTopBar)
+                                              //
                                             val route: String =
                                                 Screen.VideoView.route + "/" + URI
                                             navController.navigate(route)
@@ -516,7 +515,7 @@ fun BuildItemContent(
                             .align(Alignment.CenterVertically)
                     ) {
                         IconButton(onClick = {
-                            viewModel.onTriggerEvent(BuildEvent.SaveFromTopBar)
+
                             selectVideo.launch(arrayOf<String>(Constants.VIDEO_TYPE))
                         }) {
                             Icon(
@@ -526,7 +525,7 @@ fun BuildItemContent(
                         }
 
                         IconButton(onClick = {
-                            viewModel.onTriggerEvent(BuildEvent.SaveFromTopBar)
+
                             scope.launch {
                                 viewModel.createVideoUri()?.let { uri ->
                                     targetVideoUri = uri
@@ -554,6 +553,7 @@ fun BuildItemContent(
                                         if (videoUrl == EMPTY_STRING) {
                                             navController.navigate(Screen.PasteAndSaveScreen.route)
                                         } else {
+
                                             val intent = Intent(
                                                 Intent.ACTION_VIEW,
                                                 Uri.parse(videoUrl)
