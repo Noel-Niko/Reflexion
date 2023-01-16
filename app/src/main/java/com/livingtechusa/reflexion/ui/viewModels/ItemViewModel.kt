@@ -173,34 +173,42 @@ class ItemViewModel @Inject constructor(
                             when (event.subItem) {
                                 NAME -> {
                                     updatedReflexionItem.name = EMPTY_STRING
+                                    _name.value = EMPTY_STRING
                                 }
 
                                 DESCRIPTION -> {
                                     updatedReflexionItem.description = EMPTY_STRING
+                                    _description.value = EMPTY_STRING
                                 }
 
                                 DETAILED_DESCRIPTION -> {
                                     updatedReflexionItem.detailedDescription = EMPTY_STRING
+                                    _detailedDescription.value = EMPTY_STRING
                                 }
 
                                 IMAGE -> {
                                     updatedReflexionItem.image = null
+                                    _image.value = null
                                 }
 
                                 VIDEO_URI -> {
                                     updatedReflexionItem.videoUri = EMPTY_STRING
+                                    _videoUri.value = EMPTY_STRING
                                 }
 
                                 VIDEO_URL -> {
                                     updatedReflexionItem.videoUrl = EMPTY_STRING
+                                    _videoUrl.value = EMPTY_STRING
                                 }
 
                                 PARENT -> {
                                     updatedReflexionItem.parent = null
+                                    _parent.value = null
                                 }
                             }
                             _reflexionItem = updatedReflexionItem
                             _reflexionItemState.value = updatedReflexionItem
+                            _videoUri.value = EMPTY_STRING
                             localServiceImpl.updateReflexionItem(reflexionItem)
                         }
                     }

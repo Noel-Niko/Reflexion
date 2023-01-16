@@ -2,6 +2,7 @@ package com.livingtechusa.reflexion.ui.build
 
 import android.content.Intent
 import android.graphics.Bitmap
+import android.icu.lang.UCharacter.VerticalOrientation
 import android.net.Uri
 import android.os.Build
 import android.widget.Toast
@@ -10,7 +11,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,6 +24,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -189,10 +194,11 @@ fun BuildItemContent(
     val offsetX = remember { mutableStateOf(0f) }
     val offsetY = remember { mutableStateOf(0f) }
 
-    Box(
+    Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .padding(paddingValues)
+            .verticalScroll(rememberScrollState())
     ) {
         if (saveNow) {
             Toast.makeText(
@@ -488,7 +494,7 @@ fun BuildItemContent(
                                                 )
                                                 .show()
                                         } else {
-                                              //
+                                            //
                                             val route: String =
                                                 Screen.VideoView.route + "/" + URI
                                             navController.navigate(route)
