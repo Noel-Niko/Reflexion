@@ -44,8 +44,8 @@ import com.skydoves.landscapist.coil.CoilImage
 import java.lang.Exception
 
 
-    val previewHeight = 210.dp
-    val previewWidth = 140.dp
+val previewHeight = 210.dp
+val previewWidth = 140.dp
 
 @Composable
 fun MediaFilePreviewCard(resource: FileResource) {
@@ -80,11 +80,15 @@ fun MediaFilePreviewCard(resource: FileResource) {
 }
 
 @Composable
-fun DocumentFilePreviewCard(resource: FileResource, navController: NavHostController, docType: String) {
+fun DocumentFilePreviewCard(
+    resource: FileResource,
+    navController: NavHostController,
+    docType: String
+) {
     val context = LocalContext.current
-   // val formattedFileSize = Formatter.formatShortFileSize(context, resource.size)
+    // val formattedFileSize = Formatter.formatShortFileSize(context, resource.size)
 
-     // modify to handle play for both both saved and linked video... to delete on long or double tap...
+    // modify to handle play for both both saved and linked video... to delete on long or double tap...
 
     val URI = "Uri"
     val route: String =
@@ -101,7 +105,7 @@ fun DocumentFilePreviewCard(resource: FileResource, navController: NavHostContro
         modifier = Modifier
             .pointerInput(key1 = resource) {
                 detectTapGestures(
-                    onLongPress  = {
+                    onLongPress = {
                         // Launch dialog
                         navController.navigate(Screen.ConfirmDeleteSubItemScreen.route + "/" + docType)
                     },
@@ -119,7 +123,7 @@ fun DocumentFilePreviewCard(resource: FileResource, navController: NavHostContro
                 )
             }
             .padding(0.dp)
-            //.fillMaxWidth()
+        //.fillMaxWidth()
 //            .clickable {
 //                Screen.VideoView.route + "/" + URI
 //                navController.navigate(route)
@@ -128,14 +132,20 @@ fun DocumentFilePreviewCard(resource: FileResource, navController: NavHostContro
         Column {
             val colorStops: Array<out Pair<Float, Color>> =
                 arrayOf(Pair(10f, Color.Black), Pair(5f, Color.Red))
-            thumbnail?.let { Image(
-                modifier = Modifier.height(previewHeight).width(previewWidth)
-                    .border(
-                        1.dp, Brush.verticalGradient(colorStops = colorStops),
-                        TextFieldDefaults.OutlinedTextFieldShape
-                    ).padding(2.dp),
-                contentScale = ContentScale.Crop,
-                bitmap = it.asImageBitmap(), contentDescription = null) }
+            thumbnail?.let {
+                Image(
+                    modifier = Modifier
+                        .height(previewHeight)
+                        .width(previewWidth)
+                        .border(
+                            1.dp, Brush.verticalGradient(colorStops = colorStops),
+                            TextFieldDefaults.OutlinedTextFieldShape
+                        )
+                        .padding(2.dp),
+                    contentScale = ContentScale.Crop,
+                    bitmap = it.asImageBitmap(), contentDescription = null
+                )
+            }
 
 //            Column(modifier = Modifier.padding(16.dp)) {
 //                Text(text = resource.filename, style = MaterialTheme.typography.subtitle2)
@@ -151,7 +161,7 @@ fun DocumentFilePreviewCard(resource: FileResource, navController: NavHostContro
 @Composable
 fun videoImagePreviewCard(urlString: String?, navController: NavHostController, docType: String) {
     val context = LocalContext.current
-val resource = ResourceProviderSingleton
+    val resource = ResourceProviderSingleton
     // get url thumbnail...
     // for Youtube
     var imageUrl = urlString
@@ -159,12 +169,22 @@ val resource = ResourceProviderSingleton
         if (imageUrl?.contains("youtu") == true) {
             val urlArray = imageUrl.split("//", "/").map { it.trim() }
             imageUrl =
-                resource.getString(R.string.youtube_image_prepend) + urlArray[2] + resource.getString(R.string.youtube_image_postpend)
+                resource.getString(R.string.youtube_image_prepend) + urlArray[2] + resource.getString(
+                    R.string.youtube_image_postpend
+                )
         } else {
-            Toast.makeText(context, resource.getString(R.string.unable_to_obtain_youtube_link_preview), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                context,
+                resource.getString(R.string.unable_to_obtain_youtube_link_preview),
+                Toast.LENGTH_SHORT
+            ).show()
         }
     } catch (e: Exception) {
-        Toast.makeText(context, stringResource(R.string.unable_to_preview_non_youtube_videos), Toast.LENGTH_SHORT).show()
+        Toast.makeText(
+            context,
+            stringResource(R.string.unable_to_preview_non_youtube_videos),
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     val painter = rememberImagePainter(data = imageUrl)
@@ -212,7 +232,9 @@ val resource = ResourceProviderSingleton
             Image(
                 painter = painter,
                 contentDescription = "Linked Video Preview Image",
-                modifier = Modifier.height(previewHeight).width(previewWidth)
+                modifier = Modifier
+                    .height(previewHeight)
+                    .width(previewWidth)
                     .border(
                         1.dp, Brush.verticalGradient(colorStops = colorStops),
                         TextFieldDefaults.OutlinedTextFieldShape
@@ -223,17 +245,6 @@ val resource = ResourceProviderSingleton
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 //

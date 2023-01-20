@@ -12,6 +12,7 @@ import com.livingtechusa.reflexion.ui.components.VideoScreenRoute
 import com.livingtechusa.reflexion.ui.customListDisplay.CUSTOM_LIST_DISPLAY
 import com.livingtechusa.reflexion.ui.customLists.BuildCustomList
 import com.livingtechusa.reflexion.ui.home.HOME
+import com.livingtechusa.reflexion.ui.settings.SETTINGS
 
 
 sealed class Screen(val route: String) {
@@ -30,6 +31,8 @@ sealed class Screen(val route: String) {
     object TopicScreen: Screen(ListRoute)
 
     object CustomLists: Screen(BuildCustomList)
+
+    object SettingsScreen: Screen(SETTINGS)
 
     fun withArgs(vararg args: String): String {
         return  buildString {

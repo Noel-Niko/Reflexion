@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
@@ -38,6 +39,7 @@ import com.livingtechusa.reflexion.ui.components.VideoPlayer2CustomList
 import com.livingtechusa.reflexion.ui.customListDisplay.CustomListDisplayScreen
 import com.livingtechusa.reflexion.ui.customLists.BuildCustomListsScreen
 import com.livingtechusa.reflexion.ui.home.HomeScreen
+import com.livingtechusa.reflexion.ui.settings.SettingsScreen
 import com.livingtechusa.reflexion.ui.theme.ReflexionTheme
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
@@ -66,6 +68,7 @@ class MainActivity : ComponentActivity() {
 
     lateinit var navigationController: NavHostController
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -291,6 +294,14 @@ class MainActivity : ComponentActivity() {
                         VideoPlayer2CustomList(
                             index = 0,   //navBackStackEntry.arguments?.getInt(INDEX),
                             viewModel = parentViewModel,
+                        )
+                    }
+                    composable(
+                        route = Screen.SettingsScreen.route,
+                    ) {
+                        SettingsScreen(
+                            navHostController = navController,
+                            windowSize = windowSize
                         )
                     }
                 }

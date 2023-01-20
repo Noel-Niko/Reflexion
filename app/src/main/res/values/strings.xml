@@ -55,4 +55,6 @@
     <string name="unable_to_preview_non_youtube_videos">Unable to generate previews for non-YouTube video links.</string>
     <string name="no_persistable_flags_present_to_take">No persistable flags present to take.</string>
     <string name="unable_to_send_saved_video_file">Unable to send saved video file.</string>
+    <string name="app_icon_images">Pick an alt app image</string>
+    <string name="settings">Settings</string>
 </resources>

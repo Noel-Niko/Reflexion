@@ -1,5 +1,7 @@
 package com.livingtechusa.reflexion.ui.build
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -11,6 +13,7 @@ import com.livingtechusa.reflexion.util.extensions.findActivity
 
 const val BuildRoute = "build"
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun BuildItemScreen(
     pk: Long,

@@ -9,6 +9,28 @@ import androidx.compose.material.icons.filled.ViewList
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 
 object NavBarItems {
+    val SettingsBarItems: List<BarItem> = listOf(
+        BarItem(
+            title = "Home",
+            image = Icons.Filled.AddHome,
+            route = Screen.HomeScreen.route
+        ),
+        BarItem(
+            title = "Lists",
+            image = Icons.Filled.AddLink,
+            route = Screen.CustomLists.route
+        ),
+        BarItem(
+            title = "Topics",
+            image = Icons.Filled.DataArray,
+            route = Screen.TopicScreen.route + "/" + EMPTY_PK
+        ),
+        BarItem(
+            title = "New",
+            image = Icons.Filled.DeveloperMode,
+            route = Screen.BuildItemScreen.route + "/" + EMPTY_PK
+        )
+    )
     val HomeBarItems = listOf(
         BarItem(
             title = "New",

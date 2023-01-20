@@ -1,6 +1,7 @@
 package com.livingtechusa.reflexion.util
 
 import android.content.res.Resources
+import android.graphics.drawable.Drawable
 import androidx.annotation.DimenRes
 import androidx.annotation.IntegerRes
 import androidx.annotation.PluralsRes
@@ -35,5 +36,9 @@ object ResourceProviderSingleton : ResourceProviderInterface {
 
     override fun getDimen(@DimenRes resId: Int): Float {
         return resources.getDimension(resId)
+    }
+
+    override fun getDrawable(resId: Int): Drawable {
+        return resources.getDrawable(resId)
     }
 }

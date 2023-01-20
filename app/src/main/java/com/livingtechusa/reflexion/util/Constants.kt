@@ -1,8 +1,9 @@
 package com.livingtechusa.reflexion.util
 
+import android.graphics.Bitmap
+import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
-
 
 object Constants {
     const val DATABASE_NAME: String = "Reflexion_Database"
@@ -31,6 +32,15 @@ object Constants {
     const val VIDEO_URI = "videoUri"
     const val VIDEO_URL = "videoUrl"
     const val PARENT = "parent"
+
+    // APP ICONS
+    const val EYE_BITS = R.mipmap.ic_launcher
+    const val BUDDA = R.mipmap.ic_launcher_2
+    const val EYE_STAR = R.mipmap.ic_launcher_4
+    const val BOOKS = R.mipmap.ic_launcher_5
+    const val SUN_GLASSES = R.mipmap.ic_launcher_6
+    const val PUZZLE = R.mipmap.ic_launcher_7
+    val APP_ICON_LIST = listOf<Int>(EYE_BITS, BUDDA, EYE_STAR, BOOKS, SUN_GLASSES, PUZZLE)
 }
 
 object Temporary {
@@ -38,3 +48,4 @@ object Temporary {
     var url = EMPTY_STRING
     var tempReflexionItem: ReflexionItem = ReflexionItem()
 }
+

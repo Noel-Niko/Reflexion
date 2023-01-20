@@ -114,15 +114,11 @@ fun BuildItemContent(
 
     val saveNow by itemViewModel.saveNowFromTopBar.collectAsState()
     val resource = ResourceProviderSingleton
-    val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
     val selectedFile by viewModel.selectedFile.collectAsState()
     val colorStops: Array<out Pair<Float, Color>> =
         arrayOf(Pair(10f, Color.Black), Pair(5f, Color.Red))
 
-//    val selectFile =
-//        rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-//            uri?.let { viewModel.onFileSelect(it) }
-//        }
+    val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
     // If `lifecycleOwner` changes, dispose and reset the effect
     DisposableEffect(lifecycleOwner) {
         // Create an observer that triggers our remembered callbacks
