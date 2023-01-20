@@ -77,23 +77,6 @@
             android:name=".MainActivityAlias1"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_2"
-            android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_2_round"
-            android:targetActivity=".MainActivity">
-
-            <intent-filter>
-
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-
-            </intent-filter>
-
-        </activity-alias>
-        <activity-alias
-            android:name=".MainActivityAlias2"
-            android:enabled="false"
-            android:exported="true"
             android:icon="@mipmap/ic_launcher_4"
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_4_round"
@@ -108,12 +91,29 @@
 
         </activity-alias>
         <activity-alias
+            android:name=".MainActivityAlias2"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_8"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_launcher_8_round"
+            android:targetActivity=".MainActivity">
+
+            <intent-filter>
+
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+
+            </intent-filter>
+
+        </activity-alias>
+        <activity-alias
             android:name=".MainActivityAlias3"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_5"
+            android:icon="@mipmap/ic_launcher_9"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_5_round"
+            android:roundIcon="@mipmap/ic_launcher_9_round"
             android:targetActivity=".MainActivity">
 
             <intent-filter>
@@ -128,9 +128,9 @@
             android:name=".MainActivityAlias4"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_6"
+            android:icon="@mipmap/ic_launcher_10"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_6_round"
+            android:roundIcon="@mipmap/ic_launcher_10_round"
             android:targetActivity=".MainActivity">
 
             <intent-filter>
@@ -145,18 +145,183 @@
             android:name=".MainActivityAlias5"
             android:enabled="false"
             android:exported="true"
+            android:icon="@mipmap/ic_launcher_11"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_launcher_11_round"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".MainActivityAlias6"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_19"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_launcher_19_round"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".MainActivityAlias7"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_14"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_launcher_14_round"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".MainActivityAlias8"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_12"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_launcher_12_round"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".MainActivityAlias9"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_17"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_launcher_17_round"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".MainActivityAlias10"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_13"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_launcher_13_round"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".MainActivityAlias11"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_18"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_launcher_18_round"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".MainActivityAlias12"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_15"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_launcher_15_round"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".MainActivityAlias13"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_16"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_launcher_16_round"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".MainActivityAlias14"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_21"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_launcher_21_round"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".MainActivityAlias15"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_2"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_launcher_2_round"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".MainActivityAlias16"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_5"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_launcher_5_round"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".MainActivityAlias17"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_6"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_launcher_6_round"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".MainActivityAlias18"
+            android:enabled="false"
+            android:exported="true"
             android:icon="@mipmap/ic_launcher_7"
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_7_round"
             android:targetActivity=".MainActivity">
-
             <intent-filter>
-
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
-
             </intent-filter>
-
         </activity-alias>
 
         <provider

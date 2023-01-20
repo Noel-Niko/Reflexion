@@ -1,6 +1,5 @@
 package com.livingtechusa.reflexion.util
 
-import android.graphics.Bitmap
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
@@ -34,13 +33,29 @@ object Constants {
     const val PARENT = "parent"
 
     // APP ICONS
-    const val EYE_BITS = R.mipmap.ic_launcher
+    const val EYE_1 = R.mipmap.ic_launcher
+    const val EYE_4 = R.mipmap.ic_launcher_4
+    const val EYE_8 = R.mipmap.ic_launcher_8
+    const val EYE_9 = R.mipmap.ic_launcher_9
+    const val EYE_10 = R.mipmap.ic_launcher_10
+    const val EYE_11 = R.mipmap.ic_launcher_11
+    const val EYE_19 = R.mipmap.ic_launcher_19
+    const val EYE_14 = R.mipmap.ic_launcher_14
+    const val EYE_12 = R.mipmap.ic_launcher_12
+    const val EYE_17 = R.mipmap.ic_launcher_17
+    const val EYE_13 = R.mipmap.ic_launcher_13
+    const val EYE_18 = R.mipmap.ic_launcher_18
+    const val EYE_15 = R.mipmap.ic_launcher_15
+    const val EYE_16 = R.mipmap.ic_launcher_16
+    const val EYE_21 = R.mipmap.ic_launcher_21
     const val BUDDA = R.mipmap.ic_launcher_2
-    const val EYE_STAR = R.mipmap.ic_launcher_4
     const val BOOKS = R.mipmap.ic_launcher_5
     const val SUN_GLASSES = R.mipmap.ic_launcher_6
     const val PUZZLE = R.mipmap.ic_launcher_7
-    val APP_ICON_LIST = listOf<Int>(EYE_BITS, BUDDA, EYE_STAR, BOOKS, SUN_GLASSES, PUZZLE)
+    val APP_ICON_LIST = listOf<Int>(
+        EYE_1, EYE_4, EYE_8, EYE_9, EYE_10, EYE_11, EYE_19, EYE_14, EYE_12, EYE_17, EYE_13, EYE_18, EYE_15,
+        EYE_16, EYE_21, BUDDA, BOOKS, SUN_GLASSES, PUZZLE
+        )
 }
 
 object Temporary {
