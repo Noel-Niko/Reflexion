@@ -2,6 +2,10 @@ package com.livingtechusa.reflexion.ui.viewModels
 
 import android.graphics.Bitmap
 import android.util.Log
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.runtime.Composable
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
