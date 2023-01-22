@@ -17,7 +17,7 @@ fun MainTopBar(
 ) {
   TopAppBar(
       backgroundColor = MaterialTheme.colors.background,
-      elevation = 4.dp,
+      elevation = 6.dp,
       title = {
         Text(text = stringResource(id = R.string.app_name), color = androidx.compose.material.MaterialTheme.colors.onBackground)
       },

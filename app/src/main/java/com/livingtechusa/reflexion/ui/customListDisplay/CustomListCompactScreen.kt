@@ -77,7 +77,7 @@ fun CompactScreen(
                     }
                 },
                 backgroundColor = MaterialTheme.colors.background,
-                elevation = 4.dp,
+                elevation = 6.dp,
 //                navigationIcon = {
 //                    androidx.compose.material.Icon(
 //                        painter = painterResource(R.drawable.baseline_menu_24),

@@ -62,13 +62,13 @@ fun HomeScreen(
 
 @Composable
 fun homeContent() {
-    Row(Modifier.fillMaxSize()) {
+    Row(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primaryContainer)) {
         Box(
             modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .padding(16.dp)
                 .shadow(elevation = 12.dp, shape = RoundedCornerShape(8.dp))
-                .background(color = MaterialTheme.colorScheme.background)
+                .background(color = MaterialTheme.colorScheme.onPrimaryContainer)  //MaterialTheme.colorScheme.background)
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -78,13 +78,13 @@ fun homeContent() {
                         Color.Black,
                         RoundedCornerShape(8.dp)
                     )
+                    .background(MaterialTheme.colorScheme.surface)
                     .fillMaxWidth()
                     .padding(20.dp)
             ) {
-
                 Text(
                     text = stringResource(R.string.welcome_to_reflexion),
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp,
                     lineHeight = 30.sp

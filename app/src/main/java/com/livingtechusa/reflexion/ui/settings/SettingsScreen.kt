@@ -22,12 +22,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material.Card
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -126,8 +129,7 @@ fun IconImageCard(
         modifier = Modifier
             .height(size.dp)
             .width(size.dp)
-            .padding(4.dp)
-            .background(MaterialTheme.colorScheme.background),
+            .padding(4.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Image(
@@ -142,6 +144,7 @@ fun IconImageCard(
                         showNewIconImage(context = context, int = iconNumber, totalIndices)
                     }
                 )
+                .background(MaterialTheme.colorScheme.surface)
         )
     }
 }
@@ -217,13 +220,14 @@ fun showNewIconImage(context: Context, int: Int, totalIndices: Int) {
         .show()
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun settingsContent(paddingValues: PaddingValues, viewModel: SettingsViewModel) {
     val bitmapList by viewModel.iconImages.collectAsState()
     val context = LocalContext.current
     Scaffold(Modifier.padding(paddingValues = paddingValues)) {
         Column(
-            modifier = Modifier.padding(paddingValues = it),
+            modifier = Modifier.fillMaxSize().padding(paddingValues = it).background(MaterialTheme.colorScheme.primaryContainer),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             // Icons
@@ -239,13 +243,13 @@ fun settingsContent(paddingValues: PaddingValues, viewModel: SettingsViewModel) 
                 Box(
                     contentAlignment = Alignment.CenterStart
                 ) {
-                    Card(
+                    ElevatedCard(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(4.dp)
                             .align(Alignment.Center),
-                        elevation = 10.dp,
-                        shape = MaterialTheme.shapes.medium
+                        shape = MaterialTheme.shapes.medium,
+                        elevation = CardDefaults.elevatedCardElevation(4.dp)
                     ) {
                         Row(
                             modifier = Modifier.background(MaterialTheme.colorScheme.background),
@@ -287,13 +291,13 @@ fun settingsContent(paddingValues: PaddingValues, viewModel: SettingsViewModel) 
                 Box(
                     contentAlignment = Alignment.CenterStart,
                 ) {
-                    Card(
+                    ElevatedCard(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(4.dp)
                             .align(Alignment.Center),
-                        elevation = 10.dp,
-                        shape = MaterialTheme.shapes.medium
+                        shape = MaterialTheme.shapes.medium,
+                        elevation = CardDefaults.elevatedCardElevation(4.dp)
                     ) {
                         Row(
                             modifier = Modifier.background(MaterialTheme.colorScheme.background),

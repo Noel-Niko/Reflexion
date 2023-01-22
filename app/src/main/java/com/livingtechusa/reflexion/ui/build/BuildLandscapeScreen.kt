@@ -55,7 +55,7 @@ fun MediumScreen(
                     Text(text = stringResource(id = R.string.app_name), color = MaterialTheme.colors.onBackground)
                 },
                 backgroundColor = MaterialTheme.colors.background,
-                elevation = 4.dp,
+                elevation = 6.dp,
                 navigationIcon = {
                     Icon(
                         painter = painterResource(R.drawable.baseline_menu_24),

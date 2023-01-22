@@ -80,7 +80,7 @@ fun CustomListCompactScreen(
                     }
                 },
                 backgroundColor = MaterialTheme.colors.background,
-                elevation = 4.dp,
+                elevation = 6.dp,
             )
         },
         containerColor = MaterialTheme.colors.background,

@@ -119,7 +119,7 @@ private fun ReflexionItemsContent(
                                 onLongPress = { onLongPress(reflexionItem) }
                             )
                         },
-                    elevation = 10.dp,
+                    elevation = 6.dp,
                     shape = RoundedCornerShape(20.dp)
                 ) {
                     Row(modifier = Modifier.fillMaxSize()) {

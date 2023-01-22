@@ -44,7 +44,7 @@ fun CompactScreen(
                     )
                 },
                 backgroundColor = MaterialTheme.colorScheme.background,
-                elevation = 4.dp,
+                elevation = 6.dp,
             )
         },
         bottomBar = {

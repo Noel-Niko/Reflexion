@@ -117,7 +117,7 @@ fun CustomListContent(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(4.dp),
-                            elevation = 10.dp,
+                            elevation = 6.dp,
                             shape = RoundedCornerShape(20.dp)
                         ) {
                             Row(
