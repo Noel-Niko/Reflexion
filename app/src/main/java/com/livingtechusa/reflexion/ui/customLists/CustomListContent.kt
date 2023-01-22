@@ -2,6 +2,7 @@ package com.livingtechusa.reflexion.ui.customLists
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -21,13 +22,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,31 +37,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
-import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.livingtechusa.reflexion.navigation.Screen
-import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.util.Constants.NO_LISTS
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomListContent(
     navController: NavHostController,
@@ -70,35 +67,71 @@ fun CustomListContent(
     val listOfLists by viewModel.listOfLists.collectAsState()
     val listimages by viewModel.listImages.collectAsState()
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        Row() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.secondaryContainer)
+            .fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.secondaryContainer)
+                .align(Alignment.CenterHorizontally)
+                .padding(16.dp)
+                .fillMaxWidth()
+                .align(Alignment.CenterHorizontally)
+        ) {
             LazyColumn(
                 modifier = Modifier
-                    .padding(4.dp),
+                    .padding(4.dp)
+                    .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 items(1) { index ->
-                    Column(modifier = Modifier.background(Color.Transparent)) {
-                        TextField(
-                            modifier = Modifier.height(IntrinsicSize.Min),
-                            value = customList.itemName.toString(),
-                            colors = TextFieldDefaults.textFieldColors(
-                                //textColor = MaterialTheme.colors.primary,
-                                backgroundColor = Color.Transparent
-                            ),
-                            onValueChange = {
-                                viewModel.onTriggerEvent(
-                                    CustomListEvent.UpdateListName(
-                                        index = index,
-                                        text = it
-                                    )
+//                    Box(
+//                        modifier = Modifier
+//                            .fillParentMaxWidth()
+//                            .background(Color.Green)
+//                    ) {
+                    Column(
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.secondaryContainer),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        ElevatedCard(
+                            modifier = Modifier
+                                .border(
+                                    1.dp,
+                                    MaterialTheme.colorScheme.outline,
+                                    MaterialTheme.shapes.medium
                                 )
-                            }
-                        )
-                        EditableHorizontalScrollableRowComponent(
-                            viewModel = viewModel,
-                            customList = customList
-                        )
+                                .background(MaterialTheme.colorScheme.secondaryContainer)
+                        ) {
+                            TextField(
+                                modifier = Modifier
+                                    .height(IntrinsicSize.Min)
+                                    .background(MaterialTheme.colorScheme.surface)
+                                    .fillMaxWidth(),
+                                textStyle = MaterialTheme.typography.headlineMedium,
+                                value = customList.itemName.toString(),
+                                colors = TextFieldDefaults.textFieldColors(
+                                    textColor = MaterialTheme.colorScheme.onSurface,
+                                    containerColor = MaterialTheme.colorScheme.surface
+                                ),
+                                onValueChange = {
+                                    viewModel.onTriggerEvent(
+                                        CustomListEvent.UpdateListName(
+                                            index = index,
+                                            text = it
+                                        )
+                                    )
+                                }
+                            )
+                            EditableHorizontalScrollableRowComponent(
+                                viewModel = viewModel,
+                                customList = customList
+                            )
+                        }
                     }
                 }
             }
@@ -110,14 +143,12 @@ fun CustomListContent(
                     .padding(4.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-
                 items(listOfLists.size) { index ->
                     Box {
-                        Card(
+                        ElevatedCard(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(4.dp),
-                            elevation = 6.dp,
                             shape = RoundedCornerShape(20.dp)
                         ) {
                             Row(
@@ -142,7 +173,7 @@ fun CustomListContent(
                                     },
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                if(listimages.isNullOrEmpty().not()) {
+                                if (listimages.isEmpty().not() && listimages.size > index) {
                                     val imagePainter = rememberImagePainter(
                                         data = listimages[index],
                                         builder = {
@@ -164,7 +195,7 @@ fun CustomListContent(
                                     text = listOfLists[index]?.itemName ?: NO_LISTS,
                                     modifier = Modifier
                                         .padding(16.dp),
-                                    style = MaterialTheme.typography.subtitle2
+                                    style = MaterialTheme.typography.titleMedium
                                 )
                                 listOfLists[index]?.let {
                                     HorizontalScrollableRowComponent(
@@ -189,22 +220,24 @@ fun EditableHorizontalScrollableRowComponent(
     val scrollState = rememberScrollState()
     Row(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(4.dp)
+            .height(48.dp)
+            .padding(start = 16.dp)
             .horizontalScroll(state = scrollState),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        if (customList.children.isNullOrEmpty().not()) {
-            customList.children?.forEach { item ->
+        if (customList.children.isEmpty().not()) {
+            customList.children.forEach { item ->
                 var offsetX by remember { mutableStateOf(0f) }
                 var offsetY by remember { mutableStateOf(0f) }
                 var elevated by remember { mutableStateOf(0) }
-                val h2 = MaterialTheme.typography.h2
-                val b2 = MaterialTheme.typography.body2
-                var textStyle = b2
+//                val h2 = MaterialTheme.typography.titleLarge
+//                val b2 = MaterialTheme.typography.labelLarge
+//                var textStyle = b2
                 Text(
                     text = item.itemName.toString() + ", ",
-                    style = textStyle,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.titleMedium,
                     //color = MaterialTheme.colors.primary,
                     modifier = Modifier
                         .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
@@ -213,7 +246,6 @@ fun EditableHorizontalScrollableRowComponent(
                                 onDragStart = {
                                     offsetY = -50f
                                     elevated = 10
-                                    textStyle = h2
                                 },
                                 onDrag = { change, offset ->
                                     change.consume()
@@ -222,8 +254,8 @@ fun EditableHorizontalScrollableRowComponent(
                                 onDragEnd = {
                                     if (offsetX <= 0) {
                                         customList.children
-                                            ?.indexOf(item)
-                                            ?.let { index ->
+                                            .indexOf(item)
+                                            .let { index ->
                                                 viewModel.onTriggerEvent(
                                                     CustomListEvent.MoveItemUp(
                                                         index
@@ -233,11 +265,10 @@ fun EditableHorizontalScrollableRowComponent(
                                         offsetX = 0F
                                         offsetY = 0f
                                         elevated = 0
-                                        textStyle = b2
                                     } else if (offsetX > 0) {
                                         customList.children
-                                            ?.indexOf(item)
-                                            ?.let { index ->
+                                            .indexOf(item)
+                                            .let { index ->
                                                 viewModel.onTriggerEvent(
                                                     CustomListEvent.MoveItemDown(
                                                         index
@@ -248,7 +279,6 @@ fun EditableHorizontalScrollableRowComponent(
                                         offsetX = 0F
                                         offsetY = 0f
                                         elevated = 0
-                                        textStyle = b2
                                     }
                                 }
                             )
@@ -290,8 +320,7 @@ fun HorizontalScrollableRowComponent(
             list.children.forEach { item ->
                 Text(
                     text = item.itemName.toString() + ", ",
-                    style = MaterialTheme.typography.body1,
-                    // color = MaterialTheme.colors.primary,
+                    style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier
                         .fillMaxSize()
                 )

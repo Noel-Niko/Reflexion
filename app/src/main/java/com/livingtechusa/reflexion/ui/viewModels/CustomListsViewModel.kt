@@ -254,6 +254,7 @@ class CustomListsViewModel @Inject constructor(
                             }
                             _listOfLists.value =
                                 localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic)
+                            getListImages()
                         }
                     }
                 }

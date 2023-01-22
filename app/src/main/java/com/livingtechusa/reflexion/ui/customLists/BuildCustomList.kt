@@ -17,23 +17,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExposedDropdownMenuBox
 import androidx.compose.material.ExposedDropdownMenuDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.twotone.AddCard
-import androidx.compose.material.icons.twotone.AirlineStops
-import androidx.compose.material.icons.twotone.Anchor
-import androidx.compose.material.icons.twotone.Architecture
-import androidx.compose.material.icons.twotone.Archive
-import androidx.compose.material.icons.twotone.Circle
-import androidx.compose.material.icons.twotone.Done
-import androidx.compose.material.icons.twotone.FileCopy
-import androidx.compose.material.icons.twotone.FormatListBulleted
 import androidx.compose.material.icons.twotone.Lan
-import androidx.compose.material.icons.twotone.Language
-import androidx.compose.material.icons.twotone.Share
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -106,7 +98,9 @@ fun BuildCustomListsScreen(
 }
 
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class,
+    ExperimentalMaterial3Api::class
+)
 @Composable
 fun CustomListsContent(
     navController: NavHostController, viewModel: CustomListsViewModel, paddingValues: PaddingValues
@@ -135,6 +129,7 @@ fun CustomListsContent(
                         .align(
                             Alignment.CenterVertically,
                         )
+                        .background(MaterialTheme.colorScheme.inverseOnSurface)
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -169,9 +164,9 @@ fun CustomListsContent(
                                         expanded = expanded
                                     )
                                 },
-                                colors = ExposedDropdownMenuDefaults.textFieldColors(
-                                    textColor = MaterialTheme.colors.onSurface,
-                                    backgroundColor = MaterialTheme.colors.surface
+                                colors = TextFieldDefaults.textFieldColors(
+                                  textColor = MaterialTheme.colorScheme.onSurface,
+                                    containerColor = MaterialTheme.colorScheme.surface
                                 )
                             )
                                 CustomDropDownMenu(
@@ -182,7 +177,7 @@ fun CustomListsContent(
                                         expanded = !expanded
                                     },
                                     itemSelected = viewModel::selectItem,
-                                    menu = getMenu(itemTree.value)
+                                    menu = getMenu(itemTree.value),
                                 )
                         }
                     }
@@ -224,14 +219,15 @@ fun CustomListsContent(
                                         viewModel.selectItem(filteringOptions[it].itemPK.toString())
                                         searchText = EMPTY_STRING
                                     },
-                                style = MaterialTheme.typography.subtitle1,
-                                color = MaterialTheme.colors.onSurface,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
 
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
                 } else {
+                    Divider()
                     CustomListContent(navController = navController, viewModel = viewModel)
                 }
             }

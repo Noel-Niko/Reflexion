@@ -4,17 +4,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -48,7 +48,7 @@ fun CustomListCompactScreen(
                 title = {
                     Text(
                         text =  stringResource(R.string.lists),
-                        color = MaterialTheme.colors.onBackground
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 },
                 actions = {
@@ -61,7 +61,6 @@ fun CustomListCompactScreen(
                                 androidx.compose.material.Icon(
                                     imageVector = Icons.Default.Save,
                                     contentDescription = "save",
-                                    tint = MaterialTheme.colors.onBackground,
                                 )
                             },
                         )
@@ -73,22 +72,20 @@ fun CustomListCompactScreen(
                                 androidx.compose.material.Icon(
                                     imageVector = Icons.Default.Autorenew,
                                     contentDescription = "reset list",
-                                    tint = MaterialTheme.colors.onBackground,
+                                    tint = MaterialTheme.colorScheme.onBackground,
                                 )
                             },
                         )
                     }
-                },
-                backgroundColor = MaterialTheme.colors.background,
-                elevation = 6.dp,
+                }
             )
         },
-        containerColor = MaterialTheme.colors.background,
+        containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
             BottomNavigation(
-                backgroundColor = MaterialTheme.colors.background,
+                backgroundColor = MaterialTheme.colorScheme.background,
             ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(
@@ -103,11 +100,11 @@ fun CustomListCompactScreen(
                             Icon(
                                 imageVector = navItem.image,
                                 contentDescription = navItem.title,
-                                tint = MaterialTheme.colors.onBackground
+                                tint = MaterialTheme.colorScheme.onBackground
                             )
                         },
                         label = {
-                            Text(text = navItem.title, color = MaterialTheme.colors.onBackground)
+                            Text(text = navItem.title, color = MaterialTheme.colorScheme.onBackground)
                         }
                     )
                 }
