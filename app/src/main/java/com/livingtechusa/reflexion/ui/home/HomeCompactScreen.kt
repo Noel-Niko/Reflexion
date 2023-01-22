@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -12,6 +11,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,7 +36,7 @@ fun CompactScreen(navController: NavHostController, icons: List<BarItem>) {
                 title = {
                     Text(
                         text = stringResource(id = R.string.app_name),
-                        color = MaterialTheme.colors.onBackground
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 },
                 actions = {
@@ -49,13 +49,13 @@ fun CompactScreen(navController: NavHostController, icons: List<BarItem>) {
                                 androidx.compose.material.Icon(
                                     imageVector = Icons.Default.Settings,
                                     contentDescription = "settings",
-                                    tint = MaterialTheme.colors.onBackground,
+                                    tint = MaterialTheme.colorScheme.onBackground,
                                 )
                             },
                         )
                     }
                 },
-                backgroundColor = MaterialTheme.colors.background,
+                backgroundColor = MaterialTheme.colorScheme.background,
                 elevation = 4.dp,
             )
         },
@@ -63,7 +63,7 @@ fun CompactScreen(navController: NavHostController, icons: List<BarItem>) {
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
             BottomNavigation(
-                backgroundColor = MaterialTheme.colors.background,
+                backgroundColor = MaterialTheme.colorScheme.background,
             ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(
@@ -80,11 +80,11 @@ fun CompactScreen(navController: NavHostController, icons: List<BarItem>) {
                             Icon(
                                 imageVector = navItem.image,
                                 contentDescription = navItem.title,
-                                tint = MaterialTheme.colors.onBackground
+                                tint = MaterialTheme.colorScheme.onBackground
                             )
                         },
                         label = {
-                            Text(text = navItem.title, color = MaterialTheme.colors.onBackground)
+                            Text(text = navItem.title, color = MaterialTheme.colorScheme.onBackground)
                         }
                     )
                 }

@@ -6,7 +6,6 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
-import com.livingtechusa.reflexion.ui.theme.ReflexionItemsColors
 
 @Composable
 fun BackIcon(onClick: () -> Unit) {
@@ -16,7 +15,6 @@ fun BackIcon(onClick: () -> Unit) {
         Icon(
             imageVector = Icons.Default.ArrowBack,
             contentDescription = "back",
-            tint = ReflexionItemsColors.salem,
         )
       },
   )

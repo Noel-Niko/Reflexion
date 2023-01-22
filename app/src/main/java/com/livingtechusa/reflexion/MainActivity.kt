@@ -40,7 +40,7 @@ import com.livingtechusa.reflexion.ui.customListDisplay.CustomListDisplayScreen
 import com.livingtechusa.reflexion.ui.customLists.BuildCustomListsScreen
 import com.livingtechusa.reflexion.ui.home.HomeScreen
 import com.livingtechusa.reflexion.ui.settings.SettingsScreen
-import com.livingtechusa.reflexion.ui.theme.ReflexionTheme
+import com.livingtechusa.reflexion.ui.theme.ReflexionDynamicTheme
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.BaseApplication
@@ -52,7 +52,6 @@ import com.livingtechusa.reflexion.util.Constants.LIST_NAME
 import com.livingtechusa.reflexion.util.Constants.REFLEXION_ITEM_PK
 import com.livingtechusa.reflexion.util.Constants.SOURCE
 import com.livingtechusa.reflexion.util.Constants.SUB_ITEM
-import com.livingtechusa.reflexion.util.Constants.URI
 import com.livingtechusa.reflexion.util.MediaUtil
 import com.livingtechusa.reflexion.util.Temporary
 import dagger.hilt.android.AndroidEntryPoint
@@ -73,7 +72,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            ReflexionTheme {
+            ReflexionDynamicTheme {
                 val permissionsState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     rememberMultiplePermissionsState(
                         permissions = listOf(

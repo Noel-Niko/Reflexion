@@ -3,13 +3,7 @@ package com.livingtechusa.reflexion.ui.theme
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Shapes
-import androidx.compose.material.Typography
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -18,21 +12,24 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.view.ViewCompat
 import com.livingtechusa.reflexion.R
+import com.livingtechusa.reflexion.ui.theme.selectableColorSchemes.CustomTheme1
+import com.livingtechusa.reflexion.ui.theme.selectableColorSchemes.CustomTheme2
+import com.livingtechusa.reflexion.ui.theme.selectableColorSchemes.CustomTheme3
+import com.livingtechusa.reflexion.ui.theme.selectableColorSchemes.CustomTheme4
+import com.livingtechusa.reflexion.ui.theme.selectableColorSchemes.CustomTheme5
+import com.livingtechusa.reflexion.ui.theme.selectableColorSchemes.CustomTheme6
+import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil
+import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil.PREFERENCE_TYPE
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
-
+//
+//private val DarkColorScheme = darkColorScheme(
+//    primary = Purple80,
+//    secondary = PurpleGrey80,
+//    tertiary = Pink80
+//)
+//
 private val LightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
@@ -49,44 +46,88 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
-object ReflexionItemsColors {
-
-    val salem @Composable get() = colorResource(id = R.color.salem)
-    val rwGrey @Composable get() = colorResource(id = R.color.rw_grey)
-}
-
-private val reflexionItemsShapes
-    get() = Shapes(
-        small = RoundedCornerShape(4.dp),
-        medium = RoundedCornerShape(4.dp),
-        large = RoundedCornerShape(0.dp)
-    )
-
-private val reflexionItemsTypography
-    get() = Typography(
-        body1 = TextStyle(
-            fontFamily = FontFamily.Default,
-            fontWeight = FontWeight.Normal,
-            fontSize = 16.sp
-        )
-    )
-
-private val DarkColorPalette
-    @Composable get() = darkColors(
-        primary = ReflexionItemsColors.rwGrey,
-    )
-
-private val LightColorPalette
-    @Composable get() = lightColors(
-        primary = ReflexionItemsColors.rwGrey,
-    )
-
+//object ReflexionItemsColors {
+//
+//    val salem @Composable get() = colorResource(id = R.color.salem)
+//    val rwGrey @Composable get() = colorResource(id = R.color.rw_grey)
+//}
+//
+//private val reflexionItemsShapes
+//    get() = Shapes(
+//        small = RoundedCornerShape(4.dp),
+//        medium = RoundedCornerShape(4.dp),
+//        large = RoundedCornerShape(0.dp)
+//    )
+//
+//private val reflexionItemsTypography
+//    get() = Typography(
+//        body1 = TextStyle(
+//            fontFamily = FontFamily.Default,
+//            fontWeight = FontWeight.Normal,
+//            fontSize = 16.sp
+//        )
+//    )
+//
+//private val DarkColorPalette
+//    @Composable get() = darkColors(
+//        primary = ReflexionItemsColors.rwGrey,
+//    )
+//
+//private val LightColorPalette
+//    @Composable get() = lightColors(
+//        primary = ReflexionItemsColors.rwGrey,
+//    )
 
 
 @Composable
-fun ReflexionTheme(
+fun ReflexionDynamicTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
+    dynamicColor: Boolean = true,
+    content: @Composable () -> Unit
+) {
+    val context = LocalContext.current
+    val selectedTheme = UserPreferencesUtil.getCurrentUserThemeSelection(context = context)
+    if (selectedTheme != -1) {
+        when (selectedTheme) {
+            1 -> {
+                return CustomTheme1(content = content)
+            }
+
+            2 -> {
+                return CustomTheme2(content = content)
+            }
+
+            3 -> {
+                return CustomTheme3(content = content)
+            }
+
+            4 -> {
+                return CustomTheme4(content = content)
+            }
+
+            5 -> {
+                return CustomTheme5(content = content)
+            }
+
+            6 -> {
+                return CustomTheme6(content = content)
+            }
+
+            else -> {
+                defaultDynamicTheme(darkTheme, dynamicColor, content)
+            }
+        }
+    } else {
+        defaultDynamicTheme(darkTheme, dynamicColor, content)
+    }
+
+
+}
+
+@Composable
+fun defaultDynamicTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
@@ -95,7 +136,7 @@ fun ReflexionTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        darkTheme -> DarkColorScheme
+        //darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
     val view = LocalView.current
@@ -105,6 +146,7 @@ fun ReflexionTheme(
             ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = darkTheme
         }
     }
+
 
     MaterialTheme(
         colorScheme = colorScheme,

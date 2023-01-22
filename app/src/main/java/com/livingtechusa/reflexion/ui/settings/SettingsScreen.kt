@@ -7,30 +7,34 @@ import android.graphics.Bitmap
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,7 +43,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -49,6 +52,7 @@ import androidx.window.core.layout.WindowWidthSizeClass
 import coil.compose.rememberImagePainter
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.NavBarItems
+import com.livingtechusa.reflexion.ui.components.MaterialRadioButtonGroupComponent
 import com.livingtechusa.reflexion.ui.viewModels.SettingsViewModel
 import com.livingtechusa.reflexion.util.extensions.findActivity
 
@@ -123,7 +127,7 @@ fun IconImageCard(
             .height(size.dp)
             .width(size.dp)
             .padding(4.dp)
-            .background(Color.White),
+            .background(MaterialTheme.colorScheme.background),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Image(
@@ -146,7 +150,10 @@ fun IconImageCard(
 fun HorizontalScrollableIconRowComponent(
     list: List<Bitmap>,
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.Center
+    ) {
         LazyRow(
             modifier = Modifier
                 .padding(4.dp)
@@ -154,16 +161,13 @@ fun HorizontalScrollableIconRowComponent(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(list.size) { listitemIndex ->
-                if (list.isEmpty().not() && list[listitemIndex] != null) {
-                    IconImageCard(list[listitemIndex]!!, listitemIndex, list.size)
+                if (list.isEmpty().not()) {
+                    IconImageCard(list[listitemIndex], listitemIndex, list.size)
                 }
             }
         }
     }
 }
-
-
-
 
 
 fun showNewIconImage(context: Context, int: Int, totalIndices: Int) {
@@ -216,41 +220,103 @@ fun showNewIconImage(context: Context, int: Int, totalIndices: Int) {
 @Composable
 fun settingsContent(paddingValues: PaddingValues, viewModel: SettingsViewModel) {
     val bitmapList by viewModel.iconImages.collectAsState()
-
+    val context = LocalContext.current
     Scaffold(Modifier.padding(paddingValues = paddingValues)) {
-        LazyColumn(
+        Column(
             modifier = Modifier.padding(paddingValues = it),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            items(5) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
+            // Icons
+            val screenPixelDensity = context.resources.displayMetrics.density
+            val height = (768f / 2) / screenPixelDensity
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(height.dp)
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    contentAlignment = Alignment.CenterStart
                 ) {
-                    Box {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp),
-                            elevation = 10.dp,
-                            shape = RoundedCornerShape(20.dp)
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp)
+                            .align(Alignment.Center),
+                        elevation = 10.dp,
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        Row(
+                            modifier = Modifier.background(MaterialTheme.colorScheme.background),
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth(.3f)
+                                    .background(MaterialTheme.colorScheme.background),
                             ) {
-                                Column(modifier = Modifier.fillMaxWidth(.3f)) {
-                                    Text(
-                                        text = stringResource(R.string.app_icon_images),
-                                        modifier = Modifier
-                                            .padding(8.dp),
-                                        style = MaterialTheme.typography.subtitle2
-                                    )
-                                }
-                                Column(modifier = Modifier.fillMaxWidth(1f)) {
-                                    HorizontalScrollableIconRowComponent(bitmapList)
-                                }
+                                Text(
+                                    text = stringResource(R.string.app_icon_images),
+                                    modifier = Modifier
+                                        .padding(8.dp),
+                                    style = MaterialTheme.typography.labelMedium
+                                )
                             }
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth(1f)
+                                    .background(MaterialTheme.colorScheme.background),
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                HorizontalScrollableIconRowComponent(bitmapList)
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Theme
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height((height * 3).dp)
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp)
+                            .align(Alignment.Center),
+                        elevation = 10.dp,
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        Row(
+                            modifier = Modifier.background(MaterialTheme.colorScheme.background),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            var selected by remember { mutableStateOf(false) }
+                            Column(modifier = Modifier.fillMaxWidth(.3f)) {
+                                Text(
+                                    text = stringResource(R.string.select_theme_color_restart_app),
+                                    modifier = Modifier.padding(8.dp),
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                            }
+                            val themeMap = mapOf<String, Int>(
+                                "Theme 1" to 1,
+                                "Theme 2" to 2,
+                                "Theme 3" to 3,
+                                "Theme 4" to 4,
+                                "Theme 5" to 5,
+                                "Theme 6" to 6,
+                                stringResource(R.string.default_derived_from_your_wallpaper_selection) to -1
+                            )
+                            MaterialRadioButtonGroupComponent(themeMap, viewModel::setTheme)
                         }
                     }
                 }

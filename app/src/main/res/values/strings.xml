@@ -55,6 +55,17 @@
     <string name="unable_to_preview_non_youtube_videos">Unable to generate previews for non-YouTube video links.</string>
     <string name="no_persistable_flags_present_to_take">No persistable flags present to take.</string>
     <string name="unable_to_send_saved_video_file">Unable to send saved video file.</string>
-    <string name="app_icon_images">Pick an alt app image</string>
+    <string name="app_icon_images">Pick an alternate app image</string>
     <string name="settings">Settings</string>
+    <string name="shared_prefs_displayed_user_name">shared_prefs_displayed_user_name</string>
+    <string name="shared_prefs_logged_in_user_name">shared_prefs_logged_in_user_name</string>
+    <string name="shared_prefs_biometric_authentication_enabled">shared_prefs_biometric_authentication_enabled</string>
+    <string name="shared_prefs_biometric_should_use_manual_pw">shared_prefs_biometric_should_use_manual_pw</string>
+    <string name="shared_prefs_biometric_authentication_opt_in">shared_prefs_biometric_authentication_opt_in</string>
+    <string name="shared_prefs_encrypted_biometric_password">shared_prefs_encrypted_biometric_password</string>
+    <string name="shared_prefs_encrypted_user_password">shared_prefs_encrypted_user_password</string>
+    <string name="shared_prefs_encrypted_password">shared_prefs_encrypted_password</string>
+    <string name="shared_prefs_current_theme_selected">shared_prefs_current_theme_selected</string>
+    <string name="select_theme_color_restart_app"><![CDATA[Select Theme Color & Restart App]]></string>
+    <string name="default_derived_from_your_wallpaper_selection">Reset to default colors derived from your phone\'s wallpaper.</string>
 </resources>
