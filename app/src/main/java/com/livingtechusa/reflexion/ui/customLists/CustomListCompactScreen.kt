@@ -1,7 +1,7 @@
 package com.livingtechusa.reflexion.ui.customLists
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
@@ -12,23 +12,22 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.BarItem
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,26 +40,26 @@ fun CustomListCompactScreen(
     val state = rememberScaffoldState()
     val context = LocalContext.current
     val resource = ResourceProviderSingleton
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
+    androidx.compose.material.Scaffold(
         topBar = {
-            TopAppBar(
+            androidx.compose.material.TopAppBar(
                 title = {
                     Text(
-                        text =  stringResource(R.string.lists),
-                        color = MaterialTheme.colorScheme.onBackground
+                        text = stringResource(id = R.string.lists),
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 actions = {
                     Row() {
                         IconButton(
                             onClick = {
-                                      viewModel.onTriggerEvent(CustomListEvent.Save)
+                                viewModel.onTriggerEvent(CustomListEvent.Save)
                             },
                             content = {
                                 androidx.compose.material.Icon(
                                     imageVector = Icons.Default.Save,
                                     contentDescription = "save",
+                                    tint = MaterialTheme.colorScheme.onSurface,
                                 )
                             },
                         )
@@ -72,27 +71,40 @@ fun CustomListCompactScreen(
                                 androidx.compose.material.Icon(
                                     imageVector = Icons.Default.Autorenew,
                                     contentDescription = "reset list",
-                                    tint = MaterialTheme.colorScheme.onBackground,
+                                    tint = MaterialTheme.colorScheme.onSurface,
                                 )
                             },
                         )
                     }
-                }
-            )
+                },
+
+                backgroundColor = MaterialTheme.colorScheme.surface,
+                elevation = 6.dp,
+                navigationIcon = {
+                    androidx.compose.material.Icon(
+                        painter = painterResource(R.drawable.baseline_menu_24),
+                        contentDescription = "Toggle Drawer",
+                        modifier = Modifier.clickable(onClick = {
+                            scope.launch {
+                                if (state.drawerState.isClosed) state.drawerState.open() else state.drawerState.close()
+                            }
+                        }),
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                })
         },
-        containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
             BottomNavigation(
-                backgroundColor = MaterialTheme.colorScheme.background,
+                backgroundColor = MaterialTheme.colorScheme.primaryContainer,
             ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(
                         selected = currentRoute == navItem.route,
                         onClick = {
                             navController.navigate(navItem.route) {
-                               // popUpTo(navController.graph.findStartDestination().id) {}
+                                // popUpTo(navController.graph.findStartDestination().id) {}
                                 launchSingleTop = true
                             }
                         },
@@ -100,17 +112,24 @@ fun CustomListCompactScreen(
                             Icon(
                                 imageVector = navItem.image,
                                 contentDescription = navItem.title,
-                                tint = MaterialTheme.colorScheme.onBackground
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                         },
                         label = {
-                            Text(text = navItem.title, color = MaterialTheme.colorScheme.onBackground)
+                            Text(
+                                text = navItem.title,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
                         }
                     )
                 }
             }
         }
     ) { paddingValue ->
-            CustomListsContent(navController = navController, viewModel = viewModel, paddingValues = paddingValue)
+        CustomListsContent(
+            navController = navController,
+            viewModel = viewModel,
+            paddingValues = paddingValue
+        )
     }
 }

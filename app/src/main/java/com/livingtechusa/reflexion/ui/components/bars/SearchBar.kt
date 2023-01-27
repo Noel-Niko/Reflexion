@@ -1,8 +1,8 @@
 package com.livingtechusa.reflexion.ui.components.bars
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TopAppBar
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import com.livingtechusa.reflexion.ui.components.icons.BackIcon
 import com.livingtechusa.reflexion.ui.components.text.SearchTextField
@@ -31,7 +31,7 @@ fun SearchBar(
                 BackHandler { onSearch(null) }
                 BackIcon { onSearch(null) }
             },
-            backgroundColor = MaterialTheme.colors.background
+            backgroundColor = MaterialTheme.colorScheme.surface
         )
     }
 }

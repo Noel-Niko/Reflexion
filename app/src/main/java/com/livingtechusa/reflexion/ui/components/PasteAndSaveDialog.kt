@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -71,8 +72,10 @@ fun PasteAndSaveDialog(
                                 navController.navigate(Screen.BuildItemScreen.route + "/" + DO_NOT_UPDATE) {
                                     launchSingleTop = true
                                 }
-                            }) {
-                            Text(stringResource(R.string.save))
+                            },
+                            colors = ButtonDefaults.buttonColors(backgroundColor =  androidx.compose.material3.MaterialTheme.colorScheme.primary, contentColor =  androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
+                        ) {
+                            Text(stringResource(R.string.save), color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
                         }
                     },
                     dismissButton = {
@@ -82,8 +85,10 @@ fun PasteAndSaveDialog(
                                 navController.navigate(Screen.BuildItemScreen.route + "/" + DO_NOT_UPDATE) {
                                     launchSingleTop = true
                                 }
-                            }) {
-                            Text(stringResource(R.string.close))
+                            },
+                            colors = ButtonDefaults.buttonColors(backgroundColor =  androidx.compose.material3.MaterialTheme.colorScheme.primary, contentColor =  androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
+                        ) {
+                            Text(stringResource(R.string.close), color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
                         }
                     }
                 )

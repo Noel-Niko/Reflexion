@@ -154,13 +154,14 @@ fun HorizontalScrollableIconRowComponent(
     list: List<Bitmap>,
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primaryContainer),
         verticalArrangement = Arrangement.Center
     ) {
         LazyRow(
             modifier = Modifier
                 .padding(4.dp)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.primaryContainer),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(list.size) { listitemIndex ->
@@ -227,7 +228,7 @@ fun settingsContent(paddingValues: PaddingValues, viewModel: SettingsViewModel) 
     val context = LocalContext.current
     Scaffold(Modifier.padding(paddingValues = paddingValues)) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(paddingValues = it).background(MaterialTheme.colorScheme.primaryContainer),
+            modifier = Modifier.fillMaxSize().padding(paddingValues = it), //.background(MaterialTheme.colorScheme.primaryContainer)
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             // Icons
@@ -252,25 +253,25 @@ fun settingsContent(paddingValues: PaddingValues, viewModel: SettingsViewModel) 
                         elevation = CardDefaults.elevatedCardElevation(4.dp)
                     ) {
                         Row(
-                            modifier = Modifier.background(MaterialTheme.colorScheme.background),
+                            modifier = Modifier.background(MaterialTheme.colorScheme.secondaryContainer),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth(.3f)
-                                    .background(MaterialTheme.colorScheme.background),
+                                    .background(MaterialTheme.colorScheme.secondaryContainer),
                             ) {
                                 Text(
                                     text = stringResource(R.string.app_icon_images),
                                     modifier = Modifier
                                         .padding(8.dp),
-                                    style = MaterialTheme.typography.labelMedium
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
                                 )
                             }
                             Column(
                                 modifier = Modifier
-                                    .fillMaxWidth(1f)
-                                    .background(MaterialTheme.colorScheme.background),
+                                    .fillMaxWidth(1f),
                                 verticalArrangement = Arrangement.Center
                             ) {
                                 HorizontalScrollableIconRowComponent(bitmapList)
@@ -300,7 +301,7 @@ fun settingsContent(paddingValues: PaddingValues, viewModel: SettingsViewModel) 
                         elevation = CardDefaults.elevatedCardElevation(4.dp)
                     ) {
                         Row(
-                            modifier = Modifier.background(MaterialTheme.colorScheme.background),
+                            modifier = Modifier.background(MaterialTheme.colorScheme.secondaryContainer),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             var selected by remember { mutableStateOf(false) }
@@ -308,7 +309,8 @@ fun settingsContent(paddingValues: PaddingValues, viewModel: SettingsViewModel) 
                                 Text(
                                     text = stringResource(R.string.select_theme_color_restart_app),
                                     modifier = Modifier.padding(8.dp),
-                                    style = MaterialTheme.typography.labelMedium
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
                                 )
                             }
                             val themeMap = mapOf<String, Int>(

@@ -52,9 +52,9 @@ fun MediumScreen(
             TopAppBar(
                 modifier = Modifier.fillMaxWidth(),
                 title = {
-                    Text(text = stringResource(id = R.string.app_name), color = MaterialTheme.colors.onBackground)
+                    Text(text = stringResource(id = R.string.app_name), color = MaterialTheme.colors.onSurface)
                 },
-                backgroundColor = MaterialTheme.colors.background,
+                backgroundColor = MaterialTheme.colors.surface,
                 elevation = 6.dp,
                 navigationIcon = {
                     Icon(
@@ -86,7 +86,8 @@ fun MediumScreen(
             Column() {
                 NavigationRail(
                     modifier = Modifier.fillMaxHeight(),
-                    containerColor = MaterialTheme.colors.background,
+                    containerColor = MaterialTheme.colors.surface,
+                    contentColor = MaterialTheme.colors.onSurface
                 ) {
                     icons.forEach { navItem ->
                         Spacer(modifier = Modifier.height(32.dp))

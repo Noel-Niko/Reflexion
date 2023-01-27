@@ -32,7 +32,8 @@ fun Landscape(navController: NavHostController, headNodePk: Long, viewModel: Cus
     val selectedList by viewModel.customList.collectAsState()
     Row(modifier = Modifier.fillMaxSize()) {
         NavigationRail(
-            containerColor = MaterialTheme.colors.background,
+            containerColor = MaterialTheme.colors.surface,
+            contentColor = MaterialTheme.colors.onSurface
         ) {
             icons.forEach { navItem ->
                 Spacer(modifier = Modifier.height(32.dp))
@@ -48,7 +49,7 @@ fun Landscape(navController: NavHostController, headNodePk: Long, viewModel: Cus
                         Icon(
                             imageVector = navItem.image,
                             contentDescription = navItem.title,
-                            tint = MaterialTheme.colors.onBackground
+                            tint = MaterialTheme.colors.onSurface
                         )
                     }
                 )

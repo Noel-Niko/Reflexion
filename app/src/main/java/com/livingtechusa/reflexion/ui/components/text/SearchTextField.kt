@@ -4,8 +4,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.LocalTextStyle
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -34,7 +34,7 @@ internal fun SearchTextField(
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         cursorBrush = SolidColor(cursorColor),
         textStyle = LocalTextStyle.current.copy(
-            color = MaterialTheme.colors.onBackground
+            color = MaterialTheme.colorScheme.onSurface
         ),
     )
     LaunchedEffect(Unit) {

@@ -32,13 +32,15 @@ fun CompactScreen(navController: NavHostController, icons: List<BarItem>) {
     Scaffold(
         scaffoldState = state,
         topBar = {
-            TopAppBar(
+            androidx.compose.material.TopAppBar(
                 title = {
                     Text(
                         text = stringResource(id = R.string.app_name),
-                        color = MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
+                backgroundColor = MaterialTheme.colorScheme.surface,
+                elevation = 6.dp,
                 actions = {
                     Row() {
                         IconButton(
@@ -49,21 +51,19 @@ fun CompactScreen(navController: NavHostController, icons: List<BarItem>) {
                                 androidx.compose.material.Icon(
                                     imageVector = Icons.Default.Settings,
                                     contentDescription = "settings",
-                                    tint = MaterialTheme.colorScheme.onBackground,
+                                    tint = MaterialTheme.colorScheme.onSurface,
                                 )
                             },
                         )
                     }
                 },
-                backgroundColor = MaterialTheme.colorScheme.background,
-                elevation = 6.dp,
             )
         },
         bottomBar = {
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
             BottomNavigation(
-                backgroundColor = MaterialTheme.colorScheme.background,
+                backgroundColor = MaterialTheme.colorScheme.primaryContainer,
             ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(
@@ -80,11 +80,11 @@ fun CompactScreen(navController: NavHostController, icons: List<BarItem>) {
                             Icon(
                                 imageVector = navItem.image,
                                 contentDescription = navItem.title,
-                                tint = MaterialTheme.colorScheme.onBackground
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                         },
                         label = {
-                            Text(text = navItem.title, color = MaterialTheme.colorScheme.onBackground)
+                            Text(text = navItem.title, color = MaterialTheme.colorScheme.onPrimaryContainer)
                         }
                     )
                 }

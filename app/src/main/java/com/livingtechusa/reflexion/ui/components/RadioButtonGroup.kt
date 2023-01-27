@@ -74,7 +74,7 @@ fun MaterialRadioButtonGroupComponent(
         }
         Column(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.primaryContainer)
                 .verticalScroll(rememberScrollState())
         ) {
             options.forEach { pair ->

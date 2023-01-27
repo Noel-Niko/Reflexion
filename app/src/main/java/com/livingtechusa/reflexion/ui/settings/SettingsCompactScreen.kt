@@ -1,23 +1,39 @@
 package com.livingtechusa.reflexion.ui.settings
 
+import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.SendToMobile
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.BarItem
+import com.livingtechusa.reflexion.navigation.Screen
+import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.viewModels.SettingsViewModel
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,23 +44,23 @@ fun CompactScreen(
     viewModel: SettingsViewModel
 ) {
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            TopAppBar(
+            androidx.compose.material.TopAppBar(
                 title = {
                     Text(
                         text = stringResource(id = R.string.settings),
-                        color = MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(MaterialTheme.colorScheme.background),
-            )
+                backgroundColor = MaterialTheme.colorScheme.surface,
+                elevation = 6.dp,
+              )
         },
         bottomBar = {
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
             BottomNavigation(
-                backgroundColor = MaterialTheme.colorScheme.background,
+                backgroundColor = MaterialTheme.colorScheme.surface,
             ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(
@@ -61,13 +77,13 @@ fun CompactScreen(
                             Icon(
                                 imageVector = navItem.image,
                                 contentDescription = navItem.title,
-                                tint = MaterialTheme.colorScheme.onBackground
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         },
                         label = {
                             Text(
                                 text = navItem.title,
-                                color = MaterialTheme.colorScheme.onBackground
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                         }
                     )

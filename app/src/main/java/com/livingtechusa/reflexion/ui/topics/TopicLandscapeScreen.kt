@@ -35,8 +35,8 @@ fun MediumScreen(
     val currentRoute = backStackEntry?.destination?.route
     Row(modifier = Modifier.fillMaxSize()) {
         NavigationRail(
-            containerColor = MaterialTheme.colors.background,
-            contentColor = MaterialTheme.colors.onBackground
+            containerColor = MaterialTheme.colors.surface,
+            contentColor = MaterialTheme.colors.onSurface
 
         ) {
             icons.forEach { navItem ->
@@ -56,7 +56,7 @@ fun MediumScreen(
                         Icon(
                             imageVector = navItem.image,
                             contentDescription = navItem.title,
-                            tint = MaterialTheme.colors.onBackground
+                            tint = MaterialTheme.colors.onSurface
                         )
                     })
             }

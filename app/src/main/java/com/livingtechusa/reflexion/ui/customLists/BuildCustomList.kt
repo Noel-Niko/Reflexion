@@ -129,7 +129,7 @@ fun CustomListsContent(
                         .align(
                             Alignment.CenterVertically,
                         )
-                        .background(MaterialTheme.colorScheme.inverseOnSurface)
+
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -165,8 +165,8 @@ fun CustomListsContent(
                                     )
                                 },
                                 colors = TextFieldDefaults.textFieldColors(
-                                  textColor = MaterialTheme.colorScheme.onSurface,
-                                    containerColor = MaterialTheme.colorScheme.surface
+                                  textColor = MaterialTheme.colorScheme.primary,
+                                   // containerColor = MaterialTheme.colorScheme.surface
                                 )
                             )
                                 CustomDropDownMenu(

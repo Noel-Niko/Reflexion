@@ -11,6 +11,7 @@ import androidx.compose.material3.NavigationRailItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -26,7 +27,8 @@ fun Landscape(navController: NavHostController, icons: List<BarItem>) {
     val currentRoute = backStackEntry?.destination?.route
     Row(modifier = Modifier.fillMaxSize()) {
         NavigationRail(
-            containerColor = MaterialTheme.colorScheme.background,
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
         ) {
             icons.forEach { navItem ->
                 Spacer(modifier = Modifier.height(32.dp))
@@ -45,7 +47,7 @@ fun Landscape(navController: NavHostController, icons: List<BarItem>) {
                         Icon(
                             imageVector = navItem.image,
                             contentDescription = navItem.title,
-                            tint = MaterialTheme.colorScheme.onBackground
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     })
             }

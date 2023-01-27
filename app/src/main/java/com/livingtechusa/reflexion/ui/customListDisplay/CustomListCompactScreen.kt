@@ -45,7 +45,7 @@ fun CompactScreen(
                 title = {
                     Text(
                         text = stringResource(R.string.custom_list_display),
-                        color = MaterialTheme.colors.onBackground
+                        color = MaterialTheme.colors.onSurface
                     )
                 },
                 actions = {
@@ -58,7 +58,7 @@ fun CompactScreen(
                                 androidx.compose.material.Icon(
                                     imageVector = Icons.Default.SendToMobile,
                                     contentDescription = "send",
-                                    tint = MaterialTheme.colors.onBackground,
+                                    tint = MaterialTheme.colors.onSurface
                                 )
                             },
                         )
@@ -70,14 +70,14 @@ fun CompactScreen(
                                 androidx.compose.material.Icon(
                                     imageVector = Icons.Default.Send,
                                     contentDescription = "send",
-                                    tint = MaterialTheme.colors.onBackground,
+                                    tint = MaterialTheme.colors.onSurface,
                                 )
                             },
                         )
                     }
                 },
-                backgroundColor = MaterialTheme.colors.background,
-                elevation = 6.dp,
+                backgroundColor = MaterialTheme.colors.surface,
+                elevation = 0.dp,
 //                navigationIcon = {
 //                    androidx.compose.material.Icon(
 //                        painter = painterResource(R.drawable.baseline_menu_24),
@@ -92,12 +92,12 @@ fun CompactScreen(
 //                })
             )
         },
-        containerColor = MaterialTheme.colors.background,
+        //containerColor = MaterialTheme.colors.background,
         bottomBar = {
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
             BottomNavigation(
-                backgroundColor = MaterialTheme.colors.background,
+                backgroundColor = MaterialTheme.colors.surface,
             ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(
@@ -114,11 +114,11 @@ fun CompactScreen(
                             Icon(
                                 imageVector = navItem.image,
                                 contentDescription = navItem.title,
-                                tint = MaterialTheme.colors.onBackground
+                                tint = MaterialTheme.colors.onSurface
                             )
                         },
                         label = {
-                            Text(text = navItem.title, color = MaterialTheme.colors.onBackground)
+                            Text(text = navItem.title, color = MaterialTheme.colors.onSurface)
                         }
                     )
                 }

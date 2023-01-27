@@ -70,12 +70,10 @@ fun CustomListContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.secondaryContainer)
             .fillMaxWidth()
     ) {
         Row(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.secondaryContainer)
                 .align(Alignment.CenterHorizontally)
                 .padding(16.dp)
                 .fillMaxWidth()
@@ -94,8 +92,6 @@ fun CustomListContent(
 //                            .background(Color.Green)
 //                    ) {
                     Column(
-                        modifier = Modifier
-                            .background(MaterialTheme.colorScheme.secondaryContainer),
                         verticalArrangement = Arrangement.Center
                     ) {
                         ElevatedCard(
@@ -105,7 +101,6 @@ fun CustomListContent(
                                     MaterialTheme.colorScheme.outline,
                                     MaterialTheme.shapes.medium
                                 )
-                                .background(MaterialTheme.colorScheme.secondaryContainer)
                         ) {
                             TextField(
                                 modifier = Modifier

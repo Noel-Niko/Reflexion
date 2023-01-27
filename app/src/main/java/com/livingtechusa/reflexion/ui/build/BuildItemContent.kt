@@ -28,10 +28,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -231,7 +231,7 @@ fun BuildItemContent(
                             offsetY.value += dragAmount.y
                         }
                     },
-                    containerColor = MaterialTheme.colors.primary,
+                    containerColor = MaterialTheme.colorScheme.primary,
                     onClick = {
                         Toast.makeText(
                             context, resource.getString(R.string.changes_saved), Toast.LENGTH_SHORT
@@ -345,7 +345,7 @@ fun BuildItemContent(
                                     textColor = Black,
                                     backgroundColor = Transparent
                                 ),
-                                textStyle = MaterialTheme.typography.h6,
+                                textStyle = MaterialTheme.typography.labelLarge,
                                 modifier = Modifier.fillMaxWidth(),
                                 value = if (name == Constants.EMPTY_ITEM) {
                                     EMPTY_STRING
@@ -382,7 +382,7 @@ fun BuildItemContent(
                                     textColor = Black,
                                     backgroundColor = Transparent
                                 ),
-                                textStyle = MaterialTheme.typography.h6,
+                                textStyle = MaterialTheme.typography.labelLarge,
                                 value = if (name == Constants.EMPTY_ITEM) {
                                     EMPTY_STRING
                                 } else {
@@ -419,7 +419,7 @@ fun BuildItemContent(
                                 textColor = Black,
                                 backgroundColor = Transparent
                             ),
-                            textStyle = MaterialTheme.typography.h6,
+                            textStyle = MaterialTheme.typography.labelLarge,
                             modifier = Modifier.fillMaxWidth(),
                             value = description ?: EMPTY_STRING,
                             onValueChange = { description ->
@@ -452,7 +452,7 @@ fun BuildItemContent(
                                 textColor = Black,
                                 backgroundColor = Transparent
                             ),
-                            textStyle = MaterialTheme.typography.h6,
+                            textStyle = MaterialTheme.typography.labelLarge,
                             modifier = Modifier.fillMaxWidth(),
                             value = detailedDescription ?: EMPTY_STRING,
                             onValueChange = { detailedDescription ->
@@ -497,7 +497,7 @@ fun BuildItemContent(
                                         }
                                     },
                                 text = AnnotatedString(stringResource(R.string.saved_video)),
-                                color = Blue
+                                color = MaterialTheme.colorScheme.primary
                             )
                             if (videoUri.isNullOrEmpty().not()) {
                                 viewModel.getSelectedFile()
@@ -565,7 +565,7 @@ fun BuildItemContent(
                                     },
                                 ),
                             text = AnnotatedString(stringResource(R.string.video_link)),
-                            color = Blue
+                            color = MaterialTheme.colorScheme.primary
                         )
                         if (videoUrl.isNullOrEmpty().not()) {
                             videoImagePreviewCard(

@@ -3,7 +3,9 @@ package com.livingtechusa.reflexion.ui.components
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,8 +43,10 @@ fun ConfirmDeleteSubItemDialog(
                             viewModel.onTriggerEvent(BuildEvent.DeleteReflexionItemSubItemByName(subItem))
                             openDialog.value = false
                             navController.popBackStack()
-                        }) {
-                        Text(stringResource(R.string.delete))
+                        },
+                        colors = ButtonDefaults.buttonColors(backgroundColor =  MaterialTheme.colorScheme.primary, contentColor =  MaterialTheme.colorScheme.onPrimary)
+                    ) {
+                        Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.onPrimary)
                     }
                 },
                 dismissButton = {
@@ -50,8 +54,10 @@ fun ConfirmDeleteSubItemDialog(
                         onClick = {
                             openDialog.value = false
                              navController.popBackStack()
-                        }) {
-                        Text(stringResource(R.string.cancel))
+                        },
+                                colors = ButtonDefaults.buttonColors(backgroundColor =  MaterialTheme.colorScheme.primary, contentColor =  MaterialTheme.colorScheme.onPrimary)
+                    ) {
+                        Text(stringResource(R.string.cancel), color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
                     }
                 }
             )

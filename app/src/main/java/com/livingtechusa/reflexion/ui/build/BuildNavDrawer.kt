@@ -53,7 +53,7 @@ fun drawerNavContent(
                 .align(
                     Alignment.CenterVertically,
                 )
-                .background(color = MaterialTheme.colorScheme.onSurface)
+                .background(color = MaterialTheme.colorScheme.surface)
                 .fillMaxSize()
         ) {
             Column(
@@ -93,7 +93,7 @@ fun drawerNavContent(
                         }
                     }),
                     text = stringResource(R.string.siblings),
-                    color = MaterialTheme.colorScheme.primaryContainer,
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.headlineSmall
                 )
                 Spacer(Modifier.height(16.dp))/* CHILDREN */
@@ -119,7 +119,7 @@ fun drawerNavContent(
                         }
                     }),
                     text = stringResource(R.string.children),
-                    color = MaterialTheme.colorScheme.primaryContainer,
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.headlineSmall
                 )
                 Spacer(Modifier.height(16.dp))
@@ -142,7 +142,7 @@ fun drawerNavContent(
                         }
                     }),
                     text = stringResource(R.string.add_sibling),
-                    color = MaterialTheme.colorScheme.primaryContainer,
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.headlineSmall
                 )
                 Spacer(Modifier.height(16.dp))
@@ -157,7 +157,7 @@ fun drawerNavContent(
                         }
                     }),
                     text = stringResource(R.string.add_child),
-                    color = MaterialTheme.colorScheme.primaryContainer,
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.headlineSmall
                 )
                 Spacer(Modifier.height(16.dp))
@@ -180,7 +180,7 @@ fun drawerNavContent(
                         }
                     }),
                     text = stringResource(R.string.delete),
-                    color = MaterialTheme.colorScheme.primaryContainer,
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.headlineSmall
                 )
                 Spacer(Modifier.height(16.dp))/* NEW ITEM */
@@ -192,7 +192,7 @@ fun drawerNavContent(
                        }
                     }),
                     text = stringResource(R.string.new_item),
-                    color = MaterialTheme.colorScheme.primaryContainer,
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.headlineSmall
                 )
                 Spacer(Modifier.height(16.dp))/* MOVE TO PARENT */
@@ -218,7 +218,7 @@ fun drawerNavContent(
                         }
                     }),
                     text = stringResource(R.string.go_to_parent),
-                    color = MaterialTheme.colorScheme.primaryContainer,
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.headlineSmall
                 )
             }

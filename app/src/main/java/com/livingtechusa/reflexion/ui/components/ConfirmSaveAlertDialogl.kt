@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -61,8 +62,10 @@ fun ConfirmSaveAlertDialog(
                                 navController.navigate(Screen.BuildItemScreen.route + "/" + DO_NOT_UPDATE) {
                                     launchSingleTop = true
                                 }
-                            }) {
-                            Text(stringResource(R.string.yes))
+                            },
+                            colors = ButtonDefaults.buttonColors(backgroundColor =  androidx.compose.material3.MaterialTheme.colorScheme.primary, contentColor =  androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
+                        ) {
+                            Text(stringResource(R.string.yes), color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
                         }
                     },
                     dismissButton = {
@@ -73,8 +76,10 @@ fun ConfirmSaveAlertDialog(
                                 navController.navigate(Screen.BuildItemScreen.route + "/" + DO_NOT_UPDATE) {
                                     launchSingleTop = true
                                 }
-                            }) {
-                            Text(stringResource(R.string.no))
+                            },
+                            colors = ButtonDefaults.buttonColors(backgroundColor =  androidx.compose.material3.MaterialTheme.colorScheme.primary, contentColor =  androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
+                        ) {
+                            Text(stringResource(R.string.no), color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
                         }
                     }
                 )
