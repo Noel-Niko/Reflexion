@@ -132,8 +132,8 @@ private fun ReflexionItemsContent(
                             contentDescription = "Your Image",
                             contentScale = ContentScale.FillBounds,
                             modifier = Modifier
-                                .width(50.dp)
-                                .height(50.dp)
+                                .width(60.dp)
+                                .height(60.dp)
 
                         )
                         Spacer(modifier = Modifier.width(4.dp))
