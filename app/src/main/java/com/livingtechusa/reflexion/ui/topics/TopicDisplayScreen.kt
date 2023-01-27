@@ -4,11 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -82,10 +83,12 @@ fun ReflexionItemListUI(
 private fun ReflexionItemColumnItem(
     reflexionItem: ReflexionItem,
 ) {
-    Row() {
+    Row(modifier = Modifier) {
         Text(
             modifier = Modifier.padding(16.dp),
             text = reflexionItem.name,
+            color = MaterialTheme.colorScheme.onPrimary,
+            style = MaterialTheme.typography.titleMedium
         )
     }
 }
@@ -113,6 +116,7 @@ private fun ReflexionItemsContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(4.dp)
+                        //.background(MaterialTheme.colorScheme.surface)
                         .pointerInput(key1 = reflexionItem) {
                             detectTapGestures(
                                 onDoubleTap = { onDoubleTap(reflexionItem) },
@@ -122,7 +126,7 @@ private fun ReflexionItemsContent(
                     elevation = 6.dp,
                     shape = RoundedCornerShape(20.dp)
                 ) {
-                    Row(modifier = Modifier.fillMaxSize()) {
+                    Row(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary)) {
                         Image(
                             painter = imagePainter,
                             contentDescription = "Your Image",

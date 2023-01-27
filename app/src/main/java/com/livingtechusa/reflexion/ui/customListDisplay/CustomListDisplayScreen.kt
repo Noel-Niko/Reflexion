@@ -17,11 +17,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -38,7 +40,6 @@ import androidx.navigation.NavHostController
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.Screen
-import com.livingtechusa.reflexion.ui.build.showImage
 import com.livingtechusa.reflexion.ui.components.ImageCard
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.util.Constants
@@ -108,9 +109,14 @@ fun CustomListDisplayContent(
             ) {
                 Column(
                     Modifier
+                        .padding(12.dp)
                         .align(Alignment.CenterVertically)
+                        .background(MaterialTheme.colorScheme.surface)
                 ) {
-                    androidx.compose.material3.Text(text = stringResource(R.string.title))
+                    androidx.compose.material3.Text(
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.labelMedium,
+                        text = stringResource(R.string.title))
                 }
                 Column(
                     Modifier
@@ -118,8 +124,8 @@ fun CustomListDisplayContent(
                         .align(Alignment.CenterVertically)
                 ) {
                     Text(
-                        color = Color.Black,
-                        style = MaterialTheme.typography.h6,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.titleMedium,
                         text = selectedList.itemName.toString(),
                     )
                 }
@@ -132,14 +138,16 @@ fun CustomListDisplayContent(
         LazyRow(
             modifier = Modifier
                 .padding(4.dp)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.surfaceVariant),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(children.size) { childItemIndex ->
                 Card(
                     modifier = Modifier
                         .fillParentMaxSize()
-                        .padding(4.dp),
+                        .padding(16.dp)
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
                     elevation = 6.dp,
                     shape = RoundedCornerShape(20.dp)
                 ) {
@@ -147,6 +155,8 @@ fun CustomListDisplayContent(
                         modifier = Modifier
                             .padding(12.dp)
                             .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .verticalScroll(rememberScrollState())
                     ) {
                         /* IMAGE */
                         Row(modifier = Modifier.fillMaxWidth()) {
@@ -157,7 +167,7 @@ fun CustomListDisplayContent(
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .padding(0.dp, 0.dp, 32.dp, 0.dp)
+                                        .padding(12.dp, 12.dp, 12.dp, 12.dp)
                                         .border(
                                             1.dp, Brush.verticalGradient(colorStops = colorStops),
                                             TextFieldDefaults.OutlinedTextFieldShape
@@ -170,16 +180,15 @@ fun CustomListDisplayContent(
                                 }
                             }
                         }
-                        Spacer(Modifier.height(16.dp))
                         /* TITLE */
-                        Row(modifier = Modifier.fillMaxWidth()) {
+                        Row(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
                             Text(
-                                color = Color.Black,
-                                style = MaterialTheme.typography.h6,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.titleLarge,
                                 text = children[childItemIndex].name,
                             )
                         }
-                        Spacer(Modifier.height(16.dp))
+                        Spacer(Modifier.height(12.dp))
                         /* DESCRIPTION */
                         Row(
                             modifier = Modifier
@@ -187,24 +196,27 @@ fun CustomListDisplayContent(
                                 .fillMaxWidth()
                         ) {
                             Column(
-                                Modifier
-
+                                Modifier.padding(4.dp)
                             ) {
-                                androidx.compose.material3.Text(text = stringResource(R.string.description))
+                                androidx.compose.material3.Text(
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    text = stringResource(R.string.description))
                             }
                             Column(
                                 Modifier
+                                    .padding(4.dp)
                                     .weight(1f)
 
                             ) {
                                 Text(
-                                    color = Color.Black,
-                                    style = MaterialTheme.typography.h6,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.bodyLarge,
                                     text = children[childItemIndex].description.toString(),
                                 )
                             }
                         }
-                        Spacer(Modifier.height(16.dp))
+                        Spacer(Modifier.height(12.dp))
                         /* DETAILS */
                         Row(
                             modifier = Modifier
@@ -212,35 +224,40 @@ fun CustomListDisplayContent(
                                 .fillMaxWidth()
                         ) {
                             Column(
-                                Modifier
-
+                                Modifier.padding(12.dp)
                             ) {
-                                androidx.compose.material3.Text(text = stringResource(R.string.detailedDescription))
+                                androidx.compose.material3.Text(
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    text = stringResource(R.string.detailedDescription))
                             }
                             Column(
                                 Modifier
+                                    .padding(4.dp)
                                     .weight(1f)
 
                             ) {
                                 Text(
-                                    color = Color.Black,
-                                    style = MaterialTheme.typography.h6,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.bodyLarge,
                                     text = children[childItemIndex].detailedDescription.toString(),
                                 )
                             }
                         }
-                        Spacer(Modifier.height(16.dp))
+                        Spacer(Modifier.height(12.dp))
                         Row(
                             modifier = Modifier.padding(8.dp)
                         ) {
                             /* SAVED VIDEO */
                             Column(
                                 Modifier
+                                    .padding(12.dp)
                                     .weight(1f)
 
                             ) {
                                 androidx.compose.material3.Text(
                                     modifier = Modifier
+                                        .padding(12.dp)
                                         .fillMaxWidth()
                                         .clickable {
                                             if (children[childItemIndex].videoUri.isNullOrEmpty()) {
@@ -258,7 +275,7 @@ fun CustomListDisplayContent(
                                             }
                                         },
                                     text = AnnotatedString(stringResource(R.string.saved_video)),
-                                    color = Color.Blue
+                                    color = MaterialTheme.colorScheme.primary
                                 )
                                 if (children[childItemIndex].videoUri.isNullOrEmpty().not()) {
                                     if (childVideoUriList.isNullOrEmpty().not()) {
@@ -276,10 +293,12 @@ fun CustomListDisplayContent(
                             /* VIDEO URL */
                             Column(
                                 Modifier
+                                    .padding(12.dp)
                                     .weight(1f)
                             ) {
                                 androidx.compose.material3.Text(
                                     modifier = Modifier
+                                        .padding(12.dp)
                                         .fillMaxWidth()
                                         .clickable(
                                             onClick = {
@@ -296,12 +315,16 @@ fun CustomListDisplayContent(
                                                         Intent.ACTION_VIEW,
                                                         Uri.parse(children[childItemIndex].videoUrl)
                                                     )
-                                                    ContextCompat.startActivity(context, intent, null)
+                                                    ContextCompat.startActivity(
+                                                        context,
+                                                        intent,
+                                                        null
+                                                    )
                                                 }
                                             },
                                         ),
                                     text = AnnotatedString(stringResource(R.string.video_link)),
-                                    color = Color.Blue
+                                    color = MaterialTheme.colorScheme.primary
                                 )
                                 if (children[childItemIndex].videoUrl.isNullOrEmpty().not()) {
                                     videoImagePreviewCard(

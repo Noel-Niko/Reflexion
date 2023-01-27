@@ -123,7 +123,7 @@ class ListViewModel @Inject constructor(
     }
 
     fun onUp() {
-        if (list.value?.get(0)?.parent == null || list.value?.get(0)?.parent == EMPTY_PK) {
+        if (list.value.isEmpty() || list.value[0].parent == null || list.value[0].parent == EMPTY_PK) {
             Toast.makeText(context, R.string.no_parent_found, Toast.LENGTH_SHORT).show()
         } else {
             onTriggerEvent(ListEvent.UpOneLevel)

@@ -227,7 +227,7 @@ fun CustomListsContent(
                         }
                     }
                 } else {
-                    Divider()
+//                    Divider()
                     CustomListContent(navController = navController, viewModel = viewModel)
                 }
             }
