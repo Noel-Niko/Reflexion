@@ -13,7 +13,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.ViewCompat
-import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.ui.theme.selectableColorSchemes.CustomTheme1
 import com.livingtechusa.reflexion.ui.theme.selectableColorSchemes.CustomTheme2
 import com.livingtechusa.reflexion.ui.theme.selectableColorSchemes.CustomTheme3
@@ -21,7 +20,6 @@ import com.livingtechusa.reflexion.ui.theme.selectableColorSchemes.CustomTheme4
 import com.livingtechusa.reflexion.ui.theme.selectableColorSchemes.CustomTheme5
 import com.livingtechusa.reflexion.ui.theme.selectableColorSchemes.CustomTheme6
 import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil
-import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil.PREFERENCE_TYPE
 
 //
 //private val DarkColorScheme = darkColorScheme(
@@ -81,45 +79,51 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun ReflexionDynamicTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
+    val isDarkMode: Boolean =
+        when (UserPreferencesUtil.getCurrentUserModeSelection(LocalContext.current)) {
+            0 -> { false }
+            1 -> { true }
+            else -> { isSystemInDarkTheme() }
+        }
+
     val context = LocalContext.current
     val selectedTheme = UserPreferencesUtil.getCurrentUserThemeSelection(context = context)
     if (selectedTheme != -1) {
         when (selectedTheme) {
             1 -> {
-                return CustomTheme1(content = content)
+                return CustomTheme1(useDarkTheme = isDarkMode, content = content)
             }
 
             2 -> {
-                return CustomTheme2(content = content)
+                return CustomTheme2(useDarkTheme = isDarkMode, content = content)
             }
 
             3 -> {
-                return CustomTheme3(content = content)
+                return CustomTheme3(useDarkTheme = isDarkMode, content = content)
             }
 
             4 -> {
-                return CustomTheme4(content = content)
+                return CustomTheme4(useDarkTheme = isDarkMode, content = content)
             }
 
             5 -> {
-                return CustomTheme5(content = content)
+                return CustomTheme5(useDarkTheme = isDarkMode, content = content)
             }
 
             6 -> {
-                return CustomTheme6(content = content)
+                return CustomTheme6(useDarkTheme = isDarkMode, content = content)
             }
 
             else -> {
-                defaultDynamicTheme(darkTheme, dynamicColor, content)
+                defaultDynamicTheme(isDarkMode, dynamicColor, content)
             }
         }
     } else {
-        defaultDynamicTheme(darkTheme, dynamicColor, content)
+        defaultDynamicTheme(isDarkMode, dynamicColor, content)
     }
 
 

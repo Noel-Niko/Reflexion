@@ -14,7 +14,7 @@ fun returnPrimaryColors(int: Int): Pair<Color , Color>{
             4 -> Pair(md_theme_4_light_primary, md_theme_4_light_onPrimary)
             5 -> Pair(md_theme_5_light_primary, md_theme_5_light_onPrimary)
             6 -> Pair(md_theme_6_light_primary, md_theme_6_light_onPrimary)
-            else -> Pair(md_theme_1_light_primary, md_theme_1_light_onPrimary)
+            else -> Pair(Color.White, Color.Black)
         }
     } else {
         return when (int) {
@@ -24,7 +24,7 @@ fun returnPrimaryColors(int: Int): Pair<Color , Color>{
             4 -> Pair(md_theme_4_dark_primary, md_theme_4_dark_onPrimary)
             5 -> Pair(md_theme_5_dark_primary, md_theme_5_dark_onPrimary)
             6 -> Pair(md_theme_6_dark_primary, md_theme_6_dark_onPrimary)
-            else -> Pair(md_theme_1_dark_primary, md_theme_1_dark_onPrimary)
+            else -> Pair(Color.Black, Color.White)
         }
     }
 }

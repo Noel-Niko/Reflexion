@@ -60,7 +60,7 @@ fun CompactScreen(
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
             BottomNavigation(
-                backgroundColor = MaterialTheme.colorScheme.surface,
+                backgroundColor = MaterialTheme.colorScheme.primaryContainer,
             ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(
@@ -91,6 +91,6 @@ fun CompactScreen(
             }
         }
     ) {
-        settingsContent(paddingValues = it, viewModel = viewModel)
+        settingsContent(paddingValues = it, viewModel = viewModel, navHostController = navController)
     }
 }

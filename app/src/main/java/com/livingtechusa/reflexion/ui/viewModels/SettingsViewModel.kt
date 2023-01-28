@@ -6,11 +6,17 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.util.Log
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.MainActivity
+import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.settings.SettingsEvent
+import com.livingtechusa.reflexion.ui.theme.ReflexionDynamicTheme
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants.APP_ICON_LIST
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
@@ -23,13 +29,20 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class SettingsViewModel @Inject constructor(): ViewModel() {
+class SettingsViewModel @Inject constructor() : ViewModel() {
     private val TAG = "SettingsViewModel"
     private val context: Context
         get() = BaseApplication.getInstance()
     val resource = ResourceProviderSingleton
     private val _iconImages = MutableStateFlow(emptyList<Bitmap>())
     val iconImages: StateFlow<List<Bitmap>> get() = _iconImages
+
+    private val _isDark: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isDark: StateFlow<Boolean> get() = _isDark
+
+    fun setIsDark(dark: Boolean) {
+        _isDark.value = dark
+    }
 
     private fun getAppBitmapList() {
         val bitmapList = mutableListOf<Bitmap>()
@@ -47,6 +60,10 @@ class SettingsViewModel @Inject constructor(): ViewModel() {
                 when (event) {
                     is SettingsEvent.getIconImages -> {
                         getAppBitmapList()
+                    }
+
+                    is SettingsEvent.setMode -> {
+                        _isDark.value = event.isDark
                     }
                 }
             } catch (e: Exception) {
@@ -67,5 +84,29 @@ class SettingsViewModel @Inject constructor(): ViewModel() {
         )
         val mgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         mgr[AlarmManager.RTC, System.currentTimeMillis() + 100] = mPendingIntent
+    }
+
+    @Composable
+    fun toggleLightDarkMode(navHostController: NavHostController, isDark: Boolean) {
+        if (isSystemInDarkTheme().not() && isDark) {
+                UserPreferencesUtil.setCurrentUserModeSelection(LocalContext.current, 1)
+
+//            UserPreferencesUtil.setCurrentUserThemeSelection(context, int)
+//            val mStartActivity = Intent(context, MainActivity::class.java)
+//            val mPendingIntentId = 123456
+//            val mPendingIntent = PendingIntent.getActivity(
+//                context,
+//                mPendingIntentId,
+//                mStartActivity,
+//                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
+//            )
+//            val mgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+//            mgr[AlarmManager.RTC, System.currentTimeMillis() + 100] = mPendingIntent
+
+        } else {
+            if (isSystemInDarkTheme() && isDark.not()) {
+                UserPreferencesUtil.setCurrentUserModeSelection(LocalContext.current, 0)
+            }
+        }
     }
 }

@@ -7,29 +7,29 @@ import android.graphics.Bitmap
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material3.Card
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -44,8 +44,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -68,6 +70,7 @@ fun SettingsScreen(
     windowSize: WindowWidthSizeClass,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
+    val isDark = isSystemInDarkTheme()
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         // Create an observer that triggers our remembered callbacks
@@ -75,6 +78,7 @@ fun SettingsScreen(
         val observer = LifecycleEventObserver { owner, event ->
             if (event == Lifecycle.Event.ON_CREATE) {
                 viewModel.onTriggerEvent(SettingsEvent.getIconImages)
+                viewModel.setIsDark(isDark)
             }
         }
 
@@ -154,14 +158,17 @@ fun HorizontalScrollableIconRowComponent(
     list: List<Bitmap>,
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primaryContainer),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp)
+            .background(MaterialTheme.colorScheme.primary),
         verticalArrangement = Arrangement.Center
     ) {
         LazyRow(
             modifier = Modifier
                 .padding(4.dp)
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.primaryContainer),
+                .background(MaterialTheme.colorScheme.primary),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(list.size) { listitemIndex ->
@@ -223,17 +230,20 @@ fun showNewIconImage(context: Context, int: Int, totalIndices: Int) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun settingsContent(paddingValues: PaddingValues, viewModel: SettingsViewModel) {
+fun settingsContent(paddingValues: PaddingValues, viewModel: SettingsViewModel, navHostController: NavHostController) {
     val bitmapList by viewModel.iconImages.collectAsState()
     val context = LocalContext.current
+    val isDark = viewModel.isDark.collectAsState()
     Scaffold(Modifier.padding(paddingValues = paddingValues)) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(paddingValues = it), //.background(MaterialTheme.colorScheme.primaryContainer)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues = it), //.background(MaterialTheme.colorScheme.primaryContainer)
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             // Icons
             val screenPixelDensity = context.resources.displayMetrics.density
-            val height = (768f / 2) / screenPixelDensity
+            val height = (800f / 2) / screenPixelDensity
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -265,7 +275,7 @@ fun settingsContent(paddingValues: PaddingValues, viewModel: SettingsViewModel) 
                                     text = stringResource(R.string.app_icon_images),
                                     modifier = Modifier
                                         .padding(8.dp),
-                                    style = MaterialTheme.typography.labelMedium,
+                                    //style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSecondaryContainer
                                 )
                             }
@@ -309,7 +319,7 @@ fun settingsContent(paddingValues: PaddingValues, viewModel: SettingsViewModel) 
                                 Text(
                                     text = stringResource(R.string.select_theme_color_restart_app),
                                     modifier = Modifier.padding(8.dp),
-                                    style = MaterialTheme.typography.labelMedium,
+                                    //style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSecondaryContainer
                                 )
                             }
@@ -323,6 +333,123 @@ fun settingsContent(paddingValues: PaddingValues, viewModel: SettingsViewModel) 
                                 stringResource(R.string.default_derived_from_your_wallpaper_selection) to -1
                             )
                             MaterialRadioButtonGroupComponent(themeMap, viewModel::setTheme)
+                        }
+                    }
+                }
+            }
+
+            // Light / Dark Toggle
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    ElevatedCard(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp)
+                            .align(Alignment.Center),
+                        shape = MaterialTheme.shapes.medium,
+                        elevation = CardDefaults.elevatedCardElevation(4.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.background(MaterialTheme.colorScheme.secondaryContainer),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            val items = (0..3)
+                            var activeTabIndex by remember { mutableStateOf(0) }
+
+                            TabRow(
+                                selectedTabIndex = activeTabIndex,
+                                containerColor = Color.Transparent,
+                                indicator = {
+                                    Box(
+                                        Modifier
+                                            .tabIndicatorOffset(it[activeTabIndex])
+                                            .fillMaxSize()
+                                            .background(color = MaterialTheme.colorScheme.primary)
+                                            .zIndex(-1F)
+                                    )
+                                },
+                            ) {
+                                items.mapIndexed { i, item ->
+                                    Tab(
+                                        selected = activeTabIndex == i,
+                                        onClick = { activeTabIndex = i }
+                                    ) {
+                                        if (i == 0) {
+                                            Text(
+                                                modifier = Modifier.padding(4.dp),
+                                                text = stringResource(R.string.light_theme),
+                                                color = if (0 == activeTabIndex) {
+                                                    MaterialTheme.colorScheme.onPrimary
+
+                                                } else {
+                                                    MaterialTheme.colorScheme.onSecondaryContainer
+                                                }
+                                            )
+                                            if (0 == activeTabIndex && isDark.value) {
+                                                viewModel.onTriggerEvent(SettingsEvent.setMode(false))
+                                                viewModel.toggleLightDarkMode(
+                                                    navHostController,
+                                                    isDark.value
+                                                )
+                                            }
+                                        }
+                                        if (i == 1) {
+                                            Text(
+                                                modifier = Modifier.padding(4.dp),
+                                                text = stringResource(R.string.dark_theme),
+                                                color = if (1 == activeTabIndex) {
+                                                    MaterialTheme.colorScheme.onPrimary
+                                                } else {
+                                                    MaterialTheme.colorScheme.onSecondaryContainer
+                                                }
+                                            )
+                                            if (1 == activeTabIndex && isDark.value.not()) {
+                                                viewModel.onTriggerEvent(SettingsEvent.setMode(true))
+                                                viewModel.toggleLightDarkMode(
+                                                    navHostController,
+                                                    isDark.value
+                                                )
+                                            }
+                                            if (i == 2) {
+                                                Text(
+                                                    modifier = Modifier.padding(4.dp),
+                                                    text = stringResource(R.string.match_phone),
+                                                    color = if (2 == activeTabIndex) {
+                                                        MaterialTheme.colorScheme.onPrimary
+                                                    } else {
+                                                        MaterialTheme.colorScheme.onSecondaryContainer
+                                                    }
+                                                )
+                                                if (1 == activeTabIndex && isDark.value.not()) {
+                                                    viewModel.onTriggerEvent(
+                                                        SettingsEvent.setMode(
+                                                            true
+                                                        )
+                                                    )
+                                                    viewModel.toggleLightDarkMode(
+                                                        navHostController,
+                                                        isDark.value
+                                                    )
+                                                }
+                                            }
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.baseline_camera_24),
+                                                contentDescription = null,
+                                                tint = Color.Black,
+                                                modifier = Modifier.padding(vertical = 20.dp)
+                                            )
+                                        }
+                                    }
+                                }
+
+                            }
                         }
                     }
                 }

@@ -1,6 +1,7 @@
 package com.livingtechusa.reflexion.util.sharedPreferences
 
 import android.content.Context
+import com.livingtechusa.reflexion.R
 
 import com.livingtechusa.reflexion.R.string.shared_prefs_biometric_authentication_enabled
 import com.livingtechusa.reflexion.R.string.shared_prefs_biometric_authentication_opt_in
@@ -11,6 +12,7 @@ import com.livingtechusa.reflexion.R.string.shared_prefs_encrypted_biometric_pas
 import com.livingtechusa.reflexion.R.string.shared_prefs_encrypted_password
 import com.livingtechusa.reflexion.R.string.shared_prefs_encrypted_user_password
 import com.livingtechusa.reflexion.R.string.shared_prefs_logged_in_user_name
+import com.livingtechusa.reflexion.R.string.shared_prefs_current_mode_selected
 import com.livingtechusa.reflexion.util.EncryptedSharedPreferencesUtil
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 
@@ -161,5 +163,14 @@ object UserPreferencesUtil : SharedPreferencesUtil() {
 
     fun setCurrentUserThemeSelection(context: Context, selection: Int) {
         setInt(PREFERENCE_TYPE, context, shared_prefs_current_theme_selected, selection)
+    }
+
+    fun getCurrentUserModeSelection(context: Context): Int {
+        return getInt(PREFERENCE_TYPE, context, shared_prefs_current_mode_selected, -1)
+    }
+
+    // -1 = nothing set, 1 = darkmode, 0 = lightMode
+    fun setCurrentUserModeSelection(context: Context, selection: Int) {
+        setInt(PREFERENCE_TYPE, context, shared_prefs_current_mode_selected, selection)
     }
 }
