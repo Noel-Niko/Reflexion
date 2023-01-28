@@ -37,13 +37,6 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
     private val _iconImages = MutableStateFlow(emptyList<Bitmap>())
     val iconImages: StateFlow<List<Bitmap>> get() = _iconImages
 
-    private val _isDark: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val isDark: StateFlow<Boolean> get() = _isDark
-
-    fun setIsDark(dark: Boolean) {
-        _isDark.value = dark
-    }
-
     private fun getAppBitmapList() {
         val bitmapList = mutableListOf<Bitmap>()
         val ids = APP_ICON_LIST.let { list ->
@@ -61,10 +54,7 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
                     is SettingsEvent.getIconImages -> {
                         getAppBitmapList()
                     }
-
-                    is SettingsEvent.setMode -> {
-                        _isDark.value = event.isDark
-                    }
+                    else -> {}
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "ERROR " + e.message + " WITH CAUSE " + e.cause)
@@ -74,6 +64,10 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
 
     fun setTheme(int: Int) {
         UserPreferencesUtil.setCurrentUserThemeSelection(context, int)
+        restartApp()
+    }
+
+    private fun restartApp() {
         val mStartActivity = Intent(context, MainActivity::class.java)
         val mPendingIntentId = 123456
         val mPendingIntent = PendingIntent.getActivity(
@@ -87,25 +81,16 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
     }
 
     @Composable
-    fun toggleLightDarkMode(navHostController: NavHostController, isDark: Boolean) {
+    fun toggleLightDarkMode(isDark: Boolean) {
         if (isSystemInDarkTheme().not() && isDark) {
+                // Set Dark Mode and Restart
                 UserPreferencesUtil.setCurrentUserModeSelection(LocalContext.current, 1)
-
-//            UserPreferencesUtil.setCurrentUserThemeSelection(context, int)
-//            val mStartActivity = Intent(context, MainActivity::class.java)
-//            val mPendingIntentId = 123456
-//            val mPendingIntent = PendingIntent.getActivity(
-//                context,
-//                mPendingIntentId,
-//                mStartActivity,
-//                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
-//            )
-//            val mgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-//            mgr[AlarmManager.RTC, System.currentTimeMillis() + 100] = mPendingIntent
-
+                restartApp()
         } else {
             if (isSystemInDarkTheme() && isDark.not()) {
+                // Set Light Mode and Restart
                 UserPreferencesUtil.setCurrentUserModeSelection(LocalContext.current, 0)
+                restartApp()
             }
         }
     }

@@ -62,13 +62,13 @@ fun HomeScreen(
 
 @Composable
 fun homeContent() {
-    Row(Modifier.fillMaxSize()) {
+    Row(Modifier.fillMaxSize().background(color = MaterialTheme.colorScheme.background)) {
         Box(
             modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .padding(16.dp)
                 .shadow(elevation = 12.dp, shape = RoundedCornerShape(8.dp))
-                .background(color = MaterialTheme.colorScheme.primaryContainer)  //MaterialTheme.colorScheme.background)
+                  //d)
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,

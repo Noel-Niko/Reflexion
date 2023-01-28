@@ -20,6 +20,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -46,6 +48,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -60,6 +64,7 @@ import com.livingtechusa.reflexion.navigation.NavBarItems
 import com.livingtechusa.reflexion.ui.components.MaterialRadioButtonGroupComponent
 import com.livingtechusa.reflexion.ui.viewModels.SettingsViewModel
 import com.livingtechusa.reflexion.util.extensions.findActivity
+import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil
 
 
 const val SETTINGS = "settings"
@@ -78,7 +83,6 @@ fun SettingsScreen(
         val observer = LifecycleEventObserver { owner, event ->
             if (event == Lifecycle.Event.ON_CREATE) {
                 viewModel.onTriggerEvent(SettingsEvent.getIconImages)
-                viewModel.setIsDark(isDark)
             }
         }
 
@@ -230,15 +234,19 @@ fun showNewIconImage(context: Context, int: Int, totalIndices: Int) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun settingsContent(paddingValues: PaddingValues, viewModel: SettingsViewModel, navHostController: NavHostController) {
+fun settingsContent(
+    paddingValues: PaddingValues,
+    viewModel: SettingsViewModel,
+    navHostController: NavHostController
+) {
     val bitmapList by viewModel.iconImages.collectAsState()
     val context = LocalContext.current
-    val isDark = viewModel.isDark.collectAsState()
     Scaffold(Modifier.padding(paddingValues = paddingValues)) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues = it), //.background(MaterialTheme.colorScheme.primaryContainer)
+                .padding(paddingValues = it)
+                .verticalScroll(rememberScrollState()), //.background(MaterialTheme.colorScheme.primaryContainer)
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             // Icons
@@ -360,7 +368,7 @@ fun settingsContent(paddingValues: PaddingValues, viewModel: SettingsViewModel, 
                             modifier = Modifier.background(MaterialTheme.colorScheme.secondaryContainer),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            val items = (0..3)
+                            val items = (0..1)
                             var activeTabIndex by remember { mutableStateOf(0) }
 
                             TabRow(
@@ -382,67 +390,44 @@ fun settingsContent(paddingValues: PaddingValues, viewModel: SettingsViewModel, 
                                         onClick = { activeTabIndex = i }
                                     ) {
                                         if (i == 0) {
+                                            val color = if(0 == activeTabIndex) {
+                                                MaterialTheme.colorScheme.onPrimary
+                                            } else {
+                                                MaterialTheme.colorScheme.onSecondaryContainer
+                                            }
                                             Text(
                                                 modifier = Modifier.padding(4.dp),
                                                 text = stringResource(R.string.light_theme),
-                                                color = if (0 == activeTabIndex) {
-                                                    MaterialTheme.colorScheme.onPrimary
-
-                                                } else {
-                                                    MaterialTheme.colorScheme.onSecondaryContainer
-                                                }
+                                                color = color
                                             )
-                                            if (0 == activeTabIndex && isDark.value) {
-                                                viewModel.onTriggerEvent(SettingsEvent.setMode(false))
-                                                viewModel.toggleLightDarkMode(
-                                                    navHostController,
-                                                    isDark.value
-                                                )
-                                            }
-                                        }
-                                        if (i == 1) {
-                                            Text(
-                                                modifier = Modifier.padding(4.dp),
-                                                text = stringResource(R.string.dark_theme),
-                                                color = if (1 == activeTabIndex) {
-                                                    MaterialTheme.colorScheme.onPrimary
-                                                } else {
-                                                    MaterialTheme.colorScheme.onSecondaryContainer
-                                                }
-                                            )
-                                            if (1 == activeTabIndex && isDark.value.not()) {
-                                                viewModel.onTriggerEvent(SettingsEvent.setMode(true))
-                                                viewModel.toggleLightDarkMode(
-                                                    navHostController,
-                                                    isDark.value
-                                                )
-                                            }
-                                            if (i == 2) {
-                                                Text(
-                                                    modifier = Modifier.padding(4.dp),
-                                                    text = stringResource(R.string.match_phone),
-                                                    color = if (2 == activeTabIndex) {
-                                                        MaterialTheme.colorScheme.onPrimary
-                                                    } else {
-                                                        MaterialTheme.colorScheme.onSecondaryContainer
-                                                    }
-                                                )
-                                                if (1 == activeTabIndex && isDark.value.not()) {
-                                                    viewModel.onTriggerEvent(
-                                                        SettingsEvent.setMode(
-                                                            true
-                                                        )
-                                                    )
-                                                    viewModel.toggleLightDarkMode(
-                                                        navHostController,
-                                                        isDark.value
-                                                    )
-                                                }
+                                            if (0 == activeTabIndex) {
+                                                viewModel.toggleLightDarkMode(false)
                                             }
                                             Icon(
                                                 painter = painterResource(id = R.drawable.baseline_camera_24),
                                                 contentDescription = null,
-                                                tint = Color.Black,
+                                                tint = color,
+                                                modifier = Modifier.padding(vertical = 20.dp)
+                                            )
+                                        }
+                                        if (i == 1) {
+                                            val color = if(1 == activeTabIndex) {
+                                                MaterialTheme.colorScheme.onPrimary
+                                            } else {
+                                                MaterialTheme.colorScheme.onSecondaryContainer
+                                            }
+                                            Text(
+                                                modifier = Modifier.padding(4.dp),
+                                                text = stringResource(R.string.dark_theme),
+                                                color = color
+                                            )
+                                            if (1 == activeTabIndex) {
+                                                viewModel.toggleLightDarkMode(true)
+                                            }
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.baseline_camera_24),
+                                                contentDescription = null,
+                                                tint = color,
                                                 modifier = Modifier.padding(vertical = 20.dp)
                                             )
                                         }
@@ -454,6 +439,114 @@ fun settingsContent(paddingValues: PaddingValues, viewModel: SettingsViewModel, 
                     }
                 }
             }
+
+            // Apply Settings
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ElevatedCard(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .align(Alignment.Center),
+                        shape = MaterialTheme.shapes.large,
+                        elevation = CardDefaults.elevatedCardElevation(4.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.apply_changes),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(8.dp)
+                                .clickable {
+//                                    UserPreferencesUtil.setCurrentUserModeSelection(context, -1)
+//                                    resetIconImage(context, bitmapList.size)
+//                                    viewModel.setTheme(-1)
+                                })
+                    }
+                }
+            }
+
+            // Reset settings
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ElevatedCard(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .align(Alignment.Center),
+                        shape = MaterialTheme.shapes.large,
+                        elevation = CardDefaults.elevatedCardElevation(4.dp)
+                    ) {
+                        Text(
+                            text = "Reset Settings",
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(8.dp)
+                                .clickable {
+                            UserPreferencesUtil.setCurrentUserModeSelection(context, -1)
+                            resetIconImage(context, bitmapList.size)
+                            viewModel.setTheme(-1)
+                        })
+                    }
+                }
+            }
         }
     }
+}
+
+fun resetIconImage(context: Context, iconListSize: Int) {
+    val packageManager = context.packageManager
+
+    // enable default icon
+    packageManager.setComponentEnabledSetting(
+        ComponentName(
+            context,
+            "com.livingtechusa.reflexion.MainActivity"
+        ),
+        PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+        PackageManager.DONT_KILL_APP
+    )
+
+    var count = 0
+    while (count <= (iconListSize - 1)) {
+            // disable each other icon
+            packageManager.setComponentEnabledSetting(
+                ComponentName(
+                    context,
+                    "com.livingtechusa.reflexion.MainActivityAlias$count"
+                ),
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP
+            )
+        count++
+    }
+    Toast
+        .makeText(
+            context, context.getString(R.string.app_reset),
+            Toast.LENGTH_LONG
+        )
+        .show()
 }

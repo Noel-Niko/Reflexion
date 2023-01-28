@@ -72,4 +72,6 @@
     <string name="dark_theme">Dark Theme</string>
     <string name="shared_prefs_current_mode_selected">shared_prefs_current_mode_selected</string>
     <string name="match_phone">Match Phone</string>
+    <string name="app_reset">App Reset</string>
+    <string name="apply_changes">Apply Changes</string>
 </resources>
