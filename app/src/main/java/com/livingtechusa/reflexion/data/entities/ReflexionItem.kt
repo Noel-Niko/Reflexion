@@ -18,8 +18,8 @@ import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
                 childColumns = arrayOf("parent"),
                 onDelete = ForeignKey.CASCADE
             )
-        )
-
+        ),
+    indices = [androidx.room.Index(value = ["autogenPK"])]
 )
 data class ReflexionItem(
     @PrimaryKey(autoGenerate = true)

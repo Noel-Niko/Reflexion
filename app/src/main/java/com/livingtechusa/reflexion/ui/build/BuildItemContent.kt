@@ -192,10 +192,8 @@ fun BuildItemContent(
         )
         if (autogenPK != 0L) {
             viewModel.onTriggerEvent(BuildEvent.UpdateReflexionItem)
-            //Temporary.tempReflexionItem = ReflexionItem()
         } else {
             viewModel.onTriggerEvent(BuildEvent.SaveNew)
-            //Temporary.tempReflexionItem = ReflexionItem()
         }
         viewModel.setSaveNowFromTopBar(false)
     }

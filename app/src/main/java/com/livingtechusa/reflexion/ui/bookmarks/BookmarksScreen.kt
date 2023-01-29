@@ -1,4 +1,4 @@
-package com.livingtechusa.reflexion.ui.topics
+package com.livingtechusa.reflexion.ui.bookmarks
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -7,32 +7,34 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.livingtechusa.reflexion.navigation.NavBarItems
 import com.livingtechusa.reflexion.ui.components.ReflexionItemListUI
-import com.livingtechusa.reflexion.ui.viewModels.TopicsViewModel
+import com.livingtechusa.reflexion.ui.viewModels.BookmarksViewModel
 import com.livingtechusa.reflexion.util.extensions.findActivity
 
-const val ListRoute = "list"
+
+const val BOOKMARKS = "bookmarks"
 
 @Composable
-fun ListDisplay(
-    viewModel: TopicsViewModel = hiltViewModel(),
+fun BookmarksScreen(
     navHostController: NavHostController,
     windowSize: WindowWidthSizeClass,
-    pk: Long?
+    viewModel: BookmarksViewModel = hiltViewModel()
 ) {
-    val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
 
-    // If `lifecycleOwner` changes, dispose and reset the effect
+    val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         // Create an observer that triggers our remembered callbacks
         // for sending analytics events
-        val observer = LifecycleEventObserver { _, event ->
-                viewModel.onTriggerEvent(ListEvent.GetList(pk))
+        val observer = LifecycleEventObserver { owner, event ->
+            if (event == Lifecycle.Event.ON_CREATE) {
+               // viewModel.onTriggerEvent(BookMarksEvent.getIconImages)
+            }
         }
 
         // Add the observer to the lifecycle
@@ -45,38 +47,38 @@ fun ListDisplay(
     }
 
     val context = LocalContext.current
-    val icons = NavBarItems.ListBarItems
+    val icons = NavBarItems.BookMarksBarItems
 
     val search by viewModel.search.collectAsState()
 
     if (context.findActivity() != null) {
         when (windowSize) {
             WindowWidthSizeClass.COMPACT -> {
-                CompactScreen(navHostController, icons, viewModel, search, viewModel::searchEvent, viewModel::onUp)
+                CompactScreen(navHostController, icons, viewModel, search,  viewModel::searchEvent)
             }
 
-            WindowWidthSizeClass.MEDIUM -> {
-                MediumScreen(navHostController, icons, viewModel, search, viewModel::searchEvent, viewModel::onUp)
-            }
+//            WindowWidthSizeClass.MEDIUM -> {
+//                Landscape(navHostController, icons)
+//            }
 
 //            WindowWidthSizeClass.EXPANDED -> {
-//                ExpandedScreen(navHostController, icons, viewModel, pk)
+//                ExpandedScreen(navHostController, icons)
 //                viewModel.navigationType = ReflexionNavigationType.PERMANENT_NAVIGATION_DRAWER
 //            }
 
-            else -> CompactScreen(navHostController, icons, viewModel, search, viewModel::searchEvent, viewModel::onUp)
+            else -> CompactScreen(navHostController, icons, viewModel, search,  viewModel::searchEvent)
         }
     }
 }
 
+
 @Composable
-fun ListContent(
-    itemViewModel: TopicsViewModel,
+fun BookmarksContent(
+    viewModel: BookmarksViewModel,
     navController: NavHostController
 ) {
-    ReflexionItemListUI(
+    ReflexionItemListUIForBookmarks(
         navController = navController,
-        viewModel = itemViewModel
+        viewModel = viewModel
     )
 }
-

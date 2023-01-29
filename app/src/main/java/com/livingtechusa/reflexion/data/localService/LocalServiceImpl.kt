@@ -2,10 +2,10 @@ package com.livingtechusa.reflexion.data.localService
 
 import android.graphics.Bitmap
 import com.livingtechusa.reflexion.data.Converters
-import com.livingtechusa.reflexion.data.dao.KeyWordsDao
+import com.livingtechusa.reflexion.data.dao.BookMarksDao
 import com.livingtechusa.reflexion.data.dao.LinkedListDao
 import com.livingtechusa.reflexion.data.dao.ReflexionItemDao
-import com.livingtechusa.reflexion.data.entities.KeyWords
+import com.livingtechusa.reflexion.data.entities.BookMarks
 import com.livingtechusa.reflexion.data.entities.ListNode
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.models.AbridgedReflexionItem
@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 class LocalServiceImpl @Inject constructor(
     private val reflexionItemDao: ReflexionItemDao,
-    private val keyWordsDao: KeyWordsDao,
+    private val bookMarksDao: BookMarksDao,
     private val linkedListDao: LinkedListDao
 ) : ILocalService {
     companion object {
@@ -183,6 +183,26 @@ class LocalServiceImpl @Inject constructor(
         }
     }
 
+    override suspend fun setBookMarks(bookMark: BookMarks) {
+        bookMarksDao.setBookMarks(bookMark)
+    }
+
+    override suspend fun getBookMarks(): List<BookMarks?> {
+        return bookMarksDao.getBookMarks()
+    }
+
+    override suspend fun clearBookMarks() {
+        bookMarksDao.clearBookMarks()
+    }
+
+    override suspend fun selectItemBookMarks(item_pk: Long): List<BookMarks?> {
+        return bookMarksDao.selectItemBookMarks(item_pk)
+    }
+
+    override suspend fun selectListBookMarks(list_pk: Long): List<BookMarks?> {
+        return bookMarksDao.selectListBookMarks(list_pk)
+    }
+
     override suspend fun selectSingleAbridgedReflexionItemDataByParentPk(pk: Long): AbridgedReflexionItem {
         return reflexionItemDao.selectSingleAbridgedReflexionItemDataByParentPk(pk)
     }
@@ -201,29 +221,16 @@ class LocalServiceImpl @Inject constructor(
         }
     }
 
-
-    override suspend fun setKeyWords(keyWords: KeyWords) {
-        return keyWordsDao.setKeyWords(keyWords)
-    }
-
-    override suspend fun getKeyWords(): KeyWords? {
-        return keyWordsDao.getKeyWords()
-    }
-
-    override suspend fun clearKeyWords() {
-        keyWordsDao.clearKeyWords()
-    }
-
-    override suspend fun selectKeyWords(item_pk: String): List<KeyWords?> {
-        return keyWordsDao.selectKeyWords(item_pk)
-    }
-
-    override suspend fun deleteKeyWord(word: String) {
-        keyWordsDao.deleteKeyWord(word)
+    override suspend fun deleteBookmark(autoGenPk: Long) {
+        bookMarksDao.deleteBookmark(autoGenPk)
     }
 
     override suspend fun renameKeyWord(word: String, newWord: String) {
-        keyWordsDao.renameKeyWord(word, newWord)
+        bookMarksDao.renameKeyWord(word, newWord)
+    }
+
+    override suspend fun searchBookmarksByTitle(text: String): List<BookMarks?> {
+        return bookMarksDao.searchBookmarksByTitle(text)
     }
 
     override suspend fun deleteAllChildNodes(nodePk: Long) {
@@ -240,6 +247,10 @@ class LocalServiceImpl @Inject constructor(
 
     override suspend fun insertNewNode(listNode: ListNode) {
         linkedListDao.insertNewNode(listNode = listNode)
+    }
+
+    override suspend fun selectListNode(nodePk: Long): ListNode? {
+        return linkedListDao.selectListNode(nodePk)
     }
 
     override suspend fun selectNodeHeadsByTopic(topicPk: Long): List<ListNode?> {
@@ -283,29 +294,24 @@ class LocalServiceImpl @Inject constructor(
                 }
                 val reflexionArrayItem = headNode.toReflexionArrayItem()
                 children.forEach { node ->
-                    reflexionArrayItem.children?.add(node.toReflexionArrayItem())
+                    reflexionArrayItem.children.add(node.toReflexionArrayItem())
                 }
                 reflexionArrayItems.add(reflexionArrayItem)
-
             }
         }
         job.join()
         return reflexionArrayItems
     }
 
-    override suspend fun selectNodeListsAsArrayItemsByHeadNode(nodePk: Long?): ReflexionArrayItem? {
+    override suspend fun selectNodeListsAsArrayItemsByHeadNode(topicPk: Long?): ReflexionArrayItem? {
         // get all of the nodes by topic
         val node: ListNode? =
-            nodePk?.let { linkedListDao.selectListNode(it) }
+            topicPk?.let { linkedListDao.selectListNode(it) }
 
         var reflexionArrayItem: ReflexionArrayItem? = null
         val children = mutableListOf<ListNode>()
         val result = CoroutineScope(Dispatchers.IO).launch {
             withContext(Dispatchers.IO) {
-                // recursive function
-//                if (nodePk != null) {
-//                    linkedListDao.selectListNode(nodePk)?.let { children.add(it) }
-//                }
                 var parent: ListNode? = node
                 suspend fun getChild(itemPk: Long): ListNode? {
                     val next: ListNode? = linkedListDao.selectChildNode(itemPk)

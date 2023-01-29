@@ -1,8 +1,6 @@
-package com.livingtechusa.reflexion.ui.components
+package com.livingtechusa.reflexion.ui.bookmarks
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -31,28 +29,23 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
-import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
-import com.livingtechusa.reflexion.ui.topics.ListEvent
-import com.livingtechusa.reflexion.ui.viewModels.TopicsViewModel
+import com.livingtechusa.reflexion.ui.viewModels.BookmarksViewModel
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun ReflexionItemListUI(
+fun ReflexionItemListUIForBookmarks(
     navController: NavHostController,
-    viewModel: TopicsViewModel
+    viewModel: BookmarksViewModel
 ) {
     val context: Context = LocalContext.current
     val resource = ResourceProviderSingleton
-    val reflexionItemList by viewModel.list.collectAsState()
+    val reflexionItemList by viewModel.itemBookmarks.collectAsState()
     Scaffold(
         content = {
+            it
             ReflexionItemsContent(
                 reflexionItems = reflexionItemList,
                 onDoubleTap = { reflexionItem ->
@@ -61,18 +54,7 @@ fun ReflexionItemListUI(
                     }
                 },
                 onLongPress = { reflexionItem ->
-                    CoroutineScope(Dispatchers.Main).launch {
-                        if (viewModel.hasNoChildren(reflexionItem.autogenPK)) {
-                            Toast.makeText(
-                                context,
-                                resource.getString(R.string.no_child_items_found),
-                                Toast.LENGTH_SHORT
-                            )
-                                .show()
-                        } else {
-                            viewModel.onTriggerEvent(ListEvent.GetList(reflexionItem.autogenPK))
-                        }
-                    }
+               // TBD
                 }
             )
         }

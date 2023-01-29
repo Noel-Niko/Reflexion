@@ -18,14 +18,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.livingtechusa.reflexion.navigation.BarItem
 import com.livingtechusa.reflexion.navigation.NavBarItems
-import com.livingtechusa.reflexion.ui.viewModels.ListViewModel
+import com.livingtechusa.reflexion.ui.viewModels.TopicsViewModel
 
 
 @Composable
 fun MediumScreen(
     navController: NavHostController,
     icons: List<BarItem>,
-    viewModel: ListViewModel,
+    viewModel: TopicsViewModel,
     search: String?,
     onSearch: (String?) -> Unit,
     param: Any?

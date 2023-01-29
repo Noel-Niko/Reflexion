@@ -28,6 +28,7 @@ import androidx.window.core.layout.WindowWidthSizeClass
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.livingtechusa.reflexion.navigation.Screen
+import com.livingtechusa.reflexion.ui.bookmarks.BookmarksScreen
 import com.livingtechusa.reflexion.ui.build.BuildItemScreen
 import com.livingtechusa.reflexion.ui.components.ConfirmDeleteListDialog
 import com.livingtechusa.reflexion.ui.components.ConfirmDeleteSubItemDialog
@@ -299,6 +300,14 @@ class MainActivity : ComponentActivity() {
                         route = Screen.SettingsScreen.route,
                     ) {
                         SettingsScreen(
+                            navHostController = navController,
+                            windowSize = windowSize
+                        )
+                    }
+                    composable(
+                        route = Screen.BookmarkScreen.route,
+                    ) {
+                        BookmarksScreen(
                             navHostController = navController,
                             windowSize = windowSize
                         )

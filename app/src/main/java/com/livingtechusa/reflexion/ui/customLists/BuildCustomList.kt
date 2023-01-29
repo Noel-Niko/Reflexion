@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExposedDropdownMenuBox
 import androidx.compose.material.ExposedDropdownMenuDefaults
@@ -120,16 +122,17 @@ fun CustomListsContent(
         modifier = Modifier.padding(paddingValues),
     ) { innerPadding ->
         Spacer(Modifier.height(16.dp))
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+            ) {
             Row(Modifier.fillMaxWidth()) {
                 Box(
                     modifier = Modifier
                         .align(
                             Alignment.CenterVertically,
                         )
-
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -207,8 +210,8 @@ fun CustomListsContent(
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(16.dp),
-                        
+                            .padding(16.dp)
+                            .verticalScroll(rememberScrollState()),
                     ) {
                         items(filteringOptions.size) {
                             Text(

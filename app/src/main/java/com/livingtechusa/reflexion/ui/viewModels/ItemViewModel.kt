@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.Converters
+import com.livingtechusa.reflexion.data.entities.BookMarks
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.ui.build.BuildEvent
@@ -233,6 +234,7 @@ class ItemViewModel @Inject constructor(
                             _reflexionItem =
                                 localServiceImpl.selectReflexionItemByName(name.value)
                             _reflexionItemState.value = _reflexionItem
+                            _autogenPK.value = _reflexionItem.autogenPK
                         }
                     }
 
@@ -397,6 +399,18 @@ class ItemViewModel @Inject constructor(
 
                     is BuildEvent.Save -> {
                         _saveNowFromTopBar.value = true
+                    }
+
+                    is BuildEvent.Bookmark -> {
+                        viewModelScope.launch {
+                            val bookMark = BookMarks(
+                                autoGenPk = autogenPK.value,
+                                ITEM_PK = event.itemPk,
+                                LIST_PK = null,
+                                title = name.value
+                            )
+                            localServiceImpl.setBookMarks(bookMark)
+                        }
                     }
 
                     is BuildEvent.RotateImage -> {

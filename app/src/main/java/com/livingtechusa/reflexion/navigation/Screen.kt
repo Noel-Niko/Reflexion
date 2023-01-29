@@ -1,6 +1,7 @@
 package com.livingtechusa.reflexion.navigation
 
 import com.livingtechusa.reflexion.Main_Activity
+import com.livingtechusa.reflexion.ui.bookmarks.BOOKMARKS
 import com.livingtechusa.reflexion.ui.build.BuildRoute
 import com.livingtechusa.reflexion.ui.components.CONFIRM_DELETE_LIST
 import com.livingtechusa.reflexion.ui.components.CONFIRM_DELETE_SUBITEM
@@ -16,6 +17,8 @@ import com.livingtechusa.reflexion.ui.settings.SETTINGS
 
 
 sealed class Screen(val route: String) {
+    object BookmarkScreen : Screen(BOOKMARKS)
+
     object CustomListDisplay : Screen(CUSTOM_LIST_DISPLAY)
 
     object HomeScreen : Screen(HOME)

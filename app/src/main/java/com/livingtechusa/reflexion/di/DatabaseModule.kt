@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.livingtechusa.reflexion.data.ReflexionDatabase
 import com.livingtechusa.reflexion.data.dao.ReflexionItemDao
-import com.livingtechusa.reflexion.data.dao.KeyWordsDao
+import com.livingtechusa.reflexion.data.dao.BookMarksDao
 import com.livingtechusa.reflexion.data.dao.LinkedListDao
 import com.livingtechusa.reflexion.util.Constants
 import dagger.Module
@@ -22,7 +22,7 @@ class DatabaseModule {
         return reflexionDatabase.itemDao()
     }
     @Provides
-    fun provideKeyWordsDao(reflexionDatabase: ReflexionDatabase): KeyWordsDao {
+    fun provideKeyWordsDao(reflexionDatabase: ReflexionDatabase): BookMarksDao {
         return reflexionDatabase.keyWordsDao()
     }
 

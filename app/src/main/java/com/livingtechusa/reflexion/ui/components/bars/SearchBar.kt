@@ -13,13 +13,15 @@ import com.livingtechusa.reflexion.ui.components.icons.UpIcon
 fun SearchBar(
     search: String?,
     onSearch: (searchText: String?) -> Unit,
-    onUp: () -> Unit
+    onUp: (() -> Unit)?
 ) {
     when (search) {
         null -> MainTopBar {
             SearchIcon { onSearch("") }
-            UpIcon {
-                onUp()
+            if (onUp != null) {
+                UpIcon {
+                        onUp()
+                    }
             }
         }
 

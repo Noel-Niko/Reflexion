@@ -5,7 +5,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
@@ -22,7 +21,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class ListViewModel @Inject constructor(
+class TopicsViewModel @Inject constructor(
     private val localServiceImpl: LocalServiceImpl,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
@@ -109,7 +108,6 @@ class ListViewModel @Inject constructor(
         }
     }
 
-    //var listPK = 0L
     fun searchEvent(term: String?) {
         _search.value = term
         onTriggerEvent(ListEvent.Search(term))

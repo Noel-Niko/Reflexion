@@ -4,17 +4,17 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.livingtechusa.reflexion.data.dao.ReflexionItemDao
-import com.livingtechusa.reflexion.data.dao.KeyWordsDao
+import com.livingtechusa.reflexion.data.dao.BookMarksDao
 import com.livingtechusa.reflexion.data.dao.LinkedListDao
 import com.livingtechusa.reflexion.data.entities.Converters
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
-import com.livingtechusa.reflexion.data.entities.KeyWords
+import com.livingtechusa.reflexion.data.entities.BookMarks
 import com.livingtechusa.reflexion.data.entities.ListNode
 
 @Database(
     entities =
     [ReflexionItem::class,
-        KeyWords::class,
+        BookMarks::class,
     ListNode::class],
     version = 1,
     exportSchema = false
@@ -24,6 +24,6 @@ import com.livingtechusa.reflexion.data.entities.ListNode
 
 abstract class ReflexionDatabase : RoomDatabase() {
     abstract fun itemDao(): ReflexionItemDao
-    abstract fun keyWordsDao(): KeyWordsDao
+    abstract fun keyWordsDao(): BookMarksDao
     abstract fun linkedListDao(): LinkedListDao
 }

@@ -15,13 +15,13 @@ interface ReflexionItemDao {
     @Query("UPDATE ReflexionItem SET name = :name, description = :description, detailedDescription = :detailedDescription, image = :image, videoUri = :videoUri, videoUrl = :videoUrl, parent = :parent WHERE autogenPK = :autogenPK")
     suspend fun updateReflexionItem(autogenPK: Long , name: String, description: String?, detailedDescription: String?, image: ByteArray?, videoUri: String?, videoUrl: String?, parent: Long?)
 
-    @Query("Select * FROM ReflexionItem order by name")
+    @Query("Select * FROM ReflexionItem order by name ASC")
     suspend fun getAllReflexionItems(): List<ReflexionItem?>
 
     @Query("Delete FROM ReflexionItem")
     suspend fun clearALLReflexionItems()
 
-    @Query("Select * FROM ReflexionItem WHERE parent IS NULL ORDER BY name")
+    @Query("Select * FROM ReflexionItem WHERE parent IS NULL ORDER BY name ASC")
     suspend fun getReflexionItemTopics(): List<ReflexionItem?>
 
     @Query("Select * FROM ReflexionItem WHERE autogenPK = :autogenPK")
@@ -36,9 +36,9 @@ interface ReflexionItemDao {
     @Query("Select * FROM ReflexionItem WHERE parent =:parent order by name")
     suspend fun selectChildReflexionItems(parent: Long): List<ReflexionItem?>
 
-    @Query("Select autogenPK, name, parent FROM ReflexionItem WHERE parent IS NULL order by name")
+    @Query("Select autogenPK, name, parent FROM ReflexionItem WHERE parent IS NULL order by name ASC")
     suspend fun getAbridgedReflexionItemTopics(): List<AbridgedReflexionItem?>
-    @Query("Select autogenPK, name, parent FROM ReflexionItem WHERE parent =:parent order by name")
+    @Query("Select autogenPK, name, parent FROM ReflexionItem WHERE parent =:parent order by name ASC")
     suspend fun selectAbridgedReflexionItemDataByParentPk(parent: Long): List<AbridgedReflexionItem?>
 
     @Query("Select autogenPK, name, parent FROM ReflexionItem WHERE parent =:pk")
@@ -53,17 +53,17 @@ interface ReflexionItemDao {
     @Query("Select * FROM ReflexionItem WHERE name =:name")
     suspend fun selectReflexionItemByName(name: String): ReflexionItem
 
-    @Query("Select * FROM ReflexionItem WHERE name LIKE :search || '%' order by name")
+    @Query("Select * FROM ReflexionItem WHERE name LIKE :search || '%' order by name ASC")
     suspend fun getAllItemsContainingString(search: String): List<ReflexionItem?>
 
-    @Query("Select * FROM ReflexionItem WHERE parent IS NULL AND name LIKE :search || '%' order by name")
+    @Query("Select * FROM ReflexionItem WHERE parent IS NULL AND name LIKE :search || '%' order by name ASC")
     suspend fun getAllTopicsContainingString(search: String): List<ReflexionItem?>
-    @Query("Select * FROM ReflexionItem WHERE parent =:pk AND name LIKE :search || '%' order by name")
+    @Query("Select * FROM ReflexionItem WHERE parent =:pk AND name LIKE :search || '%' order by name ASC")
     suspend fun selectChildrenContainingString(pk: Long, search: String?): List<ReflexionItem?>
-    @Query("SELECT * FROM ReflexionItem WHERE parent = :parent AND autogenPK IS NOT :pk order by name")
+    @Query("SELECT * FROM ReflexionItem WHERE parent = :parent AND autogenPK IS NOT :pk order by name ASC")
     suspend fun selectSiblings(pk: Long, parent: Long): List<ReflexionItem?>
 
-    @Query("SELECT * FROM ReflexionItem WHERE parent = :parent order by name")
+    @Query("SELECT * FROM ReflexionItem WHERE parent = :parent order by name ASC")
     suspend fun selectAllSiblings(parent: Long): List<ReflexionItem?>
     @Query("SELECT parent FROM ReflexionItem WHERE autogenPK = :itemPk")
     suspend fun getParent(itemPk: Long): Long?

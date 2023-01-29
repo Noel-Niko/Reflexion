@@ -3,6 +3,7 @@ package com.livingtechusa.reflexion.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddHome
 import androidx.compose.material.icons.filled.AddLink
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.DataArray
 import androidx.compose.material.icons.filled.DeveloperMode
 import androidx.compose.material.icons.filled.ViewList
@@ -14,6 +15,11 @@ object NavBarItems {
             title = "Home",
             image = Icons.Filled.AddHome,
             route = Screen.HomeScreen.route
+        ),
+        BarItem(
+            title = "Bkmrk",
+            image = Icons.Filled.Bookmark,
+            route = Screen.BookmarkScreen.route
         ),
         BarItem(
             title = "Lists",
@@ -33,9 +39,14 @@ object NavBarItems {
     )
     val HomeBarItems = listOf(
         BarItem(
-            title = "New",
-            image = Icons.Filled.DeveloperMode,
-            route = Screen.BuildItemScreen.route + "/" + EMPTY_PK
+            title = "Bookmark",
+            image = Icons.Filled.Bookmark,
+            route = Screen.BookmarkScreen.route
+        ),
+        BarItem(
+            title = "Lists",
+            image = Icons.Filled.AddLink,
+            route = Screen.CustomLists.route
         ),
         BarItem(
             title = "Topics",
@@ -43,9 +54,9 @@ object NavBarItems {
             route = Screen.TopicScreen.route + "/" + EMPTY_PK
         ),
         BarItem(
-            title = "CustomLists",
-            image = Icons.Filled.AddLink,
-            route = Screen.CustomLists.route
+            title = "New",
+            image = Icons.Filled.DeveloperMode,
+            route = Screen.BuildItemScreen.route + "/" + EMPTY_PK
         )
     )
 
@@ -56,33 +67,44 @@ object NavBarItems {
             route = Screen.HomeScreen.route
         ),
         BarItem(
+            title = "Bookmark",
+            image = Icons.Filled.Bookmark,
+            route = Screen.BookmarkScreen.route
+        ),
+        BarItem(
+            title = "Lists",
+            image = Icons.Filled.AddLink,
+            route = Screen.CustomLists.route
+        ),
+        BarItem(
             title = "Topics",
             image = Icons.Filled.DataArray,
             route = Screen.TopicScreen.route + "/" + EMPTY_PK
         ),
-        BarItem(
-            title = "CustomLists",
-            image = Icons.Filled.AddLink,
-            route = Screen.CustomLists.route
-        )
     )
 
     val ListBarItems = listOf(
+        BarItem(
+            title = "Home",
+            image = Icons.Filled.AddHome,
+            route = Screen.HomeScreen.route
+        ),
+        BarItem(
+            title = "Bookmark",
+            image = Icons.Filled.Bookmark,
+            route = Screen.BookmarkScreen.route
+        ),
+        BarItem(
+            title = "Lists",
+            image = Icons.Filled.AddLink,
+            route = Screen.CustomLists.route
+        ),
         BarItem(
             title = "New",
             image = Icons.Filled.DeveloperMode,
             route = Screen.BuildItemScreen.route + "/" + EMPTY_PK
         ),
-        BarItem(
-            title = "CustomLists",
-            image = Icons.Filled.AddLink,
-            route = Screen.CustomLists.route
-        ),
-        BarItem(
-            title = "Home",
-            image = Icons.Filled.AddHome,
-            route = Screen.HomeScreen.route
-        )
+
     )
 
     val CustomListsBarItems = listOf(
@@ -90,6 +112,11 @@ object NavBarItems {
             title = "Home",
             image = Icons.Filled.AddHome,
             route = Screen.HomeScreen.route
+        ),
+        BarItem(
+            title = "Bookmark",
+            image = Icons.Filled.Bookmark,
+            route = Screen.BookmarkScreen.route
         ),
         BarItem(
             title = "Topics",
@@ -105,6 +132,16 @@ object NavBarItems {
 
     val CustomListsDisplayBarItems = listOf(
         BarItem(
+            title = "Home",
+            image = Icons.Filled.AddHome,
+            route = Screen.HomeScreen.route
+        ),
+        BarItem(
+            title = "Bookmark",
+            image = Icons.Filled.Bookmark,
+            route = Screen.BookmarkScreen.route
+        ),
+        BarItem(
             title = "Lists",
             image = Icons.Filled.AddLink,
             route = Screen.CustomLists.route
@@ -118,11 +155,35 @@ object NavBarItems {
             title = "New",
             image = Icons.Filled.DeveloperMode,
             route = Screen.BuildItemScreen.route + "/" + EMPTY_PK
-        ),
+        )
+
+    )
+
+    val BookMarksBarItems: List<BarItem> = listOf(
         BarItem(
             title = "Home",
             image = Icons.Filled.AddHome,
             route = Screen.HomeScreen.route
+        ),
+        BarItem(
+            title = "Bookmark",
+            image = Icons.Filled.Bookmark,
+            route = Screen.BookmarkScreen.route
+        ),
+        BarItem(
+            title = "Lists",
+            image = Icons.Filled.AddLink,
+            route = Screen.CustomLists.route
+        ),
+        BarItem(
+            title = "Topics",
+            image = Icons.Filled.DataArray,
+            route = Screen.TopicScreen.route + "/" + EMPTY_PK
+        ),
+        BarItem(
+            title = "New",
+            image = Icons.Filled.DeveloperMode,
+            route = Screen.BuildItemScreen.route + "/" + EMPTY_PK
         )
     )
 }

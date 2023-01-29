@@ -15,6 +15,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.SendToMobile
@@ -63,7 +64,7 @@ fun CompactScreen(
     val resource = ResourceProviderSingleton
     val offsetX = remember { mutableStateOf(0f) }
     val offsetY = remember { mutableStateOf(0f) }
-
+    val itemPk by viewModel.autogenPK.collectAsState()
 
     Scaffold(
         scaffoldState = state,
@@ -101,18 +102,35 @@ fun CompactScreen(
                         )
                         IconButton(
                             onClick = {
+                                viewModel.onTriggerEvent(BuildEvent.Save)
                                 Toast.makeText(
                                     context,
                                     resource.getString(R.string.changes_saved),
                                     Toast.LENGTH_SHORT
                                 ).show()
-                                viewModel.onTriggerEvent(BuildEvent.Save)
                             },
                             content = {
                                 Icon(
                                     imageVector = Icons.Default.Save,
                                     contentDescription = "save",
                                     tint = MaterialTheme.colorScheme.onSurface
+                                )
+                            },
+                        )
+                        IconButton(
+                            onClick = {
+                                viewModel.onTriggerEvent(BuildEvent.Bookmark(itemPk))
+                                Toast.makeText(
+                                    context,
+                                    resource.getString(R.string.bookmarked),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            },
+                            content = {
+                                Icon(
+                                    imageVector = Icons.Default.Bookmark,
+                                    contentDescription = "bookmark",
+                                    tint = MaterialTheme.colorScheme.onSurface,
                                 )
                             },
                         )
