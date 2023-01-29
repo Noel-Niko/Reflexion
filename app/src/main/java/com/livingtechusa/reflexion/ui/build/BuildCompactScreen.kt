@@ -143,6 +143,7 @@ fun CompactScreen(
                 state
             )
         },
+        drawerBackgroundColor = MaterialTheme.colorScheme.inverseSurface,
         drawerElevation = 4.dp,
         bottomBar = {
             val backStackEntry by navController.currentBackStackEntryAsState()
