@@ -36,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.livingtechusa.reflexion.R
@@ -52,7 +53,7 @@ const val CUSTOM_LIST_DISPLAY = "customListDisplay"
 
 @Composable
 fun CustomListDisplayScreen(
-    viewModel: CustomListsViewModel,
+    viewModel: CustomListsViewModel = hiltViewModel(),
     navController: NavHostController,
     windowSize: WindowWidthSizeClass,
     headNodePk: Long

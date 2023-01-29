@@ -267,12 +267,12 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     ) { navBackStackEntry ->
-                        val parentEntry = remember(navBackStackEntry) {
-                            navController.getBackStackEntry(Screen.CustomLists.route)
-                        }
-                        val parentViewModel: CustomListsViewModel = hiltViewModel(parentEntry)
+//                        val parentEntry = remember(navBackStackEntry) {
+//                            navController.getBackStackEntry(Screen.CustomLists.route)
+//                        }
+//                        val parentViewModel: CustomListsViewModel = hiltViewModel(parentEntry)
                         CustomListDisplayScreen(
-                            viewModel = parentViewModel,
+//                            viewModel = parentViewModel,
                             navController = navController,
                             headNodePk = navBackStackEntry.arguments?.getLong(HEAD_NODE_PK) ?: -1,
                             windowSize = windowSize
