@@ -50,7 +50,7 @@ class BookmarksViewModel @Inject constructor(
             val bitmaps: MutableList<Bitmap> = mutableListOf()
             val job = async {
                 listBookmark.value.forEach { node ->
-                    localServiceImpl.selectImage(node.itemPK)?.let { bitmaps.add(it) }
+                    localServiceImpl.selectImage(node.topic)?.let { bitmaps.add(it) }
                 }
             }
             job.join()
@@ -114,6 +114,7 @@ class BookmarksViewModel @Inject constructor(
                         }
                         _itemBookmarks.value = items
                         _listBookmark.value = lists
+                        getListImages()
                     }
                 }
 

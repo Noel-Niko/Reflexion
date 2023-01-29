@@ -32,7 +32,7 @@ fun BookmarksScreen(
         // for sending analytics events
         val observer = LifecycleEventObserver { owner, event ->
             if (event == Lifecycle.Event.ON_CREATE) {
-               viewModel.onTriggerEvent(BookmarksEvent.GetAllBookmarks)
+                viewModel.onTriggerEvent(BookmarksEvent.GetAllBookmarks)
             }
         }
 
@@ -53,7 +53,7 @@ fun BookmarksScreen(
     if (context.findActivity() != null) {
         when (windowSize) {
             WindowWidthSizeClass.COMPACT -> {
-                CompactScreen(navHostController, icons, viewModel, search,  viewModel::searchEvent)
+                CompactScreen(navHostController, icons, viewModel, search, viewModel::searchEvent)
             }
 
 //            WindowWidthSizeClass.MEDIUM -> {
@@ -65,7 +65,13 @@ fun BookmarksScreen(
 //                viewModel.navigationType = ReflexionNavigationType.PERMANENT_NAVIGATION_DRAWER
 //            }
 
-            else -> CompactScreen(navHostController, icons, viewModel, search,  viewModel::searchEvent)
+            else -> CompactScreen(
+                navHostController,
+                icons,
+                viewModel,
+                search,
+                viewModel::searchEvent
+            )
         }
     }
 }

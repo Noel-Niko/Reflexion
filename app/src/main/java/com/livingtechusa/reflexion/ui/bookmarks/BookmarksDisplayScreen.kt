@@ -30,7 +30,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -41,8 +40,6 @@ import coil.compose.rememberImagePainter
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
-import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
-import com.livingtechusa.reflexion.ui.customLists.HorizontalScrollableRowComponent
 import com.livingtechusa.reflexion.ui.viewModels.BookmarksViewModel
 import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
@@ -65,6 +62,7 @@ fun ReflexionItemListUIForBookmarks(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(it)
+
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth()
@@ -75,7 +73,7 @@ fun ReflexionItemListUIForBookmarks(
                         Text(text = stringResource(R.string.items), modifier = Modifier.padding(start = 16.dp), style = MaterialTheme.typography.headlineMedium)
                         ReflexionItemsContent(
                             reflexionItems = reflexionItemList,
-                            onDoubleTap = { reflexionItem ->
+                            onTap = { reflexionItem ->
                                 navController.navigate(route = Screen.BuildItemScreen.route + "/" + reflexionItem.autogenPK) {
                                     launchSingleTop = true
                                 }
@@ -145,7 +143,6 @@ fun ReflexionItemListUIForBookmarks(
                                                     modifier = Modifier
                                                         .height(55.dp)
                                                         .width(55.dp)
-
                                                 )
                                                 Spacer(modifier = Modifier.width(4.dp))
                                             }
@@ -191,7 +188,7 @@ private fun ReflexionItemColumnItem(
 @Composable
 private fun ReflexionItemsContent(
     reflexionItems: List<ReflexionItem>,
-    onDoubleTap: (ReflexionItem) -> Unit,
+    onTap: (ReflexionItem) -> Unit,
     onLongPress: (ReflexionItem) -> Unit
 ) {
     LazyColumn(
@@ -214,7 +211,7 @@ private fun ReflexionItemsContent(
                         //.background(MaterialTheme.colorScheme.surface)
                         .pointerInput(key1 = reflexionItem) {
                             detectTapGestures(
-                                onTap = { onDoubleTap(reflexionItem) },
+                                onTap = { onTap(reflexionItem) },
                                 onLongPress = { onLongPress(reflexionItem) }
                             )
                         },
