@@ -80,6 +80,23 @@ fun CompactScreen(
                     Row() {
                         IconButton(
                             onClick = {
+                                viewModel.onTriggerEvent(BuildEvent.Bookmark(itemPk))
+                                Toast.makeText(
+                                    context,
+                                    resource.getString(R.string.bookmarked),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            },
+                            content = {
+                                Icon(
+                                    imageVector = Icons.Default.Bookmark,
+                                    contentDescription = "bookmark",
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                )
+                            },
+                        )
+                        IconButton(
+                            onClick = {
                                 viewModel.onTriggerEvent(BuildEvent.BluetoothSend)
                             },
                             content = {
@@ -114,23 +131,6 @@ fun CompactScreen(
                                     imageVector = Icons.Default.Save,
                                     contentDescription = "save",
                                     tint = MaterialTheme.colorScheme.onSurface
-                                )
-                            },
-                        )
-                        IconButton(
-                            onClick = {
-                                viewModel.onTriggerEvent(BuildEvent.Bookmark(itemPk))
-                                Toast.makeText(
-                                    context,
-                                    resource.getString(R.string.bookmarked),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            },
-                            content = {
-                                Icon(
-                                    imageVector = Icons.Default.Bookmark,
-                                    contentDescription = "bookmark",
-                                    tint = MaterialTheme.colorScheme.onSurface,
                                 )
                             },
                         )
@@ -179,7 +179,7 @@ fun CompactScreen(
                             tint = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     }, label = {
-                        Text(text = navItem.title, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                        Text(text = navItem.title, color = MaterialTheme.colorScheme.onPrimaryContainer, maxLines = 1)
                     })
                 }
             }

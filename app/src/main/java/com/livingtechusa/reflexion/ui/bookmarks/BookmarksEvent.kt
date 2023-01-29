@@ -11,5 +11,5 @@ sealed class BookmarksEvent {
 
 
     object  ClearList: BookmarksEvent()
-
+    object GetAllBookmarks: BookmarksEvent()
 }

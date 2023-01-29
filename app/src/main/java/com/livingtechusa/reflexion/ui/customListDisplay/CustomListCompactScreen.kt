@@ -1,5 +1,6 @@
 package com.livingtechusa.reflexion.ui.customListDisplay
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -7,6 +8,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.SendToMobile
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -16,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -24,8 +27,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.NavBarItems
+import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
+import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,8 +42,11 @@ fun CompactScreen(
 ) {
     viewModel.onTriggerEvent(CustomListEvent.GetDisplayList(headNodePk))
     viewModel.onTriggerEvent(CustomListEvent.GetDisplayListImages(headNodePk))
-
+    val context = LocalContext.current
+    val resource = ResourceProviderSingleton
     val icons = NavBarItems.CustomListsDisplayBarItems
+    val selectedList by viewModel.customList.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -50,6 +58,24 @@ fun CompactScreen(
                 },
                 actions = {
                     Row() {
+                        IconButton(
+                            onClick = {
+                                selectedList.nodePk?.let { nodePk -> CustomListEvent.Bookmark(nodePk = nodePk) }
+                                    ?.let { event -> viewModel.onTriggerEvent(event) }
+                                Toast.makeText(
+                                    context,
+                                    resource.getString(R.string.bookmarked),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            },
+                            content = {
+                                androidx.compose.material.Icon(
+                                    imageVector = Icons.Default.Bookmark,
+                                    contentDescription = "bookmark",
+                                    tint = androidx.compose.material3.MaterialTheme.colorScheme.onSurface,
+                                )
+                            },
+                        )
                         IconButton(
                             onClick = {
                                 // viewModel.onTriggerEvent(Screen.CustomLists.BluetoothSend)
@@ -118,14 +144,22 @@ fun CompactScreen(
                             )
                         },
                         label = {
-                            Text(text = navItem.title, color = MaterialTheme.colors.onSurface)
+                            Text(
+                                text = navItem.title,
+                                color = MaterialTheme.colors.onSurface,
+                                maxLines = 1
+                            )
                         }
                     )
                 }
             }
         }
     ) { paddingValues ->
-        CustomListDisplayContent(paddingValues = paddingValues, navController = navController, viewModel = viewModel)
+        CustomListDisplayContent(
+            paddingValues = paddingValues,
+            navController = navController,
+            viewModel = viewModel
+        )
     }
 }
 

@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.Converters
+import com.livingtechusa.reflexion.data.entities.BookMarks
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.di.DefaultDispatcher
@@ -71,7 +72,6 @@ class CustomListsViewModel @Inject constructor(
 
     private val _childListImages = MutableStateFlow<List<Bitmap>>(emptyList())
     val childListImages: StateFlow<List<Bitmap?>> get() = _childListImages
-
 
     private val _childVideoUriResourceList = MutableStateFlow<List<FileResource>>(emptyList())
     val childVideoUriResourceList: StateFlow<List<FileResource?>> get() = _childVideoUriResourceList
@@ -310,6 +310,22 @@ class CustomListsViewModel @Inject constructor(
                                 getVideoResource()
                             }
                             job.join()
+                        }
+                    }
+                }
+
+                is CustomListEvent.Bookmark -> {
+                    viewModelScope.launch {
+                        val bookMark = customList.value.itemName?.let {
+                            BookMarks(
+                                autoGenPk =  0L,
+                                ITEM_PK = null,
+                                LIST_PK = customList.value.nodePk,
+                                title = it
+                            )
+                        }
+                        if (bookMark != null) {
+                            localServiceImpl.setBookMarks(bookMark)
                         }
                     }
                 }

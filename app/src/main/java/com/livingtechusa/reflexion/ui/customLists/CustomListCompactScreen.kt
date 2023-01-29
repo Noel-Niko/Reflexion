@@ -118,7 +118,8 @@ fun CustomListCompactScreen(
                         label = {
                             Text(
                                 text = navItem.title,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                maxLines = 1
                             )
                         }
                     )

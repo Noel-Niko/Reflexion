@@ -63,7 +63,7 @@ fun CompactScreen(
                             )
                         },
                         label = {
-                            Text(text = navItem.title, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            Text(text = navItem.title, color = MaterialTheme.colorScheme.onPrimaryContainer, maxLines = 1)
                         }
                     )
                 }

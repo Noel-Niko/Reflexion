@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,20 +20,28 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
+import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
+import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
+import com.livingtechusa.reflexion.ui.customLists.HorizontalScrollableRowComponent
 import com.livingtechusa.reflexion.ui.viewModels.BookmarksViewModel
+import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 
 
@@ -43,20 +53,108 @@ fun ReflexionItemListUIForBookmarks(
     val context: Context = LocalContext.current
     val resource = ResourceProviderSingleton
     val reflexionItemList by viewModel.itemBookmarks.collectAsState()
+    val listOfLists by viewModel.listBookmark.collectAsState()
+    val listimages by viewModel.listImages.collectAsState()
+
     Scaffold(
         content = {
             it
-            ReflexionItemsContent(
-                reflexionItems = reflexionItemList,
-                onDoubleTap = { reflexionItem ->
-                    navController.navigate(route = Screen.BuildItemScreen.route + "/" + reflexionItem.autogenPK) {
-                        launchSingleTop = true
-                    }
-                },
-                onLongPress = { reflexionItem ->
-               // TBD
+            Row(
+
+            ) {
+                Column {
+                    Text(text = stringResource(R.string.items))
+                    ReflexionItemsContent(
+                        reflexionItems = reflexionItemList,
+                        onDoubleTap = { reflexionItem ->
+                            navController.navigate(route = Screen.BuildItemScreen.route + "/" + reflexionItem.autogenPK) {
+                                launchSingleTop = true
+                            }
+                        },
+                        onLongPress = { reflexionItem ->
+                            // TBD
+                        }
+                    )
                 }
-            )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Divider()
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+
+            ){
+                Column {
+                    Text(text = stringResource(R.string.lists))
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize(5F)
+                            .padding(4.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        items(listOfLists.size) { index ->
+                            Box {
+                                ElevatedCard(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(4.dp),
+                                    shape = RoundedCornerShape(20.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .background(MaterialTheme.colorScheme.surfaceTint)
+                                            .pointerInput(key1 = index) {
+                                                detectTapGestures(
+                                                    onDoubleTap = {
+                                                        // Launch dialog
+                                                        // Nothing
+                                                    },
+                                                    onLongPress = {
+                                                        // Nothing
+                                                    },
+                                                    onTap = {
+                                                        navController.navigate(Screen.CustomListDisplay.route + "/" + listOfLists[index]?.nodePk)
+                                                    }
+                                                )
+                                            },
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        if (listimages.isEmpty().not() && listimages.size > index) {
+                                            val imagePainter = rememberImagePainter(
+                                                data = listimages[index],
+                                                builder = {
+                                                    allowHardware(false)
+                                                }
+                                            )
+                                            Image(
+                                                painter = imagePainter,
+                                                contentDescription = "Your Image",
+                                                contentScale = ContentScale.FillBounds,
+                                                modifier = Modifier
+                                                    .height(55.dp)
+                                                    .width(55.dp)
+
+                                            )
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                        }
+                                        androidx.compose.material3.Text(
+                                            color = MaterialTheme.colorScheme.onPrimary,
+                                            text = listOfLists[index]?.title ?: Constants.NO_LISTS,
+                                            modifier = Modifier
+                                                .padding(16.dp),
+                                            style = MaterialTheme.typography.titleMedium
+                                        )
+//                                        listOfLists[index]?.let {
+//                                            HorizontalScrollableRowComponent(
+//                                                list = it
+//                                            )
+//                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     )
 }
@@ -108,7 +206,11 @@ private fun ReflexionItemsContent(
                     elevation = 6.dp,
                     shape = RoundedCornerShape(20.dp)
                 ) {
-                    Row(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary)) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.primary)
+                    ) {
                         Image(
                             painter = imagePainter,
                             contentDescription = "Your Image",

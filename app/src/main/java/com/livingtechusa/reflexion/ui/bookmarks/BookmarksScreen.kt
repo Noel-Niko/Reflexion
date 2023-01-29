@@ -13,7 +13,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.livingtechusa.reflexion.navigation.NavBarItems
-import com.livingtechusa.reflexion.ui.components.ReflexionItemListUI
 import com.livingtechusa.reflexion.ui.viewModels.BookmarksViewModel
 import com.livingtechusa.reflexion.util.extensions.findActivity
 
@@ -33,7 +32,7 @@ fun BookmarksScreen(
         // for sending analytics events
         val observer = LifecycleEventObserver { owner, event ->
             if (event == Lifecycle.Event.ON_CREATE) {
-               // viewModel.onTriggerEvent(BookMarksEvent.getIconImages)
+               viewModel.onTriggerEvent(BookmarksEvent.GetAllBookmarks)
             }
         }
 

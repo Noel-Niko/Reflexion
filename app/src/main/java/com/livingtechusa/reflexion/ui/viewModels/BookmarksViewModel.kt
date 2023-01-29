@@ -1,6 +1,7 @@
 package com.livingtechusa.reflexion.ui.viewModels
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,9 +12,12 @@ import com.livingtechusa.reflexion.di.DefaultDispatcher
 import com.livingtechusa.reflexion.ui.bookmarks.BookmarksEvent
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
+import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,6 +39,24 @@ class BookmarksViewModel @Inject constructor(
     private val _search = MutableStateFlow(EMPTY_STRING)
     val search get() = _search
 
+    //    private val _listOfLists = MutableStateFlow<List<ReflexionArrayItem?>>(emptyList())
+//    val listOfLists: StateFlow<List<ReflexionArrayItem?>> get() = _listOfLists
+//
+    private val _listImages = MutableStateFlow<List<Bitmap>>(emptyList())
+    val listImages: StateFlow<List<Bitmap?>> get() = _listImages
+
+    fun getListImages() {
+        viewModelScope.launch {
+            val bitmaps: MutableList<Bitmap> = mutableListOf()
+            val job = async {
+                listBookmark.value.forEach { node ->
+                    localServiceImpl.selectImage(node.itemPK)?.let { bitmaps.add(it) }
+                }
+            }
+            job.join()
+            _listImages.value = bitmaps
+        }
+    }
 
     fun onTriggerEvent(event: BookmarksEvent) {
 
@@ -75,6 +97,25 @@ class BookmarksViewModel @Inject constructor(
                     }
                 }
 
+                is BookmarksEvent.GetAllBookmarks -> {
+                    viewModelScope.launch {
+                        val items = mutableListOf<ReflexionItem>()
+                        val lists = mutableListOf<ListNode>()
+                        localServiceImpl.getBookMarks().forEach { bookMarks ->
+                            if (bookMarks != null) {
+                                if (bookMarks.ITEM_PK != null) {
+                                    localServiceImpl.selectItem(bookMarks.ITEM_PK)
+                                        ?.let { reflexionItem -> items.add(reflexionItem) }
+                                } else if (bookMarks.LIST_PK != null) {
+                                    localServiceImpl.selectListNode(bookMarks.LIST_PK)
+                                        ?.let { listNode -> lists.add(listNode) }
+                                }
+                            }
+                        }
+                        _itemBookmarks.value = items
+                        _listBookmark.value = lists
+                    }
+                }
 
                 else -> {}
 
@@ -91,5 +132,4 @@ class BookmarksViewModel @Inject constructor(
         _search.value = term ?: EMPTY_STRING
         onTriggerEvent(BookmarksEvent.Search(term))
     }
-
 }
