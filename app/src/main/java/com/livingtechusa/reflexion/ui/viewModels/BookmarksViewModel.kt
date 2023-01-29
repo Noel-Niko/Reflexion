@@ -67,8 +67,7 @@ class BookmarksViewModel @Inject constructor(
                     viewModelScope.launch {
                         // Bookmark keyword search
                         if (event.search.isNullOrEmpty()) {
-                            _itemBookmarks.value = emptyList()
-                            _listBookmark.value = emptyList()
+                            populateContent()
                         } else {
                             val items = mutableListOf<ReflexionItem>()
                             val lists = mutableListOf<ListNode>()
@@ -98,24 +97,7 @@ class BookmarksViewModel @Inject constructor(
                 }
 
                 is BookmarksEvent.GetAllBookmarks -> {
-                    viewModelScope.launch {
-                        val items = mutableListOf<ReflexionItem>()
-                        val lists = mutableListOf<ListNode>()
-                        localServiceImpl.getBookMarks().forEach { bookMarks ->
-                            if (bookMarks != null) {
-                                if (bookMarks.ITEM_PK != null) {
-                                    localServiceImpl.selectItem(bookMarks.ITEM_PK)
-                                        ?.let { reflexionItem -> items.add(reflexionItem) }
-                                } else if (bookMarks.LIST_PK != null) {
-                                    localServiceImpl.selectListNode(bookMarks.LIST_PK)
-                                        ?.let { listNode -> lists.add(listNode) }
-                                }
-                            }
-                        }
-                        _itemBookmarks.value = items
-                        _listBookmark.value = lists
-                        getListImages()
-                    }
+                    populateContent()
                 }
 
                 else -> {}
@@ -132,5 +114,26 @@ class BookmarksViewModel @Inject constructor(
     fun searchEvent(term: String?) {
         _search.value = term ?: EMPTY_STRING
         onTriggerEvent(BookmarksEvent.Search(term))
+    }
+
+    fun populateContent() {
+        viewModelScope.launch {
+            val items = mutableListOf<ReflexionItem>()
+            val lists = mutableListOf<ListNode>()
+            localServiceImpl.getBookMarks().forEach { bookMarks ->
+                if (bookMarks != null) {
+                    if (bookMarks.ITEM_PK != null) {
+                        localServiceImpl.selectItem(bookMarks.ITEM_PK)
+                            ?.let { reflexionItem -> items.add(reflexionItem) }
+                    } else if (bookMarks.LIST_PK != null) {
+                        localServiceImpl.selectListNode(bookMarks.LIST_PK)
+                            ?.let { listNode -> lists.add(listNode) }
+                    }
+                }
+            }
+            _itemBookmarks.value = items
+            _listBookmark.value = lists
+            getListImages()
+        }
     }
 }
