@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -101,8 +102,8 @@ private fun ReflexionItemsContent(
 ) {
     LazyColumn(
         modifier = Modifier
-            .fillMaxWidth()
-//            .verticalScroll(rememberScrollState())
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
     ) {
         items(reflexionItems) { reflexionItem ->
             val imagePainter = rememberImagePainter(

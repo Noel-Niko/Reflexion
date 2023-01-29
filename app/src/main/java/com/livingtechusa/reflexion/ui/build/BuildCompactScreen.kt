@@ -66,6 +66,7 @@ fun CompactScreen(
 
 
     Scaffold(
+        scaffoldState = state,
         topBar = {
             TopAppBar(
                 title = {
