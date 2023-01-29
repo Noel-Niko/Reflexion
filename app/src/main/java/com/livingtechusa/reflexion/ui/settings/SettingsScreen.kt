@@ -63,6 +63,7 @@ import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.NavBarItems
 import com.livingtechusa.reflexion.ui.components.MaterialRadioButtonGroupComponent
 import com.livingtechusa.reflexion.ui.viewModels.SettingsViewModel
+import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import com.livingtechusa.reflexion.util.extensions.findActivity
 import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil
 
@@ -252,6 +253,7 @@ fun settingsContent(
     val bitmapList by viewModel.iconImages.collectAsState()
     val startMode = if(isSystemInDarkTheme()) 1 else 0
     val context = LocalContext.current
+    val resource = ResourceProviderSingleton
     Scaffold(Modifier.padding(paddingValues = paddingValues)) {
         if(apply){
             if (viewModel.mode && viewModel.isDarkMode != null) {
@@ -412,7 +414,10 @@ fun settingsContent(
                                 items.mapIndexed { i, item ->
                                     Tab(
                                         selected = activeTabIndex == i,
-                                        onClick = { activeTabIndex = i }
+                                        onClick = {
+                                            viewModel.mode = true
+                                            activeTabIndex = i
+                                        }
                                     ) {
                                         if (i == 0) {
                                             val color = if (0 == activeTabIndex) {
@@ -504,7 +509,7 @@ fun settingsContent(
                                             totalIndices = viewModel.totalIndices!!
                                         )
                                     }
-                                    // Toggle Set when collecting Apply State
+                                    // Toggle for light/dark mode Set when collecting Apply State
                                     if (viewModel.theme && (viewModel.themeNumber != null)) {
                                         UserPreferencesUtil.setCurrentUserThemeSelection(
                                             context,
@@ -512,6 +517,7 @@ fun settingsContent(
                                         )
                                     }
                                     viewModel.setApply(true)
+                                    Toast.makeText(context, resource.getString(R.string.applying_changes_and_restarting), Toast.LENGTH_SHORT).show()
                                 }
                         )
                     }
@@ -554,6 +560,7 @@ fun settingsContent(
                                     resetIconImage(context, bitmapList.size)
                                     UserPreferencesUtil.setCurrentUserThemeSelection(context, -1)
                                     viewModel.restartApp()
+                                    Toast.makeText(context, resource.getString(R.string.applying_changes_and_restarting), Toast.LENGTH_SHORT).show()
                                 })
                     }
                 }

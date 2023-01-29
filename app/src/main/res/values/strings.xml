@@ -66,7 +66,7 @@
     <string name="shared_prefs_encrypted_user_password">shared_prefs_encrypted_user_password</string>
     <string name="shared_prefs_encrypted_password">shared_prefs_encrypted_password</string>
     <string name="shared_prefs_current_theme_selected">shared_prefs_current_theme_selected</string>
-    <string name="select_theme_color_restart_app"><![CDATA[Select Theme Color & Restart App]]></string>
+    <string name="select_theme_color_restart_app"><![CDATA[Select Theme Color]]></string>
     <string name="default_derived_from_your_wallpaper_selection">Reset to default colors derived from your phone\'s wallpaper.</string>
     <string name="light_theme">Light Theme</string>
     <string name="dark_theme">Dark Theme</string>
@@ -77,4 +77,5 @@
     <string name="bookmarks">Bookmarks</string>
     <string name="bookmarked">Bookmarked</string>
     <string name="items">Items</string>
+    <string name="applying_changes_and_restarting">Applying Changes and Restarting</string>
 </resources>
