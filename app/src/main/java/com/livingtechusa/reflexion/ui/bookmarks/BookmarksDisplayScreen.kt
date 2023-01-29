@@ -65,12 +65,18 @@ fun ReflexionItemListUIForBookmarks(
                     .padding(it)
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().fillMaxHeight(.5f)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(.5f)
                 ) {
                     Column(
 
                     ) {
-                        Text(text = stringResource(R.string.items), modifier = Modifier.padding(start = 16.dp), style = MaterialTheme.typography.headlineMedium)
+                        Text(
+                            text = stringResource(R.string.items),
+                            modifier = Modifier.padding(start = 16.dp),
+                            style = MaterialTheme.typography.headlineMedium
+                        )
                         ReflexionItemsContent(
                             reflexionItems = reflexionItemList,
                             onTap = { reflexionItem ->
@@ -88,12 +94,18 @@ fun ReflexionItemListUIForBookmarks(
                 Divider()
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(
-                    modifier = Modifier.fillMaxWidth().fillMaxHeight(1f)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(1f)
                 ) {
                     Column(
                         // modifier = Modifier.verticalScroll(rememberScrollState())
                     ) {
-                        Text(text = stringResource(R.string.lists), modifier = Modifier.padding(start = 16.dp), style = MaterialTheme.typography.headlineMedium)
+                        Text(
+                            text = stringResource(R.string.lists),
+                            modifier = Modifier.padding(start = 16.dp),
+                            style = MaterialTheme.typography.headlineMedium
+                        )
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize(5F)
