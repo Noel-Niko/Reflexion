@@ -12,7 +12,6 @@ sealed class ListEvent {
 
    data class Search(
        val search: String?,
-       val pk: Long
        ): ListEvent() {}
 
     object  ClearList: ListEvent()

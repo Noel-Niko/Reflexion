@@ -53,6 +53,9 @@ interface ReflexionItemDao {
     @Query("Select * FROM ReflexionItem WHERE name =:name")
     suspend fun selectReflexionItemByName(name: String): ReflexionItem
 
+    @Query("Select * FROM ReflexionItem WHERE name LIKE :search || '%' order by name")
+    suspend fun getAllItemsContainingString(search: String): List<ReflexionItem?>
+
     @Query("Select * FROM ReflexionItem WHERE parent IS NULL AND name LIKE :search || '%' order by name")
     suspend fun getAllTopicsContainingString(search: String): List<ReflexionItem?>
     @Query("Select * FROM ReflexionItem WHERE parent =:pk AND name LIKE :search || '%' order by name")

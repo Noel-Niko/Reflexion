@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
@@ -49,46 +50,43 @@ class ListViewModel @Inject constructor(
                 is ListEvent.GetList -> {
                     viewModelScope.launch {
                         if (event.pk == null || event.pk == EMPTY_PK) {
-                            _list.value = (localServiceImpl.getAllTopics() as? List<ReflexionItem>) ?: emptyList()
+                            _list.value = (localServiceImpl.getAllTopics() as? List<ReflexionItem>)
+                                ?: emptyList()
                         } else {
                             val newList = withContext(defaultDispatcher) {
-                                (localServiceImpl.selectChildren(event.pk) as? List<ReflexionItem>) ?: emptyList()
+                                (localServiceImpl.selectChildren(event.pk) as? List<ReflexionItem>)
+                                    ?: emptyList()
                             }
                             _list.value = newList
                         }
                     }
                 }
 
-//                    is ListEvent.Search -> {
-//                        if (event.pk == EMPTY_PK) {
-//                            if (event.search.isNullOrEmpty()) {
-//                                _list.value = localServiceImpl.getAllTopics() as List<ReflexionItem>
-//                            } else {
-//                                // Topic key work search
-//                                _list.value =
-//                                    localServiceImpl.getAllTopicsContainingString(event.search) as List<ReflexionItem>
-//                            }
-//                        } else {
-//                            // Children keyword search
-//                            _list.value =
-//                                localServiceImpl.selectChildrenContainingString(
-//                                    event.pk,
-//                                    event.search
-//                                ) as List<ReflexionItem>
-//                        }
-//                    }
-//
-//                    is ListEvent.ClearList -> {
-//                        _list.value = emptyList()
-//                    }
+                is ListEvent.Search -> {
+                    viewModelScope.launch {
+                        // Item keyword search
+                        if (event.search.isNullOrEmpty()) {
+                            _list.value = localServiceImpl.getAllTopics() as List<ReflexionItem>
+                        } else {
+                            _list.value =
+                                localServiceImpl.getAllItemsContainingString(event.search) as List<ReflexionItem>
+                        }
+                    }
+                }
+
+                is ListEvent.ClearList -> {
+                    _list.value = emptyList()
+                }
+
                 is ListEvent.UpOneLevel -> {
                     viewModelScope.launch {
                         val parent: Long = list.value?.get(0)?.parent ?: EMPTY_PK
                         if (parent == EMPTY_PK) {
-                            val newList =  localServiceImpl.getAllTopics() as List<ReflexionItem>
+                            val newList = localServiceImpl.getAllTopics() as List<ReflexionItem>
                             _list.value = newList
                         } else {
-                            val newList = localServiceImpl.selectAllSiblings(parent) as List<ReflexionItem>
+                            val newList =
+                                localServiceImpl.selectAllSiblings(parent) as List<ReflexionItem>
                             _list.value = newList
                         }
                     }
@@ -109,17 +107,12 @@ class ListViewModel @Inject constructor(
                 "Exception: ${e.message}  with cause: ${e.cause}"
             )
         }
-
     }
 
-    var listPK = 0L
+    //var listPK = 0L
     fun searchEvent(term: String?) {
         _search.value = term
-        if (term.isNullOrEmpty()) {
-            onTriggerEvent(ListEvent.GetList(listPK))
-        } else {
-            //onTriggerEvent(ListEvent.Search(term, reflexionItem.value.autogenPK))
-        }
+        onTriggerEvent(ListEvent.Search(term))
     }
 
     fun onUp() {

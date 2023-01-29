@@ -57,6 +57,10 @@ class LocalServiceImpl @Inject constructor(
         return reflexionItemDao.getReflexionItemTopics()
     }
 
+    override suspend fun getAllItemsContainingString(search: String): List<ReflexionItem?> {
+        return reflexionItemDao.getAllItemsContainingString(search)
+    }
+
     override suspend fun getAllTopicsContainingString(
         search: String
     ): List<ReflexionItem?> {
