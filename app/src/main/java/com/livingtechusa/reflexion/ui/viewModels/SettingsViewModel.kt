@@ -12,11 +12,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.MainActivity
-import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.settings.SettingsEvent
-import com.livingtechusa.reflexion.ui.theme.ReflexionDynamicTheme
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants.APP_ICON_LIST
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
@@ -31,6 +28,23 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor() : ViewModel() {
     private val TAG = "SettingsViewModel"
+
+    var icon = false
+    var iconNumber: Int? = null
+
+    var theme = false
+    var themeNumber: Int? = null
+    var totalIndices: Int? = null
+
+    var mode = false
+    var isDarkMode: Boolean? = null
+
+    private val _apply = MutableStateFlow(false)
+    val apply get() = _apply
+    fun setApply(apply: Boolean) {
+        _apply.value = apply
+    }
+
     private val context: Context
         get() = BaseApplication.getInstance()
     val resource = ResourceProviderSingleton
@@ -63,11 +77,11 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
     }
 
     fun setTheme(int: Int) {
-        UserPreferencesUtil.setCurrentUserThemeSelection(context, int)
-        restartApp()
+        themeNumber = int
+        theme = true
     }
 
-    private fun restartApp() {
+    fun restartApp() {
         val mStartActivity = Intent(context, MainActivity::class.java)
         val mPendingIntentId = 123456
         val mPendingIntent = PendingIntent.getActivity(
@@ -85,12 +99,10 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
         if (isSystemInDarkTheme().not() && isDark) {
                 // Set Dark Mode and Restart
                 UserPreferencesUtil.setCurrentUserModeSelection(LocalContext.current, 1)
-                restartApp()
         } else {
             if (isSystemInDarkTheme() && isDark.not()) {
                 // Set Light Mode and Restart
                 UserPreferencesUtil.setCurrentUserModeSelection(LocalContext.current, 0)
-                restartApp()
             }
         }
     }

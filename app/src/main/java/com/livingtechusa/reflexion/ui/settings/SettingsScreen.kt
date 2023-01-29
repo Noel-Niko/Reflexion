@@ -121,10 +121,12 @@ fun SettingsScreen(
 fun IconImageCard(
     image: Bitmap,
     iconNumber: Int,
-    totalIndices: Int
+    totalIndices: Int,
+    viewModel: SettingsViewModel
 ) {
     val context = LocalContext.current
     val screenPixelDensity = context.resources.displayMetrics.density
+
     val size = (512f / 2) / screenPixelDensity
     val imagePainter = rememberImagePainter(
         data = image,
@@ -149,7 +151,9 @@ fun IconImageCard(
                 //.rotate(90f)
                 .clickable(
                     onClick = {
-                        showNewIconImage(context = context, int = iconNumber, totalIndices)
+                        viewModel.icon = true
+                        viewModel.iconNumber = iconNumber
+                        viewModel.totalIndices = totalIndices
                     }
                 )
                 .background(MaterialTheme.colorScheme.surface)
@@ -160,6 +164,7 @@ fun IconImageCard(
 @Composable
 fun HorizontalScrollableIconRowComponent(
     list: List<Bitmap>,
+    viewModel: SettingsViewModel
 ) {
     Column(
         modifier = Modifier
@@ -177,7 +182,12 @@ fun HorizontalScrollableIconRowComponent(
         ) {
             items(list.size) { listitemIndex ->
                 if (list.isEmpty().not()) {
-                    IconImageCard(list[listitemIndex], listitemIndex, list.size)
+                    IconImageCard(
+                        list[listitemIndex],
+                        listitemIndex,
+                        list.size,
+                        viewModel = viewModel
+                    )
                 }
             }
         }
@@ -236,12 +246,27 @@ fun showNewIconImage(context: Context, int: Int, totalIndices: Int) {
 @Composable
 fun settingsContent(
     paddingValues: PaddingValues,
-    viewModel: SettingsViewModel,
-    navHostController: NavHostController
+    viewModel: SettingsViewModel
 ) {
+    val apply by viewModel.apply.collectAsState()
     val bitmapList by viewModel.iconImages.collectAsState()
+    val startMode = if(isSystemInDarkTheme()) 1 else 0
     val context = LocalContext.current
     Scaffold(Modifier.padding(paddingValues = paddingValues)) {
+        if(apply){
+            if (viewModel.mode && viewModel.isDarkMode != null) {
+                viewModel.toggleLightDarkMode(viewModel.isDarkMode!!)
+            }
+            viewModel.icon = false
+            viewModel.iconNumber = null
+            viewModel.theme = false
+            viewModel.themeNumber = null
+            viewModel.totalIndices = null
+            viewModel.mode = false
+            viewModel.isDarkMode = null
+            viewModel.setApply(false)
+            viewModel.restartApp()
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -292,7 +317,7 @@ fun settingsContent(
                                     .fillMaxWidth(1f),
                                 verticalArrangement = Arrangement.Center
                             ) {
-                                HorizontalScrollableIconRowComponent(bitmapList)
+                                HorizontalScrollableIconRowComponent(bitmapList, viewModel)
                             }
                         }
                     }
@@ -369,7 +394,7 @@ fun settingsContent(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             val items = (0..1)
-                            var activeTabIndex by remember { mutableStateOf(0) }
+                            var activeTabIndex by remember { mutableStateOf(startMode) }
 
                             TabRow(
                                 selectedTabIndex = activeTabIndex,
@@ -390,7 +415,7 @@ fun settingsContent(
                                         onClick = { activeTabIndex = i }
                                     ) {
                                         if (i == 0) {
-                                            val color = if(0 == activeTabIndex) {
+                                            val color = if (0 == activeTabIndex) {
                                                 MaterialTheme.colorScheme.onPrimary
                                             } else {
                                                 MaterialTheme.colorScheme.onSecondaryContainer
@@ -401,7 +426,7 @@ fun settingsContent(
                                                 color = color
                                             )
                                             if (0 == activeTabIndex) {
-                                                viewModel.toggleLightDarkMode(false)
+                                                viewModel.isDarkMode = false
                                             }
                                             Icon(
                                                 painter = painterResource(id = R.drawable.baseline_camera_24),
@@ -411,7 +436,7 @@ fun settingsContent(
                                             )
                                         }
                                         if (i == 1) {
-                                            val color = if(1 == activeTabIndex) {
+                                            val color = if (1 == activeTabIndex) {
                                                 MaterialTheme.colorScheme.onPrimary
                                             } else {
                                                 MaterialTheme.colorScheme.onSecondaryContainer
@@ -422,7 +447,7 @@ fun settingsContent(
                                                 color = color
                                             )
                                             if (1 == activeTabIndex) {
-                                                viewModel.toggleLightDarkMode(true)
+                                                viewModel.isDarkMode = true
                                             }
                                             Icon(
                                                 painter = painterResource(id = R.drawable.baseline_camera_24),
@@ -443,13 +468,14 @@ fun settingsContent(
             // Apply Settings
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                    .fillMaxWidth(),
+                //.padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     ElevatedCard(
@@ -458,10 +484,12 @@ fun settingsContent(
                             .padding(16.dp)
                             .align(Alignment.Center),
                         shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.primary),
                         elevation = CardDefaults.elevatedCardElevation(4.dp)
                     ) {
                         Text(
                             text = stringResource(R.string.apply_changes),
+                            color = MaterialTheme.colorScheme.onPrimary,
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
@@ -469,10 +497,23 @@ fun settingsContent(
                                 .fillMaxSize()
                                 .padding(8.dp)
                                 .clickable {
-//                                    UserPreferencesUtil.setCurrentUserModeSelection(context, -1)
-//                                    resetIconImage(context, bitmapList.size)
-//                                    viewModel.setTheme(-1)
-                                })
+                                    if (viewModel.icon && (viewModel.iconNumber != null) && (viewModel.totalIndices != null)) {
+                                        showNewIconImage(
+                                            context = context,
+                                            int = viewModel.iconNumber!!,
+                                            totalIndices = viewModel.totalIndices!!
+                                        )
+                                    }
+                                    // Toggle Set when collecting Apply State
+                                    if (viewModel.theme && (viewModel.themeNumber != null)) {
+                                        UserPreferencesUtil.setCurrentUserThemeSelection(
+                                            context,
+                                            viewModel.themeNumber!!
+                                        )
+                                    }
+                                    viewModel.setApply(true)
+                                }
+                        )
                     }
                 }
             }
@@ -480,13 +521,14 @@ fun settingsContent(
             // Reset settings
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                    .fillMaxWidth(),
+                //.padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     ElevatedCard(
@@ -494,11 +536,13 @@ fun settingsContent(
                             .fillMaxWidth()
                             .padding(16.dp)
                             .align(Alignment.Center),
+                        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.primary),
                         shape = MaterialTheme.shapes.large,
                         elevation = CardDefaults.elevatedCardElevation(4.dp)
                     ) {
                         Text(
                             text = "Reset Settings",
+                            color = MaterialTheme.colorScheme.onPrimary,
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
@@ -506,10 +550,11 @@ fun settingsContent(
                                 .fillMaxSize()
                                 .padding(8.dp)
                                 .clickable {
-                            UserPreferencesUtil.setCurrentUserModeSelection(context, -1)
-                            resetIconImage(context, bitmapList.size)
-                            viewModel.setTheme(-1)
-                        })
+                                    UserPreferencesUtil.setCurrentUserModeSelection(context, -1)
+                                    resetIconImage(context, bitmapList.size)
+                                    UserPreferencesUtil.setCurrentUserThemeSelection(context, -1)
+                                    viewModel.restartApp()
+                                })
                     }
                 }
             }
@@ -532,15 +577,15 @@ fun resetIconImage(context: Context, iconListSize: Int) {
 
     var count = 0
     while (count <= (iconListSize - 1)) {
-            // disable each other icon
-            packageManager.setComponentEnabledSetting(
-                ComponentName(
-                    context,
-                    "com.livingtechusa.reflexion.MainActivityAlias$count"
-                ),
-                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                PackageManager.DONT_KILL_APP
-            )
+        // disable each other icon
+        packageManager.setComponentEnabledSetting(
+            ComponentName(
+                context,
+                "com.livingtechusa.reflexion.MainActivityAlias$count"
+            ),
+            PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+            PackageManager.DONT_KILL_APP
+        )
         count++
     }
     Toast

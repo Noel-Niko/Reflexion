@@ -62,11 +62,19 @@ fun CustomListDisplayScreen(
     if (context.findActivity() != null) {
         when (windowSize) {
             WindowWidthSizeClass.COMPACT -> {
-                CompactScreen(navController = navController, headNodePk =headNodePk, viewModel = viewModel)
+                CompactScreen(
+                    navController = navController,
+                    headNodePk = headNodePk,
+                    viewModel = viewModel
+                )
             }
 
             WindowWidthSizeClass.MEDIUM -> {
-                Landscape(navController = navController, headNodePk =headNodePk, viewModel = viewModel)
+                Landscape(
+                    navController = navController,
+                    headNodePk = headNodePk,
+                    viewModel = viewModel
+                )
             }
 
 //            WindowWidthSizeClass.EXPANDED -> {
@@ -74,7 +82,11 @@ fun CustomListDisplayScreen(
 //                viewModel.navigationType = ReflexionNavigationType.PERMANENT_NAVIGATION_DRAWER
 //            }
 
-            else -> CompactScreen(navController = navController, headNodePk = headNodePk, viewModel = viewModel)
+            else -> CompactScreen(
+                navController = navController,
+                headNodePk = headNodePk,
+                viewModel = viewModel
+            )
         }
     }
 }
@@ -116,7 +128,8 @@ fun CustomListDisplayContent(
                     androidx.compose.material3.Text(
                         color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.labelMedium,
-                        text = stringResource(R.string.title))
+                        text = stringResource(R.string.title)
+                    )
                 }
                 Column(
                     Modifier
@@ -174,14 +187,18 @@ fun CustomListDisplayContent(
                                         )
                                         .align(Alignment.End)
                                 ) {
-                                    if (childImageList.isEmpty().not() && childImageList[childItemIndex] != null) {
-                                        ImageCard(childImageList[childItemIndex]!! , navController)
+                                    if (childImageList.isEmpty()
+                                            .not() && childImageList[childItemIndex] != null
+                                    ) {
+                                        ImageCard(childImageList[childItemIndex]!!, navController)
                                     }
                                 }
                             }
                         }
                         /* TITLE */
-                        Row(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
+                        Row(modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp), Arrangement.Center) {
                             Text(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 style = MaterialTheme.typography.titleLarge,
@@ -195,19 +212,18 @@ fun CustomListDisplayContent(
                                 .padding(12.dp)
                                 .fillMaxWidth()
                         ) {
-                            Column(
-                                Modifier.padding(4.dp)
-                            ) {
+                            Column() {
                                 androidx.compose.material3.Text(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.labelMedium,
-                                    text = stringResource(R.string.description))
+                                    text = stringResource(R.string.description)
+                                )
                             }
                             Column(
                                 Modifier
                                     .padding(4.dp)
-                                    .weight(1f)
-
+                                    .weight(1f),
+                                verticalArrangement = Arrangement.Bottom
                             ) {
                                 Text(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -223,19 +239,18 @@ fun CustomListDisplayContent(
                                 .padding(12.dp)
                                 .fillMaxWidth()
                         ) {
-                            Column(
-                                Modifier.padding(12.dp)
-                            ) {
+                            Column() {
                                 androidx.compose.material3.Text(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.labelMedium,
-                                    text = stringResource(R.string.detailedDescription))
+                                    text = stringResource(R.string.detailedDescription)
+                                )
                             }
                             Column(
                                 Modifier
                                     .padding(4.dp)
-                                    .weight(1f)
-
+                                    .weight(1f),
+                                verticalArrangement = Arrangement.Bottom
                             ) {
                                 Text(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,

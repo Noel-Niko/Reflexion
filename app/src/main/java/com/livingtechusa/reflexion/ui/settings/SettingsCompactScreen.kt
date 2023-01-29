@@ -91,6 +91,6 @@ fun CompactScreen(
             }
         }
     ) {
-        settingsContent(paddingValues = it, viewModel = viewModel, navHostController = navController)
+        settingsContent(paddingValues = it, viewModel = viewModel)
     }
 }

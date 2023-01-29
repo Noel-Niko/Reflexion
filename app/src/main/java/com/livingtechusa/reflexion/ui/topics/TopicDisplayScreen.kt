@@ -120,7 +120,7 @@ private fun ReflexionItemsContent(
                         //.background(MaterialTheme.colorScheme.surface)
                         .pointerInput(key1 = reflexionItem) {
                             detectTapGestures(
-                                onDoubleTap = { onDoubleTap(reflexionItem) },
+                                onTap = { onDoubleTap(reflexionItem) },
                                 onLongPress = { onLongPress(reflexionItem) }
                             )
                         },

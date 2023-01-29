@@ -12,6 +12,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -179,47 +180,6 @@ fun BuildItemContent(
             )
         }
     }
-
-//    Scaffold(
-//        floatingActionButton = {
-//        /* SAVE */
-//        SmallFloatingActionButton(modifier = Modifier
-//            .offset {
-//                IntOffset(
-//                    x = offsetX.value.roundToInt(), y = offsetY.value.roundToInt()
-//                )
-//            }
-//            .pointerInput(Unit) {
-//                detectDragGestures { change, dragAmount ->
-//                    change.consumeAllChanges()
-//                    offsetX.value += dragAmount.x
-//                    offsetY.value += dragAmount.y
-//                }
-//            }, containerColor = MaterialTheme.colorScheme.primary, onClick = {
-//            Toast.makeText(
-//                context, resource.getString(R.string.changes_saved), Toast.LENGTH_SHORT
-//            ).show()
-//            val trimmedName = name.trim()
-//            viewModel.onTriggerEvent(
-//                BuildEvent.UpdateDisplayedReflexionItem(
-//                    subItem = NAME, newVal = trimmedName
-//                )
-//            )
-//            if (autogenPK != 0L) {
-//                viewModel.onTriggerEvent(BuildEvent.UpdateReflexionItem)
-//                Temporary.tempReflexionItem = ReflexionItem()
-//            } else {
-//                viewModel.onTriggerEvent(BuildEvent.SaveNew)
-//                Temporary.tempReflexionItem = ReflexionItem()
-//            }
-//        }) {
-//            Icon(
-//                painter = painterResource(R.drawable.ic_baseline_save_alt_24),
-//                contentDescription = null,
-//                tint = MaterialTheme.colorScheme.onSurface
-//            )
-//        }
-//    }) { paddingValues ->
     if (saveNow) {
         Toast.makeText(
             context, resource.getString(R.string.changes_saved), Toast.LENGTH_SHORT
@@ -316,7 +276,7 @@ fun BuildItemContent(
                 modifier = Modifier.padding(12.dp)
             ) {
                 Column(
-                    Modifier.align(Alignment.CenterVertically)
+                    Modifier.align(Alignment.Top)
                 ) {
                     Text(
                         text = stringResource(R.string.topic),
@@ -325,8 +285,8 @@ fun BuildItemContent(
                 }
                 Column(
                     Modifier
-                        .weight(1f)
-                        .align(Alignment.CenterVertically)
+                        .weight(1f),
+                    verticalArrangement = Arrangement.Bottom
                 ) {
                     TextField(colors = TextFieldDefaults.textFieldColors(
                         textColor = MaterialTheme.colorScheme.onSurface,
@@ -353,7 +313,7 @@ fun BuildItemContent(
                 modifier = Modifier.padding(12.dp)
             ) {
                 Column(
-                    Modifier.align(Alignment.CenterVertically)
+                    Modifier.align(Alignment.Top)
                 ) {
                     Text(
                         text = stringResource(R.string.title),
@@ -362,8 +322,8 @@ fun BuildItemContent(
                 }
                 Column(
                     Modifier
-                        .weight(1f)
-                        .align(Alignment.CenterVertically)
+                        .weight(1f),
+                    verticalArrangement = Arrangement.Bottom
                 ) {
                     TextField(colors = TextFieldDefaults.textFieldColors(
                         textColor = MaterialTheme.colorScheme.onSurface,
@@ -390,7 +350,7 @@ fun BuildItemContent(
             modifier = Modifier.padding(12.dp)
         ) {
             Column(
-                Modifier.align(Alignment.CenterVertically)
+                Modifier.align(Alignment.Top)
             ) {
                 Text(
                     text = stringResource(R.string.description),
@@ -399,8 +359,8 @@ fun BuildItemContent(
             }
             Column(
                 Modifier
-                    .weight(1f)
-                    .align(Alignment.CenterVertically)
+                    .weight(1f),
+                verticalArrangement = Arrangement.Bottom
             ) {
                 TextField(colors = TextFieldDefaults.textFieldColors(
                     textColor = MaterialTheme.colorScheme.onSurface,
@@ -423,7 +383,7 @@ fun BuildItemContent(
             modifier = Modifier.padding(12.dp)
         ) {
             Column(
-                Modifier.align(Alignment.CenterVertically)
+                Modifier.align(Alignment.Top)
             ) {
                 Text(
                     text = stringResource(R.string.detailedDescription),
@@ -432,10 +392,11 @@ fun BuildItemContent(
             }
             Column(
                 Modifier
-                    .weight(1f)
-                    .align(Alignment.CenterVertically)
+                    .weight(1f),
+                verticalArrangement = Arrangement.Bottom
             ) {
-                TextField(colors = TextFieldDefaults.textFieldColors(
+                TextField(
+                    colors = TextFieldDefaults.textFieldColors(
                     textColor = MaterialTheme.colorScheme.onSurface,
                     backgroundColor = Transparent
                 ),
@@ -448,7 +409,8 @@ fun BuildItemContent(
                                 subItem = DETAILED_DESCRIPTION, newVal = detailedDescription
                             )
                         )
-                    })
+                    }
+                )
             }
         }
         Spacer(Modifier.height(16.dp))/* SAVED VIDEO */
