@@ -68,7 +68,6 @@ fun homeContent() {
                 .align(Alignment.CenterVertically)
                 .padding(16.dp)
                 .shadow(elevation = 12.dp, shape = RoundedCornerShape(8.dp))
-                  //d)
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,

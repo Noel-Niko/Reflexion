@@ -395,7 +395,7 @@ class ItemViewModel @Inject constructor(
                         }
                     }
 
-                    is BuildEvent.SaveFromTopBar -> {
+                    is BuildEvent.Save -> {
                         _saveNowFromTopBar.value = true
                     }
 

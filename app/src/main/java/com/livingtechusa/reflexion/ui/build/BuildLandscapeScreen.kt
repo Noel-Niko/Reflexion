@@ -1,5 +1,8 @@
 package com.livingtechusa.reflexion.ui.build
 
+import android.annotation.SuppressLint
+import android.os.Build
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -13,7 +16,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
@@ -35,6 +38,7 @@ import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import kotlinx.coroutines.launch
 
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun MediumScreen(
     pk: Long, navController: NavHostController, icons: List<BarItem>, viewModel: ItemViewModel
@@ -52,9 +56,12 @@ fun MediumScreen(
             TopAppBar(
                 modifier = Modifier.fillMaxWidth(),
                 title = {
-                    Text(text = stringResource(id = R.string.app_name), color = MaterialTheme.colors.onSurface)
+                    Text(
+                        text = stringResource(id = R.string.app_name),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                 },
-                backgroundColor = MaterialTheme.colors.surface,
+                backgroundColor = MaterialTheme.colorScheme.surface,
                 elevation = 6.dp,
                 navigationIcon = {
                     Icon(
@@ -78,16 +85,20 @@ fun MediumScreen(
                 state
             )
         },
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(androidx.compose.material3.MaterialTheme.colorScheme.surface),
     ) { paddingValues ->
         Scaffold(
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier
+                .padding(paddingValues)
+                .background(androidx.compose.material3.MaterialTheme.colorScheme.surface)
         ) {
             Column() {
                 NavigationRail(
                     modifier = Modifier.fillMaxHeight(),
-                    containerColor = MaterialTheme.colors.surface,
-                    contentColor = MaterialTheme.colors.onSurface
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.onSurface
                 ) {
                     icons.forEach { navItem ->
                         Spacer(modifier = Modifier.height(32.dp))
@@ -101,14 +112,17 @@ fun MediumScreen(
                             }
                         }, icon = {
                             Icon(
-                                imageVector = navItem.image, contentDescription = navItem.title
+                                imageVector = navItem.image,
+                                contentDescription = navItem.title,
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         })
                     }
                 }
-                BuildItemContent(pk, navController, viewModel, it)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    BuildItemContent(pk, navController, viewModel, it)
+                }
             }
         }
-
     }
 }

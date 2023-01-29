@@ -4,7 +4,9 @@ import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -20,23 +22,33 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.livingtechusa.reflexion.R
+import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.BarItem
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
+import com.livingtechusa.reflexion.util.Temporary
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -49,9 +61,11 @@ fun CompactScreen(
     val state = rememberScaffoldState()
     val context = LocalContext.current
     val resource = ResourceProviderSingleton
+    val offsetX = remember { mutableStateOf(0f) }
+    val offsetY = remember { mutableStateOf(0f) }
+
 
     Scaffold(
-        scaffoldState = state,
         topBar = {
             TopAppBar(
                 title = {
@@ -91,7 +105,7 @@ fun CompactScreen(
                                     resource.getString(R.string.changes_saved),
                                     Toast.LENGTH_SHORT
                                 ).show()
-                                viewModel.onTriggerEvent(BuildEvent.SaveFromTopBar)
+                                viewModel.onTriggerEvent(BuildEvent.Save)
                             },
                             content = {
                                 Icon(
@@ -149,7 +163,37 @@ fun CompactScreen(
                     })
                 }
             }
-        }) { paddingValues ->
-        BuildItemContent(pk, navController, viewModel, paddingValues)
+        },
+        floatingActionButton = {
+            /* SAVE */
+            SmallFloatingActionButton(modifier = Modifier
+                .offset {
+                    IntOffset(
+                        x = offsetX.value.roundToInt(), y = offsetY.value.roundToInt()
+                    )
+                }
+                .pointerInput(Unit) {
+                    detectDragGestures { change, dragAmount ->
+                        change.consumeAllChanges()
+                        offsetX.value += dragAmount.x
+                        offsetY.value += dragAmount.y
+                    }
+                }, containerColor = MaterialTheme.colorScheme.primary, onClick = {
+                Toast.makeText(
+                    context,
+                    resource.getString(R.string.changes_saved),
+                    Toast.LENGTH_SHORT
+                ).show()
+                viewModel.onTriggerEvent(BuildEvent.Save)
+            }) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_baseline_save_alt_24),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+    ) { paddingValues ->
+            BuildItemContent(pk, navController, viewModel, paddingValues)
     }
 }

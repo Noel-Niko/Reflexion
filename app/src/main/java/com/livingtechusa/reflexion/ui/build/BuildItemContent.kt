@@ -2,18 +2,16 @@ package com.livingtechusa.reflexion.ui.build
 
 import android.content.Intent
 import android.graphics.Bitmap
-import android.icu.lang.UCharacter.VerticalOrientation
 import android.net.Uri
 import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -25,6 +23,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+//import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -47,8 +46,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush.Companion.verticalGradient
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Black
-import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
@@ -75,7 +72,6 @@ import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.Constants.DESCRIPTION
 import com.livingtechusa.reflexion.util.Constants.DETAILED_DESCRIPTION
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
-import com.livingtechusa.reflexion.util.Constants.EMPTY_ITEM
 import com.livingtechusa.reflexion.util.Constants.IMAGE
 import com.livingtechusa.reflexion.util.Constants.NAME
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URI
@@ -99,20 +95,20 @@ fun BuildItemContent(
 ) {
     val URI = "Uri"
     val context = LocalContext.current
-    val itemViewModel: ItemViewModel = viewModel
     val scope = rememberCoroutineScope()
 //    val reflexionItem by itemViewModel.reflexionItem.collectAsState()
-    val autogenPK by itemViewModel.autogenPK.collectAsState()
-    val name by itemViewModel.name.collectAsState()
-    val description by itemViewModel.description.collectAsState()
-    val detailedDescription by itemViewModel.detailedDescription.collectAsState()
-    val image by  itemViewModel.image.collectAsStateWithLifecycle()
-    val videoUri by itemViewModel.videoUri.collectAsState()
-    val videoUrl by itemViewModel.videoUrl.collectAsState()
-    val parent by itemViewModel.parent.collectAsState()
+
+    val name by viewModel.name.collectAsState()
+    val description by viewModel.description.collectAsState()
+    val detailedDescription by viewModel.detailedDescription.collectAsState()
+    val image by viewModel.image.collectAsStateWithLifecycle()
+    val videoUri by viewModel.videoUri.collectAsState()
+    val videoUrl by viewModel.videoUrl.collectAsState()
+    val parent by viewModel.parent.collectAsState()
+    val autogenPK by viewModel.autogenPK.collectAsState()
 
 
-    val saveNow by itemViewModel.saveNowFromTopBar.collectAsState()
+    val saveNow by viewModel.saveNowFromTopBar.collectAsState()
     val resource = ResourceProviderSingleton
     val selectedFile by viewModel.selectedFile.collectAsState()
     val colorStops: Array<out Pair<Float, Color>> =
@@ -139,25 +135,23 @@ fun BuildItemContent(
     }
 
     var targetVideoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
-    val selectVideo =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument(),
-            onResult = { uri ->
-                itemViewModel.onTriggerEvent(
-                    BuildEvent.UpdateDisplayedReflexionItem(
-                        subItem = VIDEO_URI,
-                        newVal = uri.toString()
-                    )
+    val selectVideo = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument(),
+        onResult = { uri ->
+            viewModel.onTriggerEvent(
+                BuildEvent.UpdateDisplayedReflexionItem(
+                    subItem = VIDEO_URI, newVal = uri.toString()
                 )
-            })
+            )
+        })
     val takeVideo = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CaptureVideo()
     ) { _ ->
         targetVideoUri?.let { uri ->
             targetVideoUri = null
-            itemViewModel.onTriggerEvent(
+            viewModel.onTriggerEvent(
                 BuildEvent.UpdateDisplayedReflexionItem(
-                    subItem = VIDEO_URI,
-                    newVal = uri.toString()
+                    subItem = VIDEO_URI, newVal = uri.toString()
                 )
             )
         }
@@ -165,11 +159,11 @@ fun BuildItemContent(
 
     var targetImageUri by rememberSaveable { mutableStateOf<Uri?>(null) }
 
-    val selectImage =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(),
-            onResult = { uri ->
-                viewModel.onTriggerEvent(BuildEvent.CreateThumbnailImage(uri))
-            })
+    val selectImage = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
+            viewModel.onTriggerEvent(BuildEvent.CreateThumbnailImage(uri))
+        })
 
     val takeImage = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
@@ -178,432 +172,418 @@ fun BuildItemContent(
             targetImageUri = null
             val newVal =
                 MediaStoreUtils.uriToByteArray(uri, context = context) ?: emptyArray<Byte>()
-            itemViewModel.onTriggerEvent(
+            viewModel.onTriggerEvent(
                 BuildEvent.UpdateDisplayedReflexionItem(
-                    subItem = IMAGE,
-                    newVal = newVal
+                    subItem = IMAGE, newVal = newVal
                 )
             )
         }
     }
 
-    val offsetX = remember { mutableStateOf(0f) }
-    val offsetY = remember { mutableStateOf(0f) }
-
+//    Scaffold(
+//        floatingActionButton = {
+//        /* SAVE */
+//        SmallFloatingActionButton(modifier = Modifier
+//            .offset {
+//                IntOffset(
+//                    x = offsetX.value.roundToInt(), y = offsetY.value.roundToInt()
+//                )
+//            }
+//            .pointerInput(Unit) {
+//                detectDragGestures { change, dragAmount ->
+//                    change.consumeAllChanges()
+//                    offsetX.value += dragAmount.x
+//                    offsetY.value += dragAmount.y
+//                }
+//            }, containerColor = MaterialTheme.colorScheme.primary, onClick = {
+//            Toast.makeText(
+//                context, resource.getString(R.string.changes_saved), Toast.LENGTH_SHORT
+//            ).show()
+//            val trimmedName = name.trim()
+//            viewModel.onTriggerEvent(
+//                BuildEvent.UpdateDisplayedReflexionItem(
+//                    subItem = NAME, newVal = trimmedName
+//                )
+//            )
+//            if (autogenPK != 0L) {
+//                viewModel.onTriggerEvent(BuildEvent.UpdateReflexionItem)
+//                Temporary.tempReflexionItem = ReflexionItem()
+//            } else {
+//                viewModel.onTriggerEvent(BuildEvent.SaveNew)
+//                Temporary.tempReflexionItem = ReflexionItem()
+//            }
+//        }) {
+//            Icon(
+//                painter = painterResource(R.drawable.ic_baseline_save_alt_24),
+//                contentDescription = null,
+//                tint = MaterialTheme.colorScheme.onSurface
+//            )
+//        }
+//    }) { paddingValues ->
+    if (saveNow) {
+        Toast.makeText(
+            context, resource.getString(R.string.changes_saved), Toast.LENGTH_SHORT
+        ).show()
+        val trimmedName = name.trim()
+        viewModel.onTriggerEvent(
+            BuildEvent.UpdateDisplayedReflexionItem(
+                subItem = NAME, newVal = trimmedName
+            )
+        )
+        if (autogenPK != 0L) {
+            viewModel.onTriggerEvent(BuildEvent.UpdateReflexionItem)
+            //Temporary.tempReflexionItem = ReflexionItem()
+        } else {
+            viewModel.onTriggerEvent(BuildEvent.SaveNew)
+            //Temporary.tempReflexionItem = ReflexionItem()
+        }
+        viewModel.setSaveNowFromTopBar(false)
+    }
     Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(paddingValues)
+            .background(MaterialTheme.colorScheme.surface)
             .verticalScroll(rememberScrollState())
     ) {
-        if (saveNow) {
-            Toast.makeText(
-                context, resource.getString(R.string.changes_saved), Toast.LENGTH_SHORT
-            ).show()
-            val trimmedName = name.trim()
-            itemViewModel.onTriggerEvent(
-                BuildEvent.UpdateDisplayedReflexionItem(
-                    subItem = NAME, newVal = trimmedName
-                )
-            )
-            if (autogenPK != 0L) {
-                itemViewModel.onTriggerEvent(BuildEvent.UpdateReflexionItem)
-                //Temporary.tempReflexionItem = ReflexionItem()
-            } else {
-                itemViewModel.onTriggerEvent(BuildEvent.SaveNew)
-                //Temporary.tempReflexionItem = ReflexionItem()
-            }
-            itemViewModel.setSaveNowFromTopBar(false)
-        }
-        Scaffold(
-            floatingActionButton = {
-                /* SAVE */
-                SmallFloatingActionButton(modifier = Modifier
-                    .offset {
-                        IntOffset(
-                            x = offsetX.value.roundToInt(), y = offsetY.value.roundToInt()
-                        )
-                    }
-                    .pointerInput(Unit) {
-                        detectDragGestures { change, dragAmount ->
-                            change.consumeAllChanges()
-                            offsetX.value += dragAmount.x
-                            offsetY.value += dragAmount.y
-                        }
-                    },
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    onClick = {
-                        Toast.makeText(
-                            context, resource.getString(R.string.changes_saved), Toast.LENGTH_SHORT
-                        ).show()
-                        val trimmedName = name.trim()
-                        itemViewModel.onTriggerEvent(
-                            BuildEvent.UpdateDisplayedReflexionItem(
-                                subItem = NAME, newVal = trimmedName
-                            )
-                        )
-                        if (autogenPK != 0L) {
-                            itemViewModel.onTriggerEvent(BuildEvent.UpdateReflexionItem)
-                            Temporary.tempReflexionItem = ReflexionItem()
-                        } else {
-                            itemViewModel.onTriggerEvent(BuildEvent.SaveNew)
-                            Temporary.tempReflexionItem = ReflexionItem()
-                        }
-                    }
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_baseline_save_alt_24),
-                        contentDescription = null
-                    )
-                }
-            }) { paddingValues ->
+        Spacer(Modifier.height(16.dp))
+        // Image
+        Row(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
+                    .weight(3f)
+                    .align(Alignment.CenterVertically)
             ) {
-
-                Spacer(Modifier.height(16.dp))
-                // Image
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Column(
-                        modifier = Modifier
-                            .weight(3f)
-                            .align(Alignment.CenterVertically)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .padding(0.dp, 0.dp, 32.dp, 0.dp)
-                                .border(
-                                    1.dp, verticalGradient(colorStops = colorStops),
-                                    TextFieldDefaults.OutlinedTextFieldShape
-                                )
-                                .align(Alignment.End)
-                        ) {
-                            if (image != null) {
-                                showImage(image!!, navController)
-                            } else {
-                                Text(
-                                    modifier = Modifier.padding(12.dp),
-                                    textAlign = TextAlign.Center,
-                                    text = stringResource(R.string.add_an_image_here)
-                                )
-                            }
-                        }
-                    }
-                    Column(Modifier.weight(1f)) {
-                        IconButton(onClick = {
-                            selectImage.launch(Constants.IMAGE_TYPE)
-                        }) {
-                            Icon(
-                                painter = painterResource(R.drawable.baseline_video_library_24),
-                                contentDescription = null
-                            )
-                        }
-                        IconButton(onClick = {
-                            scope.launch {
-                                viewModel.createImageUri()?.let { uri ->
-                                    targetImageUri = uri
-                                    takeImage.launch(uri)
-                                }
-                            }
-                        }) {
-                            Icon(
-                                painter = painterResource(R.drawable.baseline_photo_camera_24),
-                                contentDescription = null
-                            )
-                        }
-                        IconButton(onClick = {
-                            viewModel.onTriggerEvent(BuildEvent.RotateImage)
-                        }) {
-                            Icon(
-                                painter = painterResource(R.drawable.baseline_rotate_90_degrees_ccw_24),
-                                contentDescription = null
-                            )
-                        }
-                    }
-                }
-                /* TOPIC */
-                if (parent == null) {
-                    /* TOPIC */
-                    Row(
-                        modifier = Modifier.padding(12.dp)
-                    ) {
-                        Column(
-                            Modifier
-                                .align(Alignment.CenterVertically)
-                        ) {
-                            Text(text = stringResource(R.string.topic))
-                        }
-                        Column(
-                            Modifier
-                                .weight(1f)
-                                .align(Alignment.CenterVertically)
-                        ) {
-                            TextField(
-                                colors = TextFieldDefaults.textFieldColors(
-                                    textColor = Black,
-                                    backgroundColor = Transparent
-                                ),
-                                textStyle = MaterialTheme.typography.labelLarge,
-                                modifier = Modifier.fillMaxWidth(),
-                                value = if (name == Constants.EMPTY_ITEM) {
-                                    EMPTY_STRING
-                                } else {
-                                    name
-                                },
-                                onValueChange = { name ->
-                                    itemViewModel.onTriggerEvent(
-                                        BuildEvent.UpdateDisplayedReflexionItem(
-                                            subItem = NAME, newVal = name
-                                        )
-                                    )
-                                })
-                        }
-                    }
-                } else {
-                    /* TITLE */
-                    Row(
-                        modifier = Modifier.padding(12.dp)
-                    ) {
-                        Column(
-                            Modifier
-                                .align(Alignment.CenterVertically)
-                        ) {
-                            Text(text = stringResource(R.string.title))
-                        }
-                        Column(
-                            Modifier
-                                .weight(1f)
-                                .align(Alignment.CenterVertically)
-                        ) {
-                            TextField(
-                                colors = TextFieldDefaults.textFieldColors(
-                                    textColor = Black,
-                                    backgroundColor = Transparent
-                                ),
-                                textStyle = MaterialTheme.typography.labelLarge,
-                                value = if (name == Constants.EMPTY_ITEM) {
-                                    EMPTY_STRING
-                                } else {
-                                    name
-                                },
-                                onValueChange = { name ->
-                                    itemViewModel.onTriggerEvent(
-                                        BuildEvent.UpdateDisplayedReflexionItem(
-                                            subItem = NAME, newVal = name
-                                        )
-                                    )
-                                })
-                        }
-                    }
-                }
-                Spacer(Modifier.height(16.dp))
-                /* DESCRIPTION */
-                Row(
-                    modifier = Modifier.padding(12.dp)
-                ) {
-                    Column(
-                        Modifier
-                            .align(Alignment.CenterVertically)
-                    ) {
-                        Text(text = stringResource(R.string.description))
-                    }
-                    Column(
-                        Modifier
-                            .weight(1f)
-                            .align(Alignment.CenterVertically)
-                    ) {
-                        TextField(
-                            colors = TextFieldDefaults.textFieldColors(
-                                textColor = Black,
-                                backgroundColor = Transparent
-                            ),
-                            textStyle = MaterialTheme.typography.labelLarge,
-                            modifier = Modifier.fillMaxWidth(),
-                            value = description ?: EMPTY_STRING,
-                            onValueChange = { description ->
-                                itemViewModel.onTriggerEvent(
-                                    BuildEvent.UpdateDisplayedReflexionItem(
-                                        subItem = DESCRIPTION, newVal = description
-                                    )
-                                )
-                            })
-                    }
-                }
-                Spacer(Modifier.height(16.dp))
-                /* DETAILS */
-                Row(
-                    modifier = Modifier.padding(12.dp)
-                ) {
-                    Column(
-                        Modifier
-                            .align(Alignment.CenterVertically)
-                    ) {
-                        Text(text = stringResource(R.string.detailedDescription))
-                    }
-                    Column(
-                        Modifier
-                            .weight(1f)
-                            .align(Alignment.CenterVertically)
-                    ) {
-                        TextField(
-                            colors = TextFieldDefaults.textFieldColors(
-                                textColor = Black,
-                                backgroundColor = Transparent
-                            ),
-                            textStyle = MaterialTheme.typography.labelLarge,
-                            modifier = Modifier.fillMaxWidth(),
-                            value = detailedDescription ?: EMPTY_STRING,
-                            onValueChange = { detailedDescription ->
-                                itemViewModel.onTriggerEvent(
-                                    BuildEvent.UpdateDisplayedReflexionItem(
-                                        subItem = DETAILED_DESCRIPTION, newVal = detailedDescription
-                                    )
-                                )
-                            })
-                    }
-                }
-                Spacer(Modifier.height(16.dp))
-                /* SAVED VIDEO */
-                Row(
+                Box(
                     modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxSize()
-                ) {
-                    Column(
-                        Modifier
-                            .weight(1f)
-                            .align(Alignment.CenterVertically)
-                    ) {
-                        Column(modifier = Modifier.fillMaxWidth()) {
-                            Text(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        if (videoUri.isNullOrEmpty()) {
-                                            Toast
-                                                .makeText(
-                                                    context,
-                                                    resource.getString(R.string.is_saved),
-                                                    Toast.LENGTH_SHORT
-                                                )
-                                                .show()
-                                        } else {
-                                            //
-                                            val route: String =
-                                                Screen.VideoView.route + "/" + URI
-                                            navController.navigate(route)
-                                        }
-                                    },
-                                text = AnnotatedString(stringResource(R.string.saved_video)),
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            if (videoUri.isNullOrEmpty().not()) {
-                                viewModel.getSelectedFile()
-                                if (selectedFile != null) {
-                                    DocumentFilePreviewCard(
-                                        resource = selectedFile!!,
-                                        navController = navController,
-                                        VIDEO_URI
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    Column(
-                        Modifier
-                            .weight(.5f)
-                            .align(Alignment.CenterVertically)
-                    ) {
-                        IconButton(onClick = {
-
-                            selectVideo.launch(arrayOf<String>(Constants.VIDEO_TYPE))
-                        }) {
-                            Icon(
-                                painter = painterResource(R.drawable.baseline_video_library_24),
-                                contentDescription = null
-                            )
-                        }
-
-                        IconButton(onClick = {
-
-                            scope.launch {
-                                viewModel.createVideoUri()?.let { uri ->
-                                    targetVideoUri = uri
-                                    takeVideo.launch(uri)
-                                }
-                            }
-                        }) {
-                            Icon(
-                                painter = painterResource(R.drawable.baseline_videocam_24),
-                                contentDescription = null
-                            )
-                        }
-                    }
-                    /* VIDEO URL */
-                    Column(
-                        Modifier
-                            .weight(1f)
-                            .align(Alignment.CenterVertically)
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable(
-                                    onClick = {
-                                        if (videoUrl == EMPTY_STRING) {
-                                            navController.navigate(Screen.PasteAndSaveScreen.route)
-                                        } else {
-
-                                            val intent = Intent(
-                                                Intent.ACTION_VIEW,
-                                                Uri.parse(videoUrl)
-                                            )
-                                            ContextCompat.startActivity(context, intent, null)
-                                        }
-                                    },
-                                ),
-                            text = AnnotatedString(stringResource(R.string.video_link)),
-                            color = MaterialTheme.colorScheme.primary
+                        .padding(0.dp, 0.dp, 32.dp, 0.dp)
+                        .border(
+                            1.dp,
+                            verticalGradient(colorStops = colorStops),
+                            TextFieldDefaults.OutlinedTextFieldShape
                         )
-                        if (videoUrl.isNullOrEmpty().not()) {
-                            videoImagePreviewCard(
-                                urlString = videoUrl,
+                        .align(Alignment.End)
+                ) {
+                    if (image != null) {
+                        showImage(image!!, navController)
+                    } else {
+                        Text(
+                            modifier = Modifier.padding(12.dp),
+                            textAlign = TextAlign.Center,
+                            text = stringResource(R.string.add_an_image_here),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+            Column(Modifier.weight(1f)) {
+                IconButton(onClick = {
+                    selectImage.launch(Constants.IMAGE_TYPE)
+                }) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_video_library_24),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+                IconButton(onClick = {
+                    scope.launch {
+                        viewModel.createImageUri()?.let { uri ->
+                            targetImageUri = uri
+                            takeImage.launch(uri)
+                        }
+                    }
+                }) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_photo_camera_24),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+                IconButton(onClick = {
+                    viewModel.onTriggerEvent(BuildEvent.RotateImage)
+                }) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_rotate_90_degrees_ccw_24),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+        }/* TOPIC */
+        if (parent == null) {/* TOPIC */
+            Row(
+                modifier = Modifier.padding(12.dp)
+            ) {
+                Column(
+                    Modifier.align(Alignment.CenterVertically)
+                ) {
+                    Text(
+                        text = stringResource(R.string.topic),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+                Column(
+                    Modifier
+                        .weight(1f)
+                        .align(Alignment.CenterVertically)
+                ) {
+                    TextField(colors = TextFieldDefaults.textFieldColors(
+                        textColor = MaterialTheme.colorScheme.onSurface,
+                        backgroundColor = Transparent
+                    ),
+                        textStyle = MaterialTheme.typography.labelLarge,
+                        modifier = Modifier.fillMaxWidth(),
+                        value = if (name == Constants.EMPTY_ITEM) {
+                            EMPTY_STRING
+                        } else {
+                            name
+                        },
+                        onValueChange = { name ->
+                            viewModel.onTriggerEvent(
+                                BuildEvent.UpdateDisplayedReflexionItem(
+                                    subItem = NAME, newVal = name
+                                )
+                            )
+                        })
+                }
+            }
+        } else {/* TITLE */
+            Row(
+                modifier = Modifier.padding(12.dp)
+            ) {
+                Column(
+                    Modifier.align(Alignment.CenterVertically)
+                ) {
+                    Text(
+                        text = stringResource(R.string.title),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+                Column(
+                    Modifier
+                        .weight(1f)
+                        .align(Alignment.CenterVertically)
+                ) {
+                    TextField(colors = TextFieldDefaults.textFieldColors(
+                        textColor = MaterialTheme.colorScheme.onSurface,
+                        backgroundColor = Transparent
+                    ),
+                        textStyle = MaterialTheme.typography.labelLarge,
+                        value = if (name == Constants.EMPTY_ITEM) {
+                            EMPTY_STRING
+                        } else {
+                            name
+                        },
+                        onValueChange = { name ->
+                            viewModel.onTriggerEvent(
+                                BuildEvent.UpdateDisplayedReflexionItem(
+                                    subItem = NAME, newVal = name
+                                )
+                            )
+                        })
+                }
+            }
+        }
+        Spacer(Modifier.height(16.dp))/* DESCRIPTION */
+        Row(
+            modifier = Modifier.padding(12.dp)
+        ) {
+            Column(
+                Modifier.align(Alignment.CenterVertically)
+            ) {
+                Text(
+                    text = stringResource(R.string.description),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            Column(
+                Modifier
+                    .weight(1f)
+                    .align(Alignment.CenterVertically)
+            ) {
+                TextField(colors = TextFieldDefaults.textFieldColors(
+                    textColor = MaterialTheme.colorScheme.onSurface,
+                    backgroundColor = Transparent
+                ),
+                    textStyle = MaterialTheme.typography.labelLarge,
+                    modifier = Modifier.fillMaxWidth(),
+                    value = description ?: EMPTY_STRING,
+                    onValueChange = { description ->
+                        viewModel.onTriggerEvent(
+                            BuildEvent.UpdateDisplayedReflexionItem(
+                                subItem = DESCRIPTION, newVal = description
+                            )
+                        )
+                    })
+            }
+        }
+        Spacer(Modifier.height(16.dp))/* DETAILS */
+        Row(
+            modifier = Modifier.padding(12.dp)
+        ) {
+            Column(
+                Modifier.align(Alignment.CenterVertically)
+            ) {
+                Text(
+                    text = stringResource(R.string.detailedDescription),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            Column(
+                Modifier
+                    .weight(1f)
+                    .align(Alignment.CenterVertically)
+            ) {
+                TextField(colors = TextFieldDefaults.textFieldColors(
+                    textColor = MaterialTheme.colorScheme.onSurface,
+                    backgroundColor = Transparent
+                ),
+                    textStyle = MaterialTheme.typography.labelLarge,
+                    modifier = Modifier.fillMaxWidth(),
+                    value = detailedDescription ?: EMPTY_STRING,
+                    onValueChange = { detailedDescription ->
+                        viewModel.onTriggerEvent(
+                            BuildEvent.UpdateDisplayedReflexionItem(
+                                subItem = DETAILED_DESCRIPTION, newVal = detailedDescription
+                            )
+                        )
+                    })
+            }
+        }
+        Spacer(Modifier.height(16.dp))/* SAVED VIDEO */
+        Row(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxSize()
+        ) {
+            Column(
+                Modifier
+                    .weight(1f)
+                    .align(Alignment.CenterVertically)
+            ) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                if (videoUri.isNullOrEmpty()) {
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            resource.getString(R.string.is_saved),
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
+                                } else {
+                                    //
+                                    val route: String = Screen.VideoView.route + "/" + URI
+                                    navController.navigate(route)
+                                }
+                            },
+                        text = AnnotatedString(stringResource(R.string.saved_video)),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    if (videoUri.isNullOrEmpty().not()) {
+                        viewModel.getSelectedFile()
+                        if (selectedFile != null) {
+                            DocumentFilePreviewCard(
+                                resource = selectedFile!!,
                                 navController = navController,
-                                docType = VIDEO_URL
+                                VIDEO_URI
                             )
                         }
                     }
-                    Column(
-                        Modifier
-                            .weight(0.5f)
-                            .align(Alignment.CenterVertically)
-                    ) {
-                        IconButton(onClick = {
-                            val query = Constants.SEARCH_YOUTUBE + name
-                            val intent = Intent(
-                                Intent.ACTION_VIEW, Uri.parse(query)
-                            )
-                            ContextCompat.startActivity(context, intent, null)
-                        }) {
-                            Icon(
-                                painter = painterResource(R.drawable.baseline_youtube_searched_for_24),
-                                contentDescription = null
-                            )
+                }
+            }
+            Column(
+                Modifier
+                    .weight(.5f)
+                    .align(Alignment.CenterVertically)
+            ) {
+                IconButton(onClick = {
+                    selectVideo.launch(arrayOf<String>(Constants.VIDEO_TYPE))
+                }) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_video_library_24),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+
+                IconButton(onClick = {
+                    scope.launch {
+                        viewModel.createVideoUri()?.let { uri ->
+                            targetVideoUri = uri
+                            takeVideo.launch(uri)
                         }
                     }
+                }) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_videocam_24),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }/* VIDEO URL */
+            Column(
+                Modifier
+                    .weight(1f)
+                    .align(Alignment.CenterVertically)
+            ) {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            onClick = {
+                                if (videoUrl == EMPTY_STRING) {
+                                    navController.navigate(Screen.PasteAndSaveScreen.route)
+                                } else {
+
+                                    val intent = Intent(
+                                        Intent.ACTION_VIEW, Uri.parse(videoUrl)
+                                    )
+                                    ContextCompat.startActivity(context, intent, null)
+                                }
+                            },
+                        ),
+                    text = AnnotatedString(stringResource(R.string.video_link)),
+                    color = MaterialTheme.colorScheme.primary
+                )
+                if (videoUrl.isNullOrEmpty().not()) {
+                    videoImagePreviewCard(
+                        urlString = videoUrl, navController = navController, docType = VIDEO_URL
+                    )
+                }
+            }
+            Column(
+                Modifier
+                    .weight(0.5f)
+                    .align(Alignment.CenterVertically)
+            ) {
+                IconButton(onClick = {
+                    val query = Constants.SEARCH_YOUTUBE + name
+                    val intent = Intent(
+                        Intent.ACTION_VIEW, Uri.parse(query)
+                    )
+                    ContextCompat.startActivity(context, intent, null)
+                }) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_youtube_searched_for_24),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
                 }
             }
         }
     }
 }
 
+
 @Composable
 fun showImage(image: Bitmap, navController: NavHostController) {
     ImageCard(
-        image,
-        navController
+        image, navController
     )
 }
 

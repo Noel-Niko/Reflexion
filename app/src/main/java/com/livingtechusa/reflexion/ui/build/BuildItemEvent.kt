@@ -1,7 +1,6 @@
 package com.livingtechusa.reflexion.ui.build
 
 import android.net.Uri
-import com.livingtechusa.reflexion.data.entities.ReflexionItem
 
 sealed class BuildEvent {
 
@@ -42,5 +41,5 @@ sealed class BuildEvent {
     object BluetoothSend : BuildEvent()
     object SendText : BuildEvent()
 
-    object SaveFromTopBar : BuildEvent()
+    object Save : BuildEvent()
 }
