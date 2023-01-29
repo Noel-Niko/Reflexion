@@ -112,6 +112,7 @@ fun CustomListDisplayContent(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues = paddingValues ?: PaddingValues(8.dp))
+            .background(MaterialTheme.colorScheme.surface)
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
             /* TITLE */
@@ -124,7 +125,6 @@ fun CustomListDisplayContent(
                     Modifier
                         .padding(12.dp)
                         .align(Alignment.CenterVertically)
-                        .background(MaterialTheme.colorScheme.surface)
                 ) {
                     androidx.compose.material3.Text(
                         color = MaterialTheme.colorScheme.onSurface,

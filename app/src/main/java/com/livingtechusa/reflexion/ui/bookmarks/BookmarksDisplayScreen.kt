@@ -63,6 +63,7 @@ fun ReflexionItemListUIForBookmarks(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(it)
+                    .background(MaterialTheme.colorScheme.surface)
             ) {
                 Row(
                     modifier = Modifier
@@ -75,7 +76,9 @@ fun ReflexionItemListUIForBookmarks(
                         Text(
                             text = stringResource(R.string.items),
                             modifier = Modifier.padding(start = 16.dp),
-                            style = MaterialTheme.typography.headlineMedium
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+
                         )
                         ReflexionItemsContent(
                             reflexionItems = reflexionItemList,

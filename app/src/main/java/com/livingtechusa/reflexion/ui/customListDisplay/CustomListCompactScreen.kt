@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
@@ -13,6 +12,7 @@ import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.SendToMobile
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +27,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.NavBarItems
+import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
@@ -53,7 +54,7 @@ fun CompactScreen(
                 title = {
                     Text(
                         text = stringResource(R.string.custom_list_display),
-                        color = MaterialTheme.colors.onSurface
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 actions = {
@@ -84,25 +85,25 @@ fun CompactScreen(
                                 androidx.compose.material.Icon(
                                     imageVector = Icons.Default.SendToMobile,
                                     contentDescription = "send",
-                                    tint = MaterialTheme.colors.onSurface
+                                    tint = MaterialTheme.colorScheme.onSurface
                                 )
                             },
                         )
                         IconButton(
                             onClick = {
-//                                viewModel.onTriggerEvent(Screen.CustomLists.SendText)
+                                viewModel.onTriggerEvent(Screen.CustomLists.SendText)
                             },
                             content = {
                                 androidx.compose.material.Icon(
                                     imageVector = Icons.Default.Send,
                                     contentDescription = "send",
-                                    tint = MaterialTheme.colors.onSurface,
+                                    tint = MaterialTheme.colorScheme.onSurface,
                                 )
                             },
                         )
                     }
                 },
-                backgroundColor = MaterialTheme.colors.surface,
+                backgroundColor = MaterialTheme.colorScheme.surface,
                 elevation = 0.dp,
 //                navigationIcon = {
 //                    androidx.compose.material.Icon(
@@ -123,7 +124,7 @@ fun CompactScreen(
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
             BottomNavigation(
-                backgroundColor = MaterialTheme.colors.surface,
+                backgroundColor = androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer,
             ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(
@@ -140,13 +141,13 @@ fun CompactScreen(
                             Icon(
                                 imageVector = navItem.image,
                                 contentDescription = navItem.title,
-                                tint = MaterialTheme.colors.onSurface
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                         },
                         label = {
                             Text(
                                 text = navItem.title,
-                                color = MaterialTheme.colors.onSurface,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 maxLines = 1
                             )
                         }
