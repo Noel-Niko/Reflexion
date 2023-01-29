@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -28,6 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -58,96 +61,108 @@ fun ReflexionItemListUIForBookmarks(
 
     Scaffold(
         content = {
-            it
-            Row(
-
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(it)
             ) {
-                Column {
-                    Text(text = stringResource(R.string.items))
-                    ReflexionItemsContent(
-                        reflexionItems = reflexionItemList,
-                        onDoubleTap = { reflexionItem ->
-                            navController.navigate(route = Screen.BuildItemScreen.route + "/" + reflexionItem.autogenPK) {
-                                launchSingleTop = true
-                            }
-                        },
-                        onLongPress = { reflexionItem ->
-                            // TBD
-                        }
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            Divider()
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
 
-            ){
-                Column {
-                    Text(text = stringResource(R.string.lists))
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize(5F)
-                            .padding(4.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        items(listOfLists.size) { index ->
-                            Box {
-                                ElevatedCard(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(4.dp),
-                                    shape = RoundedCornerShape(20.dp)
-                                ) {
-                                    Row(
+                        Text(text = stringResource(R.string.items), modifier = Modifier.padding(start = 16.dp), style = MaterialTheme.typography.headlineMedium)
+                        ReflexionItemsContent(
+                            reflexionItems = reflexionItemList,
+                            onDoubleTap = { reflexionItem ->
+                                navController.navigate(route = Screen.BuildItemScreen.route + "/" + reflexionItem.autogenPK) {
+                                    launchSingleTop = true
+                                }
+                            },
+                            onLongPress = { reflexionItem ->
+                                // TBD
+                            }
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Divider()
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        // modifier = Modifier.verticalScroll(rememberScrollState())
+                    ) {
+                        Text(text = stringResource(R.string.lists), modifier = Modifier.padding(start = 16.dp), style = MaterialTheme.typography.headlineMedium)
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize(5F)
+                                .padding(4.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            items(listOfLists.size) { index ->
+                                Box {
+                                    ElevatedCard(
                                         modifier = Modifier
-                                            .background(MaterialTheme.colorScheme.surfaceTint)
-                                            .pointerInput(key1 = index) {
-                                                detectTapGestures(
-                                                    onDoubleTap = {
-                                                        // Launch dialog
-                                                        // Nothing
-                                                    },
-                                                    onLongPress = {
-                                                        // Nothing
-                                                    },
-                                                    onTap = {
-                                                        navController.navigate(Screen.CustomListDisplay.route + "/" + listOfLists[index]?.nodePk)
+                                            .fillMaxWidth()
+                                            .padding(4.dp),
+                                        shape = RoundedCornerShape(20.dp)
+                                    ) {
+                                        Row(
+                                            modifier = Modifier
+                                                .background(MaterialTheme.colorScheme.surfaceTint)
+                                                .pointerInput(key1 = index) {
+                                                    detectTapGestures(
+                                                        onDoubleTap = {
+                                                            // Launch dialog
+                                                            // Nothing
+                                                        },
+                                                        onLongPress = {
+                                                            // Nothing
+                                                        },
+                                                        onTap = {
+                                                            navController.navigate(Screen.CustomListDisplay.route + "/" + listOfLists[index]?.nodePk)
+                                                        }
+                                                    )
+                                                },
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            if (listimages.isEmpty()
+                                                    .not() && listimages.size > index
+                                            ) {
+                                                val imagePainter = rememberImagePainter(
+                                                    data = listimages[index],
+                                                    builder = {
+                                                        allowHardware(false)
                                                     }
                                                 )
-                                            },
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        if (listimages.isEmpty().not() && listimages.size > index) {
-                                            val imagePainter = rememberImagePainter(
-                                                data = listimages[index],
-                                                builder = {
-                                                    allowHardware(false)
-                                                }
-                                            )
-                                            Image(
-                                                painter = imagePainter,
-                                                contentDescription = "Your Image",
-                                                contentScale = ContentScale.FillBounds,
-                                                modifier = Modifier
-                                                    .height(55.dp)
-                                                    .width(55.dp)
+                                                Image(
+                                                    painter = imagePainter,
+                                                    contentDescription = "Your Image",
+                                                    contentScale = ContentScale.FillBounds,
+                                                    modifier = Modifier
+                                                        .height(55.dp)
+                                                        .width(55.dp)
 
+                                                )
+                                                Spacer(modifier = Modifier.width(4.dp))
+                                            }
+                                            androidx.compose.material3.Text(
+                                                color = MaterialTheme.colorScheme.onPrimary,
+                                                text = listOfLists[index]?.title
+                                                    ?: Constants.NO_LISTS,
+                                                modifier = Modifier
+                                                    .padding(16.dp),
+                                                style = MaterialTheme.typography.titleMedium
                                             )
-                                            Spacer(modifier = Modifier.width(4.dp))
-                                        }
-                                        androidx.compose.material3.Text(
-                                            color = MaterialTheme.colorScheme.onPrimary,
-                                            text = listOfLists[index]?.title ?: Constants.NO_LISTS,
-                                            modifier = Modifier
-                                                .padding(16.dp),
-                                            style = MaterialTheme.typography.titleMedium
-                                        )
 //                                        listOfLists[index]?.let {
 //                                            HorizontalScrollableRowComponent(
 //                                                list = it
 //                                            )
 //                                        }
+                                        }
                                     }
                                 }
                             }
@@ -181,7 +196,7 @@ private fun ReflexionItemsContent(
 ) {
     LazyColumn(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface)
     ) {
         items(reflexionItems) { reflexionItem ->
