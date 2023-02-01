@@ -12,7 +12,6 @@ import com.livingtechusa.reflexion.di.DefaultDispatcher
 import com.livingtechusa.reflexion.ui.bookmarks.BookmarksEvent
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
-import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
@@ -36,7 +35,7 @@ class BookmarksViewModel @Inject constructor(
     private val _itemBookmarks = MutableStateFlow(emptyList<ReflexionItem>())
     val itemBookmarks get() = _itemBookmarks
 
-    private val _search = MutableStateFlow(EMPTY_STRING)
+    private val _search = MutableStateFlow(null as String?)
     val search get() = _search
 
     //    private val _listOfLists = MutableStateFlow<List<ReflexionArrayItem?>>(emptyList())
@@ -73,7 +72,6 @@ class BookmarksViewModel @Inject constructor(
                             val lists = mutableListOf<ListNode>()
                             localServiceImpl.searchBookmarksByTitle(event.search)
                                 .forEach { bookMarks ->
-
                                     if (bookMarks != null) {
                                         if (bookMarks.ITEM_PK != null) {
                                             localServiceImpl.selectItem(bookMarks.ITEM_PK)
@@ -92,7 +90,11 @@ class BookmarksViewModel @Inject constructor(
 
                 is BookmarksEvent.DeleteBookmark -> {
                     viewModelScope.launch {
-                        localServiceImpl.deleteBookmark(event.bookmarkPk)
+                        localServiceImpl.selectItemBookMark(event.ITEM_PK)?.autoGenPk?.let { bookmark_PK ->
+                            localServiceImpl.deleteBookmark(
+                                bookmark_PK
+                            )
+                        }
                     }
                 }
 
@@ -116,7 +118,7 @@ class BookmarksViewModel @Inject constructor(
         onTriggerEvent(BookmarksEvent.Search(term))
     }
 
-    fun populateContent() {
+    private fun populateContent() {
         viewModelScope.launch {
             val items = mutableListOf<ReflexionItem>()
             val lists = mutableListOf<ListNode>()

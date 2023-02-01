@@ -1,9 +1,8 @@
 package com.livingtechusa.reflexion.data.localService
 
 import android.graphics.Bitmap
-import androidx.room.Query
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
-import com.livingtechusa.reflexion.data.entities.BookMarks
+import com.livingtechusa.reflexion.data.entities.Bookmarks
 import com.livingtechusa.reflexion.data.entities.ListNode
 import com.livingtechusa.reflexion.data.models.AbridgedReflexionItem
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
@@ -62,12 +61,12 @@ interface ILocalService {
     suspend fun selectImage(itemPk: Long): Bitmap?
 
     // BOOKMARKS
-    suspend fun setBookMarks(user: BookMarks)
-    suspend fun getBookMarks(): List<BookMarks?>
+    suspend fun setBookMarks(user: Bookmarks)
+    suspend fun getBookMarks(): List<Bookmarks?>
     suspend fun clearBookMarks()
-    suspend fun selectItemBookMarks(item_pk: Long): List<BookMarks?>
-    suspend fun selectListBookMarks(list_pk: Long): List<BookMarks?>
+    suspend fun selectItemBookMark(item_pk: Long): Bookmarks?
+    suspend fun selectListBookMarks(list_pk: Long): List<Bookmarks?>
     suspend fun deleteBookmark(autoGenPk: Long)
     suspend fun renameKeyWord(word: String, newWord: String)
-    suspend fun searchBookmarksByTitle(text: String): List<BookMarks?>
+    suspend fun searchBookmarksByTitle(text: String): List<Bookmarks?>
 }

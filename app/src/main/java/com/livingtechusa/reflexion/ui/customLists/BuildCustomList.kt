@@ -21,7 +21,10 @@ import androidx.compose.material.ExposedDropdownMenuBox
 import androidx.compose.material.ExposedDropdownMenuDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.twotone.Lan
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -42,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -100,7 +104,8 @@ fun BuildCustomListsScreen(
 }
 
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class,
+@OptIn(
+    ExperimentalMaterialApi::class, ExperimentalAnimationApi::class,
     ExperimentalMaterial3Api::class
 )
 @Composable
@@ -126,7 +131,7 @@ fun CustomListsContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-            ) {
+        ) {
             Row(Modifier.fillMaxWidth()) {
                 Box(
                     modifier = Modifier
@@ -168,20 +173,20 @@ fun CustomListsContent(
                                     )
                                 },
                                 colors = TextFieldDefaults.textFieldColors(
-                                  textColor = MaterialTheme.colorScheme.primary,
-                                   // containerColor = MaterialTheme.colorScheme.surface
+                                    textColor = MaterialTheme.colorScheme.primary,
+                                    // containerColor = MaterialTheme.colorScheme.surface
                                 )
                             )
-                                CustomDropDownMenu(
-                                    modifier = Modifier
-                                        .fillMaxWidth(.75f),
-                                    isOpen = expanded,
-                                    setIsOpen = {
-                                        expanded = !expanded
-                                    },
-                                    itemSelected = viewModel::selectItem,
-                                    menu = getMenu(itemTree.value),
-                                )
+                            CustomDropDownMenu(
+                                modifier = Modifier
+                                    .fillMaxWidth(.75f),
+                                isOpen = expanded,
+                                setIsOpen = {
+                                    expanded = !expanded
+                                },
+                                itemSelected = viewModel::selectItem,
+                                menu = getMenu(itemTree.value),
+                            )
                         }
                     }
                 }
@@ -192,7 +197,7 @@ fun CustomListsContent(
             ) {
                 // filter options based on text field value
                 val filteringOptions: MutableList<ReflexionArrayItem> = mutableListOf()
-                if(searchText != EMPTY_STRING) {
+                if (searchText != EMPTY_STRING) {
                     itemTree.value.let { abridgedParent ->
                         // Breadth first Search for search item
                         traverseBreadthFirst(itemTree.value) { RAI ->
@@ -211,21 +216,29 @@ fun CustomListsContent(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(16.dp)
-                            .verticalScroll(rememberScrollState()),
                     ) {
                         items(filteringOptions.size) {
-                            Text(
-                                text = filteringOptions[it].itemName
-                                    ?: stringResource(R.string.no_match_found),
+                            ElevatedCard(
                                 modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(4.dp)
                                     .clickable {
                                         viewModel.selectItem(filteringOptions[it].itemPK.toString())
                                         searchText = EMPTY_STRING
-                                    },
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurface,
-
-                            )
+                                    }
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    .align(Alignment.CenterHorizontally),
+                                shape = MaterialTheme.shapes.extraLarge,
+                                elevation = CardDefaults.elevatedCardElevation(4.dp)
+                            ) {
+                                Text(
+                                    text = filteringOptions[it].itemName
+                                        ?: stringResource(R.string.no_match_found),
+                                    style = MaterialTheme.typography.headlineLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(16.dp, 2.dp)
+                                )
+                            }
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }

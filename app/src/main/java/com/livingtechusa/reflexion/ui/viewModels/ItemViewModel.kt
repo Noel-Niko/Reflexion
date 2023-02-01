@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.Converters
-import com.livingtechusa.reflexion.data.entities.BookMarks
+import com.livingtechusa.reflexion.data.entities.Bookmarks
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.ui.build.BuildEvent
@@ -403,7 +403,7 @@ class ItemViewModel @Inject constructor(
 
                     is BuildEvent.Bookmark -> {
                         viewModelScope.launch {
-                            val bookMark = BookMarks(
+                            val bookMark = Bookmarks(
                                 autoGenPk = autogenPK.value,
                                 ITEM_PK = event.itemPk,
                                 LIST_PK = null,

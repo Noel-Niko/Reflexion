@@ -4,7 +4,6 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.livingtechusa.reflexion.navigation.NavBarItems
@@ -26,7 +25,7 @@ fun BuildItemScreen(
     if (context.findActivity() != null) {
         when (windowSize) {
             WindowWidthSizeClass.COMPACT -> {
-                CompactScreen(pk, navHostController, icons, viewModel)
+                BuildItemCompactScreen(pk, navHostController, icons, viewModel)
             }
 
             WindowWidthSizeClass.MEDIUM -> {
@@ -38,7 +37,7 @@ fun BuildItemScreen(
 //                viewModel.navigationType = ReflexionNavigationType.PERMANENT_NAVIGATION_DRAWER
 //            }
 
-            else -> CompactScreen(pk, navHostController, icons, viewModel)
+            else -> BuildItemCompactScreen(pk, navHostController, icons, viewModel)
         }
     }
 }

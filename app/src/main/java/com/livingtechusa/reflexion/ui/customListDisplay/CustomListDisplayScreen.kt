@@ -63,7 +63,7 @@ fun CustomListDisplayScreen(
     if (context.findActivity() != null) {
         when (windowSize) {
             WindowWidthSizeClass.COMPACT -> {
-                CompactScreen(
+                CustomListDisplayCompactScreen(
                     navController = navController,
                     headNodePk = headNodePk,
                     viewModel = viewModel
@@ -83,7 +83,7 @@ fun CustomListDisplayScreen(
 //                viewModel.navigationType = ReflexionNavigationType.PERMANENT_NAVIGATION_DRAWER
 //            }
 
-            else -> CompactScreen(
+            else -> CustomListDisplayCompactScreen(
                 navController = navController,
                 headNodePk = headNodePk,
                 viewModel = viewModel

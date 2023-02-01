@@ -21,14 +21,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.NavBarItems
 import com.livingtechusa.reflexion.navigation.Screen
-import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
@@ -36,7 +34,7 @@ import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CompactScreen(
+fun CustomListDisplayCompactScreen(
     navController: NavHostController,
     headNodePk: Long,
     viewModel: CustomListsViewModel
@@ -79,19 +77,7 @@ fun CompactScreen(
                         )
                         IconButton(
                             onClick = {
-                                // viewModel.onTriggerEvent(Screen.CustomLists.BluetoothSend)
-                            },
-                            content = {
-                                androidx.compose.material.Icon(
-                                    imageVector = Icons.Default.SendToMobile,
-                                    contentDescription = "send",
-                                    tint = MaterialTheme.colorScheme.onSurface
-                                )
-                            },
-                        )
-                        IconButton(
-                            onClick = {
-                                viewModel.onTriggerEvent(Screen.CustomLists.SendText)
+                                viewModel.onTriggerEvent(CustomListEvent.SendText)
                             },
                             content = {
                                 androidx.compose.material.Icon(

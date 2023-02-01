@@ -1,33 +1,38 @@
 package com.livingtechusa.reflexion.ui.viewModels
 
+import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
-import android.net.Uri
 import android.util.Log
+import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.Converters
-import com.livingtechusa.reflexion.data.entities.BookMarks
+import com.livingtechusa.reflexion.data.entities.Bookmarks
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.di.DefaultDispatcher
+import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK_STRING
+import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import com.livingtechusa.reflexion.util.scopedStorageUtils.FileResource
 import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.lang.StringBuilder
 import javax.inject.Inject
 
 
@@ -317,8 +322,8 @@ class CustomListsViewModel @Inject constructor(
                 is CustomListEvent.Bookmark -> {
                     viewModelScope.launch {
                         val bookMark = customList.value.itemName?.let {
-                            BookMarks(
-                                autoGenPk =  0L,
+                            Bookmarks(
+                                autoGenPk = 0L,
                                 ITEM_PK = null,
                                 LIST_PK = customList.value.nodePk,
                                 title = it
@@ -330,10 +335,26 @@ class CustomListsViewModel @Inject constructor(
                     }
                 }
 
+                is CustomListEvent.SendText -> {
+                    var listItems = EMPTY_STRING
+                    customList.value.children.forEach { item ->
+                        listItems += item.itemName + ", "
+                    }
+                    val text = customList.value.itemName + "\n" + ": " + listItems.substring(0,listItems.length - 2)
+
+                    val shareIntent = Intent()
+                    shareIntent.action = Intent.ACTION_SEND
+                    shareIntent.type = "text/*"
+
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, text)
+                    shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    ContextCompat.startActivity(context, shareIntent, null)
+                }
+
                 else -> {}
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Exception: ${e.message}  with cause: ${e.cause}")
+            Log.e(TAG, "Error: " + e.message + " with cause " + e.cause)
         }
     }
 

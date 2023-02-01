@@ -5,6 +5,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
@@ -16,6 +17,7 @@ fun SearchIcon(onClick: () -> Unit) {
         Icon(
             imageVector = Icons.Default.Search,
             contentDescription = "search",
+            tint = MaterialTheme.colorScheme.onSurface
         )
       },
   )

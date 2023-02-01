@@ -8,13 +8,13 @@ import com.livingtechusa.reflexion.data.dao.BookMarksDao
 import com.livingtechusa.reflexion.data.dao.LinkedListDao
 import com.livingtechusa.reflexion.data.entities.Converters
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
-import com.livingtechusa.reflexion.data.entities.BookMarks
+import com.livingtechusa.reflexion.data.entities.Bookmarks
 import com.livingtechusa.reflexion.data.entities.ListNode
 
 @Database(
     entities =
     [ReflexionItem::class,
-        BookMarks::class,
+        Bookmarks::class,
     ListNode::class],
     version = 1,
     exportSchema = false

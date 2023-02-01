@@ -1,7 +1,6 @@
 package com.livingtechusa.reflexion.data.entities
 
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
 @Entity(
@@ -22,7 +21,7 @@ import androidx.room.PrimaryKey
 //        )
 //    )
 )
-data class BookMarks(
+data class Bookmarks(
     @PrimaryKey(autoGenerate = true)
     val autoGenPk: Long,
     val ITEM_PK: Long?, // FK - ITEM.autogenPK

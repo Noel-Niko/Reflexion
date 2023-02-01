@@ -79,7 +79,7 @@ class TopicsViewModel @Inject constructor(
 
                 is ListEvent.UpOneLevel -> {
                     viewModelScope.launch {
-                        val parent: Long = list.value?.get(0)?.parent ?: EMPTY_PK
+                        val parent: Long = list.value[0].parent ?: EMPTY_PK
                         if (parent == EMPTY_PK) {
                             val newList = localServiceImpl.getAllTopics() as List<ReflexionItem>
                             _list.value = newList

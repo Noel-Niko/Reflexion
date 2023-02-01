@@ -42,12 +42,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.livingtechusa.reflexion.R
-import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.BarItem
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
-import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
-import com.livingtechusa.reflexion.util.Temporary
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -55,7 +52,7 @@ import kotlin.math.roundToInt
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CompactScreen(
+fun BuildItemCompactScreen(
     pk: Long, navController: NavHostController, icons: List<BarItem>, viewModel: ItemViewModel
 ) {
     val scope = rememberCoroutineScope()

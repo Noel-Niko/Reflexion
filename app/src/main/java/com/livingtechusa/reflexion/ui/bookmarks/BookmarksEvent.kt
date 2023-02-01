@@ -6,7 +6,7 @@ sealed class BookmarksEvent {
     ): BookmarksEvent() {}
 
     data class DeleteBookmark(
-       val bookmarkPk: Long,
+       val ITEM_PK: Long,
     ): BookmarksEvent() {}
 
 

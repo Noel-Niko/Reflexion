@@ -39,8 +39,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
 import com.livingtechusa.reflexion.R
+import com.livingtechusa.reflexion.data.entities.Bookmarks
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
+import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.viewModels.BookmarksViewModel
 import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
@@ -87,8 +89,8 @@ fun ReflexionItemListUIForBookmarks(
                                     launchSingleTop = true
                                 }
                             },
-                            onLongPress = { reflexionItem ->
-                                // TBD
+                            onDoubleTap = { ITEM_PK ->
+                                viewModel.onTriggerEvent(BookmarksEvent.DeleteBookmark(ITEM_PK))
                             }
                         )
                     }
@@ -107,7 +109,8 @@ fun ReflexionItemListUIForBookmarks(
                         Text(
                             text = stringResource(R.string.lists),
                             modifier = Modifier.padding(start = 16.dp),
-                            style = MaterialTheme.typography.headlineMedium
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         LazyColumn(
                             modifier = Modifier
@@ -204,7 +207,7 @@ private fun ReflexionItemColumnItem(
 private fun ReflexionItemsContent(
     reflexionItems: List<ReflexionItem>,
     onTap: (ReflexionItem) -> Unit,
-    onLongPress: (ReflexionItem) -> Unit
+    onDoubleTap: (Long) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -227,7 +230,7 @@ private fun ReflexionItemsContent(
                         .pointerInput(key1 = reflexionItem) {
                             detectTapGestures(
                                 onTap = { onTap(reflexionItem) },
-                                onLongPress = { onLongPress(reflexionItem) }
+                                onDoubleTap = { onDoubleTap(reflexionItem.autogenPK) }
                             )
                         },
                     elevation = 6.dp,

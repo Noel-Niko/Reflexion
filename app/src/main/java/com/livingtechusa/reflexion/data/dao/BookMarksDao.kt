@@ -4,24 +4,24 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.livingtechusa.reflexion.data.entities.BookMarks
+import com.livingtechusa.reflexion.data.entities.Bookmarks
 
 @Dao
 interface BookMarksDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun setBookMarks(bookMark: BookMarks)
+    suspend fun setBookMarks(bookMark: Bookmarks)
 
     @Query("Select * FROM BookMarks")
-    suspend fun getBookMarks(): List<BookMarks?>
+    suspend fun getBookMarks(): List<Bookmarks?>
 
     @Query("Delete FROM BookMarks")
     suspend fun clearBookMarks()
 
     @Query("Select * FROM BookMarks WHERE ITEM_PK = :item_pk")
-    suspend fun selectItemBookMarks(item_pk: Long): List<BookMarks?>
+    suspend fun selectItemBookMark(item_pk: Long): Bookmarks?
 
     @Query("Select * FROM BookMarks WHERE LIST_PK = :list_pk")
-    suspend fun selectListBookMarks(list_pk: Long): List<BookMarks?>
+    suspend fun selectListBookMarks(list_pk: Long): List<Bookmarks?>
 
     @Query("Delete FROM BookMarks WHERE autoGenPk = :autoGenPk")
     suspend fun deleteBookmark(autoGenPk: Long)
@@ -34,5 +34,5 @@ interface BookMarksDao {
 
 
     @Query("Select * FROM BookMarks WHERE title LIKE :text || '%' order by title ASC")
-    suspend fun searchBookmarksByTitle(text: String): List<BookMarks?>
+    suspend fun searchBookmarksByTitle(text: String): List<Bookmarks?>
 }

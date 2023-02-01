@@ -5,7 +5,7 @@ import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.dao.BookMarksDao
 import com.livingtechusa.reflexion.data.dao.LinkedListDao
 import com.livingtechusa.reflexion.data.dao.ReflexionItemDao
-import com.livingtechusa.reflexion.data.entities.BookMarks
+import com.livingtechusa.reflexion.data.entities.Bookmarks
 import com.livingtechusa.reflexion.data.entities.ListNode
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.models.AbridgedReflexionItem
@@ -183,11 +183,11 @@ class LocalServiceImpl @Inject constructor(
         }
     }
 
-    override suspend fun setBookMarks(bookMark: BookMarks) {
+    override suspend fun setBookMarks(bookMark: Bookmarks) {
         bookMarksDao.setBookMarks(bookMark)
     }
 
-    override suspend fun getBookMarks(): List<BookMarks?> {
+    override suspend fun getBookMarks(): List<Bookmarks?> {
         return bookMarksDao.getBookMarks()
     }
 
@@ -195,11 +195,11 @@ class LocalServiceImpl @Inject constructor(
         bookMarksDao.clearBookMarks()
     }
 
-    override suspend fun selectItemBookMarks(item_pk: Long): List<BookMarks?> {
-        return bookMarksDao.selectItemBookMarks(item_pk)
+    override suspend fun selectItemBookMark(item_pk: Long): Bookmarks? {
+        return bookMarksDao.selectItemBookMark(item_pk)
     }
 
-    override suspend fun selectListBookMarks(list_pk: Long): List<BookMarks?> {
+    override suspend fun selectListBookMarks(list_pk: Long): List<Bookmarks?> {
         return bookMarksDao.selectListBookMarks(list_pk)
     }
 
@@ -229,7 +229,7 @@ class LocalServiceImpl @Inject constructor(
         bookMarksDao.renameKeyWord(word, newWord)
     }
 
-    override suspend fun searchBookmarksByTitle(text: String): List<BookMarks?> {
+    override suspend fun searchBookmarksByTitle(text: String): List<Bookmarks?> {
         return bookMarksDao.searchBookmarksByTitle(text)
     }
 
