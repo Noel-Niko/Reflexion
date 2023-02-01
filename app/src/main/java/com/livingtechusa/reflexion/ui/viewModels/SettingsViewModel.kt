@@ -102,10 +102,8 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
                 UserPreferencesUtil.setCurrentUserModeSelection(LocalContext.current, 1)
         } else {
            // if (isSystemInDarkTheme() && isDark.not()) {
-                if (isDark.not()) {
                 // Set Light Mode and Restart
                 UserPreferencesUtil.setCurrentUserModeSelection(LocalContext.current, 0)
-            }
         }
     }
 }
