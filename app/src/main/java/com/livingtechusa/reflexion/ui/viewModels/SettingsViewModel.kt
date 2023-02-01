@@ -96,11 +96,13 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
 
     @Composable
     fun toggleLightDarkMode(isDark: Boolean) {
-        if (isSystemInDarkTheme().not() && isDark) {
+        //if (isSystemInDarkTheme().not() && isDark) {
+            if (isDark) {
                 // Set Dark Mode and Restart
                 UserPreferencesUtil.setCurrentUserModeSelection(LocalContext.current, 1)
         } else {
-            if (isSystemInDarkTheme() && isDark.not()) {
+           // if (isSystemInDarkTheme() && isDark.not()) {
+                if (isDark.not()) {
                 // Set Light Mode and Restart
                 UserPreferencesUtil.setCurrentUserModeSelection(LocalContext.current, 0)
             }

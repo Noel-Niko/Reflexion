@@ -251,7 +251,11 @@ fun settingsContent(
 ) {
     val apply by viewModel.apply.collectAsState()
     val bitmapList by viewModel.iconImages.collectAsState()
-    val startMode = if(isSystemInDarkTheme()) 1 else 0
+    val startMode: Int = if(UserPreferencesUtil.getCurrentUserModeSelection(LocalContext.current) != -1) {
+        UserPreferencesUtil.getCurrentUserModeSelection(LocalContext.current)
+    } else {
+        if(isSystemInDarkTheme()) 1 else 0
+    }
     val context = LocalContext.current
     val resource = ResourceProviderSingleton
     Scaffold(Modifier.padding(paddingValues = paddingValues)) {
@@ -517,7 +521,13 @@ fun settingsContent(
                                         )
                                     }
                                     viewModel.setApply(true)
-                                    Toast.makeText(context, resource.getString(R.string.applying_changes_and_restarting), Toast.LENGTH_SHORT).show()
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            resource.getString(R.string.applying_changes_and_restarting),
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
                                 }
                         )
                     }
@@ -560,7 +570,13 @@ fun settingsContent(
                                     resetIconImage(context, bitmapList.size)
                                     UserPreferencesUtil.setCurrentUserThemeSelection(context, -1)
                                     viewModel.restartApp()
-                                    Toast.makeText(context, resource.getString(R.string.applying_changes_and_restarting), Toast.LENGTH_SHORT).show()
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            resource.getString(R.string.applying_changes_and_restarting),
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
                                 })
                     }
                 }
