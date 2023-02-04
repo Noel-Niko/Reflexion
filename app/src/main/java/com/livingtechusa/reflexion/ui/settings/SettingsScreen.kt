@@ -76,7 +76,6 @@ fun SettingsScreen(
     windowSize: WindowWidthSizeClass,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
-    val isDark = isSystemInDarkTheme()
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         // Create an observer that triggers our remembered callbacks
@@ -127,8 +126,10 @@ fun IconImageCard(
 ) {
     val context = LocalContext.current
     val screenPixelDensity = context.resources.displayMetrics.density
-
     val size = (512f / 2) / screenPixelDensity
+    val selectedIconIndex by viewModel.iconSelected.collectAsState()
+    val isSelected = (selectedIconIndex == iconNumber)
+    val outlineColor = if(isSelected) { MaterialTheme.colorScheme.surface } else { MaterialTheme.colorScheme.primary}
     val imagePainter = rememberImagePainter(
         data = image,
         builder = {
@@ -141,7 +142,8 @@ fun IconImageCard(
             .height(size.dp)
             .width(size.dp)
             .padding(4.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        border = CardDefaults.outlinedCardBorder(isSelected),
+        colors = CardDefaults.outlinedCardColors(containerColor = outlineColor)
     ) {
         Image(
             painter = imagePainter,
@@ -149,15 +151,15 @@ fun IconImageCard(
             contentScale = ContentScale.FillBounds,
             modifier = Modifier
                 .fillMaxSize()
-                //.rotate(90f)
                 .clickable(
                     onClick = {
                         viewModel.icon = true
                         viewModel.iconNumber = iconNumber
                         viewModel.totalIndices = totalIndices
+                        viewModel.onTriggerEvent(SettingsEvent.setIconSelected(iconNumber))
                     }
-                )
-                .background(MaterialTheme.colorScheme.surface)
+                ),
+            alignment = Alignment.Center
         )
     }
 }
@@ -235,17 +237,11 @@ fun showNewIconImage(context: Context, int: Int, totalIndices: Int) {
         }
         count++
     }
-    Toast
-        .makeText(
-            context, "Icon Selected",
-            Toast.LENGTH_LONG
-        )
-        .show()
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun settingsContent(
+fun SettingsContent(
     paddingValues: PaddingValues,
     viewModel: SettingsViewModel
 ) {
@@ -261,7 +257,7 @@ fun settingsContent(
     Scaffold(Modifier.padding(paddingValues = paddingValues)) {
         if(apply){
             if (viewModel.mode && viewModel.isDarkMode != null) {
-                viewModel.toggleLightDarkMode(viewModel.isDarkMode!!)
+                viewModel.ToggleLightDarkMode(viewModel.isDarkMode!!)
             }
             viewModel.icon = false
             viewModel.iconNumber = null
@@ -282,7 +278,7 @@ fun settingsContent(
         ) {
             // Icons
             val screenPixelDensity = context.resources.displayMetrics.density
-            val height = (800f / 2) / screenPixelDensity
+            val height = (768f / 2) / screenPixelDensity
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -353,7 +349,6 @@ fun settingsContent(
                             modifier = Modifier.background(MaterialTheme.colorScheme.secondaryContainer),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            var selected by remember { mutableStateOf(false) }
                             Column(modifier = Modifier.fillMaxWidth(.3f)) {
                                 Text(
                                     text = stringResource(R.string.select_theme_color_restart_app),

@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.util.Log
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.graphics.drawable.toBitmap
@@ -51,9 +50,12 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
     private val _iconImages = MutableStateFlow(emptyList<Bitmap>())
     val iconImages: StateFlow<List<Bitmap>> get() = _iconImages
 
+    private val _iconSelected: MutableStateFlow<Int?> = MutableStateFlow(null)
+    val iconSelected: StateFlow<Int?> get() = _iconSelected
+
     private fun getAppBitmapList() {
         val bitmapList = mutableListOf<Bitmap>()
-        val ids = APP_ICON_LIST.let { list ->
+        APP_ICON_LIST.let { list ->
             list.forEach { id ->
                 bitmapList.add(resource.getDrawable(id).toBitmap())
             }
@@ -68,7 +70,9 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
                     is SettingsEvent.getIconImages -> {
                         getAppBitmapList()
                     }
-                    else -> {}
+                    is SettingsEvent.setIconSelected -> {
+                        _iconSelected.value = event.iconSelected
+                    }
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "ERROR " + e.message + " WITH CAUSE " + e.cause)
@@ -95,7 +99,7 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
     }
 
     @Composable
-    fun toggleLightDarkMode(isDark: Boolean) {
+    fun ToggleLightDarkMode(isDark: Boolean) {
         //if (isSystemInDarkTheme().not() && isDark) {
             if (isDark) {
                 // Set Dark Mode and Restart
