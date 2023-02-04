@@ -80,7 +80,7 @@ fun SettingsScreen(
     DisposableEffect(lifecycleOwner) {
         // Create an observer that triggers our remembered callbacks
         // for sending analytics events
-        val observer = LifecycleEventObserver { owner, event ->
+        val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_CREATE) {
                 viewModel.onTriggerEvent(SettingsEvent.getIconImages)
             }
@@ -353,7 +353,6 @@ fun SettingsContent(
                                 Text(
                                     text = stringResource(R.string.select_theme_color_restart_app),
                                     modifier = Modifier.padding(8.dp),
-                                    //style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSecondaryContainer
                                 )
                             }
@@ -410,7 +409,7 @@ fun SettingsContent(
                                     )
                                 },
                             ) {
-                                items.mapIndexed { i, item ->
+                                items.mapIndexed { i, _ ->
                                     Tab(
                                         selected = activeTabIndex == i,
                                         onClick = {
