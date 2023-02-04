@@ -350,7 +350,6 @@ class ItemViewModel @Inject constructor(
                                 it
                             )
                         }
-
                         val resolver: ContentResolver = context.contentResolver
                         val shareIntent = Intent()
                         shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
@@ -430,15 +429,7 @@ class ItemViewModel @Inject constructor(
                             var thumbNail = ImageUtils.extractThumbnail(bitmap, 100, 100)
                             if (thumbNail != null) {
                                 thumbNail = rotateImage(thumbNail, 90f)
-                                val copy = reflexionItem.copy(
-                                    image = thumbNail?.let {
-                                        com.livingtechusa.reflexion.data.entities.Converters()
-                                            .convertBitMapToByteArray(it)
-                                    }
-                                )
-                                _reflexionItem = copy
-                                _reflexionItemState.value = _reflexionItem
-                                resetAllDisplayedSubItemsToDBVersion()
+                                _image.value = thumbNail
                             }
                         }
                         withContext(Dispatchers.IO) {

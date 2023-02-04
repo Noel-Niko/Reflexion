@@ -314,7 +314,7 @@ object MediaStoreUtils {
 
             // lastly closing an instance of file input stream
             // to avoid memory leakage
-            inputStream?.close()
+            inputStream.close()
 
             // Returning above byte array
             return arr

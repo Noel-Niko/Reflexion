@@ -136,6 +136,7 @@ fun BuildItemContent(
     }
 
     var targetVideoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+
     val selectVideo = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument(),
         onResult = { uri ->
@@ -145,6 +146,7 @@ fun BuildItemContent(
                 )
             )
         })
+
     val takeVideo = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CaptureVideo()
     ) { _ ->
@@ -163,7 +165,9 @@ fun BuildItemContent(
     val selectImage = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
-            viewModel.onTriggerEvent(BuildEvent.CreateThumbnailImage(uri))
+            viewModel.onTriggerEvent(
+                BuildEvent.CreateThumbnailImage(uri)
+            )
         })
 
     val takeImage = rememberLauncherForActivityResult(
@@ -395,9 +399,9 @@ fun BuildItemContent(
             ) {
                 TextField(
                     colors = TextFieldDefaults.textFieldColors(
-                    textColor = MaterialTheme.colorScheme.onSurface,
-                    backgroundColor = Transparent
-                ),
+                        textColor = MaterialTheme.colorScheme.onSurface,
+                        backgroundColor = Transparent
+                    ),
                     textStyle = MaterialTheme.typography.labelLarge,
                     modifier = Modifier.fillMaxWidth(),
                     value = detailedDescription ?: EMPTY_STRING,
