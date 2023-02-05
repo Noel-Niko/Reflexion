@@ -2,7 +2,6 @@ package com.livingtechusa.reflexion
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,7 +9,6 @@ import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.DisposableEffectScope
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -34,7 +32,6 @@ import com.livingtechusa.reflexion.ui.bookmarks.BookmarksScreen
 import com.livingtechusa.reflexion.ui.build.BuildItemScreen
 import com.livingtechusa.reflexion.ui.components.ConfirmDeleteListDialog
 import com.livingtechusa.reflexion.ui.components.ConfirmDeleteSubItemDialog
-import com.livingtechusa.reflexion.ui.topics.ListDisplay
 import com.livingtechusa.reflexion.ui.components.ConfirmSaveAlertDialog
 import com.livingtechusa.reflexion.ui.components.PasteAndSaveDialog
 import com.livingtechusa.reflexion.ui.components.VideoPlayer
@@ -44,6 +41,7 @@ import com.livingtechusa.reflexion.ui.customLists.BuildCustomListsScreen
 import com.livingtechusa.reflexion.ui.home.HomeScreen
 import com.livingtechusa.reflexion.ui.settings.SettingsScreen
 import com.livingtechusa.reflexion.ui.theme.ReflexionDynamicTheme
+import com.livingtechusa.reflexion.ui.topics.ListDisplay
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.BaseApplication
@@ -319,20 +317,20 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-//                DisposableEffect(key1 = Intent()) {
-//                    val listener = Consumer<Intent> { intent ->
-//                        if (intent.clipData?.getItemAt(0)?.text != null && intent.clipData?.getItemAt(
-//                                0
-//                            )?.text != EMPTY_STRING
-//                        ) {
-//                            val url = intent.clipData?.getItemAt(0)?.text
-//                            Temporary.url = url.toString()
-//                            navigationController.navigate(Screen.ConfirmSaveScreen.route)
-//                        }
-//                    }
-//                    addOnNewIntentListener(listener)
-//                    onDispose { removeOnNewIntentListener(listener) }
-//                }
+                DisposableEffect(key1 = Intent()) {
+                    val listener = Consumer<Intent> { intent ->
+                        if (intent.clipData?.getItemAt(0)?.text != null && intent.clipData?.getItemAt(
+                                0
+                            )?.text != EMPTY_STRING
+                        ) {
+                            val url = intent.clipData?.getItemAt(0)?.text
+                            Temporary.url = url.toString()
+                            navigationController.navigate(Screen.ConfirmSaveScreen.route)
+                        }
+                    }
+                    addOnNewIntentListener(listener)
+                    onDispose { removeOnNewIntentListener(listener) }
+                }
 
                 DisposableEffect(key1 =Intent()) {
                    // val url: String = intent.clipData?.getItemAt(0)?.text.toString()
