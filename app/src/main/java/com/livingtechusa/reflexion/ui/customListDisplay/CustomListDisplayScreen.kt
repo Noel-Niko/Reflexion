@@ -21,9 +21,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
-import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -126,7 +126,7 @@ fun CustomListDisplayContent(
                         .padding(12.dp)
                         .align(Alignment.CenterVertically)
                 ) {
-                    androidx.compose.material3.Text(
+                    Text(
                         color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.labelMedium,
                         text = stringResource(R.string.title)
@@ -161,7 +161,11 @@ fun CustomListDisplayContent(
                     modifier = Modifier
                         .fillParentMaxSize()
                         .padding(16.dp)
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .clickable {
+                                   navController.navigate(Screen.BuildItemScreen.route + "/" + children[childItemIndex].autogenPK)
+                        },
+
                     elevation = 6.dp,
                     shape = RoundedCornerShape(20.dp)
                 ) {
@@ -214,7 +218,7 @@ fun CustomListDisplayContent(
                                 .fillMaxWidth()
                         ) {
                             Column() {
-                                androidx.compose.material3.Text(
+                                Text(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.labelMedium,
                                     text = stringResource(R.string.description)
@@ -241,7 +245,7 @@ fun CustomListDisplayContent(
                                 .fillMaxWidth()
                         ) {
                             Column() {
-                                androidx.compose.material3.Text(
+                                Text(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     style = MaterialTheme.typography.labelMedium,
                                     text = stringResource(R.string.detailedDescription)
@@ -271,7 +275,7 @@ fun CustomListDisplayContent(
                                     .weight(1f)
 
                             ) {
-                                androidx.compose.material3.Text(
+                                Text(
                                     modifier = Modifier
                                         .padding(12.dp)
                                         .fillMaxWidth()
@@ -286,7 +290,7 @@ fun CustomListDisplayContent(
                                                     .show()
                                             } else {
                                                 val route: String =
-                                                    Screen.VideoViewCustomList.route + "/" + childItemIndex
+                                                    Screen.VideoViewCustomList.route + "/" + childVideoUriList[childItemIndex]?.uri
                                                 navController.navigate(route)
                                             }
                                         },
@@ -294,7 +298,7 @@ fun CustomListDisplayContent(
                                     color = MaterialTheme.colorScheme.primary
                                 )
                                 if (children[childItemIndex].videoUri.isNullOrEmpty().not()) {
-                                    if (childVideoUriList.isNullOrEmpty().not()) {
+                                    if (childVideoUriList.isEmpty().not()) {
                                         if (childVideoUriList[childItemIndex] != null) {
                                             DocumentFilePreviewCard(
                                                 resource = childVideoUriList[childItemIndex]!!,
@@ -312,7 +316,7 @@ fun CustomListDisplayContent(
                                     .padding(12.dp)
                                     .weight(1f)
                             ) {
-                                androidx.compose.material3.Text(
+                                Text(
                                     modifier = Modifier
                                         .padding(12.dp)
                                         .fillMaxWidth()

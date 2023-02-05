@@ -97,15 +97,8 @@ class ItemViewModel @Inject constructor(
     private val context: Context
         get() = BaseApplication.getInstance()
 
-    private val handler = CoroutineExceptionHandler { _, throwable ->
-        Log.i(TAG, "ERROR: $throwable")
-        throwable.printStackTrace()
-    }
-
     private val _saveNowFromTopBar = MutableStateFlow(false)
     val saveNowFromTopBar: StateFlow<Boolean> get() = _saveNowFromTopBar
-
-//    var listPK = 0L
 
     suspend fun hasNoChildren(pk: Long): Boolean {
         return localServiceImpl.selectChildren(pk).isEmpty()
@@ -355,10 +348,8 @@ class ItemViewModel @Inject constructor(
                         val shareIntent = Intent()
                         shareIntent.action = Intent.ACTION_SEND
                         shareIntent.type = "text/*"
-
                         shareIntent.putExtra(Intent.EXTRA_TEXT, text)
                         shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-
                         val resolver: ContentResolver = context.contentResolver
                         shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
                         shareIntent.type = "video/*"

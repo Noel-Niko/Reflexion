@@ -9,7 +9,6 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material.icons.filled.SendToMobile
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -26,7 +25,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.NavBarItems
-import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
@@ -71,7 +69,7 @@ fun CustomListDisplayCompactScreen(
                                 androidx.compose.material.Icon(
                                     imageVector = Icons.Default.Bookmark,
                                     contentDescription = "bookmark",
-                                    tint = androidx.compose.material3.MaterialTheme.colorScheme.onSurface,
+                                    tint = MaterialTheme.colorScheme.onSurface,
                                 )
                             },
                         )
@@ -110,7 +108,7 @@ fun CustomListDisplayCompactScreen(
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
             BottomNavigation(
-                backgroundColor = androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer,
+                backgroundColor = MaterialTheme.colorScheme.primaryContainer,
             ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(

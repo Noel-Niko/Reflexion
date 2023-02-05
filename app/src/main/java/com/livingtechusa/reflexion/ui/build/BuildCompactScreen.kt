@@ -18,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material.icons.filled.SendToMobile
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -88,18 +87,6 @@ fun BuildItemCompactScreen(
                                 Icon(
                                     imageVector = Icons.Default.Bookmark,
                                     contentDescription = "bookmark",
-                                    tint = MaterialTheme.colorScheme.onSurface,
-                                )
-                            },
-                        )
-                        IconButton(
-                            onClick = {
-                                viewModel.onTriggerEvent(BuildEvent.BluetoothSend)
-                            },
-                            content = {
-                                Icon(
-                                    imageVector = Icons.Default.SendToMobile,
-                                    contentDescription = "send",
                                     tint = MaterialTheme.colorScheme.onSurface,
                                 )
                             },
@@ -191,7 +178,7 @@ fun BuildItemCompactScreen(
                 }
                 .pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
-                        change.consumeAllChanges()
+                        change.consume()
                         offsetX.value += dragAmount.x
                         offsetY.value += dragAmount.y
                     }

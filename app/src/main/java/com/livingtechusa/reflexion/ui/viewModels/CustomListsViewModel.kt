@@ -4,9 +4,9 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
-import android.widget.Toast
-import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.livingtechusa.reflexion.R
@@ -14,8 +14,6 @@ import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.entities.Bookmarks
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
-import com.livingtechusa.reflexion.di.DefaultDispatcher
-import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
@@ -25,21 +23,18 @@ import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import com.livingtechusa.reflexion.util.scopedStorageUtils.FileResource
 import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.StringBuilder
 import javax.inject.Inject
 
 
 @HiltViewModel
 class CustomListsViewModel @Inject constructor(
-    private val localServiceImpl: LocalServiceImpl,
-    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
+    private val localServiceImpl: LocalServiceImpl
 ) : ViewModel() {
     companion object {
         private val TAG = this::class.java.simpleName
@@ -84,7 +79,7 @@ class CustomListsViewModel @Inject constructor(
     private var newList = true
     private var topic: Long = EMPTY_PK
 
-    suspend fun getTopic(pk: Long): Long? {
+    suspend fun getTopic(pk: Long): Long {
         var childPk: Long? = pk
         // If pk is a topic, it's own pk should be returned.
         var parent = pk
@@ -100,7 +95,7 @@ class CustomListsViewModel @Inject constructor(
         return parent
     }
 
-    fun getListImages() {
+    private fun getListImages() {
         viewModelScope.launch {
             val bitmaps: MutableList<Bitmap> = mutableListOf()
             val job = async {
@@ -114,7 +109,7 @@ class CustomListsViewModel @Inject constructor(
         }
     }
 
-    fun getChildListImages() {
+    private fun getChildListImages() {
         viewModelScope.launch {
             val bitmaps: MutableList<Bitmap> = mutableListOf()
             val job = async {
@@ -130,7 +125,7 @@ class CustomListsViewModel @Inject constructor(
         }
     }
 
-    fun getVideoResource() {
+    private fun getVideoResource() {
         viewModelScope.launch {
             val resources: MutableList<FileResource> = mutableListOf()
             val job = async {
@@ -153,7 +148,7 @@ class CustomListsViewModel @Inject constructor(
         }
     }
 
-    val item1 = ReflexionArrayItem(
+    private val item1 = ReflexionArrayItem(
         itemPK = null,
         itemName = context.getString(R.string.topics),
         0L,
@@ -162,17 +157,13 @@ class CustomListsViewModel @Inject constructor(
     private val _itemTree = MutableStateFlow(item1)
     val itemTree: StateFlow<ReflexionArrayItem> get() = _itemTree
 
-    suspend fun hasChildren(pk: Long): Boolean {
-        return localServiceImpl.selectChildren(pk).isNotEmpty()
-    }
-
     init {
         viewModelScope.launch {
             _itemTree.value = newLevel(item1, getMore(item1.itemPK))
         }
     }
 
-    fun newLevel(
+    private fun newLevel(
         Rai: ReflexionArrayItem,
         list: MutableList<ReflexionArrayItem>?
     ): ReflexionArrayItem {
@@ -182,7 +173,7 @@ class CustomListsViewModel @Inject constructor(
         return Rai
     }
 
-    suspend fun getMore(pk: Long?): MutableList<ReflexionArrayItem> {
+    private suspend fun getMore(pk: Long?): MutableList<ReflexionArrayItem> {
         val _list = mutableListOf<ReflexionArrayItem>()
         val job = viewModelScope.async {
             localServiceImpl.selectReflexionArrayItemsByParentPk(pk).forEach() {
@@ -336,19 +327,48 @@ class CustomListsViewModel @Inject constructor(
                 }
 
                 is CustomListEvent.SendText -> {
+                    val title = customList.value.itemName + "\n"
                     var listItems = EMPTY_STRING
-                    customList.value.children.forEach { item ->
-                        listItems += item.itemName + ", "
+                    _children.value.forEach { reflexionItem ->
+                        listItems += reflexionItem.name + "\n" +
+                                reflexionItem.description + "\n" + reflexionItem.detailedDescription + " " + reflexionItem.videoUrl + "\n"
                     }
-                    val text = customList.value.itemName + "\n" + ": " + listItems.substring(0,listItems.length - 2)
+                    val text = title + listItems
 
                     val shareIntent = Intent()
                     shareIntent.action = Intent.ACTION_SEND
                     shareIntent.type = "text/*"
 
                     shareIntent.putExtra(Intent.EXTRA_TEXT, text)
+
+
                     shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    ContextCompat.startActivity(context, shareIntent, null)
+
+                    val resolver: ContentResolver = context.contentResolver
+                    shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
+                    shareIntent.type = "video/*"
+
+                    val videoList: MutableList<Uri> = mutableListOf()
+
+                    _children.value.forEach { reflexionItem ->
+                        reflexionItem.videoUri?.let { uri ->
+                            Converters().convertStringToUri(
+                                uri
+                            )?.let { videoUri ->
+                                videoList.add(
+                                    videoUri
+                                )
+                            }
+                        }
+                    }
+                    videoList.forEach { uri ->
+                        shareIntent.setDataAndType(uri, resolver.getType(uri) )
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
+                    }
+                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    shareIntent.action = Intent.ACTION_SEND
+                    startActivity(context, shareIntent, null)
                 }
 
                 else -> {}
