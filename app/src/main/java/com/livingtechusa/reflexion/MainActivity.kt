@@ -2,6 +2,7 @@ package com.livingtechusa.reflexion
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -9,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.DisposableEffectScope
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -143,7 +145,8 @@ class MainActivity : ComponentActivity() {
                         }
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         BuildItemScreen(
-                            pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK) ?: EMPTY_PK,
+                            pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK)
+                                ?: EMPTY_PK,
                             navHostController = navController,
                             windowSize = windowSize,
                             viewModel = parentViewModel
@@ -163,7 +166,7 @@ class MainActivity : ComponentActivity() {
                         }
                         val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
                         VideoPlayer(
-                            viewModel =  parentViewModel
+                            viewModel = parentViewModel
                         )
                     }
 
@@ -203,7 +206,8 @@ class MainActivity : ComponentActivity() {
                     ) { navBackStackEntry ->
                         ListDisplay(
                             navHostController = navController,
-                            pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK) ?: EMPTY_PK,
+                            pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK)
+                                ?: EMPTY_PK,
                             windowSize = windowSize,
                         )
                     }
@@ -218,7 +222,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable(
-                        route = Screen.ConfirmDeleteListScreen.route+ "/{index}/{listName}",
+                        route = Screen.ConfirmDeleteListScreen.route + "/{index}/{listName}",
                         arguments = listOf(
                             navArgument(INDEX) {
                                 type = NavType.IntType
@@ -255,7 +259,8 @@ class MainActivity : ComponentActivity() {
                         ConfirmDeleteSubItemDialog(
                             viewModel = parentViewModel,
                             navController = navController,
-                            subItem = navBackStackEntry.arguments?.getString(SUB_ITEM) ?: EMPTY_STRING
+                            subItem = navBackStackEntry.arguments?.getString(SUB_ITEM)
+                                ?: EMPTY_STRING
                         )
                     }
 
@@ -315,18 +320,29 @@ class MainActivity : ComponentActivity() {
                 }
 
                 DisposableEffect(key1 = Intent()) {
-                    val listener = Consumer<Intent> { intent ->
-                        if (intent.clipData?.getItemAt(0)?.text != null && intent.clipData?.getItemAt(
-                                0
-                            )?.text != EMPTY_STRING
-                        ) {
-                            val url = intent.clipData?.getItemAt(0)?.text
-                            Temporary.url = url.toString()
-                            navigationController.navigate(Screen.ConfirmSaveScreen.route)
+                    val data: Uri? = intent?.data
+
+                    if (intent?.type?.startsWith("video/") == true) {
+                        val uri = intent.clipData?.getItemAt(0)?.uri
+                        Temporary.url = uri.toString()
+                        navigationController.navigate(Screen.ConfirmSaveScreen.route)
+                        val listener = Consumer<Intent> { Unit }
+                        addOnNewIntentListener(listener)
+                        onDispose { removeOnNewIntentListener(listener) }
+                    } else {
+                        val listener = Consumer<Intent> { intent ->
+                            if (intent.clipData?.getItemAt(0)?.text != null && intent.clipData?.getItemAt(
+                                    0
+                                )?.text != EMPTY_STRING
+                            ) {
+                                val url = intent.clipData?.getItemAt(0)?.text
+                                Temporary.url = url.toString()
+                                navigationController.navigate(Screen.ConfirmSaveScreen.route)
+                            }
                         }
+                        addOnNewIntentListener(listener)
+                        onDispose { removeOnNewIntentListener(listener) }
                     }
-                    addOnNewIntentListener(listener)
-                    onDispose { removeOnNewIntentListener(listener) }
                 }
             }
         }

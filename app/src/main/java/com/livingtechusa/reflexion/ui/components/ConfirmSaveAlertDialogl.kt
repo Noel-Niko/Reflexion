@@ -62,6 +62,7 @@ fun ConfirmSaveAlertDialog(
                                 navController.navigate(Screen.BuildItemScreen.route + "/" + DO_NOT_UPDATE) {
                                     launchSingleTop = true
                                 }
+                                Temporary.url = EMPTY_STRING
                             },
                             colors = ButtonDefaults.buttonColors(backgroundColor =  androidx.compose.material3.MaterialTheme.colorScheme.primary, contentColor =  androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
                         ) {

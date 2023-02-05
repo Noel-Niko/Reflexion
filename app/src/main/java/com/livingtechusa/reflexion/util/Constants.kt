@@ -1,5 +1,6 @@
 package com.livingtechusa.reflexion.util
 
+import android.net.Uri
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
@@ -61,6 +62,6 @@ object Constants {
 object Temporary {
     var use: Boolean = false
     var url = EMPTY_STRING
-    var tempReflexionItem: ReflexionItem = ReflexionItem()
+    var uri  = EMPTY_STRING
 }
 
