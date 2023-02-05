@@ -108,10 +108,10 @@ class ItemViewModel @Inject constructor(
         return localServiceImpl.selectSiblings(pk, parentPk).isEmpty()
     }
 
-    /**
-     * We keep the current media [Uri] in the savedStateHandle to re-render it if there is a
-     * configuration change and we expose it as a [LiveData] to the UI
-     */
+//    /**
+//     * We keep the current media [Uri] in the savedStateHandle to re-render it if there is a
+//     * configuration change and we expose it as a [LiveData] to the UI
+//     */
 //    val selectedFile: LiveData<FileResource?> =
 //        savedStateHandle.getLiveData<FileResource?>(SELECTED_FILE_KEY)
 //    private val uri: Uri? = reflexionItem.value.videoUri?.let { Converters().convertStringToUri(it)}
@@ -337,8 +337,8 @@ class ItemViewModel @Inject constructor(
 
                     is BuildEvent.SendText -> {
                         val text =
-                            name.value + "\n" + description.value +
-                                    " \n" + detailedDescription.value + "\n" + videoUrl.value + "\n\n" +
+                            context.getString(R.string.title) + ": " + name.value + "\n" + context.getString(R.string.description) + ": "  + description.value +
+                                    " \n" + context.getString(R.string.detailedDescription) + ": "  + detailedDescription.value + "\n" + videoUrl.value + "\n\n" +
                                     context.getString(R.string.sent_with_reflexion_from_the_google_play_store)
                         val video = videoUri.value?.let {
                             Converters().convertStringToUri(

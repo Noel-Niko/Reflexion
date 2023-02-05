@@ -3,6 +3,8 @@ package com.livingtechusa.reflexion.ui.viewModels
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.EXTRA_STREAM
+import android.content.Intent.EXTRA_TEXT
 import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
@@ -330,44 +332,40 @@ class CustomListsViewModel @Inject constructor(
                     val title = customList.value.itemName + "\n"
                     var listItems = EMPTY_STRING
                     _children.value.forEach { reflexionItem ->
-                        listItems += reflexionItem.name + "\n" +
-                                reflexionItem.description + "\n" + reflexionItem.detailedDescription + " " + reflexionItem.videoUrl + "\n"
+                        listItems += context.getString(R.string.title) + ": " + reflexionItem.name + "\n" +
+                               context.getString(R.string.description) + ": " + reflexionItem.description + "\n" + context.getString(R.string.detailedDescription) + ": " + reflexionItem.detailedDescription + "\n" + reflexionItem.videoUrl + "\n"
                     }
                     val text = title + listItems
 
                     val shareIntent = Intent()
-                    shareIntent.action = Intent.ACTION_SEND
+//                    shareIntent.action = Intent.ACTION_SEND_MULTIPLE
+                    shareIntent.putExtra(EXTRA_TEXT, text);
                     shareIntent.type = "text/*"
 
-                    shareIntent.putExtra(Intent.EXTRA_TEXT, text)
-
-
-                    shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//                    shareIntent.putExtra(Intent.EXTRA_TEXT, text)
+//                    shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
                     val resolver: ContentResolver = context.contentResolver
                     shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
-                    shareIntent.type = "video/*"
+                    shareIntent.action = Intent.ACTION_SEND_MULTIPLE
+//                    shareIntent.type = "video/*"
 
-                    val videoList: MutableList<Uri> = mutableListOf()
-
+                    val uriList = mutableListOf<Uri>()
                     _children.value.forEach { reflexionItem ->
                         reflexionItem.videoUri?.let { uri ->
                             Converters().convertStringToUri(
                                 uri
                             )?.let { videoUri ->
-                                videoList.add(
-                                    videoUri
-                                )
+                                uriList.add(videoUri)
                             }
                         }
                     }
-                    videoList.forEach { uri ->
-                        shareIntent.setDataAndType(uri, resolver.getType(uri) )
-                        shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
-                    }
+                    val parcelableUriList: ArrayList<Uri> = ArrayList(uriList)
+                    shareIntent.putParcelableArrayListExtra(EXTRA_STREAM, parcelableUriList)
+//                    shareIntent.putExtra(EXTRA_STREAM, videoUri)
+
                     shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    shareIntent.action = Intent.ACTION_SEND
                     startActivity(context, shareIntent, null)
                 }
 
