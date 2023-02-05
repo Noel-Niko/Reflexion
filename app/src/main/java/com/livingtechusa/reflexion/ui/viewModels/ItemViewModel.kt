@@ -29,6 +29,7 @@ import com.livingtechusa.reflexion.util.Constants.NAME
 import com.livingtechusa.reflexion.util.Constants.PARENT
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URI
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URL
+import com.livingtechusa.reflexion.util.Temporary
 import com.livingtechusa.reflexion.util.scopedStorageUtils.FileResource
 import com.livingtechusa.reflexion.util.scopedStorageUtils.ImageUtils
 import com.livingtechusa.reflexion.util.scopedStorageUtils.ImageUtils.rotateImage
@@ -209,7 +210,6 @@ class ItemViewModel @Inject constructor(
                             }
                             _reflexionItem = updatedReflexionItem
                             _reflexionItemState.value = updatedReflexionItem
-                            _videoUri.value = EMPTY_STRING
                             localServiceImpl.updateReflexionItem(reflexionItem)
                         }
                     }
@@ -441,15 +441,17 @@ class ItemViewModel @Inject constructor(
                             val _savedRI = async {
                                 localServiceImpl.selectItemByUri(event.uri)
                             }
-                            val savedRI = _savedRI.await()
-                            if(savedRI.videoUri != null) {
-                                resetAllDisplayedSubItemsToDBVersion()
-                                _reflexionItemState.value = savedRI
+                            val savedRI: ReflexionItem? = _savedRI.await()
+                            resetAllDisplayedSubItemsToDBVersion()
+                            if(savedRI != null) {
+                                _reflexionItem = savedRI
+                                _reflexionItemState.value = _reflexionItem
                             } else {
-                                resetAllDisplayedSubItemsToDBVersion()
-                                _videoUri.value = event.uri.toString()
+                                this@ItemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(VIDEO_URI,event.uri))
                             }
-
+                            Temporary.url = EMPTY_STRING
+                            Temporary.uri = EMPTY_STRING
+                            Temporary.use = false
                         }
                     }
 

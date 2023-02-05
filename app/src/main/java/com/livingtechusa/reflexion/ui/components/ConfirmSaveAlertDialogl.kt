@@ -63,6 +63,7 @@ fun ConfirmSaveAlertDialog(
                                     launchSingleTop = true
                                 }
                                 Temporary.url = EMPTY_STRING
+                                Temporary.uri = EMPTY_STRING
                             },
                             colors = ButtonDefaults.buttonColors(backgroundColor =  androidx.compose.material3.MaterialTheme.colorScheme.primary, contentColor =  androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
                         ) {
@@ -72,11 +73,12 @@ fun ConfirmSaveAlertDialog(
                     dismissButton = {
                         Button(
                             onClick = {
-                                Temporary.url = EMPTY_STRING
                                 openDialog.value = false
                                 navController.navigate(Screen.BuildItemScreen.route + "/" + DO_NOT_UPDATE) {
                                     launchSingleTop = true
                                 }
+                                Temporary.url = EMPTY_STRING
+                                Temporary.uri = EMPTY_STRING
                             },
                             colors = ButtonDefaults.buttonColors(backgroundColor =  androidx.compose.material3.MaterialTheme.colorScheme.primary, contentColor =  androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
                         ) {

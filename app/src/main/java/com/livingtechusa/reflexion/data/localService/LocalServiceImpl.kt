@@ -378,7 +378,7 @@ class LocalServiceImpl @Inject constructor(
         return reflexionItemDao.selectReflexionItemByName(name)
     }
 
-    override suspend fun selectItemByUri(uri: String): ReflexionItem {
+    override suspend fun selectItemByUri(uri: String): ReflexionItem? {
        return reflexionItemDao.selectItemByUri(uri)
     }
 }

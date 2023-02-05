@@ -319,27 +319,37 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                DisposableEffect(key1 = Intent()) {
-                    val listener = Consumer<Intent> { intent ->
-                        if (intent?.type?.startsWith("text/") == true || intent?.type?.startsWith("video/") == true) {
-                            if (intent.clipData?.getItemAt(0)?.text != null && intent.clipData?.getItemAt(
-                                    0
-                                )?.text != EMPTY_STRING
-                            ) {
-                                val url = intent.clipData?.getItemAt(0)?.text
-                                Temporary.url = url.toString()
-                                navigationController.navigate(Screen.ConfirmSaveScreen.route)
-                            }
-//                            else {
-//                                val uri = intent.clipData?.getItemAt(0)?.uri
-//                                Temporary.url = uri.toString()
-//                                navigationController.navigate(Screen.ConfirmSaveScreen.route)
-//                            }
-                        }
+//                DisposableEffect(key1 = Intent()) {
+//                    val listener = Consumer<Intent> { intent ->
+//                        if (intent.clipData?.getItemAt(0)?.text != null && intent.clipData?.getItemAt(
+//                                0
+//                            )?.text != EMPTY_STRING
+//                        ) {
+//                            val url = intent.clipData?.getItemAt(0)?.text
+//                            Temporary.url = url.toString()
+//                            navigationController.navigate(Screen.ConfirmSaveScreen.route)
+//                        }
+//                    }
+//                    addOnNewIntentListener(listener)
+//                    onDispose { removeOnNewIntentListener(listener) }
+//                }
+
+                DisposableEffect(key1 =Intent()) {
+                   // val url: String = intent.clipData?.getItemAt(0)?.text.toString()
+                    val uri: String = intent.clipData?.getItemAt(0)?.uri.toString()
+                   // Temporary.url = url
+                    Temporary.uri = uri
+//                    if(url != EMPTY_STRING && url != "null") {
+//                        navigationController.navigate(Screen.ConfirmSaveScreen.route)
+//                    } else {
+                        if (uri != EMPTY_STRING && uri != "null") {
+                            Temporary.use = true
+                            navigationController.navigate(Screen.BuildItemScreen.route + "/-1")
+//                        }
                     }
-                    addOnNewIntentListener(listener)
-                    onDispose { removeOnNewIntentListener(listener) }
+                    onDispose {  }
                 }
+
             }
         }
     }
