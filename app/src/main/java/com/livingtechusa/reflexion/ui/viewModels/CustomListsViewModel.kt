@@ -332,8 +332,8 @@ class CustomListsViewModel @Inject constructor(
                     val title = customList.value.itemName + "\n"
                     var listItems = EMPTY_STRING
                     _children.value.forEach { reflexionItem ->
-                        listItems += context.getString(R.string.title) + ": " + reflexionItem.name + "\n" +
-                               context.getString(R.string.description) + ": " + reflexionItem.description + "\n" + context.getString(R.string.detailedDescription) + ": " + reflexionItem.detailedDescription + "\n" + reflexionItem.videoUrl + "\n"
+                        listItems += context.getString(R.string.title) + reflexionItem.name + "\n" +
+                               context.getString(R.string.description) + reflexionItem.description + "\n" + context.getString(R.string.detailedDescription) + reflexionItem.detailedDescription + "\n" + reflexionItem.videoUrl + "\n"
                     }
                     val text = title + listItems
 

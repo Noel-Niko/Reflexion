@@ -337,8 +337,8 @@ class ItemViewModel @Inject constructor(
 
                     is BuildEvent.SendText -> {
                         val text =
-                            context.getString(R.string.title) + ": " + name.value + "\n" + context.getString(R.string.description) + ": "  + description.value +
-                                    " \n" + context.getString(R.string.detailedDescription) + ": "  + detailedDescription.value + "\n" + videoUrl.value + "\n\n" +
+                            context.getString(R.string.title) + name.value + "\n" + context.getString(R.string.description) + description.value +
+                                    " \n" + context.getString(R.string.detailedDescription) + detailedDescription.value + "\n" + videoUrl.value + "\n\n" +
                                     context.getString(R.string.sent_with_reflexion_from_the_google_play_store)
                         val video = videoUri.value?.let {
                             Converters().convertStringToUri(
