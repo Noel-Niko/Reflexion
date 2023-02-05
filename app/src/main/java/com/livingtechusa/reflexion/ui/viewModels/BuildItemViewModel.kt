@@ -284,7 +284,9 @@ class ItemViewModel @Inject constructor(
                             when (event.pk) {
                                 EMPTY_PK -> {
                                     _reflexionItem = ReflexionItem()
+                                    resetAllDisplayedSubItemsToDBVersion()
                                     _reflexionItemState.value = _reflexionItem
+
                                 }
 
                                 DO_NOT_UPDATE -> {}
@@ -340,34 +342,11 @@ class ItemViewModel @Inject constructor(
                         }
                     }
 
-                    is BuildEvent.BluetoothSend -> {
-                        val text =
-                            name.value + "\n" + description.value +
-                                    " \n" + detailedDescription.value + "\n" + videoUrl.value
-
-                        val video = videoUri.value?.let {
-                            Converters().convertStringToUri(
-                                it
-                            )
-                        }
-                        val resolver: ContentResolver = context.contentResolver
-                        val shareIntent = Intent()
-                        shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
-                        shareIntent.type = "video/*"
-                        shareIntent.putExtra(Intent.EXTRA_TEXT, text)
-                        shareIntent.setDataAndType(video, video?.let { resolver.getType(it) })
-                        shareIntent.putExtra(Intent.EXTRA_STREAM, video)
-                        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        shareIntent.action = Intent.ACTION_SEND
-                        startActivity(context, shareIntent, null)
-                    }
-
                     is BuildEvent.SendText -> {
                         val text =
                             name.value + "\n" + description.value +
-                                    " \n" + detailedDescription.value + "\n" + videoUrl.value
-
+                                    " \n" + detailedDescription.value + "\n" + videoUrl.value + "\n\n" +
+                                    context.getString(R.string.sent_with_reflexion_from_the_google_play_store)
                         val video = videoUri.value?.let {
                             Converters().convertStringToUri(
                                 it
@@ -379,21 +358,16 @@ class ItemViewModel @Inject constructor(
 
                         shareIntent.putExtra(Intent.EXTRA_TEXT, text)
                         shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+                        val resolver: ContentResolver = context.contentResolver
+                        shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
+                        shareIntent.type = "video/*"
+                        shareIntent.setDataAndType(video, video?.let { resolver.getType(it) })
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, video)
+                        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        shareIntent.action = Intent.ACTION_SEND
                         startActivity(context, shareIntent, null)
-                        try {
-                            val resolver: ContentResolver = context.contentResolver
-                            val videoShareIntent = Intent()
-                            videoShareIntent.action = Intent.ACTION_OPEN_DOCUMENT
-                            videoShareIntent.type = "video/*"
-                            videoShareIntent.setDataAndType(video, video?.let { resolver.getType(it) })
-                            videoShareIntent.putExtra(Intent.EXTRA_STREAM, video)
-                            videoShareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                            videoShareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            videoShareIntent.action = Intent.ACTION_SEND
-                            startActivity(context, videoShareIntent, null)
-                        } catch (e: Exception) {
-                            Toast.makeText(context, context.getString(R.string.unable_to_send_saved_video_file), Toast.LENGTH_SHORT).show()
-                        }
                     }
 
                     is BuildEvent.Save -> {
@@ -436,6 +410,7 @@ class ItemViewModel @Inject constructor(
                             iStream?.close()
                         }
                     }
+
                     is BuildEvent.SearchUri -> {
                         viewModelScope.launch {
                             val _savedRI = async {
@@ -443,19 +418,21 @@ class ItemViewModel @Inject constructor(
                             }
                             val savedRI: ReflexionItem? = _savedRI.await()
                             resetAllDisplayedSubItemsToDBVersion()
-                            if(savedRI != null) {
+                            if (savedRI != null) {
                                 _reflexionItem = savedRI
                                 _reflexionItemState.value = _reflexionItem
                             } else {
-                                this@ItemViewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(VIDEO_URI,event.uri))
+                                this@ItemViewModel.onTriggerEvent(
+                                    BuildEvent.UpdateDisplayedReflexionItem(
+                                        VIDEO_URI,
+                                        event.uri
+                                    )
+                                )
                             }
                             Temporary.url = EMPTY_STRING
                             Temporary.uri = EMPTY_STRING
                             Temporary.use = false
                         }
-                    }
-
-                    else -> {
                     }
                 }
             } catch (e: Exception) {

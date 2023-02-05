@@ -6,7 +6,6 @@ import androidx.compose.material.icons.filled.AddLink
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.DataArray
 import androidx.compose.material.icons.filled.DeveloperMode
-import androidx.compose.material.icons.filled.ViewList
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 
 object NavBarItems {
@@ -83,7 +82,7 @@ object NavBarItems {
         ),
     )
 
-    val ListBarItems = listOf(
+    val TopicsBarItems = listOf(
         BarItem(
             title = "Home",
             image = Icons.Filled.AddHome,

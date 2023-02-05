@@ -45,7 +45,7 @@ fun ListDisplay(
     }
 
     val context = LocalContext.current
-    val icons = NavBarItems.ListBarItems
+    val icons = NavBarItems.TopicsBarItems
 
     val search by viewModel.search.collectAsState()
 

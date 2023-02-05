@@ -40,7 +40,6 @@ sealed class BuildEvent {
 
     object RotateImage : BuildEvent()
 
-    object BluetoothSend : BuildEvent()
     object SendText : BuildEvent()
 
     object Save : BuildEvent()
