@@ -122,7 +122,11 @@ fun BuildItemContent(
         // for sending analytics events
         val observer = LifecycleEventObserver { owner, event ->
             if (event == Lifecycle.Event.ON_CREATE) {
-                viewModel.onTriggerEvent(BuildEvent.GetSelectedReflexionItem(pk))
+                if(Temporary.use) {
+                    viewModel.onTriggerEvent(BuildEvent.SearchUri(Temporary.uri))
+                } else {
+                    viewModel.onTriggerEvent(BuildEvent.GetSelectedReflexionItem(pk))
+                }
             }
         }
 

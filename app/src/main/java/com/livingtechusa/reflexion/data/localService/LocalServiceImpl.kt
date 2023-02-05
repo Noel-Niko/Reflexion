@@ -152,7 +152,10 @@ class LocalServiceImpl @Inject constructor(
         return reflexionItemDao.getParent(pk)
     }
 
-    override suspend fun insertNewOrUpdateNodeList(arrayItem: ReflexionArrayItem, topic: Long): Long? {
+    override suspend fun insertNewOrUpdateNodeList(
+        arrayItem: ReflexionArrayItem,
+        topic: Long
+    ): Long? {
         val nodeList: List<ListNode?> = arrayItem.toListNode(topic, arrayItem.nodePk)
         // Delete prior children
         arrayItem.nodePk?.let { deleteAllChildNodes(it) }
@@ -164,7 +167,7 @@ class LocalServiceImpl @Inject constructor(
             if (listNode != null) {
                 val updated = listNode.copy(parentPk = parent)
                 parent = linkedListDao.insertNewNode(updated)
-                if(count == 0) {
+                if (count == 0) {
                     headNodePk = parent
                 }
                 tailNode = listNode.nodePk
@@ -176,7 +179,7 @@ class LocalServiceImpl @Inject constructor(
 
     override suspend fun selectImage(itemPk: Long): Bitmap? {
         val byteArray: ByteArray? = reflexionItemDao.selectImage(itemPk)
-        return if(byteArray != null) {
+        return if (byteArray != null) {
             Converters().getBitmapFromByteArray(byteArray = byteArray)
         } else {
             null
@@ -236,8 +239,9 @@ class LocalServiceImpl @Inject constructor(
     override suspend fun deleteAllChildNodes(nodePk: Long) {
         var child = linkedListDao.selectChildNode(nodePk = nodePk)
         do {
-            val grandChild: ListNode? = child?.nodePk?.let { linkedListDao.selectChildNode(nodePk = it) }
-           // val parent: Long? = child?.nodePk
+            val grandChild: ListNode? =
+                child?.nodePk?.let { linkedListDao.selectChildNode(nodePk = it) }
+            // val parent: Long? = child?.nodePk
             if (child?.nodePk != null) {
                 linkedListDao.deleteSelectedNode(child.nodePk)
             }
@@ -323,7 +327,7 @@ class LocalServiceImpl @Inject constructor(
                 }
                 // recursively get all the children for each head node
                 while (parent?.nodePk != null) {
-                        getChild(parent?.nodePk!!)
+                    getChild(parent?.nodePk!!)
                 }
                 val nodeRAI = node?.toReflexionArrayItem()
                 children.forEach { childNodes ->
@@ -333,67 +337,48 @@ class LocalServiceImpl @Inject constructor(
             }
         }
         result.join()
-    return reflexionArrayItem
-}
+        return reflexionArrayItem
+    }
 
-override suspend fun selectChildNode(nodePk: Long): ListNode? {
-    return linkedListDao.selectChildNode(nodePk = nodePk)
-}
+    override suspend fun selectChildNode(nodePk: Long): ListNode? {
+        return linkedListDao.selectChildNode(nodePk = nodePk)
+    }
 
-override suspend fun selectParentNode(parentPk: Long): ListNode? {
-    return linkedListDao.selectParentNode(parentPk = parentPk)
-}
+    override suspend fun selectParentNode(parentPk: Long): ListNode? {
+        return linkedListDao.selectParentNode(parentPk = parentPk)
+    }
 
-override suspend fun updateListNode(
-    nodePk: Long,
-    title: String,
-    parentPK: Long,
-    childPk: Long
-) {
-    linkedListDao.updateListNode(
-        nodePk = nodePk,
-        title = title,
-        parentPK = parentPK,
-        childPk = childPk
-    )
-}
+    override suspend fun updateListNode(
+        nodePk: Long,
+        title: String,
+        parentPK: Long,
+        childPk: Long
+    ) {
+        linkedListDao.updateListNode(
+            nodePk = nodePk,
+            title = title,
+            parentPK = parentPK,
+            childPk = childPk
+        )
+    }
 
-override suspend fun getAllLinkedLists(): List<ListNode?> {
-    return linkedListDao.getAllLinkedLists()
-}
+    override suspend fun getAllLinkedLists(): List<ListNode?> {
+        return linkedListDao.getAllLinkedLists()
+    }
 
-override suspend fun deleteAllLinkedLists() {
-    linkedListDao.deleteAllLinkedLists()
-}
+    override suspend fun deleteAllLinkedLists() {
+        linkedListDao.deleteAllLinkedLists()
+    }
 
-override suspend fun deleteSelectedNode(nodePk: Long) {
-    linkedListDao.deleteSelectedNode(nodePk = nodePk)
-}
+    override suspend fun deleteSelectedNode(nodePk: Long) {
+        linkedListDao.deleteSelectedNode(nodePk = nodePk)
+    }
 
-override suspend fun selectReflexionItemByName(name: String): ReflexionItem {
-    return reflexionItemDao.selectReflexionItemByName(name)
-}
-}
+    override suspend fun selectReflexionItemByName(name: String): ReflexionItem {
+        return reflexionItemDao.selectReflexionItemByName(name)
+    }
 
-//                val childrenSorted = children.sortedWith<ListNode>(object : Comparator<ListNode> {
-//                    override fun compare(o1: ListNode, o2: ListNode): Int {
-//                        try {
-//                            if (o1.itemPK > o2.parentPk!!) {
-//                                return 0
-//                            }
-//                            if (o1.itemPK == o2.parentPk) {
-//                                return 1
-//                            }
-//                            if (o1.itemPK < o2.parentPk) {
-//                                return 0
-//                            }
-//                        } catch (e: Exception) {
-//                            Log.e(TAG, "ERROR: " + e.message + " WITH CAUSE: " + e.cause)
-//                        }
-//                        return 0
-//                    }
-//                })
-//                val reflexionArrayItems: MutableList<ReflexionArrayItem> = mutableListOf()
-//                for (childNode in childrenSorted) {
-//                    reflexionArrayItems.add(childNode.toReflexionArrayItem())
-//                }
+    override suspend fun selectItemByUri(uri: String): ReflexionItem {
+       return reflexionItemDao.selectItemByUri(uri)
+    }
+}

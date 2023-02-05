@@ -22,6 +22,7 @@ interface ILocalService {
     suspend fun selectSingleAbridgedReflexionItemDataByParentPk(pk: Long): AbridgedReflexionItem
 
     suspend fun selectReflexionItemByName(name: String): ReflexionItem
+    suspend fun selectItemByUri(uri: String): ReflexionItem
     suspend fun selectChildren(pk: Long): List<ReflexionItem?>
     suspend fun getAllTopics(): List<ReflexionItem?>
     suspend fun getAllItemsContainingString(search: String): List<ReflexionItem?>

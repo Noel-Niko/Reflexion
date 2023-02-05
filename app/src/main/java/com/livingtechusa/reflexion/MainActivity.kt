@@ -320,17 +320,8 @@ class MainActivity : ComponentActivity() {
                 }
 
                 DisposableEffect(key1 = Intent()) {
-                    val data: Uri? = intent?.data
-
-                    if (intent?.type?.startsWith("video/") == true) {
-                        val uri = intent.clipData?.getItemAt(0)?.uri
-                        Temporary.url = uri.toString()
-                        navigationController.navigate(Screen.ConfirmSaveScreen.route)
-                        val listener = Consumer<Intent> { Unit }
-                        addOnNewIntentListener(listener)
-                        onDispose { removeOnNewIntentListener(listener) }
-                    } else {
-                        val listener = Consumer<Intent> { intent ->
+                    val listener = Consumer<Intent> { intent ->
+                        if (intent?.type?.startsWith("text/") == true || intent?.type?.startsWith("video/") == true) {
                             if (intent.clipData?.getItemAt(0)?.text != null && intent.clipData?.getItemAt(
                                     0
                                 )?.text != EMPTY_STRING
@@ -339,10 +330,15 @@ class MainActivity : ComponentActivity() {
                                 Temporary.url = url.toString()
                                 navigationController.navigate(Screen.ConfirmSaveScreen.route)
                             }
+//                            else {
+//                                val uri = intent.clipData?.getItemAt(0)?.uri
+//                                Temporary.url = uri.toString()
+//                                navigationController.navigate(Screen.ConfirmSaveScreen.route)
+//                            }
                         }
-                        addOnNewIntentListener(listener)
-                        onDispose { removeOnNewIntentListener(listener) }
                     }
+                    addOnNewIntentListener(listener)
+                    onDispose { removeOnNewIntentListener(listener) }
                 }
             }
         }

@@ -44,4 +44,5 @@ sealed class BuildEvent {
     object SendText : BuildEvent()
 
     object Save : BuildEvent()
+    data class SearchUri(val uri: String): BuildEvent ()
 }

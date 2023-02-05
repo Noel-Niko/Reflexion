@@ -37,6 +37,7 @@ import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -48,8 +49,6 @@ import javax.inject.Inject
 
 const val STATE_KEY_URL = "com.livingtechusa.reflexion.ui.build.BuildItemScreen.url"
 
-enum class ApiStatus { PRE_INIT, LOADING, ERROR, DONE }
-
 
 @HiltViewModel
 class ItemViewModel @Inject constructor(
@@ -59,6 +58,7 @@ class ItemViewModel @Inject constructor(
     companion object {
         private val TAG = this::class.java.simpleName
     }
+
     // Used in Nav Drawer to ensure the most up-to-date-state provided
     private var _reflexionItemState = MutableStateFlow(ReflexionItem())
     val reflexionItemState: StateFlow<ReflexionItem> get() = _reflexionItemState
@@ -434,6 +434,22 @@ class ItemViewModel @Inject constructor(
                         }
                         withContext(Dispatchers.IO) {
                             iStream?.close()
+                        }
+                    }
+                    is BuildEvent.SearchUri -> {
+                        viewModelScope.launch {
+                            val _savedRI = async {
+                                localServiceImpl.selectItemByUri(event.uri)
+                            }
+                            val savedRI = _savedRI.await()
+                            if(savedRI.videoUri != null) {
+                                resetAllDisplayedSubItemsToDBVersion()
+                                _reflexionItemState.value = savedRI
+                            } else {
+                                resetAllDisplayedSubItemsToDBVersion()
+                                _videoUri.value = event.uri.toString()
+                            }
+
                         }
                     }
 

@@ -35,6 +35,8 @@ interface ReflexionItemDao {
 
     @Query("Select * FROM ReflexionItem WHERE parent =:parent order by name")
     suspend fun selectChildReflexionItems(parent: Long): List<ReflexionItem?>
+    @Query("SELECT * FROM ReflexionItem WHERE videoUri = :uri Limit 1")
+    suspend fun selectItemByUri(uri: String): ReflexionItem
 
     @Query("Select autogenPK, name, parent FROM ReflexionItem WHERE parent IS NULL order by name ASC")
     suspend fun getAbridgedReflexionItemTopics(): List<AbridgedReflexionItem?>
