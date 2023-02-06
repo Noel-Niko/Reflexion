@@ -20,9 +20,8 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.livingtechusa.reflexion.navigation.BarItem
-import com.livingtechusa.reflexion.ui.components.bars.SearchBar
+import com.livingtechusa.reflexion.ui.components.bars.TopicSearchBar
 import com.livingtechusa.reflexion.ui.viewModels.TopicsViewModel
-import kotlin.reflect.KFunction2
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,7 +36,7 @@ fun CompactScreen(
 ) {
     Scaffold(
         topBar = {
-            SearchBar(search = search, onSearch = onSearch, onUp = onUp, bookmark = bookmark)
+            TopicSearchBar(search = search, onSearch = onSearch, onUp = onUp, bookmark = bookmark)
         },
         bottomBar = {
             val backStackEntry by navController.currentBackStackEntryAsState()

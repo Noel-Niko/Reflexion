@@ -16,7 +16,7 @@ object NavBarItems {
             route = Screen.HomeScreen.route
         ),
         BarItem(
-            title = "Bkmrk",
+            title = "Bookmark",
             image = Icons.Filled.Bookmark,
             route = Screen.BookmarkScreen.route
         ),
@@ -163,11 +163,6 @@ object NavBarItems {
             title = "Home",
             image = Icons.Filled.AddHome,
             route = Screen.HomeScreen.route
-        ),
-        BarItem(
-            title = "Bookmark",
-            image = Icons.Filled.Bookmark,
-            route = Screen.BookmarkScreen.route
         ),
         BarItem(
             title = "Lists",

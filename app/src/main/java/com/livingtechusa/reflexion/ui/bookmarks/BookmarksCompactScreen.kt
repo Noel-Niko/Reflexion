@@ -20,7 +20,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.livingtechusa.reflexion.navigation.BarItem
-import com.livingtechusa.reflexion.ui.components.bars.SearchBar
+import com.livingtechusa.reflexion.ui.components.bars.BookmarkSearchBar
 import com.livingtechusa.reflexion.ui.viewModels.BookmarksViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,7 +34,7 @@ fun BookmarksCompactScreen(
 ) {
     Scaffold(
         topBar = {
-            SearchBar(search = search, onSearch = onSearch, null, null)
+            BookmarkSearchBar(search = search, onSearch = onSearch, null, null)
         },
         bottomBar = {
             val backStackEntry by navController.currentBackStackEntryAsState()

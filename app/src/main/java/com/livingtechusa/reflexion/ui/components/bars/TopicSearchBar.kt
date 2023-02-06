@@ -1,6 +1,5 @@
 package com.livingtechusa.reflexion.ui.components.bars
 
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.material.Icon
 import androidx.compose.material.TopAppBar
@@ -16,10 +15,9 @@ import com.livingtechusa.reflexion.ui.components.text.SearchTextField
 import com.livingtechusa.reflexion.ui.components.icons.SearchIcon
 import com.livingtechusa.reflexion.ui.components.icons.UpIcon
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
-import kotlin.reflect.KFunction2
 
 @Composable
-fun SearchBar(
+fun TopicSearchBar(
     search: String?,
     onSearch: (searchText: String?) -> Unit,
     onUp: (() -> Unit)?,

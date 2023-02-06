@@ -70,13 +70,13 @@ fun CustomListDisplayScreen(
                 )
             }
 
-            WindowWidthSizeClass.MEDIUM -> {
-                Landscape(
-                    navController = navController,
-                    headNodePk = headNodePk,
-                    viewModel = viewModel
-                )
-            }
+//            WindowWidthSizeClass.MEDIUM -> {
+//                Landscape(
+//                    navController = navController,
+//                    headNodePk = headNodePk,
+//                    viewModel = viewModel
+//                )
+//            }
 
 //            WindowWidthSizeClass.EXPANDED -> {
 //                ExpandedScreen(navHostController, icons)

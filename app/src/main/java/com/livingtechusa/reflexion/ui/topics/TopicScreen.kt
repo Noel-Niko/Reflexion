@@ -55,9 +55,9 @@ fun ListDisplay(
                 CompactScreen(navHostController, icons, viewModel, search, viewModel::searchEvent, viewModel::onUp, viewModel::bookmark)
             }
 
-            WindowWidthSizeClass.MEDIUM -> {
-                MediumScreen(navHostController, icons, viewModel, search, viewModel::searchEvent, viewModel::onUp)
-            }
+//            WindowWidthSizeClass.MEDIUM -> {
+//                MediumScreen(navHostController, icons, viewModel, search, viewModel::searchEvent, viewModel::onUp)
+//            }
 
 //            WindowWidthSizeClass.EXPANDED -> {
 //                ExpandedScreen(navHostController, icons, viewModel, pk)

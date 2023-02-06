@@ -85,9 +85,9 @@ fun BuildCustomListsScreen(
                 )
             }
 
-            WindowWidthSizeClass.MEDIUM -> {
-                // todo
-            }
+//            WindowWidthSizeClass.MEDIUM -> {
+//                // todo
+//            }
 
 //            WindowWidthSizeClass.EXPANDED -> {
 //                ExpandedScreen(navHostController, icons, viewModel)

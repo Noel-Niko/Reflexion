@@ -28,9 +28,9 @@ fun BuildItemScreen(
                 BuildItemCompactScreen(pk, navHostController, icons, viewModel)
             }
 
-            WindowWidthSizeClass.MEDIUM -> {
-                MediumScreen(pk, navHostController, icons, viewModel)
-            }
+//            WindowWidthSizeClass.MEDIUM -> {
+//                MediumScreen(pk, navHostController, icons, viewModel)
+//            }
 
 //            WindowWidthSizeClass.EXPANDED -> {
 //                ExpandedScreen(navHostController, icons, viewModel)
