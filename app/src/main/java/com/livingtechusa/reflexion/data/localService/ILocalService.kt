@@ -1,8 +1,11 @@
 package com.livingtechusa.reflexion.data.localService
 
+import android.graphics.Bitmap
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
-import com.livingtechusa.reflexion.data.entities.KeyWords
-import com.livingtechusa.reflexion.data.entities.LinkedList
+import com.livingtechusa.reflexion.data.entities.Bookmarks
+import com.livingtechusa.reflexion.data.entities.ListNode
+import com.livingtechusa.reflexion.data.models.AbridgedReflexionItem
+import com.livingtechusa.reflexion.util.ReflexionArrayItem
 
 interface ILocalService {
     suspend fun setItem(item: ReflexionItem)
@@ -12,23 +15,62 @@ interface ILocalService {
     suspend fun selectItem(autogenPK: Long): ReflexionItem?
     suspend fun deleteReflexionItem(autogenPK: Long, name: String)
     suspend fun renameItem(autogenPK: Long, name: String, newName: String)
-    suspend fun selectChildItems(parent: Long): List<ReflexionItem?>
     suspend fun setItemParent(autogenPK: Long, name: String, newParent: Long)
 
-    suspend fun setKeyWords(keyWords: KeyWords)
-    suspend fun getKeyWords(): KeyWords?
-    suspend fun clearKeyWords()
-    suspend fun selectKeyWords(item_pk: String): List<KeyWords?>
-    suspend fun deleteKeyWord(word: String)
-    suspend fun renameKeyWord(word: String, newWord: String)
+    suspend fun selectAbridgedReflexionItemDataByParentPk(pk: Long?): List<AbridgedReflexionItem?>
 
-    suspend fun setLinkedList(linkedList: LinkedList)
-    suspend fun getAllLinkedLists(): LinkedList?
-    suspend fun clearLinkedList()
-    suspend fun selectLinkedList(title: String, itemPK: Long): LinkedList?
-    suspend fun deleteLinkedList(title: String, itemPK: Long)
-    suspend fun setLinkedListIndex(title: String, itemPK: Long, index: Int)
-    suspend fun selectChildLinkedLists(parent: Long): List<LinkedList?>
-    suspend fun renameLinkedList(title: String, itemPK: Long, newTitle: String)
+    suspend fun selectSingleAbridgedReflexionItemDataByParentPk(pk: Long): AbridgedReflexionItem
+
     suspend fun selectReflexionItemByName(name: String): ReflexionItem
+    suspend fun selectItemByUri(uri: String): ReflexionItem?
+    suspend fun selectChildren(pk: Long): List<ReflexionItem?>
+    suspend fun getAllTopics(): List<ReflexionItem?>
+    suspend fun getAllItemsContainingString(search: String): List<ReflexionItem?>
+    suspend fun getAllTopicsContainingString(search: String): List<ReflexionItem?>
+    suspend fun selectChildrenContainingString(pk: Long, search: String?): List<ReflexionItem?>
+    suspend fun selectSiblings(pk: Long, parent: Long): List<ReflexionItem?>
+    suspend fun selectAllSiblings(parent: Long): List<ReflexionItem?>
+
+    suspend fun deleteAllChildNodes(nodePk: Long)
+
+    // LISTNODES
+    suspend fun insertNewNode(listNode: ListNode)
+
+    suspend fun selectListNode(nodePk: Long): ListNode?
+    suspend fun selectNodeHeadsByTopic(topicPk: Long): List<ListNode?>
+    suspend fun selectNodeTopic(itemPk: Long): Long?
+
+    suspend fun selectNodeListsAsArrayItemsByTopic(topicPk: Long): List<ReflexionArrayItem?>
+    suspend fun selectNodeListsAsArrayItemsByHeadNode(topicPk: Long?): ReflexionArrayItem?
+
+    suspend fun selectChildNode(nodePk: Long): ListNode?
+
+    suspend fun selectParentNode(parentPk: Long): ListNode?
+
+    suspend fun updateListNode(nodePk: Long, title: String, parentPK: Long, childPk: Long)
+
+    suspend fun getAllLinkedLists(): List<ListNode?>
+
+    suspend fun deleteAllLinkedLists()
+
+    suspend fun deleteSelectedNode(nodePk: Long)
+    suspend fun selectReflexionArrayItemsByParentPk(pk: Long?): List<ReflexionArrayItem?>
+
+    suspend fun selectReflexionArrayItemsByPk(pk: Long): ReflexionArrayItem?
+    suspend fun selectParent(pk: Long): Long?
+    suspend fun insertNewOrUpdateNodeList(arrayItem: ReflexionArrayItem, topic: Long): Long?
+    suspend fun selectImage(itemPk: Long): Bitmap?
+
+    // BOOKMARKS
+    suspend fun setBookMarks(user: Bookmarks)
+    suspend fun getBookMarks(): List<Bookmarks?>
+    suspend fun clearBookMarks()
+    suspend fun selectItemBookMark(item_pk: Long): Bookmarks?
+    suspend fun selectListBookMarks(list_pk: Long): Bookmarks?
+    suspend fun deleteBookmark(autoGenPk: Long)
+    suspend fun renameKeyWord(word: String, newWord: String)
+    suspend fun searchBookmarksByTitle(text: String): List<Bookmarks?>
+
+    suspend fun selectLevelBookMarks(): List<Bookmarks?>
+    suspend fun selectBookmarkByLevelPK(autogenPK: Long?): Bookmarks?
 }

@@ -7,4 +7,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+        <!-- Name: https://www.crispedge.com/color/177b4d -->
+        <color name="salem">#178043</color>
+        <color name="rw_grey">#343434</color>
 </resources>

@@ -6,6 +6,8 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 import android.os.Parcelable
+import com.livingtechusa.reflexion.util.Constants.EMPTY_ITEM
+import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 
 @Parcelize
 @Entity(tableName = "ReflexionItem",
@@ -16,20 +18,19 @@ import android.os.Parcelable
                 childColumns = arrayOf("parent"),
                 onDelete = ForeignKey.CASCADE
             )
-        )
-
+        ),
+    indices = [androidx.room.Index(value = ["autogenPK", "videoUri"])]
 )
 data class ReflexionItem(
     @PrimaryKey(autoGenerate = true)
     var autogenPK: Long = 0,
-    var name: String = "",
-    var description: String? = "",
-    var detailedDescription: String? = "",
+    var name: String = EMPTY_ITEM,
+    var description: String? = EMPTY_STRING,
+    var detailedDescription: String? = EMPTY_STRING,
     var image: ByteArray? = null,
-    var videoUri: String? = "",
-    var videoUrl: String? = "",
-    var parent: Long? = null,
-    var hasChildren: Boolean? = true
+    var videoUri: String? = EMPTY_STRING,
+    var videoUrl: String? = EMPTY_STRING,
+    var parent: Long? = null
 ): Parcelable {
     companion object {
         val AUTOGEN_PK = "autogenPK"
@@ -41,7 +42,6 @@ data class ReflexionItem(
         val VIDEO_URL = "videoUrl"
         val PARENT = "parent"
         val SIBLINGS = "siblings"
-        val HAS_CHILDREN = "hasChildren"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -61,7 +61,6 @@ data class ReflexionItem(
         if (videoUri != other.videoUri) return false
         if (videoUrl != other.videoUrl) return false
         if (parent != other.parent) return false
-        if (hasChildren != other.hasChildren) return false
 
         return true
     }
@@ -75,7 +74,7 @@ data class ReflexionItem(
         result = 31 * result + (videoUri?.hashCode() ?: 0)
         result = 31 * result + (videoUrl?.hashCode() ?: 0)
         result = 31 * result + (parent?.hashCode() ?: 0)
-        result = 31 * result + (hasChildren?.hashCode() ?: 0)
+
         return result
     }
 }

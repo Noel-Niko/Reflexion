@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -19,16 +20,20 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.MainActivity
 import com.livingtechusa.reflexion.R
+import com.livingtechusa.reflexion.navigation.Screen
+import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.build.BuildRoute
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import com.livingtechusa.reflexion.util.Constants.DO_NOT_UPDATE
+import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
-import com.livingtechusa.reflexion.util.Temporary
+import com.livingtechusa.reflexion.util.Constants.VIDEO_URL
 
 const val PASTE_SAVE = "PasteAndSaveDialog"
 
 @Composable
 fun PasteAndSaveDialog(
-    itemViewModel: ItemViewModel = hiltViewModel(),
+    viewModel: ItemViewModel = hiltViewModel(),
     navController: NavHostController
 ) {
 
@@ -61,27 +66,29 @@ fun PasteAndSaveDialog(
                     confirmButton = {
                         Button(
                             onClick = {
-                                Temporary.url = webAddress.value
-                                Temporary.tempReflexionItem.videoUrl = webAddress.value
-                                Temporary.use = true
-                                navController.navigate(BuildRoute)
+                                viewModel.onTriggerEvent( BuildEvent.UpdateDisplayedReflexionItem(
+                                    subItem = VIDEO_URL, newVal = webAddress.value))
                                 openDialog.value = false
-                                navController.navigate(BuildRoute)
-                            }) {
-                            Text(stringResource(R.string.save))
+                                navController.navigate(Screen.BuildItemScreen.route + "/" + DO_NOT_UPDATE) {
+                                    launchSingleTop = true
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(backgroundColor =  androidx.compose.material3.MaterialTheme.colorScheme.primary, contentColor =  androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
+                        ) {
+                            Text(stringResource(R.string.save), color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
                         }
                     },
                     dismissButton = {
                         Button(
                             onClick = {
                                 openDialog.value = false
-                                startActivity(
-                                    context,
-                                    Intent(context, MainActivity::class.java),
-                                    null
-                                )
-                            }) {
-                            Text(stringResource(R.string.close))
+                                navController.navigate(Screen.BuildItemScreen.route + "/" + DO_NOT_UPDATE) {
+                                    launchSingleTop = true
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(backgroundColor =  androidx.compose.material3.MaterialTheme.colorScheme.primary, contentColor =  androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
+                        ) {
+                            Text(stringResource(R.string.close), color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
                         }
                     }
                 )

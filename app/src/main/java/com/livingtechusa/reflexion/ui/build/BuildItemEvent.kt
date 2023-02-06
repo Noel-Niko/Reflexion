@@ -1,38 +1,47 @@
 package com.livingtechusa.reflexion.ui.build
 
 import android.net.Uri
-import com.livingtechusa.reflexion.data.entities.ReflexionItem
 
 sealed class BuildEvent {
 
-    data class SaveNew(
-        val reflexionItem: ReflexionItem
+    object SaveNew : BuildEvent()
+
+    object UpdateReflexionItem : BuildEvent()
+
+    data class DeleteReflexionItemSubItemByName(
+        val subItem: String
     ) : BuildEvent()
 
-    data class UpdateReflexionItem(
-        val reflexionItem: ReflexionItem
+    data class UpdateDisplayedReflexionItem(
+        val subItem: String,
+        val newVal: Any
     ) : BuildEvent()
 
-    data class ShowVideo(
-        val uri: String?,
-        val Url: String?
-    ) : BuildEvent()
+//    data class ShowVideo(
+//        val uri: String?,
+//        val Url: String?
+//    ) : BuildEvent()
 
     object Delete : BuildEvent()
 
-    object clearReflexionItem : BuildEvent() {
-    }
+    object ClearReflexionItem : BuildEvent()
 
-    data class UpdateVideoURL(
-        val videoUrl: String
-    ) : BuildEvent()
+//    data class UpdateVideoURL(
+//        val videoUrl: String
+//    ) : BuildEvent()
 
-    object ShowSiblings : BuildEvent() {
-    }
-
-    object ShowChildren : BuildEvent()
     data class GetSelectedReflexionItem(
-        val pk: Long
-    ): BuildEvent() {
-    }
+        val pk: Long?
+    ): BuildEvent()
+
+    data class SetParent(val parent: Long): BuildEvent()
+    data class CreateThumbnailImage(val uri: Uri?) : BuildEvent()
+    data class Bookmark(val itemPk: Long) : BuildEvent()
+
+    object RotateImage : BuildEvent()
+
+    object SendText : BuildEvent()
+
+    object Save : BuildEvent()
+    data class SearchUri(val uri: String): BuildEvent ()
 }
