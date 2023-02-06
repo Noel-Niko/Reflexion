@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +22,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.livingtechusa.reflexion.navigation.BarItem
 import com.livingtechusa.reflexion.ui.components.bars.SearchBar
 import com.livingtechusa.reflexion.ui.viewModels.TopicsViewModel
+import kotlin.reflect.KFunction2
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,11 +32,12 @@ fun CompactScreen(
     viewModel: TopicsViewModel,
     search: String?,
     onSearch: (String?) -> Unit,
-    OnUp: () -> Unit
+    onUp: () -> Unit,
+    bookmark: () -> Unit
 ) {
     Scaffold(
         topBar = {
-            SearchBar(search = search, onSearch = onSearch, onUp = OnUp)
+            SearchBar(search = search, onSearch = onSearch, onUp = onUp, bookmark = bookmark)
         },
         bottomBar = {
             val backStackEntry by navController.currentBackStackEntryAsState()

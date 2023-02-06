@@ -19,7 +19,7 @@ import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
                 onDelete = ForeignKey.CASCADE
             )
         ),
-    indices = [androidx.room.Index(value = ["autogenPK"])]
+    indices = [androidx.room.Index(value = ["autogenPK", "videoUri"])]
 )
 data class ReflexionItem(
     @PrimaryKey(autoGenerate = true)

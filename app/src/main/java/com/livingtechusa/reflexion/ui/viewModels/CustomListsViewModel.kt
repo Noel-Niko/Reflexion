@@ -319,6 +319,7 @@ class CustomListsViewModel @Inject constructor(
                                 autoGenPk = 0L,
                                 ITEM_PK = null,
                                 LIST_PK = customList.value.nodePk,
+                                LEVEL_PK = null,
                                 title = it
                             )
                         }

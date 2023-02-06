@@ -236,6 +236,14 @@ class LocalServiceImpl @Inject constructor(
         return bookMarksDao.searchBookmarksByTitle(text)
     }
 
+    override suspend fun selectLevelBookMarks(): List<Bookmarks?> {
+        return bookMarksDao.selectLevelBookMarks()
+    }
+
+    override suspend fun selectBookmarkByLevelPK(levelPk: Long?): Bookmarks? {
+        return bookMarksDao.selectBookmarkByLevelPK(levelPk)
+    }
+
     override suspend fun deleteAllChildNodes(nodePk: Long) {
         var child = linkedListDao.selectChildNode(nodePk = nodePk)
         do {

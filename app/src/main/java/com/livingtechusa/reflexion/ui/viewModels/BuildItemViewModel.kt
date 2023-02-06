@@ -371,6 +371,7 @@ class ItemViewModel @Inject constructor(
                                 autoGenPk = autogenPK.value,
                                 ITEM_PK = event.itemPk,
                                 LIST_PK = null,
+                                LEVEL_PK = null,
                                 title = name.value
                             )
                             localServiceImpl.setBookMarks(bookMark)

@@ -53,7 +53,7 @@ fun BookmarksScreen(
     if (context.findActivity() != null) {
         when (windowSize) {
             WindowWidthSizeClass.COMPACT -> {
-                CompactScreen(navHostController, icons, viewModel, search, viewModel::searchEvent)
+                BookmarksCompactScreen(navHostController, icons, viewModel, search, viewModel::searchEvent)
             }
 
 //            WindowWidthSizeClass.MEDIUM -> {
@@ -65,7 +65,7 @@ fun BookmarksScreen(
 //                viewModel.navigationType = ReflexionNavigationType.PERMANENT_NAVIGATION_DRAWER
 //            }
 
-            else -> CompactScreen(
+            else -> BookmarksCompactScreen(
                 navHostController,
                 icons,
                 viewModel,

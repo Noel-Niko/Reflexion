@@ -70,4 +70,7 @@ interface ILocalService {
     suspend fun deleteBookmark(autoGenPk: Long)
     suspend fun renameKeyWord(word: String, newWord: String)
     suspend fun searchBookmarksByTitle(text: String): List<Bookmarks?>
+
+    suspend fun selectLevelBookMarks(): List<Bookmarks?>
+    suspend fun selectBookmarkByLevelPK(autogenPK: Long?): Bookmarks?
 }

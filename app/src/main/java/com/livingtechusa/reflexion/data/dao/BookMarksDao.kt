@@ -23,6 +23,9 @@ interface BookMarksDao {
     @Query("Select * FROM BookMarks WHERE LIST_PK = :list_pk")
     suspend fun selectListBookMarks(list_pk: Long): List<Bookmarks?>
 
+    @Query("Select * FROM BookMarks WHERE LEVEL_PK IS NOT NULL")
+    suspend fun selectLevelBookMarks(): List<Bookmarks?>
+
     @Query("Delete FROM BookMarks WHERE autoGenPk = :autoGenPk")
     suspend fun deleteBookmark(autoGenPk: Long)
 
@@ -35,4 +38,7 @@ interface BookMarksDao {
 
     @Query("Select * FROM BookMarks WHERE title LIKE :text || '%' order by title ASC")
     suspend fun searchBookmarksByTitle(text: String): List<Bookmarks?>
+    @Query("Select * FROM BookMarks WHERE LEVEL_PK = :levelPk")
+    suspend fun selectBookmarkByLevelPK(levelPk: Long?): Bookmarks?
+
 }

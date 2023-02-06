@@ -79,4 +79,10 @@
     <string name="items">Items</string>
     <string name="applying_changes_and_restarting">Applying Changes and Restarting</string>
     <string name="sent_with_reflexion_from_the_google_play_store">Sent with Reflexion from the Google Play Store</string>
+    <string name="clear_search">Clear search</string>
+    <string name="search_by_topic">Search By Topic</string>
+    <string name="bookmark">bookmark</string>
+    <string name="send">send</string>
+    <string name="up">up</string>
+    <string name="already_bookmarked">Already Bookmarked</string>
 </resources>

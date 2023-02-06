@@ -122,13 +122,13 @@ class BookmarksViewModel @Inject constructor(
         viewModelScope.launch {
             val items = mutableListOf<ReflexionItem>()
             val lists = mutableListOf<ListNode>()
-            localServiceImpl.getBookMarks().forEach { bookMarks ->
-                if (bookMarks != null) {
-                    if (bookMarks.ITEM_PK != null) {
-                        localServiceImpl.selectItem(bookMarks.ITEM_PK)
+            localServiceImpl.getBookMarks().forEach { bookmarks ->
+                if (bookmarks != null) {
+                    if (bookmarks.ITEM_PK != null) {
+                        localServiceImpl.selectItem(bookmarks.ITEM_PK)
                             ?.let { reflexionItem -> items.add(reflexionItem) }
-                    } else if (bookMarks.LIST_PK != null) {
-                        localServiceImpl.selectListNode(bookMarks.LIST_PK)
+                    } else if (bookmarks.LIST_PK != null) {
+                        localServiceImpl.selectListNode(bookmarks.LIST_PK)
                             ?.let { listNode -> lists.add(listNode) }
                     }
                 }

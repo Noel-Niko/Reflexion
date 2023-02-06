@@ -1,20 +1,20 @@
 package com.livingtechusa.reflexion.ui.topics
 
-sealed class ListEvent {
+sealed class TopicItemEvent {
 
-    data class GetList(
+    data class GetTopicItem(
         val pk: Long?
-    ) : ListEvent() {}
+    ) : TopicItemEvent() {}
 
     data class DisplaySelectedReflexionItem(
         val pk: Long
-    ) : ListEvent() {}
+    ) : TopicItemEvent() {}
 
    data class Search(
        val search: String?,
-       ): ListEvent() {}
+       ): TopicItemEvent() {}
 
-    object  ClearList: ListEvent()
+    object  ClearTopicItem: TopicItemEvent()
 
-    object UpOneLevel: ListEvent()
+    object UpOneLevel: TopicItemEvent()
 }

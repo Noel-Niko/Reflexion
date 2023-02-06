@@ -15,7 +15,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -26,7 +25,7 @@ import com.livingtechusa.reflexion.ui.viewModels.BookmarksViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CompactScreen(
+fun BookmarksCompactScreen(
     navController: NavHostController,
     icons: List<BarItem>,
     viewModel: BookmarksViewModel,
@@ -35,7 +34,7 @@ fun CompactScreen(
 ) {
     Scaffold(
         topBar = {
-            SearchBar(search = search, onSearch = onSearch, null)
+            SearchBar(search = search, onSearch = onSearch, null, null)
         },
         bottomBar = {
             val backStackEntry by navController.currentBackStackEntryAsState()

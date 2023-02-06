@@ -4,21 +4,18 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.livingtechusa.reflexion.R
 
 
 @Composable
-fun MainTopBar(
+fun TopicTopBar(
     actions: @Composable RowScope.() -> Unit = {}
 ) {
   TopAppBar(
       title = {
-        Text(text = stringResource(id = R.string.app_name),
+        Text(text = stringResource(R.string.search_by_topic),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
