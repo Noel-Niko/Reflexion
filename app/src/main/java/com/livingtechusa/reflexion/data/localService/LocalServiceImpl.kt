@@ -202,7 +202,7 @@ class LocalServiceImpl @Inject constructor(
         return bookMarksDao.selectItemBookMark(item_pk)
     }
 
-    override suspend fun selectListBookMarks(list_pk: Long): List<Bookmarks?> {
+    override suspend fun selectListBookMarks(list_pk: Long): Bookmarks? {
         return bookMarksDao.selectListBookMarks(list_pk)
     }
 

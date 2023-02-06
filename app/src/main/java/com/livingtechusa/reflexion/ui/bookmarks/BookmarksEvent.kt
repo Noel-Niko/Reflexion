@@ -5,9 +5,13 @@ sealed class BookmarksEvent {
         val search: String?,
     ): BookmarksEvent() {}
 
-    data class DeleteBookmark(
+    data class DeleteItemBookmark(
        val ITEM_PK: Long,
     ): BookmarksEvent() {}
+
+    data class DeleteListBookmark(
+        val NODE_PK: Long,
+    ) : BookmarksEvent()
 
 
     object  ClearList: BookmarksEvent()

@@ -21,7 +21,7 @@ interface BookMarksDao {
     suspend fun selectItemBookMark(item_pk: Long): Bookmarks?
 
     @Query("Select * FROM BookMarks WHERE LIST_PK = :list_pk")
-    suspend fun selectListBookMarks(list_pk: Long): List<Bookmarks?>
+    suspend fun selectListBookMarks(list_pk: Long): Bookmarks?
 
     @Query("Select * FROM BookMarks WHERE LEVEL_PK IS NOT NULL")
     suspend fun selectLevelBookMarks(): List<Bookmarks?>

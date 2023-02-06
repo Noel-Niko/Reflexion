@@ -66,7 +66,7 @@ interface ILocalService {
     suspend fun getBookMarks(): List<Bookmarks?>
     suspend fun clearBookMarks()
     suspend fun selectItemBookMark(item_pk: Long): Bookmarks?
-    suspend fun selectListBookMarks(list_pk: Long): List<Bookmarks?>
+    suspend fun selectListBookMarks(list_pk: Long): Bookmarks?
     suspend fun deleteBookmark(autoGenPk: Long)
     suspend fun renameKeyWord(word: String, newWord: String)
     suspend fun searchBookmarksByTitle(text: String): List<Bookmarks?>

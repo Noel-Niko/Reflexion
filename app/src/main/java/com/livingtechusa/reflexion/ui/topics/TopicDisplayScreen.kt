@@ -39,6 +39,7 @@ import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.Bookmarks
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
+import com.livingtechusa.reflexion.ui.bookmarks.BookmarksEvent
 import com.livingtechusa.reflexion.ui.topics.TopicItemEvent
 import com.livingtechusa.reflexion.ui.viewModels.TopicsViewModel
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
@@ -61,7 +62,9 @@ fun ReflexionItemListUI(
     Scaffold(
         content = {
             Column(modifier = Modifier.fillMaxSize()) {
-                Row(modifier = Modifier.fillMaxWidth().fillMaxHeight(.7f)) {
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(.7f)) {
                     ReflexionItemsContent(
                         reflexionItems = reflexionItemList,
                         onTap = { reflexionItem ->
@@ -110,6 +113,7 @@ fun ReflexionItemListUI(
                             BookmarkItemsContent(
                                 bookmarks = bookmarksList,
                                 onTap = viewModel::selectLevel,
+                                onDoubleTap = viewModel::deleteBookmark,
                                 images = bookmarkImages
                             )
                         }
@@ -197,6 +201,7 @@ private fun ReflexionItemsContent(
 private fun BookmarkItemsContent(
     bookmarks: List<Bookmarks?>,
     onTap: (Long) -> Unit,
+    onDoubleTap: (Long) -> Unit,
     images: List<Bitmap?>
 ) {
     LazyColumn(
@@ -220,6 +225,9 @@ private fun BookmarkItemsContent(
                         .pointerInput(key1 = bookmark) {
                             detectTapGestures(
                                 onTap = { bookmarks[bookmark]?.LEVEL_PK?.let { pk -> onTap(pk) } },
+                                onDoubleTap = {
+                                    bookmarks[bookmark]?.autoGenPk?.let { itemPk -> onDoubleTap(itemPk) }
+                                }
                             )
                         },
                     elevation = 6.dp,

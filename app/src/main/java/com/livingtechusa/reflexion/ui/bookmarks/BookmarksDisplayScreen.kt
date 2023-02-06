@@ -17,9 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -39,10 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
 import com.livingtechusa.reflexion.R
-import com.livingtechusa.reflexion.data.entities.Bookmarks
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
-import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.viewModels.BookmarksViewModel
 import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
@@ -89,7 +85,7 @@ fun ReflexionItemListUIForBookmarks(
                             }
                         },
                         onDoubleTap = { ITEM_PK ->
-                            viewModel.onTriggerEvent(BookmarksEvent.DeleteBookmark(ITEM_PK))
+                            viewModel.onTriggerEvent(BookmarksEvent.DeleteItemBookmark(ITEM_PK))
                         }
                     )
                 }
@@ -131,14 +127,13 @@ fun ReflexionItemListUIForBookmarks(
                                             .pointerInput(key1 = index) {
                                                 detectTapGestures(
                                                     onDoubleTap = {
-                                                        // Launch dialog
-                                                        // Nothing
+                                                        viewModel.onTriggerEvent(BookmarksEvent.DeleteListBookmark(listOfLists[index].nodePk))
                                                     },
                                                     onLongPress = {
                                                         // Nothing
                                                     },
                                                     onTap = {
-                                                        navController.navigate(Screen.CustomListDisplay.route + "/" + listOfLists[index]?.nodePk)
+                                                        navController.navigate(Screen.CustomListDisplay.route + "/" + listOfLists[index].nodePk)
                                                     }
                                                 )
                                             },

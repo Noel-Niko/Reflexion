@@ -3,8 +3,10 @@ package com.livingtechusa.reflexion.ui.viewModels
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ListNode
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
@@ -14,6 +16,7 @@ import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -49,7 +52,8 @@ class BookmarksViewModel @Inject constructor(
             val bitmaps: MutableList<Bitmap> = mutableListOf()
             val job = async {
                 listBookmark.value.forEach { node ->
-                    localServiceImpl.selectImage(node.childPk ?: node.topic)?.let { bitmaps.add(it) }
+                    localServiceImpl.selectImage(node.childPk ?: node.topic)
+                        ?.let { bitmaps.add(it) }
                 }
             }
             job.join()
@@ -88,13 +92,39 @@ class BookmarksViewModel @Inject constructor(
                     }
                 }
 
-                is BookmarksEvent.DeleteBookmark -> {
+                is BookmarksEvent.DeleteItemBookmark -> {
                     viewModelScope.launch {
                         localServiceImpl.selectItemBookMark(event.ITEM_PK)?.autoGenPk?.let { bookmark_PK ->
                             localServiceImpl.deleteBookmark(
                                 bookmark_PK
                             )
                         }
+                        viewModelScope.launch(Dispatchers.Main) {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.removed),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        populateContent()
+                    }
+                }
+
+                is BookmarksEvent.DeleteListBookmark -> {
+                    viewModelScope.launch {
+                        localServiceImpl.selectListBookMarks(event.NODE_PK)?.autoGenPk?.let { bookmark_PK ->
+                            localServiceImpl.deleteBookmark(
+                                bookmark_PK
+                            )
+                        }
+                        viewModelScope.launch(Dispatchers.Main) {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.removed),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        populateContent()
                     }
                 }
 

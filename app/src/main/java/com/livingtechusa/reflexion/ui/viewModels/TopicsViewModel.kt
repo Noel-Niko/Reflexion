@@ -127,23 +127,21 @@ class TopicsViewModel @Inject constructor(
     }
 
     private fun setBookmarks() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val _bookmarkedLevels: Deferred<List<Bookmarks?>> =
                 async { localServiceImpl.selectLevelBookMarks() }
             val bookmarkedLevels = _bookmarkedLevels.await()
-            if (bookmarkedLevels.isEmpty().not()) {
-                _bookmarks.value = bookmarkedLevels
-                val _images = async {
-                    val bitmaps = mutableListOf<Bitmap>()
-                    _bookmarks.value.forEach { bookmark ->
-                        bookmark?.LIST_PK?.let { bk -> localServiceImpl.selectImage(bk) }
-                            ?.let { bitmap -> bitmaps.add(bitmap) }
-                    }
-                    return@async bitmaps
+            _bookmarks.value = bookmarkedLevels
+            val _images: Deferred<MutableList<Bitmap>> = async {
+                val bitmaps = mutableListOf<Bitmap>()
+                _bookmarks.value.forEach { bookmark ->
+                    bookmark?.LIST_PK?.let { bk -> localServiceImpl.selectImage(bk) }
+                        ?.let { bitmap -> bitmaps.add(bitmap) }
                 }
-                val images = _images.await()
-                _bookmarkImages.value = images
+                return@async bitmaps
             }
+            val images = _images.await()
+            _bookmarkImages.value = images
         }
     }
 
@@ -199,5 +197,21 @@ class TopicsViewModel @Inject constructor(
 
     fun selectLevel(parentPk: Long) {
         this@TopicsViewModel.onTriggerEvent(TopicItemEvent.GetTopicItem(parentPk))
+    }
+
+    fun deleteBookmark(autogenPk: Long) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                localServiceImpl.deleteBookmark(autogenPk)
+                viewModelScope.launch(Dispatchers.Main) {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.removed),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                setBookmarks()
+            }
+        }
     }
 }
