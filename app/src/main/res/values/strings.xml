@@ -74,6 +74,7 @@
     <string name="match_phone">Match Phone</string>
     <string name="app_reset">App Reset</string>
     <string name="apply_changes">Apply Changes</string>
+    <string name="subtopic_bookmarks">Subtopic Bookmarks</string>
     <string name="bookmarks">Bookmarks</string>
     <string name="bookmarked">Bookmarked</string>
     <string name="items">Items</string>

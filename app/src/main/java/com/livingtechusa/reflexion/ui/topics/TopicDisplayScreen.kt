@@ -34,12 +34,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.Bookmarks
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
-import com.livingtechusa.reflexion.ui.bookmarks.BookmarksEvent
 import com.livingtechusa.reflexion.ui.topics.TopicItemEvent
 import com.livingtechusa.reflexion.ui.viewModels.TopicsViewModel
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
@@ -102,7 +103,7 @@ fun ReflexionItemListUI(
                     ) {
                         Row(modifier = Modifier.fillMaxWidth()) {
                             Text(
-                                text = resource.getString(R.string.bookmarks),
+                                text = resource.getString(R.string.subtopic_bookmarks),
                                 modifier = Modifier.padding(start = 16.dp),
                                 style = MaterialTheme.typography.headlineMedium,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -150,11 +151,11 @@ private fun ReflexionItemsContent(
             .background(MaterialTheme.colorScheme.surface)
     ) {
         items(reflexionItems) { reflexionItem ->
-            val imagePainter = rememberImagePainter(
-                data = reflexionItem.image,
-                builder = {
-                    allowHardware(false)
-                }
+            val imagePainter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current).data(data = reflexionItem.image)
+                    .apply(block = fun ImageRequest.Builder.() {
+                        allowHardware(false)
+                    }).build()
             )
             Box {
                 Card(
@@ -210,11 +211,12 @@ private fun BookmarkItemsContent(
             .background(MaterialTheme.colorScheme.surface)
     ) {
         items(bookmarks.size) { bookmark ->
-            val imagePainter = rememberImagePainter(
-                data = if (images.isEmpty().not()) images[bookmark] else R.mipmap.ic_launcher,
-                builder = {
-                    allowHardware(false)
-                }
+            val imagePainter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current)
+                    .data(data = if (images.isEmpty().not()) images[bookmark] else R.mipmap.ic_launcher)
+                    .apply(block = fun ImageRequest.Builder.() {
+                        allowHardware(false)
+                    }).build()
             )
             Box {
                 Card(

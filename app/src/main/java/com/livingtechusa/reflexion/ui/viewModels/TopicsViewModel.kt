@@ -6,7 +6,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.Bookmarks
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
@@ -135,7 +134,7 @@ class TopicsViewModel @Inject constructor(
             val _images: Deferred<MutableList<Bitmap>> = async {
                 val bitmaps = mutableListOf<Bitmap>()
                 _bookmarks.value.forEach { bookmark ->
-                    bookmark?.LIST_PK?.let { bk -> localServiceImpl.selectImage(bk) }
+                    bookmark?.LEVEL_PK?.let { bk -> localServiceImpl.selectImage(bk) }
                         ?.let { bitmap -> bitmaps.add(bitmap) }
                 }
                 return@async bitmaps
