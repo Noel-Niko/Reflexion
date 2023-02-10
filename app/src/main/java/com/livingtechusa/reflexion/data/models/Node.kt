@@ -1,4 +1,4 @@
-package com.livingtechusa.reflexion.util
+package com.livingtechusa.reflexion.data.models
 
 
 class Node<T>(
@@ -7,7 +7,6 @@ class Node<T>(
 ) {
 
     companion object {
-
         fun <T> traverseBreadthFirst(
             rootNode: Node<T>,
             action: (value: T) -> Unit
@@ -15,12 +14,12 @@ class Node<T>(
             val queue = ArrayDeque<Node<T>>()
             queue.addFirst(rootNode)
 
-            while(queue.isNotEmpty()) {
+            while (queue.isNotEmpty()) {
                 val currentNode = queue.removeLast()
 
                 action.invoke(currentNode.value)
 
-                for(childNode in currentNode.children) {
+                for (childNode in currentNode.children) {
                     queue.addFirst(childNode)
                 }
             }

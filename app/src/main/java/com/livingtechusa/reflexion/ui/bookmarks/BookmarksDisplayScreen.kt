@@ -49,8 +49,6 @@ fun ReflexionItemListUIForBookmarks(
     navController: NavHostController,
     viewModel: BookmarksViewModel
 ) {
-    val context: Context = LocalContext.current
-    val resource = ResourceProviderSingleton
     val reflexionItemList by viewModel.itemBookmarks.collectAsState()
     val listOfLists by viewModel.listBookmark.collectAsState()
     val listimages by viewModel.listImages.collectAsState()
@@ -98,9 +96,7 @@ fun ReflexionItemListUIForBookmarks(
                     .fillMaxWidth()
                     .fillMaxHeight(1f)
             ) {
-                Column(
-                    // modifier = Modifier.verticalScroll(rememberScrollState())
-                ) {
+                Column {
                     Text(
                         text = stringResource(R.string.lists),
                         modifier = Modifier.padding(start = 16.dp),
@@ -167,11 +163,6 @@ fun ReflexionItemListUIForBookmarks(
                                                 .fillMaxWidth(),
                                             style = MaterialTheme.typography.titleMedium
                                         )
-//                                        listOfLists[index]?.let {
-//                                            HorizontalScrollableRowComponent(
-//                                                list = it
-//                                            )
-//                                        }
                                     }
                                 }
                             }
@@ -220,7 +211,6 @@ private fun ReflexionItemsContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(4.dp)
-                        //.background(MaterialTheme.colorScheme.surface)
                         .pointerInput(key1 = reflexionItem) {
                             detectTapGestures(
                                 onTap = { onTap(reflexionItem) },

@@ -17,12 +17,18 @@ import android.provider.MediaStore
 import android.provider.MediaStore.MediaColumns.DATE_ADDED
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat.checkSelfPermission
+import androidx.core.net.toFile
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
+import java.io.DataInputStream
+import java.io.FileInputStream
 import java.io.IOException
+import java.io.InputStream
 import kotlin.coroutines.resume
+
 
 object MediaStoreUtils {
     /**
@@ -298,16 +304,18 @@ object MediaStoreUtils {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @Throws(IOException::class)
     fun uriToByteArray(uri: Uri, context: Context): ByteArray? {
-        // Creating an object of FileInputStream to
-        // read from a file
+    // Creating an object of FileInputStream to
+    // read from a file
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         val inputStream = context.contentResolver.openInputStream(uri)
 
         if (inputStream != null) {
             // Now creating byte array of same length as file
             val arr = inputStream.readAllBytes()
+
 
             // Reading file content to byte array
             // using standard read() method
@@ -321,7 +329,41 @@ object MediaStoreUtils {
         } else {
             return null
         }
+    } else {
+        val inputStream = context.contentResolver.openInputStream(uri)
+        return if (inputStream != null) {
+            readAllBytes(inputStream)
+        } else {
+            null
+        }
     }
+}
+
+@Throws(IOException::class)
+fun readAllBytes(inputStream: InputStream): ByteArray? {
+    val bufLen = 1024
+    val buf = ByteArray(bufLen)
+    var readLen: Int
+    var exception: IOException? = null
+    return try {
+        val outputStream = ByteArrayOutputStream()
+        while (inputStream.read(buf, 0, bufLen).also { readLen = it } != -1) outputStream.write(
+            buf,
+            0,
+            readLen
+        )
+        outputStream.toByteArray()
+    } catch (e: IOException) {
+        exception = e
+        throw e
+    } finally {
+        if (exception == null) inputStream.close() else try {
+            inputStream.close()
+        } catch (e: IOException) {
+            exception.addSuppressed(e)
+        }
+    }
+}
 
 
     @Throws(Throwable::class)

@@ -89,21 +89,8 @@ fun CustomListDisplayCompactScreen(
                 },
                 backgroundColor = MaterialTheme.colorScheme.surface,
                 elevation = 0.dp,
-//                navigationIcon = {
-//                    androidx.compose.material.Icon(
-//                        painter = painterResource(R.drawable.baseline_menu_24),
-//                        contentDescription = "Toggle Drawer",
-//                        modifier = Modifier.clickable(onClick = {
-//                            scope.launch {
-//                                if (state.drawerState.isClosed) state.drawerState.open() else state.drawerState.close()
-//                            }
-//                        }),
-//                        tint = MaterialTheme.colors.onBackground
-//                    )
-//                })
             )
         },
-        //containerColor = MaterialTheme.colors.background,
         bottomBar = {
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
@@ -118,7 +105,6 @@ fun CustomListDisplayCompactScreen(
                                 popUpTo(navController.graph.findStartDestination().id) {
                                 }
                                 launchSingleTop = true
-//                                restoreState = true
                             }
                         },
                         icon = {

@@ -41,9 +41,6 @@ class BookmarksViewModel @Inject constructor(
     private val _search = MutableStateFlow(null as String?)
     val search get() = _search
 
-    //    private val _listOfLists = MutableStateFlow<List<ReflexionArrayItem?>>(emptyList())
-//    val listOfLists: StateFlow<List<ReflexionArrayItem?>> get() = _listOfLists
-//
     private val _listImages = MutableStateFlow<List<Bitmap>>(emptyList())
     val listImages: StateFlow<List<Bitmap?>> get() = _listImages
 
@@ -60,7 +57,6 @@ class BookmarksViewModel @Inject constructor(
             _listImages.value = bitmaps
         }
     }
-
     fun onTriggerEvent(event: BookmarksEvent) {
 
         try {

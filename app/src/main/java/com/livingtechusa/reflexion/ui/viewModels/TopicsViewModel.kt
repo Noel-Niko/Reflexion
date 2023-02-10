@@ -46,7 +46,6 @@ class TopicsViewModel @Inject constructor(
     private val _bookmarkImages = MutableStateFlow(emptyList<Bitmap?>())
     val bookmarkImages: StateFlow<List<Bitmap?>> get() = _bookmarkImages
 
-
     // Term for query
     private val _search = MutableStateFlow(null as String?)
     val search: StateFlow<String?> = _search

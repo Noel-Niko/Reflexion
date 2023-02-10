@@ -17,14 +17,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.BarItem
 import com.livingtechusa.reflexion.ui.viewModels.SettingsViewModel
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CompactScreen(
     navController: NavHostController,
     icons: List<BarItem>,
-    viewModel: SettingsViewModel
+    viewModel: com.livingtechusa.reflexion.ui.viewModels.SettingsViewModel
 ) {
     Scaffold(
         topBar = {
@@ -53,7 +51,6 @@ fun CompactScreen(
                                 popUpTo(navController.graph.findStartDestination().id) {
                                 }
                                 launchSingleTop = true
-//                                restoreState = true
                             }
                         },
                         icon = {

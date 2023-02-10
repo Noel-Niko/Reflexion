@@ -65,7 +65,6 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var app: BaseApplication
-
     lateinit var navigationController: NavHostController
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -270,12 +269,7 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     ) { navBackStackEntry ->
-//                        val parentEntry = remember(navBackStackEntry) {
-//                            navController.getBackStackEntry(Screen.CustomLists.route)
-//                        }
-//                        val parentViewModel: CustomListsViewModel = hiltViewModel(parentEntry)
                         CustomListDisplayScreen(
-//                            viewModel = parentViewModel,
                             navController = navController,
                             headNodePk = navBackStackEntry.arguments?.getLong(HEAD_NODE_PK) ?: -1,
                             windowSize = windowSize
@@ -284,18 +278,13 @@ class MainActivity : ComponentActivity() {
 
                     composable(
                         route = Screen.VideoViewCustomList.route + "/{Index}",
-//                        arguments = listOf(
-//                            navArgument(INDEX) {
-//                                type = NavType.IntType
-//                            }
-//                        )
                     ) { navBackStackEntry ->
                         val parentEntry = remember(navBackStackEntry) {
                             navController.getBackStackEntry(Screen.CustomLists.route)
                         }
                         val parentViewModel: CustomListsViewModel = hiltViewModel(parentEntry)
                         VideoPlayer2CustomList(
-                            index = 0,   //navBackStackEntry.arguments?.getInt(INDEX),
+                            index = 0,
                             viewModel = parentViewModel,
                         )
                     }
@@ -332,20 +321,14 @@ class MainActivity : ComponentActivity() {
                     onDispose { removeOnNewIntentListener(listener) }
                 }
 
-                DisposableEffect(key1 =Intent()) {
-                   // val url: String = intent.clipData?.getItemAt(0)?.text.toString()
+                DisposableEffect(key1 = Intent()) {
                     val uri: String = intent.clipData?.getItemAt(0)?.uri.toString()
-                   // Temporary.url = url
                     Temporary.uri = uri
-//                    if(url != EMPTY_STRING && url != "null") {
-//                        navigationController.navigate(Screen.ConfirmSaveScreen.route)
-//                    } else {
-                        if (uri != EMPTY_STRING && uri != "null") {
-                            Temporary.use = true
-                            navigationController.navigate(Screen.BuildItemScreen.route + "/-1")
-//                        }
+                    if (uri != EMPTY_STRING && uri != "null") {
+                        Temporary.use = true
+                        navigationController.navigate(Screen.BuildItemScreen.route + "/-1")
                     }
-                    onDispose {  }
+                    onDispose { }
                 }
 
             }

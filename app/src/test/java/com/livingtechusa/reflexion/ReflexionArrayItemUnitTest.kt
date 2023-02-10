@@ -1,47 +1,47 @@
 package com.livingtechusa.reflexion
 
-import com.livingtechusa.reflexion.util.ReflexionArrayItem
+import com.livingtechusa.reflexion.data.models.ReflexionArrayItem
 import org.junit.Test
 
 /**
- * Example local unit test, which will execute on the development machine (host).
- *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
-class ExampleUnitTest {
+class ReflexionArrayItemUnitTest {
 
-
-    var count = 0L
+    private var count = 0L
 
     @Test
     fun addLevel() {
         val item1 = ReflexionArrayItem(
             itemPK = count,
             itemName = "first",
-            children = mutableListOf()
+            children = mutableListOf(),
+            nodePk = null
         )
         count += 1L
         val newFirst = ReflexionArrayItem(
             itemPK = count,
             itemName = count.toString(),
-            children = mutableListOf()
+            children = mutableListOf(),
+            nodePk = null
         )
         count += 1L
         val newSecond = ReflexionArrayItem(
             itemPK = count,
             itemName = count.toString(),
-            children = mutableListOf()
+            children = mutableListOf(),
+            nodePk = null
         )
-        val list = mutableListOf<ReflexionArrayItem?>()
+        val list = mutableListOf<ReflexionArrayItem>()
         list.add(newFirst)
         list.add(newSecond)
         val result = newLevel(item1, list)
         println(result)
     }
 
-    fun newLevel(
+    private fun newLevel(
         Rai: ReflexionArrayItem,
-        list: MutableList<ReflexionArrayItem?>
+        list: MutableList<ReflexionArrayItem>,
     ): ReflexionArrayItem {
         Rai.children = list
         return Rai
@@ -50,7 +50,8 @@ class ExampleUnitTest {
     val item1 = ReflexionArrayItem(
         itemPK = count,
         itemName = "first",
-        children = mutableListOf()
+        children = mutableListOf(),
+        nodePk = null
     )
     @Test
     fun addMultipleLevels() {
@@ -63,20 +64,22 @@ class ExampleUnitTest {
         println(result)
     }
 
-    fun getTwoMore(): MutableList<ReflexionArrayItem?> {
+    fun getTwoMore(): MutableList<ReflexionArrayItem> {
         count += 1L
         val newFirst = ReflexionArrayItem(
             itemPK = count,
             itemName = count.toString(),
-            children = mutableListOf()
+            children = mutableListOf(),
+            nodePk = null
         )
         count += 1L
         val newSecond = ReflexionArrayItem(
             itemPK = count,
             itemName = count.toString(),
-            children = mutableListOf()
+            children = mutableListOf(),
+            nodePk = null
         )
-        val list = mutableListOf<ReflexionArrayItem?>()
+        val list = mutableListOf<ReflexionArrayItem>()
         list.add(newFirst)
         list.add(newSecond)
         return list

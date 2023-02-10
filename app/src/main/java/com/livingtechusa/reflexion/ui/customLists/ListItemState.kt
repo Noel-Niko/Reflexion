@@ -3,7 +3,7 @@ package com.livingtechusa.reflexion.ui.customLists
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.livingtechusa.reflexion.util.ReflexionArrayItem
+import com.livingtechusa.reflexion.data.models.ReflexionArrayItem
 
 
 /*[ListItemState]  represents currentListItem state. */

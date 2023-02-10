@@ -4,8 +4,7 @@ import com.livingtechusa.reflexion.data.entities.ListNode
 import com.livingtechusa.reflexion.data.models.AbridgedReflexionItem
 import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
-import com.livingtechusa.reflexion.util.ReflexionArrayItem
-
+import com.livingtechusa.reflexion.data.models.ReflexionArrayItem
 
 fun ReflexionArrayItem.toListNode(topic: Long?, headNodePk: Long?): List<ListNode?> {
     val list = mutableListOf<ListNode>()

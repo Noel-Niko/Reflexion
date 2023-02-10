@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import com.livingtechusa.reflexion.ui.theme.selectableColorSchemes.returnPrimaryColors
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import kotlin.reflect.KFunction1
-
 @Composable
 fun MaterialRadioButtonGroupComponent(
     options: Map<String, Int>,

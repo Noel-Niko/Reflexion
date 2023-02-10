@@ -175,13 +175,13 @@ public fun <T : Any> DropdownContent(
 
 /*[Space] add space content . */
 @Composable
-public fun Space() {
+fun Space() {
     Spacer(modifier = Modifier.width(12.dp))
 }
 
 /*[MenuItemIcon] icon properties. */
 @Composable
-public fun CustomMenuItemIcon(icon: ImageVector, tint: Color ) {
+fun CustomMenuItemIcon(icon: ImageVector, tint: Color ) {
     Icon(
         modifier = Modifier.size(24.dp),
         imageVector = icon,
@@ -192,7 +192,7 @@ public fun CustomMenuItemIcon(icon: ImageVector, tint: Color ) {
 
 /*[MenuItemText] text properties. */
 @Composable
-public fun MenuItemText(
+fun MenuItemText(
     modifier: Modifier,
     text: String,
     color: Color,
@@ -214,7 +214,7 @@ public fun MenuItemText(
 
 /*[MenuItem] DropdownMenuItem  wrapper to handle onclick and user interaction */
 @Composable
-public fun CustomMenuItem(onClick: () -> Unit, content: @Composable RowScope.() -> Unit) {
+fun CustomMenuItem(onClick: () -> Unit, content: @Composable RowScope.() -> Unit) {
     DropdownMenuItem(
         onClick = onClick,
         interactionSource = remember { MutableInteractionSource() },
@@ -224,7 +224,7 @@ public fun CustomMenuItem(onClick: () -> Unit, content: @Composable RowScope.() 
 
 /*[CascadeHeaderItem] represent header item of the menu */
 @Composable
-public fun CascadeHeaderItem(
+fun CascadeHeaderItem(
     title: String,
     contentColor: Color,
     onClick: () -> Unit,
@@ -247,7 +247,7 @@ public fun CascadeHeaderItem(
 
 /*[ParentItem] parentItem of the menu*/
 @Composable
-public fun <T> ParentItem(
+fun <T> ParentItem(
     id: T,
     title: String,
     icon: ImageVector?,
@@ -278,7 +278,7 @@ public fun <T> ParentItem(
 
 /*[ChildItem] childItem of the menu*/
 @Composable
-public fun <T> ChildItem(
+fun <T> ChildItem(
     id: T,
     title: String,
     icon: ImageVector?,

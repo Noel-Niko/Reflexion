@@ -3,15 +3,12 @@ package com.livingtechusa.reflexion.ui.build
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,25 +18,20 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-//import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.Scaffold
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -48,15 +40,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush.Companion.verticalGradient
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
-import androidx.compose.ui.input.pointer.consumeAllChanges
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -65,7 +54,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.R
-import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.components.ImageCard
 import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
@@ -83,10 +71,8 @@ import com.livingtechusa.reflexion.util.scopedStorageUtils.DocumentFilePreviewCa
 import com.livingtechusa.reflexion.util.scopedStorageUtils.MediaStoreUtils
 import com.livingtechusa.reflexion.util.scopedStorageUtils.videoImagePreviewCard
 import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun BuildItemContent(
     pk: Long,
@@ -94,11 +80,9 @@ fun BuildItemContent(
     viewModel: ItemViewModel,
     paddingValues: PaddingValues
 ) {
-    val URI = "Uri"
+    val uRI = "Uri"
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-//    val reflexionItem by itemViewModel.reflexionItem.collectAsState()
-
     val name by viewModel.name.collectAsState()
     val description by viewModel.description.collectAsState()
     val detailedDescription by viewModel.detailedDescription.collectAsState()
@@ -153,7 +137,7 @@ fun BuildItemContent(
 
     val takeVideo = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CaptureVideo()
-    ) { _ ->
+    ) {
         targetVideoUri?.let { uri ->
             targetVideoUri = null
             viewModel.onTriggerEvent(
@@ -176,7 +160,7 @@ fun BuildItemContent(
 
     val takeImage = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
-    ) { _ ->
+    ) {
         targetImageUri?.let { uri ->
             targetImageUri = null
             val newVal =
@@ -231,7 +215,7 @@ fun BuildItemContent(
                         .align(Alignment.End)
                 ) {
                     if (image != null) {
-                        showImage(image!!, navController)
+                        ShowImage(image!!, navController)
                     } else {
                         Text(
                             modifier = Modifier.padding(12.dp),
@@ -445,7 +429,7 @@ fun BuildItemContent(
                                         .show()
                                 } else {
                                     //
-                                    val route: String = Screen.VideoView.route + "/" + URI
+                                    val route: String = Screen.VideoView.route + "/" + uRI
                                     navController.navigate(route)
                                 }
                             },
@@ -470,7 +454,7 @@ fun BuildItemContent(
                     .align(Alignment.CenterVertically)
             ) {
                 IconButton(onClick = {
-                    selectVideo.launch(arrayOf<String>(Constants.VIDEO_TYPE))
+                    selectVideo.launch(arrayOf(Constants.VIDEO_TYPE))
                 }) {
                     Icon(
                         painter = painterResource(R.drawable.baseline_video_library_24),
@@ -549,7 +533,7 @@ fun BuildItemContent(
 
 
 @Composable
-fun showImage(image: Bitmap, navController: NavHostController) {
+fun ShowImage(image: Bitmap, navController: NavHostController) {
     ImageCard(
         image, navController
     )

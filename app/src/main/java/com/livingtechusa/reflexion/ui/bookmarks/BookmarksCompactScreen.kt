@@ -48,10 +48,8 @@ fun BookmarksCompactScreen(
                         onClick = {
                             navController.navigate(navItem.route) {
                                 popUpTo(navController.graph.findStartDestination().id) {
-//                                    saveState = true
                                 }
                                 launchSingleTop = true
-//                                restoreState = true
                             }
                         },
                         icon = {
@@ -81,6 +79,5 @@ fun BookmarksCompactScreen(
             Spacer(modifier = Modifier.height(16.dp))
             BookmarksContent(navController = navController, viewModel = viewModel)
         }
-
     }
 }

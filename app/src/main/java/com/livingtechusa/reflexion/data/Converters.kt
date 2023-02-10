@@ -39,16 +39,4 @@ class Converters {
     fun getBitmapFromByteArray(byteArray: ByteArray): Bitmap {
         return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
     }
-
-//    @TypeConverter
-//    fun fromString(value: String?): ArrayList<String>? {
-//        val listType: Type = object : TypeToken<ArrayList<String>?>() {}.getType()
-//        return Gson().fromJson(value, listType)
-//    }
-//
-//    @TypeConverter
-//    fun fromArrayList(list: ArrayList<String?>?): String? {
-//        val gson = Gson()
-//        return gson.toJson(list)
-//    }
 }

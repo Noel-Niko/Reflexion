@@ -13,7 +13,7 @@ import com.livingtechusa.reflexion.data.toListNode
 import com.livingtechusa.reflexion.data.toReflexionArrayItem
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
-import com.livingtechusa.reflexion.util.ReflexionArrayItem
+import com.livingtechusa.reflexion.data.models.ReflexionArrayItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers

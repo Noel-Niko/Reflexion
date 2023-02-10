@@ -16,7 +16,6 @@ import com.livingtechusa.reflexion.navigation.NavBarItems
 import com.livingtechusa.reflexion.ui.viewModels.BookmarksViewModel
 import com.livingtechusa.reflexion.util.extensions.findActivity
 
-
 const val BOOKMARKS = "bookmarks"
 
 @Composable

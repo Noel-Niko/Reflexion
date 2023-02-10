@@ -13,7 +13,6 @@ sealed class BookmarksEvent {
         val NODE_PK: Long,
     ) : BookmarksEvent()
 
-
     object  ClearList: BookmarksEvent()
     object GetAllBookmarks: BookmarksEvent()
 }

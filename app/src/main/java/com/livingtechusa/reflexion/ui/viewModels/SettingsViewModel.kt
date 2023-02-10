@@ -67,10 +67,11 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             try {
                 when (event) {
-                    is SettingsEvent.getIconImages -> {
+                    is SettingsEvent.GetIconImages -> {
                         getAppBitmapList()
                     }
-                    is SettingsEvent.setIconSelected -> {
+
+                    is SettingsEvent.SetIconSelected -> {
                         _iconSelected.value = event.iconSelected
                     }
                 }
@@ -100,14 +101,12 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
 
     @Composable
     fun ToggleLightDarkMode(isDark: Boolean) {
-        //if (isSystemInDarkTheme().not() && isDark) {
-            if (isDark) {
-                // Set Dark Mode and Restart
-                UserPreferencesUtil.setCurrentUserModeSelection(LocalContext.current, 1)
+        if (isDark) {
+            // Set Dark Mode and Restart
+            UserPreferencesUtil.setCurrentUserModeSelection(LocalContext.current, 1)
         } else {
-           // if (isSystemInDarkTheme() && isDark.not()) {
-                // Set Light Mode and Restart
-                UserPreferencesUtil.setCurrentUserModeSelection(LocalContext.current, 0)
+            // Set Light Mode and Restart
+            UserPreferencesUtil.setCurrentUserModeSelection(LocalContext.current, 0)
         }
     }
 }

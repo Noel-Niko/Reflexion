@@ -13,6 +13,5 @@ interface ResourceProviderInterface {
     fun getQuantityString(@PluralsRes resId: Int, quantity: Int, vararg formatArgs: Any): String
     fun getInteger(@IntegerRes resId: Int): Int
     fun getDimen(@DimenRes resId: Int): Float
-
     fun getDrawable(@DrawableRes resId: Int): Drawable
 }

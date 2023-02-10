@@ -50,10 +50,8 @@ fun CompactScreen(
                         onClick = {
                             navController.navigate(navItem.route) {
                                 popUpTo(navController.graph.findStartDestination().id) {
-//                                    saveState = true
                                 }
                                 launchSingleTop = true
-//                                restoreState = true
                             }
                         },
                         icon = {
@@ -64,7 +62,11 @@ fun CompactScreen(
                             )
                         },
                         label = {
-                            Text(text = navItem.title, color = MaterialTheme.colorScheme.onPrimaryContainer, maxLines = 1)
+                            Text(
+                                text = navItem.title,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                maxLines = 1
+                            )
                         }
                     )
                 }

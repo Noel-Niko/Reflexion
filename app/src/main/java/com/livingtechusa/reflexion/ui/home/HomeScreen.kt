@@ -21,12 +21,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.NavBarItems
-import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.extensions.findActivity
 
 const val HOME = "home"
@@ -34,8 +32,7 @@ const val HOME = "home"
 @Composable
 fun HomeScreen(
     navHostController: NavHostController,
-    windowSize: WindowWidthSizeClass,
-    viewModel: ItemViewModel = hiltViewModel()
+    windowSize: WindowWidthSizeClass
 ) {
 
     val context = LocalContext.current
@@ -61,8 +58,11 @@ fun HomeScreen(
 }
 
 @Composable
-fun homeContent() {
-    Row(Modifier.fillMaxSize().background(color = MaterialTheme.colorScheme.background)) {
+fun HomeContent() {
+    Row(
+        Modifier
+            .fillMaxSize()
+            .background(color = MaterialTheme.colorScheme.background)) {
         Box(
             modifier = Modifier
                 .align(Alignment.CenterVertically)

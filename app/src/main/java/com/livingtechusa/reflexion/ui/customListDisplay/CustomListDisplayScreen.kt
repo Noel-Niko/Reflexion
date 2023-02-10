@@ -50,7 +50,6 @@ import com.livingtechusa.reflexion.util.scopedStorageUtils.DocumentFilePreviewCa
 import com.livingtechusa.reflexion.util.scopedStorageUtils.videoImagePreviewCard
 
 const val CUSTOM_LIST_DISPLAY = "customListDisplay"
-
 @Composable
 fun CustomListDisplayScreen(
     viewModel: CustomListsViewModel = hiltViewModel(),

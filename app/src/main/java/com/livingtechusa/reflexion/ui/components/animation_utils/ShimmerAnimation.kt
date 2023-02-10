@@ -18,7 +18,6 @@ import com.livingtechusa.reflexion.ui.theme.ShimmerColorShades
 @Composable
 fun ShimmerAnimation(
 ) {
-
     /*
     Create InfiniteTransition
     which holds child animation like [Transition]

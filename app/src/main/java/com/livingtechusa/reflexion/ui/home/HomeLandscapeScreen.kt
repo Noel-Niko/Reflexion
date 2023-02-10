@@ -11,18 +11,15 @@ import androidx.compose.material3.NavigationRailItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.livingtechusa.reflexion.navigation.BarItem
-import com.livingtechusa.reflexion.navigation.NavBarItems
 
 
 @Composable
 fun Landscape(navController: NavHostController, icons: List<BarItem>) {
-    val icons = NavBarItems.HomeBarItems
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
     Row(modifier = Modifier.fillMaxSize()) {
@@ -37,10 +34,8 @@ fun Landscape(navController: NavHostController, icons: List<BarItem>) {
                     onClick = {
                         navController.navigate(navItem.route) {
                             popUpTo(navController.graph.findStartDestination().id) {
-
                             }
                             launchSingleTop = true
-
                         }
                     },
                     icon = {
@@ -52,6 +47,6 @@ fun Landscape(navController: NavHostController, icons: List<BarItem>) {
                     })
             }
         }
-        homeContent()
+        HomeContent()
     }
 }

@@ -82,7 +82,7 @@ fun SettingsScreen(
         // for sending analytics events
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_CREATE) {
-                viewModel.onTriggerEvent(SettingsEvent.getIconImages)
+                viewModel.onTriggerEvent(SettingsEvent.GetIconImages)
             }
         }
 
@@ -156,7 +156,7 @@ fun IconImageCard(
                         viewModel.icon = true
                         viewModel.iconNumber = iconNumber
                         viewModel.totalIndices = totalIndices
-                        viewModel.onTriggerEvent(SettingsEvent.setIconSelected(iconNumber))
+                        viewModel.onTriggerEvent(SettingsEvent.SetIconSelected(iconNumber))
                     }
                 ),
             alignment = Alignment.Center
