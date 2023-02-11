@@ -1,4 +1,4 @@
-package com.livingtechusa.reflexion.data
+package com.livingtechusa.reflexion.di
 
 import android.content.Context
 import com.livingtechusa.reflexion.util.BaseApplication

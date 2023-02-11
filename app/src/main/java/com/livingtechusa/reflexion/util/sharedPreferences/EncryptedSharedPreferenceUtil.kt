@@ -1,4 +1,4 @@
-package com.livingtechusa.reflexion.util
+package com.livingtechusa.reflexion.util.sharedPreferences
 
 
 import android.content.Context

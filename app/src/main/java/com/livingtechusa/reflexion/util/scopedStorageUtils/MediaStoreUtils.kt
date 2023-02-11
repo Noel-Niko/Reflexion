@@ -15,6 +15,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.provider.MediaStore.MediaColumns.DATE_ADDED
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.core.net.toFile
@@ -31,6 +32,8 @@ import kotlin.coroutines.resume
 
 
 object MediaStoreUtils {
+    const val TAG = "MediaStoreUtils"
+
     /**
      * Check if the app can read the shared storage
      */
@@ -133,7 +136,7 @@ object MediaStoreUtils {
             try {
                 volumeName = MediaStore.getVolumeName(uri)
             } catch(e: Exception) {
-
+                Log.e(TAG, "Error " + e.message + " with cause : " + e.cause)
             }
             if(volumeName.isEmpty()) volumeName = "external"
             MediaStore.Files.getContentUri( volumeName, entryId.toLong())

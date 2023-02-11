@@ -217,10 +217,10 @@ class LocalServiceImpl @Inject constructor(
 
     override suspend fun selectAllSiblings(parent: Long): List<ReflexionItem?> {
         val grandparent: Long = reflexionItemDao.getParent(parent) ?: EMPTY_PK
-        if (grandparent == EMPTY_PK) {
-            return reflexionItemDao.getReflexionItemTopics()
+        return if (grandparent == EMPTY_PK) {
+            reflexionItemDao.getReflexionItemTopics()
         } else {
-            return reflexionItemDao.selectAllSiblings(grandparent)
+            reflexionItemDao.selectAllSiblings(grandparent)
         }
     }
 

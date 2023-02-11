@@ -1,4 +1,4 @@
-package com.livingtechusa.reflexion.ui.components
+package com.livingtechusa.reflexion.ui.topics
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -40,7 +40,6 @@ import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.Bookmarks
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
-import com.livingtechusa.reflexion.ui.topics.TopicItemEvent
 import com.livingtechusa.reflexion.ui.viewModels.TopicsViewModel
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import kotlinx.coroutines.CoroutineScope

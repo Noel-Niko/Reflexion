@@ -1,4 +1,4 @@
-package com.livingtechusa.reflexion.ui.components
+package com.livingtechusa.reflexion.ui.components.animation_utils
 
 
 import androidx.compose.animation.core.FastOutSlowInEasing

@@ -12,7 +12,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.livingtechusa.reflexion.navigation.NavBarItems
-import com.livingtechusa.reflexion.ui.components.ReflexionItemListUI
 import com.livingtechusa.reflexion.ui.viewModels.TopicsViewModel
 import com.livingtechusa.reflexion.util.extensions.findActivity
 

@@ -11,7 +11,6 @@ import com.livingtechusa.reflexion.R.string.shared_prefs_encrypted_biometric_pas
 import com.livingtechusa.reflexion.R.string.shared_prefs_encrypted_password
 import com.livingtechusa.reflexion.R.string.shared_prefs_encrypted_user_password
 import com.livingtechusa.reflexion.R.string.shared_prefs_logged_in_user_name
-import com.livingtechusa.reflexion.util.EncryptedSharedPreferencesUtil
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 
 object UserPreferencesUtil : SharedPreferencesUtil() {
