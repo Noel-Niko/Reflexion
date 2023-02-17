@@ -519,15 +519,15 @@ class CustomListsViewModel @Inject constructor(
                         setParent(itemPk)
                     }
                 }
+                Toast.makeText(
+                    context,
+                    buildString {
+                        append(resource.getString(R.string.setting_as_the_new_parent))
+                        append(selectedParent.value.name)
+                    },
+                    Toast.LENGTH_SHORT
+                ).show()
             }
-            Toast.makeText(
-                context,
-                buildString {
-                    append(resource.getString(R.string.setting_as_the_new_parent))
-                    append(selectedParent.value.name)
-                },
-                Toast.LENGTH_SHORT
-            ).show()
         }
     }
 
