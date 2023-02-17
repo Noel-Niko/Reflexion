@@ -3,6 +3,7 @@ package com.livingtechusa.reflexion.ui.customLists
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
@@ -36,8 +38,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -54,6 +59,7 @@ import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.data.models.ReflexionArrayItem
 import com.livingtechusa.reflexion.data.models.ReflexionArrayItem.Companion.traverseBreadthFirst
 import com.livingtechusa.reflexion.util.extensions.findActivity
+import kotlin.math.roundToInt
 
 const val BuildCustomList = "build_custom_lists"
 
@@ -119,18 +125,44 @@ fun CustomListsContent(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                TextField(
+                    modifier = Modifier
+
+                        .shadow(20.dp)
+                        .fillMaxWidth(),
+                    value = searchText,
+                    onValueChange = {
+                        searchText = it
+                    },
+                    label = {
+                        Text(
+                            text = stringResource(R.string.search)
+                        )
+                    },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(
+                            expanded = expanded,
+                            onIconClick = {
+                                searchText = EMPTY_STRING
+                                expanded = !expanded
+                            }
+                        )
+                    },
+                    colors = TextFieldDefaults.textFieldColors(
+                        textColor = MaterialTheme.colorScheme.primary
+                    )
+                )
+            }
             Row(Modifier.fillMaxWidth()) {
                 Box(
                     modifier = Modifier
-                        .align(
-                            Alignment.CenterVertically,
-                        )
+                        .align(Alignment.CenterVertically)
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp),
+                            .fillMaxWidth(),
                     ) {
                         ExposedDropdownMenuBox(
                             modifier = Modifier
@@ -140,29 +172,6 @@ fun CustomListsContent(
                                 expanded = !expanded
                             }
                         ) {
-                            TextField(
-                                modifier = Modifier
-                                    .align(Alignment.CenterHorizontally)
-                                    .shadow(20.dp)
-                                    .fillMaxWidth(),
-                                value = searchText,
-                                onValueChange = {
-                                    searchText = it
-                                },
-                                label = {
-                                    Text(
-                                        text = stringResource(R.string.search)
-                                    )
-                                },
-                                trailingIcon = {
-                                    ExposedDropdownMenuDefaults.TrailingIcon(
-                                        expanded = expanded
-                                    )
-                                },
-                                colors = TextFieldDefaults.textFieldColors(
-                                    textColor = MaterialTheme.colorScheme.primary
-                                )
-                            )
                             CustomDropDownMenu(
                                 modifier = Modifier
                                     .fillMaxWidth(.75f),
@@ -177,62 +186,62 @@ fun CustomListsContent(
                     }
                 }
             }
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                // filter options based on text field value
-                val filteringOptions: MutableList<ReflexionArrayItem> = mutableListOf()
-                if (searchText != EMPTY_STRING) {
-                    itemTree.value.let { abridgedParent ->
-                        // Breadth first Search for search item
-                        traverseBreadthFirst(itemTree.value) { RAI ->
-                            if (RAI.itemName?.contains(
-                                    searchText,
-                                    ignoreCase = true
-                                ) == true
-                            ) {
-                                filteringOptions.add(RAI)
+            Row(Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    // filter options based on text field value
+                    val filteringOptions: MutableList<ReflexionArrayItem> = mutableListOf()
+                    if (searchText != EMPTY_STRING) {
+                        itemTree.value.let { abridgedParent ->
+                            // Breadth first Search for search item
+                            traverseBreadthFirst(itemTree.value) { RAI ->
+                                if (RAI.itemName?.contains(
+                                        searchText,
+                                        ignoreCase = true
+                                    ) == true
+                                ) {
+                                    filteringOptions.add(RAI)
+                                }
                             }
                         }
                     }
-                }
-                if (filteringOptions.isNotEmpty()) {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp)
-                    ) {
-                        items(filteringOptions.size) {
-                            ElevatedCard(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(4.dp)
-                                    .clickable {
-                                        viewModel.selectItem(filteringOptions[it].itemPK.toString())
-                                        searchText = EMPTY_STRING
-                                    }
-                                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                                    .align(Alignment.CenterHorizontally),
-                                shape = MaterialTheme.shapes.extraLarge,
-                                elevation = CardDefaults.elevatedCardElevation(4.dp)
-                            ) {
-                                Text(
-                                    text = filteringOptions[it].itemName
-                                        ?: stringResource(R.string.no_match_found),
-                                    style = MaterialTheme.typography.headlineLarge,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.padding(16.dp, 2.dp)
-                                )
+                    if (filteringOptions.isNotEmpty()) {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp)
+                        ) {
+                            items(filteringOptions.size) {
+                                ElevatedCard(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(4.dp)
+                                        .clickable {
+                                            viewModel.selectItem(filteringOptions[it].itemPK.toString())
+                                            searchText = EMPTY_STRING
+                                        }
+                                        .align(Alignment.CenterHorizontally),
+                                    shape = MaterialTheme.shapes.extraLarge,
+                                    elevation = CardDefaults.elevatedCardElevation(4.dp)
+                                ) {
+                                    Text(
+                                        text = filteringOptions[it].itemName
+                                            ?: stringResource(R.string.no_match_found),
+                                        style = MaterialTheme.typography.headlineLarge,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.padding(16.dp, 2.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
                         }
+                    } else {
+                        CustomListContent(navController = navController, viewModel = viewModel)
                     }
-                } else {
-                    CustomListContent(navController = navController, viewModel = viewModel)
                 }
             }
-
         }
     }
 }

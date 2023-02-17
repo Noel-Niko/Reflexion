@@ -2,6 +2,8 @@ package com.livingtechusa.reflexion.ui.components
 
 import android.widget.Toast
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,16 +13,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExposedDropdownMenuBox
-import androidx.compose.material.ExposedDropdownMenuDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.twotone.Lan
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -91,7 +96,6 @@ fun ParentSelectUI(
     var expanded by remember {
         mutableStateOf(false)
     }
-
     val selectedParent = viewModel.selectedParent.collectAsState()
     Scaffold(
         modifier = Modifier.padding(paddingValues),
@@ -155,9 +159,38 @@ fun ParentSelectUI(
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.changing_an_item_s_parent_will_also_move_any_of_the_item_s_children))
+                    text = stringResource(R.string.changing_an_item_s_parent_will_also_move_any_of_the_item_s_children)
+                )
             }
             Spacer(Modifier.height(16.dp))
+            Row(modifier = Modifier.fillMaxWidth()) {
+                TextField(
+                    modifier = Modifier
+                        .shadow(20.dp)
+                        .fillMaxWidth(),
+                    value = searchText,
+                    onValueChange = {
+                        searchText = it
+                    },
+                    label = {
+                        Text(
+                            text = stringResource(R.string.search)
+                        )
+                    },
+                    trailingIcon = {
+                        androidx.compose.material.ExposedDropdownMenuDefaults.TrailingIcon(
+                            expanded = expanded,
+                            onIconClick = {
+                                searchText = Constants.EMPTY_STRING
+                                expanded = !expanded
+                            }
+                        )
+                    },
+                    colors = TextFieldDefaults.textFieldColors(
+                        textColor = MaterialTheme.colorScheme.primary
+                    )
+                )
+            }
             Row(Modifier.fillMaxWidth()) {
                 Box(
                     modifier = Modifier
@@ -171,47 +204,83 @@ fun ParentSelectUI(
                             .fillMaxWidth()
                             .padding(20.dp),
                     ) {
-                        ExposedDropdownMenuBox(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            expanded = expanded,
-                            onExpandedChange = {
-                                expanded = !expanded
-                            }
-                        ) {
-                            TextField(
+                        Row(modifier = Modifier.fillMaxWidth()) {
+                            ExposedDropdownMenuBox(
                                 modifier = Modifier
-                                    .align(Alignment.CenterHorizontally)
-                                    .shadow(20.dp)
                                     .fillMaxWidth(),
-                                value = searchText,
-                                onValueChange = {
-                                    searchText = it
-                                },
-                                label = {
-                                    Text(
-                                        text = stringResource(R.string.search)
-                                    )
-                                },
-                                trailingIcon = {
-                                    ExposedDropdownMenuDefaults.TrailingIcon(
-                                        expanded = expanded
-                                    )
-                                },
-                                colors = TextFieldDefaults.textFieldColors(
-                                    textColor = MaterialTheme.colorScheme.primary
-                                )
-                            )
-                            CustomDropDownMenu(
-                                modifier = Modifier
-                                    .fillMaxWidth(.75f),
-                                isOpen = expanded,
-                                setIsOpen = {
+                                expanded = expanded,
+                                onExpandedChange = {
                                     expanded = !expanded
-                                },
-                                itemSelected = viewModel::selectParentItem,
-                                menu = getMenu(itemTree.value)
-                            )
+                                }
+                            ) {
+                                CustomDropDownMenu(
+                                    modifier = Modifier
+                                        .fillMaxWidth(.75f),
+                                    isOpen = expanded,
+                                    setIsOpen = {
+                                        expanded = !expanded
+                                    },
+                                    itemSelected = viewModel::selectParentItem,
+                                    menu = getMenu(itemTree.value)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            Row() {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    // filter options based on text field value
+                    val filteringOptions: MutableList<ReflexionArrayItem> = mutableListOf()
+                    if (searchText != Constants.EMPTY_STRING) {
+                        itemTree.value.let { abridgedParent ->
+                            // Breadth first Search for search item
+                            ReflexionArrayItem.traverseBreadthFirst(itemTree.value) { RAI ->
+                                if (RAI.itemName?.contains(
+                                        searchText,
+                                        ignoreCase = true
+                                    ) == true
+                                ) {
+                                    filteringOptions.add(RAI)
+                                }
+                            }
+                        }
+                    }
+                    if (filteringOptions.isNotEmpty()) {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp)
+                        ) {
+                            items(filteringOptions.size) {
+                                ElevatedCard(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(4.dp)
+                                        .clickable {
+                                            viewModel.selectItem(filteringOptions[it].itemPK.toString())
+                                            searchText = Constants.EMPTY_STRING
+                                        }
+                                        .align(Alignment.CenterHorizontally),
+                                    shape = MaterialTheme.shapes.extraLarge,
+                                    elevation = CardDefaults.elevatedCardElevation(4.dp)
+                                ) {
+                                    Text(
+                                        text = filteringOptions[it].itemName
+                                            ?: stringResource(R.string.no_match_found),
+                                        style = MaterialTheme.typography.headlineLarge,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.padding(16.dp, 2.dp)
+                                            .clickable {
+                                                viewModel.selectItem(filteringOptions[it].itemPK.toString())
+                                            }
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
                         }
                     }
                 }
