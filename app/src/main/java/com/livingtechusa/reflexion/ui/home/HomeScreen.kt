@@ -77,13 +77,13 @@ fun HomeContent() {
                         Color.Black,
                         RoundedCornerShape(8.dp)
                     )
-                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .background(MaterialTheme.colorScheme.secondaryContainer)
                     .fillMaxWidth()
                     .padding(20.dp)
             ) {
                 Text(
                     text = stringResource(R.string.welcome_to_reflexion),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp,
                     lineHeight = 30.sp

@@ -273,7 +273,7 @@ fun SettingsContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues = it)
-                .verticalScroll(rememberScrollState()), //.background(MaterialTheme.colorScheme.primaryContainer)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             // Icons
