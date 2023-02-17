@@ -56,7 +56,7 @@ import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.components.ImageCard
-import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
 import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.Constants.DESCRIPTION
 import com.livingtechusa.reflexion.util.Constants.DETAILED_DESCRIPTION
@@ -77,7 +77,7 @@ import kotlinx.coroutines.launch
 fun BuildItemContent(
     pk: Long,
     navController: NavHostController,
-    viewModel: ItemViewModel,
+    viewModel: BuildItemViewModel,
     paddingValues: PaddingValues
 ) {
     val uRI = "Uri"
@@ -106,7 +106,7 @@ fun BuildItemContent(
         // for sending analytics events
         val observer = LifecycleEventObserver { owner, event ->
             if (event == Lifecycle.Event.ON_CREATE) {
-                if(Temporary.use) {
+                if(Temporary.useUri) {
                     viewModel.onTriggerEvent(BuildEvent.SearchUri(Temporary.uri))
                 } else {
                     viewModel.onTriggerEvent(BuildEvent.GetSelectedReflexionItem(pk))
@@ -403,7 +403,8 @@ fun BuildItemContent(
                 )
             }
         }
-        Spacer(Modifier.height(16.dp))/* SAVED VIDEO */
+        /* SAVED VIDEO */
+        Spacer(Modifier.height(16.dp))
         Row(
             modifier = Modifier
                 .padding(8.dp)
@@ -428,7 +429,6 @@ fun BuildItemContent(
                                         )
                                         .show()
                                 } else {
-                                    //
                                     val route: String = Screen.VideoView.route + "/" + uRI
                                     navController.navigate(route)
                                 }

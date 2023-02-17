@@ -141,7 +141,7 @@ class LocalServiceImpl @Inject constructor(
         }
     }
 
-    override suspend fun selectReflexionArrayItemsByPk(pk: Long): ReflexionArrayItem? {
+    override suspend fun selectReflexionArrayItemByPk(pk: Long): ReflexionArrayItem? {
         val _result: Deferred<AbridgedReflexionItem> = scope.async {
             reflexionItemDao.selectSingleAbridgedReflexionItem(pk)
         }

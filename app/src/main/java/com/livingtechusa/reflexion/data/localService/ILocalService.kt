@@ -32,7 +32,7 @@ interface ILocalService {
     suspend fun selectAbridgedReflexionItemDataByParentPk(pk: Long?): List<AbridgedReflexionItem?>
     suspend fun selectSingleAbridgedReflexionItemDataByParentPk(pk: Long): AbridgedReflexionItem
     suspend fun selectReflexionArrayItemsByParentPk(pk: Long?): List<ReflexionArrayItem?>
-    suspend fun selectReflexionArrayItemsByPk(pk: Long): ReflexionArrayItem?
+    suspend fun selectReflexionArrayItemByPk(pk: Long): ReflexionArrayItem?
     suspend fun selectImage(itemPk: Long): Bitmap?
 
     // LINKED LIST NODES

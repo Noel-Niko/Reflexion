@@ -1,6 +1,7 @@
 package com.livingtechusa.reflexion.ui.build
 
 import android.net.Uri
+import com.livingtechusa.reflexion.data.entities.ReflexionItem
 
 sealed class BuildEvent {
 
@@ -23,6 +24,7 @@ sealed class BuildEvent {
         val pk: Long?
     ): BuildEvent()
     data class SetParent(val parent: Long): BuildEvent()
+    data class SetSelectedParent(val parent: ReflexionItem): BuildEvent()
     data class CreateThumbnailImage(val uri: Uri?) : BuildEvent()
     data class Bookmark(val itemPk: Long) : BuildEvent()
     object RotateImage : BuildEvent()

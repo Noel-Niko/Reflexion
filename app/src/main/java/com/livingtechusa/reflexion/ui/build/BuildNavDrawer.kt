@@ -30,7 +30,7 @@ import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
-import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import kotlinx.coroutines.launch
 
@@ -38,7 +38,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun drawerNavContent(
     navHostController: NavHostController,
-    itemViewModel: ItemViewModel,
+    viewModel: BuildItemViewModel,
     reflexionItem: ReflexionItem,
     scaffoldState: ScaffoldState
 ) {
@@ -72,7 +72,7 @@ fun drawerNavContent(
                     modifier = Modifier.clickable(onClick = {
                         scope.launch {
                             val hasNoSiblings =
-                                itemViewModel.hasNoSiblings(
+                                viewModel.hasNoSiblings(
                                     reflexionItem.autogenPK,
                                     reflexionItem.parent ?: 0L
                                 )
@@ -101,7 +101,7 @@ fun drawerNavContent(
                     modifier = Modifier.clickable(onClick = {
                         scope.launch {
                             val hasNoChildren =
-                                itemViewModel.hasNoChildren(reflexionItem.autogenPK)
+                                viewModel.hasNoChildren(reflexionItem.autogenPK)
                             if (hasNoChildren) {
                                 Toast.makeText(
                                     context,
@@ -127,9 +127,9 @@ fun drawerNavContent(
                 Text(
                     modifier = Modifier.clickable(onClick = {
                         val parent = reflexionItem.parent
-                        itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
+                        viewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
                         if (parent != null) {
-                            itemViewModel.onTriggerEvent(BuildEvent.SetParent(parent))
+                            viewModel.onTriggerEvent(BuildEvent.SetParent(parent))
                             scope.launch {
                                 scaffoldState.drawerState.close()
                             }
@@ -150,8 +150,8 @@ fun drawerNavContent(
                 Text(
                     modifier = Modifier.clickable(onClick = {
                         val parent = reflexionItem.autogenPK
-                        itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
-                        itemViewModel.onTriggerEvent(BuildEvent.SetParent(parent))
+                        viewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
+                        viewModel.onTriggerEvent(BuildEvent.SetParent(parent))
                         scope.launch {
                             scaffoldState.drawerState.close()
                         }
@@ -166,9 +166,9 @@ fun drawerNavContent(
                     modifier = Modifier.clickable(onClick = {
                         scope.launch {
                             val noChildren =
-                                itemViewModel.hasNoChildren(reflexionItem.autogenPK)
+                                viewModel.hasNoChildren(reflexionItem.autogenPK)
                             if (noChildren) {
-                                itemViewModel.onTriggerEvent(BuildEvent.Delete)
+                                viewModel.onTriggerEvent(BuildEvent.Delete)
                                 scaffoldState.drawerState.close()
                             } else {
                                 Toast.makeText(
@@ -186,7 +186,7 @@ fun drawerNavContent(
                 Spacer(Modifier.height(16.dp))/* NEW ITEM */
                 Text(
                     modifier = Modifier.clickable(onClick = {
-                        itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
+                        viewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
                        scope.launch {
                            scaffoldState.drawerState.close()
                        }
@@ -200,8 +200,8 @@ fun drawerNavContent(
                     modifier = Modifier.clickable(onClick = {
                         val parent = reflexionItem.parent
                         if (parent != null) {
-                            itemViewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
-                            itemViewModel.onTriggerEvent(
+                            viewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
+                            viewModel.onTriggerEvent(
                                 BuildEvent.GetSelectedReflexionItem(
                                     parent
                                 )
@@ -218,6 +218,16 @@ fun drawerNavContent(
                         }
                     }),
                     text = stringResource(R.string.go_to_parent),
+                    color = MaterialTheme.colorScheme.inverseOnSurface,
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                /* CHANGE OR SET ITEM PARENT */
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    modifier = Modifier.clickable(onClick = {
+                        navHostController.navigate(Screen.SelectParentScreen.route)
+                    }),
+                    text = stringResource(R.string.set_or_change_parent),
                     color = MaterialTheme.colorScheme.inverseOnSurface,
                     style = MaterialTheme.typography.headlineSmall
                 )

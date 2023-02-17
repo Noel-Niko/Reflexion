@@ -1,8 +1,6 @@
 package com.livingtechusa.reflexion.util
 
-import android.net.Uri
 import com.livingtechusa.reflexion.R
-import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 
 object Constants {
@@ -60,8 +58,10 @@ object Constants {
 }
 
 object Temporary {
-    var use: Boolean = false
+    var useUri: Boolean = false
     var url = EMPTY_STRING
     var uri  = EMPTY_STRING
+    var useParentPk: Boolean = false
+    var parentPk: String = EMPTY_STRING
 }
 

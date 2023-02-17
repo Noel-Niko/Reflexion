@@ -38,14 +38,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.BarItem
-import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @Composable
 fun BuildItemCompactScreen(
-    pk: Long, navController: NavHostController, icons: List<BarItem>, viewModel: ItemViewModel
+    pk: Long, navController: NavHostController, icons: List<BarItem>, viewModel: BuildItemViewModel
 ) {
     val scope = rememberCoroutineScope()
     val state = rememberScaffoldState()

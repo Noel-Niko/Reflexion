@@ -7,7 +7,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.livingtechusa.reflexion.navigation.NavBarItems
-import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
 import com.livingtechusa.reflexion.util.extensions.findActivity
 
 const val BuildRoute = "build"
@@ -18,7 +18,7 @@ fun BuildItemScreen(
     pk: Long,
     navHostController: NavHostController,
     windowSize: WindowWidthSizeClass,
-    viewModel: ItemViewModel,
+    viewModel: BuildItemViewModel,
 ) {
     val context = LocalContext.current
     val icons = NavBarItems.BuildBarItems

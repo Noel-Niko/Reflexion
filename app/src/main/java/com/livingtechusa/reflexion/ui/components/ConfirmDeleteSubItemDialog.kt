@@ -14,14 +14,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.ui.build.BuildEvent
-import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton.getString
 
 const val CONFIRM_DELETE_SUB_ITEM = "ConfirmDeleteSubItemDialog"
 
 @Composable
 fun ConfirmDeleteSubItemDialog(
-    viewModel: ItemViewModel = hiltViewModel(),
+    viewModel: BuildItemViewModel = hiltViewModel(),
     navController: NavHostController,
     subItem: String,
 ) {

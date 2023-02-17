@@ -50,7 +50,7 @@ const val STATE_KEY_URL = "com.livingtechusa.reflexion.ui.build.BuildItemScreen.
 
 
 @HiltViewModel
-class ItemViewModel @Inject constructor(
+class BuildItemViewModel @Inject constructor(
     private val localServiceImpl: LocalServiceImpl
 ) : ViewModel() {
     companion object {
@@ -311,6 +311,18 @@ class ItemViewModel @Inject constructor(
                         }
                     }
 
+                    is BuildEvent.SetSelectedParent -> {
+                        viewModelScope.launch {
+                            val item = _reflexionItem
+                            item.parent = event.parent.autogenPK
+                            item.image = event.parent.image
+                            _reflexionItem = item
+                            _reflexionItemState.value = _reflexionItem
+                            resetAllDisplayedSubItemsToDBVersion()
+                            this@BuildItemViewModel.onTriggerEvent(BuildEvent.Save)
+                        }
+                    }
+
                     is BuildEvent.SendText -> {
                         val text =
                             context.getString(R.string.title) + name.value + "\n" + context.getString(
@@ -392,7 +404,7 @@ class ItemViewModel @Inject constructor(
                                 _reflexionItem = savedRI
                                 _reflexionItemState.value = _reflexionItem
                             } else {
-                                this@ItemViewModel.onTriggerEvent(
+                                this@BuildItemViewModel.onTriggerEvent(
                                     BuildEvent.UpdateDisplayedReflexionItem(
                                         VIDEO_URI,
                                         event.uri
@@ -401,7 +413,7 @@ class ItemViewModel @Inject constructor(
                             }
                             Temporary.url = EMPTY_STRING
                             Temporary.uri = EMPTY_STRING
-                            Temporary.use = false
+                            Temporary.useUri = false
                         }
                     }
                 }

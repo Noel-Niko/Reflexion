@@ -16,7 +16,7 @@ import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildEvent
-import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
 import com.livingtechusa.reflexion.util.Constants.DO_NOT_UPDATE
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URL
@@ -27,7 +27,7 @@ const val CONFIRM_SAVE = "ConfirmSaveAlertDialog"
 @Composable
 fun ConfirmSaveAlertDialog(
     navController: NavHostController,
-    viewModel: ItemViewModel = hiltViewModel()
+    viewModel: BuildItemViewModel = hiltViewModel()
 ) {
     val url = Temporary.url
     MaterialTheme {
