@@ -297,7 +297,7 @@ fun CustomListDisplayContent(
                                     color = MaterialTheme.colorScheme.primary
                                 )
                                 if (children[childItemIndex].videoUri.isNullOrEmpty().not()) {
-                                    if (childVideoUriList.isEmpty().not()) {
+                                    if (childVideoUriList.isEmpty().not() && childVideoUriList.size > childItemIndex) {
                                         if (childVideoUriList[childItemIndex] != null) {
                                             DocumentFilePreviewCard(
                                                 resource = childVideoUriList[childItemIndex]!!,

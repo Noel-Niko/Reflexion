@@ -275,7 +275,7 @@ fun ParentSelectUI(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.padding(16.dp, 2.dp)
                                             .clickable {
-                                                viewModel.selectItem(filteringOptions[it].itemPK.toString())
+                                                viewModel.selectParentItem(filteringOptions[it].itemPK.toString())
                                             }
                                     )
                                 }
