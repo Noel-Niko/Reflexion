@@ -9,7 +9,6 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -25,14 +24,13 @@ import com.livingtechusa.reflexion.navigation.BarItem
 import com.livingtechusa.reflexion.navigation.Screen
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CompactScreen(navController: NavHostController, icons: List<BarItem>) {
     val state = rememberScaffoldState()
     Scaffold(
         scaffoldState = state,
         topBar = {
-            androidx.compose.material.TopAppBar(
+            TopAppBar(
                 title = {
                     Text(
                         text = stringResource(id = R.string.app_name),
@@ -63,7 +61,7 @@ fun CompactScreen(navController: NavHostController, icons: List<BarItem>) {
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
             BottomNavigation(
-                backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+                backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
             ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(
@@ -73,18 +71,17 @@ fun CompactScreen(navController: NavHostController, icons: List<BarItem>) {
                                 popUpTo(navController.graph.findStartDestination().id) {
                                 }
                                 launchSingleTop = true
-//                                restoreState = true
                             }
                         },
                         icon = {
                             Icon(
                                 imageVector = navItem.image,
                                 contentDescription = navItem.title,
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer
                             )
                         },
                         label = {
-                            Text(text = navItem.title, color = MaterialTheme.colorScheme.onPrimaryContainer, maxLines = 1)
+                            Text(text = navItem.title, color = MaterialTheme.colorScheme.onSecondaryContainer, maxLines = 1)
                         }
                     )
                 }
@@ -92,6 +89,6 @@ fun CompactScreen(navController: NavHostController, icons: List<BarItem>) {
         }
     ) {
         it
-        homeContent()
+        HomeContent()
     }
 }

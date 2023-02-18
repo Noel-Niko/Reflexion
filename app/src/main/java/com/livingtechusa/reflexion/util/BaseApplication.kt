@@ -22,7 +22,7 @@ class BaseApplication : Application() {
         Stetho.initializeWithDefaults(this)
     }
 
-    val isDark = mutableStateOf(false)
+    private val isDark = mutableStateOf(false)
 
     fun toggleTheme() {
         isDark.value = !isDark.value

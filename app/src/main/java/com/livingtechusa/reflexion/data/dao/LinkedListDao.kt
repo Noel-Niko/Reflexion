@@ -40,5 +40,4 @@ interface LinkedListDao{
 
     @Query("Delete FROM LinkedList WHERE nodePk = :nodePk")
     suspend fun deleteSelectedNode(nodePk: Long)
-
 }

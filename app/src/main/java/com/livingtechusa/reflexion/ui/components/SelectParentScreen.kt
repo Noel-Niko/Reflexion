@@ -1,9 +1,9 @@
-package com.livingtechusa.reflexion.ui.customLists
+package com.livingtechusa.reflexion.ui.components
 
+import android.widget.Toast
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,112 +12,142 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExposedDropdownMenuBox
-import androidx.compose.material.ExposedDropdownMenuDefaults
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.twotone.Lan
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.window.core.layout.WindowWidthSizeClass
 import com.androidpoet.dropdown.DropDownMenuBuilder
 import com.androidpoet.dropdown.MenuItem
 import com.androidpoet.dropdown.dropDownMenu
 import com.livingtechusa.reflexion.R
-import com.livingtechusa.reflexion.navigation.NavBarItems
-import com.livingtechusa.reflexion.ui.components.cascade.rememberCascadeState
-import com.livingtechusa.reflexion.ui.components.menu.CustomDropDownMenu
-import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
-import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.data.models.ReflexionArrayItem
-import com.livingtechusa.reflexion.data.models.ReflexionArrayItem.Companion.traverseBreadthFirst
-import com.livingtechusa.reflexion.util.extensions.findActivity
-import kotlin.math.roundToInt
+import com.livingtechusa.reflexion.ui.components.menu.CustomDropDownMenu
+import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
+import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
+import com.livingtechusa.reflexion.util.Constants
+import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 
-const val BuildCustomList = "build_custom_lists"
+const val SELECT_PARENT = "SelectParentDialog"
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BuildCustomListsScreen(
+fun SelectParentScreen(
     navController: NavHostController,
-    windowSize: WindowWidthSizeClass,
+    buildViewModel: BuildItemViewModel,
     viewModel: CustomListsViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
-    val icons = NavBarItems.CustomListsBarItems
-
-    if (context.findActivity() != null) {
-        when (windowSize) {
-            WindowWidthSizeClass.COMPACT -> {
-                CustomListCompactScreen(
-                    navController = navController,
-                    icons = icons,
-                    viewModel = viewModel,
-                )
-            }
-
-//            WindowWidthSizeClass.MEDIUM -> {
-//                // todo
-//            }
-
-//            WindowWidthSizeClass.EXPANDED -> {
-//                ExpandedScreen(navHostController, icons, viewModel)
-//                viewModel.navigationType = ReflexionNavigationType.PERMANENT_NAVIGATION_DRAWER
-//            }
-
-            else -> CustomListCompactScreen(
-                navController = navController,
-                icons = icons,
-                viewModel = viewModel,
-            )
-        }
+    Scaffold() { paddingValues ->
+        ParentSelectUI(
+            navController = navController,
+            viewModel = viewModel,
+            paddingValues = paddingValues,
+            buildViewModel = buildViewModel
+        )
     }
 }
-
 
 @OptIn(
     ExperimentalMaterialApi::class, ExperimentalAnimationApi::class,
     ExperimentalMaterial3Api::class
 )
 @Composable
-fun CustomListsContent(
-    navController: NavHostController, viewModel: CustomListsViewModel, paddingValues: PaddingValues
+fun ParentSelectUI(
+    navController: NavHostController,
+    viewModel: CustomListsViewModel,
+    paddingValues: PaddingValues,
+    buildViewModel: BuildItemViewModel
 ) {
+    val context = LocalContext.current
+    val resource = ResourceProviderSingleton
     val itemTree = viewModel.itemTree.collectAsState()
     var searchText by remember {
-        mutableStateOf(EMPTY_STRING)
+        mutableStateOf(Constants.EMPTY_STRING)
     }
     var expanded by remember {
         mutableStateOf(false)
     }
+    val selectedParent = viewModel.selectedParent.collectAsState()
     Scaffold(
         modifier = Modifier.padding(paddingValues),
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.set_or_change_parent),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                },
+                actions = {
+                    Row() {
+                        IconButton(
+                            onClick = {
+                                viewModel.sendPKToBuildViewModel(
+                                    selectedParent.value,
+                                    buildViewModel
+                                )
+                                Toast.makeText(
+                                    context,
+                                    buildString {
+                                        append(resource.getString(R.string.saving_as_the_new_parent))
+                                        append(selectedParent.value.name)
+                                    },
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            },
+                            content = {
+                                Icon(
+                                    imageVector = Icons.Default.Save,
+                                    contentDescription = "save",
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                            },
+                        )
+                        IconButton(
+                            onClick = {
+                                navController.popBackStack()
+                            },
+                            content = {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowBack,
+                                    contentDescription = "back",
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                            },
+                        )
+                    }
+                }
+            )
+        }
     ) { innerPadding ->
         Spacer(Modifier.height(16.dp))
         Column(
@@ -125,10 +155,17 @@ fun CustomListsContent(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            Row(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.changing_an_item_s_parent_will_also_move_any_of_the_item_s_children)
+                )
+            }
+            Spacer(Modifier.height(16.dp))
             Row(modifier = Modifier.fillMaxWidth()) {
                 TextField(
                     modifier = Modifier
-
                         .shadow(20.dp)
                         .fillMaxWidth(),
                     value = searchText,
@@ -141,10 +178,10 @@ fun CustomListsContent(
                         )
                     },
                     trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(
+                        androidx.compose.material.ExposedDropdownMenuDefaults.TrailingIcon(
                             expanded = expanded,
                             onIconClick = {
-                                searchText = EMPTY_STRING
+                                searchText = Constants.EMPTY_STRING
                                 expanded = !expanded
                             }
                         )
@@ -157,46 +194,51 @@ fun CustomListsContent(
             Row(Modifier.fillMaxWidth()) {
                 Box(
                     modifier = Modifier
-                        .align(Alignment.CenterVertically)
+                        .align(
+                            Alignment.CenterVertically,
+                        )
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .padding(20.dp),
                     ) {
-                        ExposedDropdownMenuBox(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            expanded = expanded,
-                            onExpandedChange = {
-                                expanded = !expanded
-                            }
-                        ) {
-                            CustomDropDownMenu(
+                        Row(modifier = Modifier.fillMaxWidth()) {
+                            ExposedDropdownMenuBox(
                                 modifier = Modifier
-                                    .fillMaxWidth(.75f),
-                                isOpen = expanded,
-                                setIsOpen = {
+                                    .fillMaxWidth(),
+                                expanded = expanded,
+                                onExpandedChange = {
                                     expanded = !expanded
-                                },
-                                itemSelected = viewModel::selectItem,
-                                menu = getMenu(itemTree.value),
-                            )
+                                }
+                            ) {
+                                CustomDropDownMenu(
+                                    modifier = Modifier
+                                        .fillMaxWidth(.75f),
+                                    isOpen = expanded,
+                                    setIsOpen = {
+                                        expanded = !expanded
+                                    },
+                                    itemSelected = viewModel::selectParentItem,
+                                    menu = getMenu(itemTree.value)
+                                )
+                            }
                         }
                     }
                 }
             }
-            Row(Modifier.fillMaxWidth()) {
+            Row() {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                 ) {
                     // filter options based on text field value
                     val filteringOptions: MutableList<ReflexionArrayItem> = mutableListOf()
-                    if (searchText != EMPTY_STRING) {
+                    if (searchText != Constants.EMPTY_STRING) {
                         itemTree.value.let { abridgedParent ->
                             // Breadth first Search for search item
-                            traverseBreadthFirst(itemTree.value) { RAI ->
+                            ReflexionArrayItem.traverseBreadthFirst(itemTree.value) { RAI ->
                                 if (RAI.itemName?.contains(
                                         searchText,
                                         ignoreCase = true
@@ -220,7 +262,7 @@ fun CustomListsContent(
                                         .padding(4.dp)
                                         .clickable {
                                             viewModel.selectItem(filteringOptions[it].itemPK.toString())
-                                            searchText = EMPTY_STRING
+                                            searchText = Constants.EMPTY_STRING
                                         }
                                         .align(Alignment.CenterHorizontally),
                                     shape = MaterialTheme.shapes.extraLarge,
@@ -232,13 +274,14 @@ fun CustomListsContent(
                                         style = MaterialTheme.typography.headlineLarge,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.padding(16.dp, 2.dp)
+                                            .clickable {
+                                                viewModel.selectParentItem(filteringOptions[it].itemPK.toString())
+                                            }
                                     )
                                 }
                                 Spacer(modifier = Modifier.height(8.dp))
                             }
                         }
-                    } else {
-                        CustomListContent(navController = navController, viewModel = viewModel)
                     }
                 }
             }
@@ -267,26 +310,8 @@ fun getItems(
 fun getMenu(
     tree: ReflexionArrayItem
 ): MenuItem<String> {
-//    val list: MutableList<ImageVector> = mutableListOf(
-//        Icons.TwoTone.Language,
-//        Icons.TwoTone.FileCopy,
-//        Icons.TwoTone.Share,
-//        Icons.TwoTone.Done,
-//        Icons.TwoTone.AirlineStops,
-//        Icons.TwoTone.Lan,
-//        Icons.TwoTone.AddCard,
-//        Icons.TwoTone.Circle,
-//        Icons.TwoTone.FormatListBulleted,
-//        Icons.TwoTone.Anchor,
-//        Icons.TwoTone.Architecture,
-//        Icons.TwoTone.Archive
-//    )
     val menu = dropDownMenu<String> {
-        getItems(tree, this) //, list)
+        getItems(tree, this)
     }
     return menu
 }
-
-
-
-

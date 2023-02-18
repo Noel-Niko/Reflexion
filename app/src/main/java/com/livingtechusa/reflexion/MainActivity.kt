@@ -34,6 +34,7 @@ import com.livingtechusa.reflexion.ui.components.ConfirmDeleteListDialog
 import com.livingtechusa.reflexion.ui.components.ConfirmDeleteSubItemDialog
 import com.livingtechusa.reflexion.ui.components.ConfirmSaveAlertDialog
 import com.livingtechusa.reflexion.ui.components.PasteAndSaveDialog
+import com.livingtechusa.reflexion.ui.components.SelectParentScreen
 import com.livingtechusa.reflexion.ui.components.VideoPlayer
 import com.livingtechusa.reflexion.ui.components.VideoPlayer2CustomList
 import com.livingtechusa.reflexion.ui.customListDisplay.CustomListDisplayScreen
@@ -43,7 +44,7 @@ import com.livingtechusa.reflexion.ui.settings.SettingsScreen
 import com.livingtechusa.reflexion.ui.theme.ReflexionDynamicTheme
 import com.livingtechusa.reflexion.ui.topics.ListDisplay
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
-import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
@@ -65,7 +66,6 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var app: BaseApplication
-
     lateinit var navigationController: NavHostController
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -141,7 +141,7 @@ class MainActivity : ComponentActivity() {
                         val parentEntry = remember(navBackStackEntry) {
                             navController.getBackStackEntry(Screen.HomeScreen.route)
                         }
-                        val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
+                        val parentViewModel: BuildItemViewModel = hiltViewModel(parentEntry)
                         BuildItemScreen(
                             pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK)
                                 ?: EMPTY_PK,
@@ -162,7 +162,7 @@ class MainActivity : ComponentActivity() {
                         val parentEntry = remember(navBackStackEntry) {
                             navController.getBackStackEntry(Screen.HomeScreen.route)
                         }
-                        val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
+                        val parentViewModel: BuildItemViewModel = hiltViewModel(parentEntry)
                         VideoPlayer(
                             viewModel = parentViewModel
                         )
@@ -174,7 +174,7 @@ class MainActivity : ComponentActivity() {
                         val parentEntry = remember(navBackStackEntry) {
                             navController.getBackStackEntry(Screen.HomeScreen.route)
                         }
-                        val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
+                        val parentViewModel: BuildItemViewModel = hiltViewModel(parentEntry)
                         ConfirmSaveAlertDialog(
                             navController = navController,
                             viewModel = parentViewModel
@@ -187,7 +187,7 @@ class MainActivity : ComponentActivity() {
                         val parentEntry = remember(navBackStackEntry) {
                             navController.getBackStackEntry(Screen.HomeScreen.route)
                         }
-                        val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
+                        val parentViewModel: BuildItemViewModel = hiltViewModel(parentEntry)
                         PasteAndSaveDialog(
                             viewModel = parentViewModel,
                             navController = navController
@@ -253,7 +253,7 @@ class MainActivity : ComponentActivity() {
                         val parentEntry = remember(navBackStackEntry) {
                             navController.getBackStackEntry(Screen.HomeScreen.route)
                         }
-                        val parentViewModel: ItemViewModel = hiltViewModel(parentEntry)
+                        val parentViewModel: BuildItemViewModel = hiltViewModel(parentEntry)
                         ConfirmDeleteSubItemDialog(
                             viewModel = parentViewModel,
                             navController = navController,
@@ -270,12 +270,7 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     ) { navBackStackEntry ->
-//                        val parentEntry = remember(navBackStackEntry) {
-//                            navController.getBackStackEntry(Screen.CustomLists.route)
-//                        }
-//                        val parentViewModel: CustomListsViewModel = hiltViewModel(parentEntry)
                         CustomListDisplayScreen(
-//                            viewModel = parentViewModel,
                             navController = navController,
                             headNodePk = navBackStackEntry.arguments?.getLong(HEAD_NODE_PK) ?: -1,
                             windowSize = windowSize
@@ -284,18 +279,13 @@ class MainActivity : ComponentActivity() {
 
                     composable(
                         route = Screen.VideoViewCustomList.route + "/{Index}",
-//                        arguments = listOf(
-//                            navArgument(INDEX) {
-//                                type = NavType.IntType
-//                            }
-//                        )
                     ) { navBackStackEntry ->
                         val parentEntry = remember(navBackStackEntry) {
                             navController.getBackStackEntry(Screen.CustomLists.route)
                         }
                         val parentViewModel: CustomListsViewModel = hiltViewModel(parentEntry)
                         VideoPlayer2CustomList(
-                            index = 0,   //navBackStackEntry.arguments?.getInt(INDEX),
+                            index = 0,
                             viewModel = parentViewModel,
                         )
                     }
@@ -315,8 +305,22 @@ class MainActivity : ComponentActivity() {
                             windowSize = windowSize
                         )
                     }
+
+                    composable(
+                        route = Screen.SelectParentScreen.route,
+                    ) {navBackStackEntry ->
+                        val parentEntry = remember(navBackStackEntry) {
+                            navController.getBackStackEntry(Screen.HomeScreen.route)
+                        }
+                        val parentViewModel: BuildItemViewModel = hiltViewModel(parentEntry)
+                        SelectParentScreen(
+                            navController = navController,
+                            buildViewModel = parentViewModel
+                        )
+                    }
                 }
 
+                // "Share" from internet browser
                 DisposableEffect(key1 = Intent()) {
                     val listener = Consumer<Intent> { intent ->
                         if (intent.clipData?.getItemAt(0)?.text != null && intent.clipData?.getItemAt(
@@ -331,21 +335,15 @@ class MainActivity : ComponentActivity() {
                     addOnNewIntentListener(listener)
                     onDispose { removeOnNewIntentListener(listener) }
                 }
-
-                DisposableEffect(key1 =Intent()) {
-                   // val url: String = intent.clipData?.getItemAt(0)?.text.toString()
+                // "Share" from media file
+                DisposableEffect(key1 = Intent()) {
                     val uri: String = intent.clipData?.getItemAt(0)?.uri.toString()
-                   // Temporary.url = url
                     Temporary.uri = uri
-//                    if(url != EMPTY_STRING && url != "null") {
-//                        navigationController.navigate(Screen.ConfirmSaveScreen.route)
-//                    } else {
-                        if (uri != EMPTY_STRING && uri != "null") {
-                            Temporary.use = true
-                            navigationController.navigate(Screen.BuildItemScreen.route + "/-1")
-//                        }
+                    if (uri != EMPTY_STRING && uri != "null") {
+                        Temporary.useUri = true
+                        navigationController.navigate(Screen.BuildItemScreen.route + "/-1")
                     }
-                    onDispose {  }
+                    onDispose { }
                 }
 
             }

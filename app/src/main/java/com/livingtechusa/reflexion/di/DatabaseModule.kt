@@ -1,4 +1,4 @@
-package com.livingtechusa.gotjokes.di
+package com.livingtechusa.reflexion.di
 
 import android.content.Context
 import androidx.room.Room

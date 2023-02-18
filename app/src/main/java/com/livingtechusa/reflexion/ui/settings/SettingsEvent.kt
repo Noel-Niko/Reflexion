@@ -1,8 +1,8 @@
 package com.livingtechusa.reflexion.ui.settings
 
 sealed class SettingsEvent {
-    object getIconImages : SettingsEvent()
-    data class setIconSelected (
+    object GetIconImages : SettingsEvent()
+    data class SetIconSelected (
         val iconSelected: Int
     ) : SettingsEvent()
 }

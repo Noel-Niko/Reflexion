@@ -1,6 +1,5 @@
 package com.livingtechusa.reflexion.ui.viewModels
 
-import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_STREAM
@@ -8,6 +7,7 @@ import android.content.Intent.EXTRA_TEXT
 import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,14 +16,16 @@ import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.entities.Bookmarks
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
+import com.livingtechusa.reflexion.data.models.ReflexionArrayItem
+import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK_STRING
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
-import com.livingtechusa.reflexion.util.ReflexionArrayItem
 import com.livingtechusa.reflexion.util.scopedStorageUtils.FileResource
 import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
+import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil.resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -78,10 +80,14 @@ class CustomListsViewModel @Inject constructor(
     private val _childVideoUriResourceList = MutableStateFlow<List<FileResource>>(emptyList())
     val childVideoUriResourceList: StateFlow<List<FileResource?>> get() = _childVideoUriResourceList
 
+    private val _selectedParent = MutableStateFlow(ReflexionItem())
+    val selectedParent: StateFlow<ReflexionItem> get() = _selectedParent
+
+
     private var newList = true
     private var topic: Long = EMPTY_PK
 
-    suspend fun getTopic(pk: Long): Long {
+    private suspend fun getTopic(pk: Long): Long {
         var childPk: Long? = pk
         // If pk is a topic, it's own pk should be returned.
         var parent = pk
@@ -334,23 +340,16 @@ class CustomListsViewModel @Inject constructor(
                     var listItems = EMPTY_STRING
                     _children.value.forEach { reflexionItem ->
                         listItems += context.getString(R.string.title) + reflexionItem.name + "\n" +
-                               context.getString(R.string.description) + reflexionItem.description + "\n" + context.getString(R.string.detailedDescription) + reflexionItem.detailedDescription + "\n" + reflexionItem.videoUrl + "\n"
+                                context.getString(R.string.description) + reflexionItem.description + "\n" + context.getString(
+                            R.string.detailedDescription
+                        ) + reflexionItem.detailedDescription + "\n" + reflexionItem.videoUrl + "\n"
                     }
                     val text = title + listItems
-
                     val shareIntent = Intent()
-//                    shareIntent.action = Intent.ACTION_SEND_MULTIPLE
                     shareIntent.putExtra(EXTRA_TEXT, text);
                     shareIntent.type = "text/*"
-
-//                    shareIntent.putExtra(Intent.EXTRA_TEXT, text)
-//                    shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-
-                    val resolver: ContentResolver = context.contentResolver
                     shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
                     shareIntent.action = Intent.ACTION_SEND_MULTIPLE
-//                    shareIntent.type = "video/*"
-
                     val uriList = mutableListOf<Uri>()
                     _children.value.forEach { reflexionItem ->
                         reflexionItem.videoUri?.let { uri ->
@@ -363,8 +362,6 @@ class CustomListsViewModel @Inject constructor(
                     }
                     val parcelableUriList: ArrayList<Uri> = ArrayList(uriList)
                     shareIntent.putParcelableArrayListExtra(EXTRA_STREAM, parcelableUriList)
-//                    shareIntent.putExtra(EXTRA_STREAM, videoUri)
-
                     shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     startActivity(context, shareIntent, null)
@@ -453,10 +450,10 @@ class CustomListsViewModel @Inject constructor(
                             async { localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic) }
                         _listOfLists.value = newList.await()
                         getListImages()
-                        /* If we are adding to an existing list, only allowing items under the same topic,
-                        we copy to list and add the newly selected child.
-                         */
                     } else {
+                        /* If we are adding to an existing list, only allowing items under the same topic,
+                      we copy to list and add the newly selected child.
+                       */
                         newList = false
                         addItemToList(itemPk)
                     }
@@ -475,7 +472,7 @@ class CustomListsViewModel @Inject constructor(
         if (itemPk != null) {
             if (itemPk.isEmpty().not() && (itemPk == "null").not()) {
                 itemPk.toLong().let { pk ->
-                    localServiceImpl.selectReflexionArrayItemsByPk(pk)
+                    localServiceImpl.selectReflexionArrayItemByPk(pk)
                         ?.let { newListItem.children.add(it) }
                 }
             }
@@ -483,18 +480,67 @@ class CustomListsViewModel @Inject constructor(
         _customList.value = newListItem
     }
 
-//    suspend fun getReflextionItem(reflexionItemPK: Long): ReflexionItem? {
-//        val item = viewModelScope.async {
-//            localServiceImpl.selectItem(reflexionItemPK)
-//        }
-//        return item.await()
-//    }
+    fun selectParentItem(itemPk: String?) {
+        // Ignore the empty Topic label
+        if (itemPk.isNullOrEmpty().not() && itemPk.equals(EMPTY_PK_STRING)
+                .not() && itemPk.equals("null").not()
+        ) {
+            viewModelScope.launch() {
+                withContext(Dispatchers.IO) {
+                    // First item selected in new topic in new list. Set Topic, and add selection and load topic lists
+                    if (topic == EMPTY_PK || newList) {
+                        if (itemPk != null) {
+                            // Set the topic
+                            topic = getTopic(itemPk.toLong()) ?: itemPk.toLong()
+                            // Add the first list item
+                            setParent(itemPk)
+                            newList = false
+                            val newList =
+                                async { localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic) }
+                            _listOfLists.value = newList.await()
+                        }
 
-//    suspend fun getImage(itemPk: Long): Bitmap? {
-//        val bitmap: Deferred<Bitmap?> =
-//            viewModelScope.async {
-//                localServiceImpl.selectImage(itemPk)
-//            }
-//        return bitmap.await()
-//    }
+                        // A new topic item has been selected, create new list with selected first item, and load related lists.
+                    } else if (itemPk?.toLong()?.let { getTopic(it) } != topic) {
+                        topic = itemPk?.toLong()?.let { getTopic(it) } ?: EMPTY_PK
+                        // Reset the UI with the new list item
+                        withContext(Dispatchers.Main) { _customList.value = emptyRai }
+                        setParent(itemPk)
+                        // Get that topic's lists
+                        val newList =
+                            async { localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic) }
+                        _listOfLists.value = newList.await()
+
+                    } else {
+                        /* If we are adding to an existing list, only allowing items under the same topic,
+                        we copy to list and add the newly selected child.
+                         */
+                        newList = false
+                        setParent(itemPk)
+                    }
+                }
+                Toast.makeText(
+                    context,
+                    buildString {
+                        append(resource.getString(R.string.setting_as_the_new_parent))
+                        append(selectedParent.value.name)
+                    },
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    private fun setParent(itemPk: String?){
+        viewModelScope.launch {
+            val pk = itemPk?.toLong()
+            if (pk != null) {
+                _selectedParent.value = localServiceImpl.selectItem(itemPk.toLong()) ?: ReflexionItem()
+            }
+        }
+    }
+    fun sendPKToBuildViewModel(parent: ReflexionItem, buildItemViewModel: BuildItemViewModel) {
+                buildItemViewModel.onTriggerEvent(BuildEvent.SetSelectedParent(parent))
+    }
+
 }

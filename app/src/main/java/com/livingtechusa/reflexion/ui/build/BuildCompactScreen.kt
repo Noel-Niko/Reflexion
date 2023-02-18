@@ -1,8 +1,6 @@
 package com.livingtechusa.reflexion.ui.build
 
-import android.os.Build
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Row
@@ -20,7 +18,6 @@ import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
@@ -31,7 +28,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -42,17 +38,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.BarItem
-import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
-
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BuildItemCompactScreen(
-    pk: Long, navController: NavHostController, icons: List<BarItem>, viewModel: ItemViewModel
+    pk: Long, navController: NavHostController, icons: List<BarItem>, viewModel: BuildItemViewModel
 ) {
     val scope = rememberCoroutineScope()
     val state = rememberScaffoldState()
@@ -151,7 +144,7 @@ fun BuildItemCompactScreen(
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
             BottomNavigation(
-                backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+                backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
             ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(selected = currentRoute == navItem.route, onClick = {
@@ -160,10 +153,10 @@ fun BuildItemCompactScreen(
                         Icon(
                             imageVector = navItem.image,
                             contentDescription = navItem.title,
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     }, label = {
-                        Text(text = navItem.title, color = MaterialTheme.colorScheme.onPrimaryContainer, maxLines = 1)
+                        Text(text = navItem.title, color = MaterialTheme.colorScheme.onSecondaryContainer, maxLines = 1)
                     })
                 }
             }

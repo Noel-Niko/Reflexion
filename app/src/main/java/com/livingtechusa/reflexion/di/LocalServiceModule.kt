@@ -1,4 +1,4 @@
-package com.livingtechusa.gotjokes.di
+package com.livingtechusa.reflexion.di
 
 import com.livingtechusa.reflexion.data.localService.ILocalService
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl

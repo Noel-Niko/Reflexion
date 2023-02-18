@@ -1,4 +1,4 @@
-package com.livingtechusa.reflexion.util
+package com.livingtechusa.reflexion.data.models
 
 class ReflexionArrayItem(var itemPK: Long?, var itemName: String?, var nodePk: Long?, var children: MutableList<ReflexionArrayItem> = mutableListOf()) {
 

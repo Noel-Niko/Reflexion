@@ -1,4 +1,4 @@
-package com.livingtechusa.reflexion.ui.components
+package com.livingtechusa.reflexion.ui.topics
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -35,19 +35,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.Bookmarks
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
-import com.livingtechusa.reflexion.ui.topics.TopicItemEvent
 import com.livingtechusa.reflexion.ui.viewModels.TopicsViewModel
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -63,9 +60,11 @@ fun ReflexionItemListUI(
     Scaffold(
         content = {
             Column(modifier = Modifier.fillMaxSize()) {
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(.7f)) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(.7f)
+                ) {
                     ReflexionItemsContent(
                         reflexionItems = reflexionItemList,
                         onTap = { reflexionItem ->
@@ -94,7 +93,6 @@ fun ReflexionItemListUI(
                     )
                 }
                 Divider()
-                //Spacer(modifier = Modifier.height(8.dp).background(MaterialTheme.colorScheme.surface))
                 Row(modifier = Modifier.fillMaxSize()) {
                     Column(
                         modifier = Modifier
@@ -162,7 +160,6 @@ private fun ReflexionItemsContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(4.dp)
-                        //.background(MaterialTheme.colorScheme.surface)
                         .pointerInput(key1 = reflexionItem) {
                             detectTapGestures(
                                 onTap = { onTap(reflexionItem) },
@@ -213,7 +210,11 @@ private fun BookmarkItemsContent(
         items(bookmarks.size) { bookmark ->
             val imagePainter = rememberAsyncImagePainter(
                 ImageRequest.Builder(LocalContext.current)
-                    .data(data = if (images.isEmpty().not()) images[bookmark] else R.mipmap.ic_launcher)
+                    .data(
+                        data = if (images.isEmpty()
+                                .not()
+                        ) images[bookmark] else R.mipmap.ic_launcher
+                    )
                     .apply(block = fun ImageRequest.Builder.() {
                         allowHardware(false)
                     }).build()
@@ -228,7 +229,11 @@ private fun BookmarkItemsContent(
                             detectTapGestures(
                                 onTap = { bookmarks[bookmark]?.LEVEL_PK?.let { pk -> onTap(pk) } },
                                 onDoubleTap = {
-                                    bookmarks[bookmark]?.autoGenPk?.let { itemPk -> onDoubleTap(itemPk) }
+                                    bookmarks[bookmark]?.autoGenPk?.let { itemPk ->
+                                        onDoubleTap(
+                                            itemPk
+                                        )
+                                    }
                                 }
                             )
                         },

@@ -50,7 +50,6 @@ import com.livingtechusa.reflexion.util.scopedStorageUtils.DocumentFilePreviewCa
 import com.livingtechusa.reflexion.util.scopedStorageUtils.videoImagePreviewCard
 
 const val CUSTOM_LIST_DISPLAY = "customListDisplay"
-
 @Composable
 fun CustomListDisplayScreen(
     viewModel: CustomListsViewModel = hiltViewModel(),
@@ -298,7 +297,7 @@ fun CustomListDisplayContent(
                                     color = MaterialTheme.colorScheme.primary
                                 )
                                 if (children[childItemIndex].videoUri.isNullOrEmpty().not()) {
-                                    if (childVideoUriList.isEmpty().not()) {
+                                    if (childVideoUriList.isEmpty().not() && childVideoUriList.size > childItemIndex) {
                                         if (childVideoUriList[childItemIndex] != null) {
                                             DocumentFilePreviewCard(
                                                 resource = childVideoUriList[childItemIndex]!!,

@@ -12,7 +12,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.livingtechusa.reflexion.navigation.NavBarItems
-import com.livingtechusa.reflexion.ui.components.ReflexionItemListUI
 import com.livingtechusa.reflexion.ui.viewModels.TopicsViewModel
 import com.livingtechusa.reflexion.util.extensions.findActivity
 
@@ -29,10 +28,8 @@ fun ListDisplay(
 
     // If `lifecycleOwner` changes, dispose and reset the effect
     DisposableEffect(lifecycleOwner) {
-        // Create an observer that triggers our remembered callbacks
-        // for sending analytics events
         val observer = LifecycleEventObserver { _, event ->
-                viewModel.onTriggerEvent(TopicItemEvent.GetTopicItem(pk))
+            viewModel.onTriggerEvent(TopicItemEvent.GetTopicItem(pk))
         }
 
         // Add the observer to the lifecycle
@@ -52,7 +49,15 @@ fun ListDisplay(
     if (context.findActivity() != null) {
         when (windowSize) {
             WindowWidthSizeClass.COMPACT -> {
-                CompactScreen(navHostController, icons, viewModel, search, viewModel::searchEvent, viewModel::onUp, viewModel::bookmark)
+                CompactScreen(
+                    navHostController,
+                    icons,
+                    viewModel,
+                    search,
+                    viewModel::searchEvent,
+                    viewModel::onUp,
+                    viewModel::bookmark
+                )
             }
 
 //            WindowWidthSizeClass.MEDIUM -> {
@@ -64,7 +69,15 @@ fun ListDisplay(
 //                viewModel.navigationType = ReflexionNavigationType.PERMANENT_NAVIGATION_DRAWER
 //            }
 
-            else -> CompactScreen(navHostController, icons, viewModel, search, viewModel::searchEvent, viewModel::onUp, viewModel::bookmark)
+            else -> CompactScreen(
+                navHostController,
+                icons,
+                viewModel,
+                search,
+                viewModel::searchEvent,
+                viewModel::onUp,
+                viewModel::bookmark
+            )
         }
     }
 }

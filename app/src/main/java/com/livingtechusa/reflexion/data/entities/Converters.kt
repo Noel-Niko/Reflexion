@@ -15,7 +15,6 @@ class Converters {
     fun convertStringToUri(string: String): Uri? {
         return Uri.parse(string)
     }
-
     @TypeConverter
     fun convertUriToString(uri: Uri): String? {
         return uri.toString()
@@ -39,5 +38,4 @@ class Converters {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 50 /*ignored for PNG*/, bos);
         return bos.toByteArray();
     }
-
 }

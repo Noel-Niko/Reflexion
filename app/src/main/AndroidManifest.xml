@@ -60,9 +60,9 @@
             android:screenOrientation="portrait"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@mipmap/ic_launcher_4"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_round"
+            android:roundIcon="@mipmap/ic_launcher_4_round"
             android:theme="@style/Theme.Reflexion"
             android:targetActivity=".MainActivity">
             <intent-filter>

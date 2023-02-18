@@ -14,6 +14,7 @@ import kotlinx.coroutines.withContext
 
 object SafeUtils {
     val TAG = "SafeUtils"
+
     /**
      * Returns a [FileResource] if it finds its related DocumentsProvider
      */
@@ -105,7 +106,7 @@ object SafeUtils {
                     )
                 }
             } catch (e: Exception) {
-            Log.e(TAG, "ERROR: " +  e.message  + " WITH CAUSE " + e.cause)
+                Log.e(TAG, "ERROR: " + e.message + " WITH CAUSE " + e.cause)
                 return@withContext null
             }
         }
@@ -114,17 +115,17 @@ object SafeUtils {
     suspend fun getThumbnail(context: Context, uri: Uri): Bitmap? {
         return withContext(Dispatchers.IO) {
             try {
-                val takeFlags : Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                 context.contentResolver.takePersistableUriPermission(uri, takeFlags)
             } catch (e: Exception) {
                 Log.e(TAG, context.getString(R.string.no_persistable_flags_present_to_take))
             }
             return@withContext DocumentsContract.getDocumentThumbnail(
-            context.contentResolver,
-            uri,
-            Point(512, 512),
-            null
+                context.contentResolver,
+                uri,
+                Point(512, 512),
+                null
             )
         }
     }

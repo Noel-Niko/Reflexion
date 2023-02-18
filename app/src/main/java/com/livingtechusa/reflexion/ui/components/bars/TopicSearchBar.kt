@@ -23,8 +23,6 @@ fun TopicSearchBar(
     onUp: (() -> Unit)?,
     bookmark: (() -> Unit)?,
 ) {
-    val resource = ResourceProviderSingleton
-    val context = LocalContext.current
     when (search) {
         null -> TopicTopBar() {
             SearchIcon { onSearch("") }

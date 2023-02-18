@@ -13,7 +13,7 @@ import com.livingtechusa.reflexion.data.toListNode
 import com.livingtechusa.reflexion.data.toReflexionArrayItem
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
-import com.livingtechusa.reflexion.util.ReflexionArrayItem
+import com.livingtechusa.reflexion.data.models.ReflexionArrayItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -141,7 +141,7 @@ class LocalServiceImpl @Inject constructor(
         }
     }
 
-    override suspend fun selectReflexionArrayItemsByPk(pk: Long): ReflexionArrayItem? {
+    override suspend fun selectReflexionArrayItemByPk(pk: Long): ReflexionArrayItem? {
         val _result: Deferred<AbridgedReflexionItem> = scope.async {
             reflexionItemDao.selectSingleAbridgedReflexionItem(pk)
         }
@@ -217,10 +217,10 @@ class LocalServiceImpl @Inject constructor(
 
     override suspend fun selectAllSiblings(parent: Long): List<ReflexionItem?> {
         val grandparent: Long = reflexionItemDao.getParent(parent) ?: EMPTY_PK
-        if (grandparent == EMPTY_PK) {
-            return reflexionItemDao.getReflexionItemTopics()
+        return if (grandparent == EMPTY_PK) {
+            reflexionItemDao.getReflexionItemTopics()
         } else {
-            return reflexionItemDao.selectAllSiblings(grandparent)
+            reflexionItemDao.selectAllSiblings(grandparent)
         }
     }
 

@@ -4,22 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "BookMarks",
-//
-//    foreignKeys = arrayOf(
-//        ForeignKey(
-//            entity = ReflexionItem::class,
-//            parentColumns = arrayOf("autogenPK"),
-//            childColumns = arrayOf("ITEM_PK"),
-//            onDelete = ForeignKey.CASCADE
-//        ),
-//        ForeignKey(
-//            entity = ListNode::class,
-//            parentColumns = arrayOf("nodePk"),
-//            childColumns = arrayOf("LIST_PK"),
-//            onDelete = ForeignKey.CASCADE
-//        )
-//    )
+    tableName = "BookMarks"
 )
 data class Bookmarks(
     @PrimaryKey(autoGenerate = true)

@@ -4,6 +4,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.Scaffold
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Save
@@ -17,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -26,7 +27,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.BarItem
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
-import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,15 +34,13 @@ import kotlinx.coroutines.launch
 fun CustomListCompactScreen(
     navController: NavHostController,
     icons: List<BarItem>,
-    viewModel: CustomListsViewModel ,
+    viewModel: CustomListsViewModel,
 ) {
     val scope = rememberCoroutineScope()
     val state = rememberScaffoldState()
-    val context = LocalContext.current
-    val resource = ResourceProviderSingleton
-    androidx.compose.material.Scaffold(
+    Scaffold(
         topBar = {
-            androidx.compose.material.TopAppBar(
+            TopAppBar(
                 title = {
                     Text(
                         text = stringResource(id = R.string.lists),
@@ -97,14 +95,13 @@ fun CustomListCompactScreen(
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
             BottomNavigation(
-                backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+                backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
             ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(
                         selected = currentRoute == navItem.route,
                         onClick = {
                             navController.navigate(navItem.route) {
-                                // popUpTo(navController.graph.findStartDestination().id) {}
                                 launchSingleTop = true
                             }
                         },
@@ -112,13 +109,13 @@ fun CustomListCompactScreen(
                             Icon(
                                 imageVector = navItem.image,
                                 contentDescription = navItem.title,
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer
                             )
                         },
                         label = {
                             Text(
                                 text = navItem.title,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
                                 maxLines = 1
                             )
                         }

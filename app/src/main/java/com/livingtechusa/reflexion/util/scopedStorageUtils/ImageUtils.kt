@@ -1,4 +1,3 @@
-
 package com.livingtechusa.reflexion.util.scopedStorageUtils
 
 import android.graphics.Bitmap
@@ -6,8 +5,6 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.Rect
-import android.media.ThumbnailUtils
-import android.os.Build
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.random.Random
@@ -122,8 +119,7 @@ object ImageUtils {
                 scaler = null
             }
         }
-        val b1: Bitmap
-        b1 = if (scaler != null) {
+        val b1: Bitmap = if (scaler != null) {
             // this is used for minithumb and crop, so we want to filter here.
             Bitmap.createBitmap(
                 source, 0, 0,

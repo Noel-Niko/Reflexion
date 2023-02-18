@@ -9,7 +9,6 @@ import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.livingtechusa.reflexion.R
@@ -36,7 +35,6 @@ import com.livingtechusa.reflexion.util.scopedStorageUtils.ImageUtils.rotateImag
 import com.livingtechusa.reflexion.util.scopedStorageUtils.MediaStoreUtils
 import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,10 +50,9 @@ const val STATE_KEY_URL = "com.livingtechusa.reflexion.ui.build.BuildItemScreen.
 
 
 @HiltViewModel
-class ItemViewModel @Inject constructor(
+class BuildItemViewModel @Inject constructor(
     private val localServiceImpl: LocalServiceImpl
 ) : ViewModel() {
-
     companion object {
         private val TAG = this::class.java.simpleName
     }
@@ -108,13 +105,6 @@ class ItemViewModel @Inject constructor(
         return localServiceImpl.selectSiblings(pk, parentPk).isEmpty()
     }
 
-//    /**
-//     * We keep the current media [Uri] in the savedStateHandle to re-render it if there is a
-//     * configuration change and we expose it as a [LiveData] to the UI
-//     */
-//    val selectedFile: LiveData<FileResource?> =
-//        savedStateHandle.getLiveData<FileResource?>(SELECTED_FILE_KEY)
-//    private val uri: Uri? = reflexionItem.value.videoUri?.let { Converters().convertStringToUri(it)}
     private val _selectedFile: MutableStateFlow<FileResource?> = MutableStateFlow(null)
     val selectedFile get() = _selectedFile
 
@@ -268,8 +258,6 @@ class ItemViewModel @Inject constructor(
                                 _parent.value = event.newVal as Long?
                             }
                         }
-
-
                     }
 
                     is BuildEvent.GetSelectedReflexionItem -> {
@@ -306,24 +294,12 @@ class ItemViewModel @Inject constructor(
                         }
                     }
 
-//                    is BuildEvent.ShowVideo -> {
-//                        if (event.uri.isNullOrEmpty().not()) {
-//                            event.uri?.let {
-//
-//                            }
-//                        }
-//                    }
-
                     is BuildEvent.ClearReflexionItem -> {
                         _reflexionItem = ReflexionItem()
                         _reflexionItemState.value = _reflexionItem
                         resetAllDisplayedSubItemsToDBVersion()
-
                     }
 
-//                    is BuildEvent.UpdateVideoURL -> { // no longer needed use above update displayed
-//                        _videoUrl.value = event.videoUrl
-//                    }
 
                     is BuildEvent.SetParent -> {
                         viewModelScope.launch {
@@ -335,9 +311,23 @@ class ItemViewModel @Inject constructor(
                         }
                     }
 
+                    is BuildEvent.SetSelectedParent -> {
+                        viewModelScope.launch {
+                            val item = _reflexionItem
+                            item.parent = event.parent.autogenPK
+                            item.image = event.parent.image
+                            _reflexionItem = item
+                            _reflexionItemState.value = _reflexionItem
+                            resetAllDisplayedSubItemsToDBVersion()
+                            this@BuildItemViewModel.onTriggerEvent(BuildEvent.Save)
+                        }
+                    }
+
                     is BuildEvent.SendText -> {
                         val text =
-                            context.getString(R.string.title) + name.value + "\n" + context.getString(R.string.description) + description.value +
+                            context.getString(R.string.title) + name.value + "\n" + context.getString(
+                                R.string.description
+                            ) + description.value +
                                     " \n" + context.getString(R.string.detailedDescription) + detailedDescription.value + "\n" + videoUrl.value + "\n\n" +
                                     context.getString(R.string.sent_with_reflexion_from_the_google_play_store)
                         val video = videoUri.value?.let {
@@ -414,7 +404,7 @@ class ItemViewModel @Inject constructor(
                                 _reflexionItem = savedRI
                                 _reflexionItemState.value = _reflexionItem
                             } else {
-                                this@ItemViewModel.onTriggerEvent(
+                                this@BuildItemViewModel.onTriggerEvent(
                                     BuildEvent.UpdateDisplayedReflexionItem(
                                         VIDEO_URI,
                                         event.uri
@@ -423,7 +413,7 @@ class ItemViewModel @Inject constructor(
                             }
                             Temporary.url = EMPTY_STRING
                             Temporary.uri = EMPTY_STRING
-                            Temporary.use = false
+                            Temporary.useUri = false
                         }
                     }
                 }
@@ -474,18 +464,6 @@ class ItemViewModel @Inject constructor(
             null
         }
     }
-
-    //    private fun effect(block: suspend () -> Unit) {
-//        viewModelScope.launch(Dispatchers.IO) { block() }
-//    }
-//    fun searchEvent(term: String?) {
-//        _search.value = term
-//        if (term.isNullOrEmpty()) {
-//            onTriggerEvent(ListEvent.GetList(listPK))
-//        } else {
-//            onTriggerEvent(ListEvent.Search(term, reflexionItem.value.autogenPK))
-//        }
-//    }
 
     fun setSaveNowFromTopBar(saveNow: Boolean) {
         _saveNowFromTopBar.value = saveNow

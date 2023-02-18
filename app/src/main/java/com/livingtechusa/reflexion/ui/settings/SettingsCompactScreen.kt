@@ -17,14 +17,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.BarItem
 import com.livingtechusa.reflexion.ui.viewModels.SettingsViewModel
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CompactScreen(
     navController: NavHostController,
     icons: List<BarItem>,
-    viewModel: SettingsViewModel
+    viewModel: com.livingtechusa.reflexion.ui.viewModels.SettingsViewModel
 ) {
     Scaffold(
         topBar = {
@@ -43,7 +41,7 @@ fun CompactScreen(
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
             BottomNavigation(
-                backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+                backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
             ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(
@@ -53,20 +51,19 @@ fun CompactScreen(
                                 popUpTo(navController.graph.findStartDestination().id) {
                                 }
                                 launchSingleTop = true
-//                                restoreState = true
                             }
                         },
                         icon = {
                             Icon(
                                 imageVector = navItem.image,
                                 contentDescription = navItem.title,
-                                tint = MaterialTheme.colorScheme.onSurface
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer
                             )
                         },
                         label = {
                             Text(
                                 text = navItem.title,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
                                 maxLines = 1
                             )
                         }

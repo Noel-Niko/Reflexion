@@ -19,6 +19,7 @@ import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton.getString
 
 const val CONFIRM_DELETE_LIST = "ConfirmDeleteListDialog"
+
 @Composable
 fun ConfirmDeleteListDialog(
     viewModel: CustomListsViewModel = hiltViewModel(),
@@ -26,44 +27,59 @@ fun ConfirmDeleteListDialog(
     index: Int?,
     itemToDelete: String?
 ) {
-    //MaterialTheme {
-        Column {
-            val openDialog = remember { mutableStateOf(true) }
-            if(openDialog.value) {
-                AlertDialog(
-                    onDismissRequest = { openDialog.value = false },
-                    title = {
-                        Text(text = stringResource(R.string.confirm_to_delete))
-                    },
-                    text = {
-                        Text(text = getString(R.string.do_you_want_to_delete, itemToDelete ?: EMPTY_STRING))
-                    },
-                    confirmButton = {
-                        Button(
-                            onClick = {
-                                index?.let { CustomListEvent.DeleteList(it) }
-                                    ?.let { viewModel.onTriggerEvent(it) }
-                                openDialog.value = false
-                                navController.popBackStack()
-                            },
-                            colors = ButtonDefaults.buttonColors(backgroundColor =  MaterialTheme.colorScheme.primary, contentColor =  MaterialTheme.colorScheme.onPrimary)
-                        ) {
-                            Text(text = stringResource(R.string.delete), color = MaterialTheme.colorScheme.onPrimary)
-                        }
-                    },
-                    dismissButton = {
-                        Button(
-                            onClick = {
-                                openDialog.value = false
-                                navController.popBackStack()
-                            },
-                            colors = ButtonDefaults.buttonColors(backgroundColor =  MaterialTheme.colorScheme.primary, contentColor =  MaterialTheme.colorScheme.onPrimary)
-                        ) {
-                            Text(text = stringResource(R.string.cancel), color = MaterialTheme.colorScheme.onPrimary)
-                        }
+    Column {
+        val openDialog = remember { mutableStateOf(true) }
+        if (openDialog.value) {
+            AlertDialog(
+                onDismissRequest = { openDialog.value = false },
+                title = {
+                    Text(text = stringResource(R.string.confirm_to_delete))
+                },
+                text = {
+                    Text(
+                        text = getString(
+                            R.string.do_you_want_to_delete,
+                            itemToDelete ?: EMPTY_STRING
+                        )
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            index?.let { CustomListEvent.DeleteList(it) }
+                                ?.let { viewModel.onTriggerEvent(it) }
+                            openDialog.value = false
+                            navController.popBackStack()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    ) {
+                        Text(
+                            text = stringResource(R.string.delete),
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
                     }
-                )
-            }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = {
+                            openDialog.value = false
+                            navController.popBackStack()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    ) {
+                        Text(
+                            text = stringResource(R.string.cancel),
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                }
+            )
         }
     }
-//}
+}

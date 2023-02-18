@@ -6,14 +6,13 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material.icons.filled.SendToMobile
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.livingtechusa.reflexion.R
-import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
 
 @Composable
-fun BuildIcons(viewModel: ItemViewModel){
+fun BuildIcons(viewModel: BuildItemViewModel){
     Row() {
         IconButton(
             onClick = {},

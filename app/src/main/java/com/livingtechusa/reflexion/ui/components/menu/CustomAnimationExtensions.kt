@@ -29,7 +29,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.ui.unit.IntOffset
 
-/*[EnterAnimation] will return enter animation instance ont he basis of enum selection */
+/*[EnterAnimation] will return enter animation instance on the basis of enum selection */
 @OptIn(ExperimentalAnimationApi::class)
 @JvmSynthetic
 @PublishedApi

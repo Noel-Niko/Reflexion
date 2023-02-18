@@ -18,14 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.livingtechusa.reflexion.data.entities.ReflexionItem
-import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
 import com.livingtechusa.reflexion.util.DataProvider
 import com.livingtechusa.reflexion.util.Puppy
 
 @Composable
-fun ItemRecyclerView() { //navigateToProfile: (ReflexionItem) -> Unit
+fun ItemRecyclerView() {
     val reflexionItems = remember { DataProvider.puppyList }
     LazyColumn(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
@@ -37,10 +34,13 @@ fun ItemRecyclerView() { //navigateToProfile: (ReflexionItem) -> Unit
             })
     }
 }
+
 @Composable
 fun ReflexionListItem(reflexionItem: Puppy) {
-    Card (
-        modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp).fillMaxWidth(),
+    Card(
+        modifier = Modifier
+            .padding(horizontal = 8.dp, vertical = 8.dp)
+            .fillMaxWidth(),
         elevation = 2.dp,
         backgroundColor = Color.White,
         shape = RoundedCornerShape(corner = CornerSize(16.dp))

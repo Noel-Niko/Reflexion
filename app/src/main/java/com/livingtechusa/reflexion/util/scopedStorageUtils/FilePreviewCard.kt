@@ -86,16 +86,10 @@ fun DocumentFilePreviewCard(
     docType: String
 ) {
     val context = LocalContext.current
-    // val formattedFileSize = Formatter.formatShortFileSize(context, resource.size)
-
-    // modify to handle play for both both saved and linked video... to delete on long or double tap...
-
     val URI = "Uri"
     val route: String =
         Screen.VideoView.route + "/" + URI
-    //val fileMetadata = "${resource.mimeType} - $formattedFileSize"
-
-    val thumbnail by produceState<Bitmap?>(null, resource.uri) {
+   val thumbnail by produceState<Bitmap?>(null, resource.uri) {
         value = SafeUtils.getThumbnail(context, resource.uri)
     }
 
@@ -109,13 +103,6 @@ fun DocumentFilePreviewCard(
                         // Launch dialog
                         navController.navigate(Screen.ConfirmDeleteSubItemScreen.route + "/" + docType)
                     },
-//                    onDoubleTap = {
-//                        viewModel.onTriggerEvent(
-//                            CustomListEvent.MoveToEdit(
-//                                index
-//                            )
-//                        )
-//                    },
                     onTap = {
                         Screen.VideoView.route + "/" + URI
                         navController.navigate(route)
@@ -123,11 +110,6 @@ fun DocumentFilePreviewCard(
                 )
             }
             .padding(0.dp)
-        //.fillMaxWidth()
-//            .clickable {
-//                Screen.VideoView.route + "/" + URI
-//                navController.navigate(route)
-//            }
     ) {
         Column {
             val colorStops: Array<out Pair<Float, Color>> =
@@ -146,14 +128,6 @@ fun DocumentFilePreviewCard(
                     bitmap = it.asImageBitmap(), contentDescription = null
                 )
             }
-
-//            Column(modifier = Modifier.padding(16.dp)) {
-//                Text(text = resource.filename, style = MaterialTheme.typography.subtitle2)
-//                Spacer(modifier = Modifier.height(4.dp))
-//                Text(text = fileMetadata, style = MaterialTheme.typography.caption)
-//                Spacer(modifier = Modifier.height(12.dp))
-//                resource.path?.let { Text(text = it, style = MaterialTheme.typography.caption) }
-//            }
         }
     }
 }
@@ -199,13 +173,6 @@ fun videoImagePreviewCard(urlString: String?, navController: NavHostController, 
                         // Launch dialog
                         navController.navigate(Screen.ConfirmDeleteSubItemScreen.route + "/" + docType)
                     },
-//                    onDoubleTap = {
-//                        viewModel.onTriggerEvent(
-//                            CustomListEvent.MoveToEdit(
-//                                index
-//                            )
-//                        )
-//                    },
                     onTap = {
                         val intent = Intent(
                             Intent.ACTION_VIEW,
@@ -216,15 +183,7 @@ fun videoImagePreviewCard(urlString: String?, navController: NavHostController, 
                 )
             }
             .padding(0.dp)
-//            .fillMaxWidth()
             .background(Color.Transparent)
-//            .clickable {
-//                val intent = Intent(
-//                    Intent.ACTION_VIEW,
-//                    Uri.parse(reflexionItem.videoUrl)
-//                )
-//                ContextCompat.startActivity(context, intent, null)
-//            }
     ) {
         Column {
             val colorStops: Array<out Pair<Float, Color>> =
@@ -245,72 +204,3 @@ fun videoImagePreviewCard(urlString: String?, navController: NavHostController, 
         }
     }
 }
-
-
-//
-//    // val formattedFileSize = Formatter.formatShortFileSize(context, resource.size)
-//
-//    // modify to handle play for both both saved and linked video... to delete on long or double tap...
-//
-//    val URI = "Uri"
-//    val route: String =
-//        Screen.VideoView.route + "/" + URI
-//    //val fileMetadata = "${resource.mimeType} - $formattedFileSize"
-//
-//    val thumbnail by produceState<Bitmap?>(null, resource.uri) {
-//        value = SafeUtils.getThumbnail(context, resource.uri)
-//    }
-//
-//
-//    Card(
-//        elevation = 0.dp,
-//        border = BorderStroke(width = 1.dp, color = compositeBorderColor()),
-//        modifier = Modifier
-//            .pointerInput(key1 = resource) {
-//                detectTapGestures(
-//                    onLongPress  = {
-//                        // Launch dialog
-//                        navController.navigate(Screen.ConfirmDeleteSubItemScreen.route + "/" + docType)
-//                    },
-////                    onDoubleTap = {
-////                        viewModel.onTriggerEvent(
-////                            CustomListEvent.MoveToEdit(
-////                                index
-////                            )
-////                        )
-////                    },
-//                    onTap = {
-//                        Screen.VideoView.route + "/" + URI
-//                        navController.navigate(route)
-//                    }
-//                )
-//            }
-//            .padding(16.dp)
-//            .fillMaxWidth()
-//            .clickable {
-//                Screen.VideoView.route + "/" + URI
-//                navController.navigate(route)
-//            }
-//    ) {
-//        Column {
-//            val colorStops: Array<out Pair<Float, Color>> =
-//                arrayOf(Pair(10f, Color.Black), Pair(5f, Color.Red))
-//            Image(
-//                modifier = Modifier.height(90.dp).width(60.dp)
-//                    .border(
-//                        1.dp, Brush.verticalGradient(colorStops = colorStops),
-//                        TextFieldDefaults.OutlinedTextFieldShape
-//                    ).padding(2.dp),
-//                contentScale = ContentScale.FillBounds,
-//                bitmap = it.asImageBitmap(), contentDescription = null)
-//
-////            Column(modifier = Modifier.padding(16.dp)) {
-////                Text(text = resource.filename, style = MaterialTheme.typography.subtitle2)
-////                Spacer(modifier = Modifier.height(4.dp))
-////                Text(text = fileMetadata, style = MaterialTheme.typography.caption)
-////                Spacer(modifier = Modifier.height(12.dp))
-////                resource.path?.let { Text(text = it, style = MaterialTheme.typography.caption) }
-////            }
-//        }
-//    }
-//}

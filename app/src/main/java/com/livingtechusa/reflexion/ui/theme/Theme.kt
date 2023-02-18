@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -12,6 +13,10 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.core.view.ViewCompat
 import com.livingtechusa.reflexion.ui.theme.selectableColorSchemes.CustomTheme1
 import com.livingtechusa.reflexion.ui.theme.selectableColorSchemes.CustomTheme2
@@ -57,14 +62,14 @@ private val LightColorScheme = lightColorScheme(
 //        large = RoundedCornerShape(0.dp)
 //    )
 //
-//private val reflexionItemsTypography
-//    get() = Typography(
-//        body1 = TextStyle(
-//            fontFamily = FontFamily.Default,
-//            fontWeight = FontWeight.Normal,
-//            fontSize = 16.sp
-//        )
-//    )
+private val reflexionItemsTypography
+    get() = Typography(
+        bodySmall = TextStyle(
+            fontFamily = FontFamily.Default,
+            fontWeight = FontWeight.Normal,
+            fontSize = 16.sp
+        )
+    )
 //
 //private val DarkColorPalette
 //    @Composable get() = darkColors(
@@ -140,7 +145,6 @@ fun defaultDynamicTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        //darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
     val view = LocalView.current

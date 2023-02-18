@@ -24,8 +24,6 @@ fun BookmarkSearchBar(
     onUp: (() -> Unit)?,
     bookmark: (() -> Unit)?,
 ) {
-    val resource = ResourceProviderSingleton
-    val context = LocalContext.current
     when (search) {
         null -> BookmarkTopBar() {
             SearchIcon { onSearch("") }

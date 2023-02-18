@@ -14,21 +14,20 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.ui.build.BuildEvent
-import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
-import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
+import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton.getString
 
-const val CONFIRM_DELETE_SUBITEM = "ConfirmDeleteSubItemDialog"
+const val CONFIRM_DELETE_SUB_ITEM = "ConfirmDeleteSubItemDialog"
+
 @Composable
 fun ConfirmDeleteSubItemDialog(
-    viewModel: ItemViewModel = hiltViewModel(),
+    viewModel: BuildItemViewModel = hiltViewModel(),
     navController: NavHostController,
     subItem: String,
 ) {
-    //MaterialTheme {
     Column {
         val openDialog = remember { mutableStateOf(true) }
-        if(openDialog.value) {
+        if (openDialog.value) {
             AlertDialog(
                 onDismissRequest = { openDialog.value = false },
                 title = {
@@ -40,28 +39,43 @@ fun ConfirmDeleteSubItemDialog(
                 confirmButton = {
                     Button(
                         onClick = {
-                            viewModel.onTriggerEvent(BuildEvent.DeleteReflexionItemSubItemByName(subItem))
+                            viewModel.onTriggerEvent(
+                                BuildEvent.DeleteReflexionItemSubItemByName(
+                                    subItem
+                                )
+                            )
                             openDialog.value = false
                             navController.popBackStack()
                         },
-                        colors = ButtonDefaults.buttonColors(backgroundColor =  MaterialTheme.colorScheme.primary, contentColor =  MaterialTheme.colorScheme.onPrimary)
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        )
                     ) {
-                        Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.onPrimary)
+                        Text(
+                            stringResource(R.string.delete),
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
                     }
                 },
                 dismissButton = {
                     Button(
                         onClick = {
                             openDialog.value = false
-                             navController.popBackStack()
+                            navController.popBackStack()
                         },
-                                colors = ButtonDefaults.buttonColors(backgroundColor =  MaterialTheme.colorScheme.primary, contentColor =  MaterialTheme.colorScheme.onPrimary)
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        )
                     ) {
-                        Text(stringResource(R.string.cancel), color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
+                        Text(
+                            stringResource(R.string.cancel),
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
                     }
                 }
             )
         }
     }
 }
-//}

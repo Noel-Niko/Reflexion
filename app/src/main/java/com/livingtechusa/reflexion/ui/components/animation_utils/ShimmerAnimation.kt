@@ -1,4 +1,4 @@
-package com.livingtechusa.reflexion.ui.components
+package com.livingtechusa.reflexion.ui.components.animation_utils
 
 
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -18,7 +18,6 @@ import com.livingtechusa.reflexion.ui.theme.ShimmerColorShades
 @Composable
 fun ShimmerAnimation(
 ) {
-
     /*
     Create InfiniteTransition
     which holds child animation like [Transition]

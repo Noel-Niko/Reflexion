@@ -1,6 +1,5 @@
 package com.livingtechusa.reflexion.ui.components
 
-import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.AlertDialog
@@ -13,19 +12,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.livingtechusa.reflexion.MainActivity
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildEvent
-import com.livingtechusa.reflexion.ui.build.BuildRoute
-import com.livingtechusa.reflexion.ui.viewModels.ItemViewModel
+import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
 import com.livingtechusa.reflexion.util.Constants.DO_NOT_UPDATE
-import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URL
 
@@ -33,14 +27,13 @@ const val PASTE_SAVE = "PasteAndSaveDialog"
 
 @Composable
 fun PasteAndSaveDialog(
-    viewModel: ItemViewModel = hiltViewModel(),
+    viewModel: BuildItemViewModel = hiltViewModel(),
     navController: NavHostController
 ) {
 
     val webAddress = remember { mutableStateOf(EMPTY_STRING) }
 
     MaterialTheme {
-        val context = LocalContext.current
         Column {
             val openDialog = remember { mutableStateOf(true) }
             if (openDialog.value) {
@@ -66,16 +59,25 @@ fun PasteAndSaveDialog(
                     confirmButton = {
                         Button(
                             onClick = {
-                                viewModel.onTriggerEvent( BuildEvent.UpdateDisplayedReflexionItem(
-                                    subItem = VIDEO_URL, newVal = webAddress.value))
+                                viewModel.onTriggerEvent(
+                                    BuildEvent.UpdateDisplayedReflexionItem(
+                                        subItem = VIDEO_URL, newVal = webAddress.value
+                                    )
+                                )
                                 openDialog.value = false
                                 navController.navigate(Screen.BuildItemScreen.route + "/" + DO_NOT_UPDATE) {
                                     launchSingleTop = true
                                 }
                             },
-                            colors = ButtonDefaults.buttonColors(backgroundColor =  androidx.compose.material3.MaterialTheme.colorScheme.primary, contentColor =  androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                                contentColor = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary
+                            )
                         ) {
-                            Text(stringResource(R.string.save), color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
+                            Text(
+                                stringResource(R.string.save),
+                                color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary
+                            )
                         }
                     },
                     dismissButton = {
@@ -86,9 +88,15 @@ fun PasteAndSaveDialog(
                                     launchSingleTop = true
                                 }
                             },
-                            colors = ButtonDefaults.buttonColors(backgroundColor =  androidx.compose.material3.MaterialTheme.colorScheme.primary, contentColor =  androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                                contentColor = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary
+                            )
                         ) {
-                            Text(stringResource(R.string.close), color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
+                            Text(
+                                stringResource(R.string.close),
+                                color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary
+                            )
                         }
                     }
                 )

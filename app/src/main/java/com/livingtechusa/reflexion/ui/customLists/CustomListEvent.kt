@@ -40,6 +40,7 @@ sealed class CustomListEvent {
     ) : CustomListEvent()
 
     object ReSet : CustomListEvent()
+
     data class Bookmark(val nodePk: Long) : CustomListEvent()
 
     // For Custom List Display Screen

@@ -26,10 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.livingtechusa.reflexion.ui.theme.selectableColorSchemes.returnPrimaryColors
+import com.livingtechusa.reflexion.ui.theme.selectableColorSchemes.returnSecondaryColors
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import kotlin.reflect.KFunction1
-
 @Composable
 fun MaterialRadioButtonGroupComponent(
     options: Map<String, Int>,
@@ -82,10 +81,10 @@ fun MaterialRadioButtonGroupComponent(
                     ) {
                         Text(
                             text = pair.key,
-                            color = returnPrimaryColors(pair.value).second,
+                            color = returnSecondaryColors(pair.value).second,
                             style = MaterialTheme.typography.bodyLarge.merge(),
                             modifier = Modifier
-                                .background(returnPrimaryColors(pair.value).first)
+                                .background(returnSecondaryColors(pair.value).first)
                                 .padding(16.dp)
                                 .fillMaxSize(),
                             textAlign = TextAlign.Center,

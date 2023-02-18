@@ -40,7 +40,7 @@ fun BookmarksCompactScreen(
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
             BottomNavigation(
-                backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+                backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
             ) {
                 icons.forEach { navItem ->
                     BottomNavigationItem(
@@ -48,23 +48,21 @@ fun BookmarksCompactScreen(
                         onClick = {
                             navController.navigate(navItem.route) {
                                 popUpTo(navController.graph.findStartDestination().id) {
-//                                    saveState = true
                                 }
                                 launchSingleTop = true
-//                                restoreState = true
                             }
                         },
                         icon = {
                             Icon(
                                 imageVector = navItem.image,
                                 contentDescription = navItem.title,
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer
                             )
                         },
                         label = {
                             Text(
                                 text = navItem.title,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
                                 maxLines = 1
                             )
                         }
@@ -81,6 +79,5 @@ fun BookmarksCompactScreen(
             Spacer(modifier = Modifier.height(16.dp))
             BookmarksContent(navController = navController, viewModel = viewModel)
         }
-
     }
 }

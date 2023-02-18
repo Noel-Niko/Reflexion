@@ -87,4 +87,9 @@
     <string name="up">up</string>
     <string name="already_bookmarked">Already Bookmarked</string>
     <string name="removed">Removed</string>
+    <string name="set_or_change_parent">Set Or Change Parent</string>
+    <string name="no_selection_made">No selection made.</string>
+    <string name="setting_as_the_new_parent">"Setting as the new parent: "</string>
+    <string name="saving_as_the_new_parent">"Saving as the new parent: "</string>
+    <string name="changing_an_item_s_parent_will_also_move_any_of_the_item_s_children">Changing an item\'s parent will also move any of the item\'s children.</string>
 </resources>

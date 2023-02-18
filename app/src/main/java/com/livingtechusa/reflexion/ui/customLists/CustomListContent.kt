@@ -36,21 +36,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.util.Constants.NO_LISTS
-import com.livingtechusa.reflexion.util.ReflexionArrayItem
+import com.livingtechusa.reflexion.data.models.ReflexionArrayItem
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,7 +55,6 @@ fun CustomListContent(
     navController: NavHostController,
     viewModel: CustomListsViewModel = hiltViewModel()
 ) {
-    val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
     val customList by viewModel.customList.collectAsState()
     val listOfLists by viewModel.listOfLists.collectAsState()
     val listimages by viewModel.listImages.collectAsState()
@@ -83,11 +78,6 @@ fun CustomListContent(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 items(1) { index ->
-//                    Box(
-//                        modifier = Modifier
-//                            .fillParentMaxWidth()
-//                            .background(Color.Green)
-//                    ) {
                     Column(
                         verticalArrangement = Arrangement.Center
                     ) {
@@ -216,17 +206,14 @@ fun EditableHorizontalScrollableRowComponent(
             .height(48.dp)
             .padding(start = 16.dp)
             .horizontalScroll(state = scrollState),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        //verticalAlignment = Alignment.CenterVertically
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         if (customList.children.isEmpty().not()) {
             customList.children.forEach { item ->
                 var offsetX by remember { mutableStateOf(0f) }
                 var offsetY by remember { mutableStateOf(50f) }
                 var elevated by remember { mutableStateOf(0) }
-//                val h2 = MaterialTheme.typography.titleLarge
-//                val b2 = MaterialTheme.typography.labelLarge
-//                var textStyle = b2
+
                 Text(
                     text = item.itemName.toString() + ", ",
                     color = MaterialTheme.colorScheme.onSurface,
