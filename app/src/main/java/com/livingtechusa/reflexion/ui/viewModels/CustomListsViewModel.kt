@@ -108,8 +108,12 @@ class CustomListsViewModel @Inject constructor(
             val bitmaps: MutableList<Bitmap> = mutableListOf()
             val job = async {
                 listOfLists.value.forEach { topicItem ->
-                    topicItem?.children?.get(0)?.itemPK?.let { localServiceImpl.selectImage(it) }
-                        ?.let { bitmaps.add(it) }
+                    topicItem?.children?.get(0)?.itemPK?.let { itemPk ->
+                        localServiceImpl.selectItem(itemPk)?.imagePk?.let { imagePk ->
+                            localServiceImpl.selectImage(imagePk)
+                                ?.let { bitmap -> bitmaps.add(bitmap) }
+                        }
+                    }
                 }
             }
             job.join()
@@ -346,7 +350,7 @@ class CustomListsViewModel @Inject constructor(
                     }
                     val text = title + listItems
                     val shareIntent = Intent()
-                    shareIntent.putExtra(EXTRA_TEXT, text);
+                    shareIntent.putExtra(EXTRA_TEXT, text)
                     shareIntent.type = "text/*"
                     shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
                     shareIntent.action = Intent.ACTION_SEND_MULTIPLE

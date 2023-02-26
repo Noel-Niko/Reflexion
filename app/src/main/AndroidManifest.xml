@@ -40,7 +40,10 @@
         tools:targetApi="31">
         <activity
             android:name=".MainActivity"
+            android:enabled="true"
             android:exported="true"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:label="@string/app_name"
             android:theme="@style/Theme.Reflexion">
             <intent-filter>
@@ -60,9 +63,9 @@
             android:screenOrientation="portrait"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_4"
+            android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_4_round"
+            android:roundIcon="@mipmap/ic_launcher"
             android:theme="@style/Theme.Reflexion"
             android:targetActivity=".MainActivity">
             <intent-filter>

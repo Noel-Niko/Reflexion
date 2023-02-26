@@ -3,17 +3,19 @@ package com.livingtechusa.reflexion.data.localService
 import android.graphics.Bitmap
 import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.dao.BookMarksDao
+import com.livingtechusa.reflexion.data.dao.ImagesDao
 import com.livingtechusa.reflexion.data.dao.LinkedListDao
 import com.livingtechusa.reflexion.data.dao.ReflexionItemDao
 import com.livingtechusa.reflexion.data.entities.Bookmarks
+import com.livingtechusa.reflexion.data.entities.Image
 import com.livingtechusa.reflexion.data.entities.ListNode
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.models.AbridgedReflexionItem
+import com.livingtechusa.reflexion.data.models.ReflexionArrayItem
 import com.livingtechusa.reflexion.data.toListNode
 import com.livingtechusa.reflexion.data.toReflexionArrayItem
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
-import com.livingtechusa.reflexion.data.models.ReflexionArrayItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -25,28 +27,64 @@ import javax.inject.Inject
 class LocalServiceImpl @Inject constructor(
     private val reflexionItemDao: ReflexionItemDao,
     private val bookMarksDao: BookMarksDao,
-    private val linkedListDao: LinkedListDao
+    private val linkedListDao: LinkedListDao,
+    private val imagesDao: ImagesDao
 ) : ILocalService {
     companion object {
         val TAG = "LocalServiceImpl"
     }
 
     private val scope = CoroutineScope(Dispatchers.IO)
-    override suspend fun setItem(item: ReflexionItem) {
-        reflexionItemDao.setReflexionItem(item)
+    override suspend fun savedNewItem(item: ReflexionItem) {
+        var addedToExisting = false
+        var imagePk = 0L
+        if (item.image != null) {
+            val existingImage = item.image.let { imagesDao.selectImagePKByByteArray(item.image!!) }
+            if (existingImage != null) {
+                addedToExisting = true
+                imagePk = existingImage
+            } else {
+                imagePk =
+                    imagesDao.insertImage(Image(imagePk = 0L, image = item.image!!, useCount = 1))
+            }
+        }
+        val saveItem = item.copy(imagePk = imagePk, image = null)
+        reflexionItemDao.setReflexionItem(saveItem)
+        if (addedToExisting) {
+            imagesDao.setIncreaseCount(imagePk)
+        }
     }
 
     override suspend fun updateReflexionItem(item: ReflexionItem) {
+        var addedToExisting = false
+        if (item.imagePk != null) {
+            imagesDao.setDecreaseCount(item.imagePk!!)
+        }
+        var imagePk = 0L
+        if (item.image != null) {
+            val existingImage = item.image.let { imagesDao.selectImagePKByByteArray(item.image!!) }
+            if (existingImage != null) {
+                addedToExisting = true
+                imagePk = existingImage
+            } else {
+                imagePk =
+                    imagesDao.insertImage(Image(imagePk = 0L, image = item.image!!, useCount = 1))
+            }
+        }
+
         reflexionItemDao.updateReflexionItem(
             item.autogenPK,
             item.name,
             item.description,
             item.detailedDescription,
-            item.image,
+            imagePk,
             item.videoUri,
             item.videoUrl,
             item.parent
         )
+        if (addedToExisting) {
+            imagesDao.setIncreaseCount(imagePk)
+        }
     }
 
     override suspend fun getAllItems(): List<ReflexionItem?> {
@@ -85,16 +123,13 @@ class LocalServiceImpl @Inject constructor(
         return reflexionItemDao.selectChildReflexionItems(pk)
     }
 
-    override suspend fun clearALLReflexionItems() {
-        reflexionItemDao.clearALLReflexionItems()
-    }
-
     override suspend fun selectItem(autogenPK: Long): ReflexionItem? {
         return reflexionItemDao.selectReflexionItem(autogenPK)
     }
 
     override suspend fun deleteReflexionItem(autogenPK: Long, name: String) {
-        return reflexionItemDao.deleteReflexionItem(autogenPK, name)
+
+        reflexionItemDao.deleteReflexionItem(autogenPK, name)
     }
 
     override suspend fun renameItem(autogenPK: Long, name: String, newName: String) {
@@ -128,7 +163,7 @@ class LocalServiceImpl @Inject constructor(
         } else {
             val result: MutableList<ReflexionArrayItem> = mutableListOf()
             reflexionItemDao.selectAbridgedReflexionItemDataByParentPk(pk).forEach() {
-                val Rai: ReflexionArrayItem =
+                val Rai =
                     ReflexionArrayItem(
                         itemPK = it?.autogenPK ?: 0L,
                         itemName = it?.name ?: EMPTY_STRING,
@@ -142,10 +177,10 @@ class LocalServiceImpl @Inject constructor(
     }
 
     override suspend fun selectReflexionArrayItemByPk(pk: Long): ReflexionArrayItem? {
-        val _result: Deferred<AbridgedReflexionItem> = scope.async {
+        val _result: Deferred<AbridgedReflexionItem?> = scope.async {
             reflexionItemDao.selectSingleAbridgedReflexionItem(pk)
         }
-        return _result.await().toReflexionArrayItem()
+        return _result.await()?.toReflexionArrayItem()
     }
 
     override suspend fun selectParent(pk: Long): Long? {
@@ -177,8 +212,8 @@ class LocalServiceImpl @Inject constructor(
         return headNodePk
     }
 
-    override suspend fun selectImage(itemPk: Long): Bitmap? {
-        val byteArray: ByteArray? = reflexionItemDao.selectImage(itemPk)
+    override suspend fun selectImage(imagePk: Long): Bitmap? {
+        val byteArray: ByteArray? = reflexionItemDao.selectImage(imagePk)
         return if (byteArray != null) {
             Converters().getBitmapFromByteArray(byteArray = byteArray)
         } else {
@@ -297,8 +332,7 @@ class LocalServiceImpl @Inject constructor(
             // get the children for each head node
             headNodeList.forEach() { headNode ->
                 val children = mutableListOf<ListNode>()
-                var child: ListNode? = null
-                child = getChild(headNode.nodePk)
+                var child = getChild(headNode.nodePk)
                 // recursively get all the children for each head node
                 while (child != null) {
                     children.add(child)
@@ -387,6 +421,6 @@ class LocalServiceImpl @Inject constructor(
     }
 
     override suspend fun selectItemByUri(uri: String): ReflexionItem? {
-       return reflexionItemDao.selectItemByUri(uri)
+        return reflexionItemDao.selectItemByUri(uri)
     }
 }

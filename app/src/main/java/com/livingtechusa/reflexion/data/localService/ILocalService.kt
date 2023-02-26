@@ -9,10 +9,9 @@ import com.livingtechusa.reflexion.data.models.ReflexionArrayItem
 
 interface ILocalService {
     // REFLEXION ITEMS
-    suspend fun setItem(item: ReflexionItem)
+    suspend fun savedNewItem(item: ReflexionItem)
     suspend fun updateReflexionItem(item: ReflexionItem)
     suspend fun getAllItems(): List<ReflexionItem?>
-    suspend fun clearALLReflexionItems()
     suspend fun selectItem(autogenPK: Long): ReflexionItem?
     suspend fun deleteReflexionItem(autogenPK: Long, name: String)
     suspend fun renameItem(autogenPK: Long, name: String, newName: String)
@@ -33,7 +32,7 @@ interface ILocalService {
     suspend fun selectSingleAbridgedReflexionItemDataByParentPk(pk: Long): AbridgedReflexionItem
     suspend fun selectReflexionArrayItemsByParentPk(pk: Long?): List<ReflexionArrayItem?>
     suspend fun selectReflexionArrayItemByPk(pk: Long): ReflexionArrayItem?
-    suspend fun selectImage(itemPk: Long): Bitmap?
+    suspend fun selectImage(imagePk: Long): Bitmap?
 
     // LINKED LIST NODES
     suspend fun deleteAllChildNodes(nodePk: Long)
@@ -52,7 +51,7 @@ interface ILocalService {
     suspend fun insertNewOrUpdateNodeList(arrayItem: ReflexionArrayItem, topic: Long): Long?
 
     // BOOKMARKS
-    suspend fun setBookMarks(user: Bookmarks)
+    suspend fun setBookMarks(bookMark: Bookmarks)
     suspend fun getBookMarks(): List<Bookmarks?>
     suspend fun clearBookMarks()
     suspend fun selectItemBookMark(item_pk: Long): Bookmarks?
@@ -61,5 +60,5 @@ interface ILocalService {
     suspend fun renameKeyWord(word: String, newWord: String)
     suspend fun searchBookmarksByTitle(text: String): List<Bookmarks?>
     suspend fun selectLevelBookMarks(): List<Bookmarks?>
-    suspend fun selectBookmarkByLevelPK(autogenPK: Long?): Bookmarks?
+    suspend fun selectBookmarkByLevelPK(levelPk: Long?): Bookmarks?
 }

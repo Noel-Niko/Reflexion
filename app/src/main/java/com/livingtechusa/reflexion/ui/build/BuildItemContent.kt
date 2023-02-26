@@ -173,9 +173,6 @@ fun BuildItemContent(
         }
     }
     if (saveNow) {
-        Toast.makeText(
-            context, resource.getString(R.string.changes_saved), Toast.LENGTH_SHORT
-        ).show()
         val trimmedName = name.trim()
         viewModel.onTriggerEvent(
             BuildEvent.UpdateDisplayedReflexionItem(
@@ -188,6 +185,9 @@ fun BuildItemContent(
             viewModel.onTriggerEvent(BuildEvent.SaveNew)
         }
         viewModel.setSaveNowFromTopBar(false)
+        Toast.makeText(
+            context, resource.getString(R.string.changes_saved), Toast.LENGTH_SHORT
+        ).show()
     }
     Column(
         modifier = Modifier
