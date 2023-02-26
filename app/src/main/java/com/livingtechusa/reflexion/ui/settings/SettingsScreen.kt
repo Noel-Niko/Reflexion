@@ -212,16 +212,6 @@ fun showNewIconImage(context: Context, int: Int, totalIndices: Int) {
         PackageManager.DONT_KILL_APP
     )
 
-    // address original  icon - prevents reloading
-//    packageManager.setComponentEnabledSetting(
-//        ComponentName(
-//            context,
-//            "com.livingtechusa.reflexion.util.BaseApplication/roundIcon"
-//        ),
-//        PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-//        PackageManager.DONT_KILL_APP
-//    )
-
     var count = 0
     while (count <= (totalIndices - 1)) {
         if (count != int) {
