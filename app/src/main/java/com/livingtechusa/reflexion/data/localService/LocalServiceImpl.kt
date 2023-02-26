@@ -1,8 +1,10 @@
 package com.livingtechusa.reflexion.data.localService
 
 import android.graphics.Bitmap
+import android.util.Log
 import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.dao.BookMarksDao
+import com.livingtechusa.reflexion.data.dao.ImagesDao
 import com.livingtechusa.reflexion.data.dao.LinkedListDao
 import com.livingtechusa.reflexion.data.dao.ReflexionItemDao
 import com.livingtechusa.reflexion.data.entities.Bookmarks
@@ -25,7 +27,8 @@ import javax.inject.Inject
 class LocalServiceImpl @Inject constructor(
     private val reflexionItemDao: ReflexionItemDao,
     private val bookMarksDao: BookMarksDao,
-    private val linkedListDao: LinkedListDao
+    private val linkedListDao: LinkedListDao,
+    private val imagesDao: ImagesDao
 ) : ILocalService {
     companion object {
         val TAG = "LocalServiceImpl"
@@ -33,20 +36,39 @@ class LocalServiceImpl @Inject constructor(
 
     private val scope = CoroutineScope(Dispatchers.IO)
     override suspend fun setItem(item: ReflexionItem) {
-        reflexionItemDao.setReflexionItem(item)
+        val newPK = reflexionItemDao.setReflexionItem(item)
+        Log.d("Test", "New Pk is $newPK")
     }
 
     override suspend fun updateReflexionItem(item: ReflexionItem) {
+        var addedToExisting = false
+        if(item.imagePk != null){
+            imagesDao.setDecreaseCount(item.imagePk!!)
+        }
+        var imagePk: Long = 0L
+        if(item.image != null) {
+            val existingImage = item.image.let { imagesDao.selectImagePKByByteArray(item.image!!) }
+            if (existingImage != null) {
+                addedToExisting = true
+                imagePk = existingImage
+            } else {
+                imagePk = imagesDao.insertImage(item.image!!)
+            }
+        }
+
         reflexionItemDao.updateReflexionItem(
             item.autogenPK,
             item.name,
             item.description,
             item.detailedDescription,
-            item.image,
+            imagePk,
             item.videoUri,
             item.videoUrl,
             item.parent
         )
+        if (addedToExisting) {
+            imagesDao.setIncreaseCount(imagePk)
+        }
     }
 
     override suspend fun getAllItems(): List<ReflexionItem?> {
@@ -85,16 +107,13 @@ class LocalServiceImpl @Inject constructor(
         return reflexionItemDao.selectChildReflexionItems(pk)
     }
 
-    override suspend fun clearALLReflexionItems() {
-        reflexionItemDao.clearALLReflexionItems()
-    }
-
     override suspend fun selectItem(autogenPK: Long): ReflexionItem? {
         return reflexionItemDao.selectReflexionItem(autogenPK)
     }
 
     override suspend fun deleteReflexionItem(autogenPK: Long, name: String) {
-        return reflexionItemDao.deleteReflexionItem(autogenPK, name)
+
+        reflexionItemDao.deleteReflexionItem(autogenPK, name)
     }
 
     override suspend fun renameItem(autogenPK: Long, name: String, newName: String) {

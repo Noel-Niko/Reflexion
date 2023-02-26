@@ -5,6 +5,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.livingtechusa.reflexion.data.dao.ReflexionItemDao
 import com.livingtechusa.reflexion.data.dao.BookMarksDao
+import com.livingtechusa.reflexion.data.dao.ImagesDao
 import com.livingtechusa.reflexion.data.dao.LinkedListDao
 import com.livingtechusa.reflexion.data.entities.Converters
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
@@ -26,4 +27,5 @@ abstract class ReflexionDatabase : RoomDatabase() {
     abstract fun itemDao(): ReflexionItemDao
     abstract fun keyWordsDao(): BookMarksDao
     abstract fun linkedListDao(): LinkedListDao
+    abstract fun imagesDao(): ImagesDao
 }

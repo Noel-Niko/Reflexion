@@ -28,6 +28,7 @@ data class ReflexionItem(
     var description: String? = EMPTY_STRING,
     var detailedDescription: String? = EMPTY_STRING,
     var image: ByteArray? = null,
+    var imagePk: Long? = null,
     var videoUri: String? = EMPTY_STRING,
     var videoUrl: String? = EMPTY_STRING,
     var parent: Long? = null
@@ -38,6 +39,7 @@ data class ReflexionItem(
         val DESCRIPTION = "description"
         val DETAILED_DESCRIPTION = "detailedDescription"
         val IMAGE = "image"
+        val IMAGEPK = "imagePk"
         val VIDEO_URI = "videoUri"
         val VIDEO_URL = "videoUrl"
         val PARENT = "parent"
@@ -58,6 +60,7 @@ data class ReflexionItem(
             if (other.image == null) return false
             if (!image.contentEquals(other.image)) return false
         } else if (other.image != null) return false
+        if (imagePk != other.imagePk) return false
         if (videoUri != other.videoUri) return false
         if (videoUrl != other.videoUrl) return false
         if (parent != other.parent) return false
@@ -71,6 +74,7 @@ data class ReflexionItem(
         result = 31 * result + (description?.hashCode() ?: 0)
         result = 31 * result + (detailedDescription?.hashCode() ?: 0)
         result = 31 * result + (image?.contentHashCode() ?: 0)
+        result = 31 * result + (imagePk?.hashCode() ?: 0)
         result = 31 * result + (videoUri?.hashCode() ?: 0)
         result = 31 * result + (videoUrl?.hashCode() ?: 0)
         result = 31 * result + (parent?.hashCode() ?: 0)

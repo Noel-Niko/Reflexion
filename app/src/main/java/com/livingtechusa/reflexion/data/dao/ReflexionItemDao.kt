@@ -12,19 +12,16 @@ interface ReflexionItemDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun setReflexionItem(item: ReflexionItem)
 
-    @Query("UPDATE ReflexionItem SET name = :name, description = :description, detailedDescription = :detailedDescription, image = :image, videoUri = :videoUri, videoUrl = :videoUrl, parent = :parent WHERE autogenPK = :autogenPK")
-    suspend fun updateReflexionItem(autogenPK: Long , name: String, description: String?, detailedDescription: String?, image: ByteArray?, videoUri: String?, videoUrl: String?, parent: Long?)
+    @Query("UPDATE ReflexionItem SET name = :name, description = :description, detailedDescription = :detailedDescription, imagePk = :imagePk, videoUri = :videoUri, videoUrl = :videoUrl, parent = :parent WHERE autogenPK = :autogenPK")
+    suspend fun updateReflexionItem(autogenPK: Long , name: String, description: String?, detailedDescription: String?, imagePk: Long?, videoUri: String?, videoUrl: String?, parent: Long?)
 
-    @Query("Select * FROM ReflexionItem order by name ASC")
+    @Query("Select * FROM ReflexionItem LEFT JOIN Images ON ReflexionItem.imagePk = Images.imagePk order by name ASC")
     suspend fun getAllReflexionItems(): List<ReflexionItem?>
 
-    @Query("Delete FROM ReflexionItem")
-    suspend fun clearALLReflexionItems()
-
-    @Query("Select * FROM ReflexionItem WHERE parent IS NULL ORDER BY name ASC")
+    @Query("Select * FROM ReflexionItem LEFT JOIN Images ON ReflexionItem.imagePk = Images.imagePk WHERE parent IS NULL ORDER BY name ASC")
     suspend fun getReflexionItemTopics(): List<ReflexionItem?>
 
-    @Query("Select * FROM ReflexionItem WHERE autogenPK = :autogenPK")
+    @Query("Select * FROM ReflexionItem LEFT JOIN Images ON ReflexionItem.imagePk = Images.imagePk WHERE autogenPK = :autogenPK")
     suspend fun selectReflexionItem(autogenPK: Long): ReflexionItem?
 
     @Query("Delete FROM ReflexionItem WHERE autogenPK = :autogenPK AND name = :name")
