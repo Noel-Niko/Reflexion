@@ -222,9 +222,6 @@ class BuildItemViewModel @Inject constructor(
                     }
 
                     is BuildEvent.UpdateDisplayedReflexionItem -> {
-                        ///  here we are updating the image every time and that's why it flickers.
-                        //switch to updating juast the specific part by name
-                        //_reflexionItem.value = event.reflexionItem
                         when (event.subItem) {
                             NAME -> {
                                 _name.value = event.newVal as String
@@ -269,7 +266,6 @@ class BuildItemViewModel @Inject constructor(
                                     _reflexionItemState.value = _reflexionItem
 
                                 }
-
                                 DO_NOT_UPDATE -> {}
                                 else -> {
                                     _reflexionItem =

@@ -19,6 +19,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
+import androidx.navigation.NavType.Companion
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -164,7 +165,8 @@ class MainActivity : ComponentActivity() {
                         }
                         val parentViewModel: BuildItemViewModel = hiltViewModel(parentEntry)
                         VideoPlayer(
-                            viewModel = parentViewModel
+                            viewModel = parentViewModel,
+                            navHostController = navController
                         )
                     }
 
@@ -226,7 +228,7 @@ class MainActivity : ComponentActivity() {
                                 type = NavType.IntType
                             },
                             navArgument(LIST_NAME) {
-                                type = androidx.navigation.NavType.StringType
+                                type = NavType.StringType
                             }
                         )
                     ) { navBackStackEntry ->
