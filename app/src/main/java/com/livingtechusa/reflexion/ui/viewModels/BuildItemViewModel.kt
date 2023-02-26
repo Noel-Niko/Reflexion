@@ -213,7 +213,7 @@ class BuildItemViewModel @Inject constructor(
                                 videoUrl = videoUrl.value,
                                 parent = parent.value
                             )
-                            localServiceImpl.setItem(newItem)
+                            localServiceImpl.savedNewItem(newItem)
                             _reflexionItem =
                                 localServiceImpl.selectReflexionItemByName(name.value)
                             _reflexionItemState.value = _reflexionItem

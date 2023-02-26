@@ -7,7 +7,9 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.livingtechusa.reflexion.R
+import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.entities.Bookmarks
+import com.livingtechusa.reflexion.data.entities.TypeConverters
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.di.DefaultDispatcher
@@ -32,7 +34,7 @@ class TopicsViewModel @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-    private val TAG = "ListViewModel"
+    private val TAG = "TopicsViewModel"
 
     private val context: Context
         get() = BaseApplication.getInstance()
@@ -132,12 +134,15 @@ class TopicsViewModel @Inject constructor(
             _bookmarks.value = bookmarkedLevels
             val _images: Deferred<MutableList<Bitmap>> = async {
                 val bitmaps = mutableListOf<Bitmap>()
-                _bookmarks.value.forEach { bookmark ->
-                    bookmark?.LEVEL_PK?.let { bk -> localServiceImpl.selectImage(bk) }
-                        ?.let { bitmap -> bitmaps.add(bitmap) }
-                }
+                 _bookmarks.value.forEach { bookmark ->
+                     bookmark?.LEVEL_PK?.let { bk ->
+                         localServiceImpl.selectItem(bk)?.image?.let {
+                                 bitmaps.add(Converters().getBitmapFromByteArray(it))
+                             }
+                         }
+                     }
                 return@async bitmaps
-            }
+                 }
             val images = _images.await()
             _bookmarkImages.value = images
         }

@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.livingtechusa.reflexion.data.ReflexionDatabase
 import com.livingtechusa.reflexion.data.dao.ReflexionItemDao
 import com.livingtechusa.reflexion.data.dao.BookMarksDao
+import com.livingtechusa.reflexion.data.dao.ImagesDao
 import com.livingtechusa.reflexion.data.dao.LinkedListDao
 import com.livingtechusa.reflexion.util.Constants
 import dagger.Module
@@ -29,6 +30,11 @@ class DatabaseModule {
     @Provides
     fun provideLinkedListDao(reflexionDatabase: ReflexionDatabase): LinkedListDao {
         return reflexionDatabase.linkedListDao()
+    }
+
+    @Provides
+    fun provideImagesDao(reflexionDatabase: ReflexionDatabase): ImagesDao {
+        return reflexionDatabase.imagesDao()
     }
 
     @Provides

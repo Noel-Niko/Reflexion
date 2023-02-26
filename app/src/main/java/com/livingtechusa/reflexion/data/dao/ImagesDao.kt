@@ -4,12 +4,13 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.livingtechusa.reflexion.data.entities.Image
 
 
 @Dao
 interface ImagesDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertImage(image: ByteArray): Long
+    suspend fun insertImage(image: Image): Long
 
     @Query("Select image FROM Image WHERE imagePk = :imagePk")
     suspend fun selectImageByPK(imagePk: Long): ByteArray
@@ -28,5 +29,4 @@ interface ImagesDao {
 
     @Query("DELETE from Image WHERE imagePk = :imagePk AND useCount = 0")
     suspend fun setDeleteImageIfUnused(imagePk: Long)
-
 }
