@@ -23,6 +23,7 @@ import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK_STRING
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
+import com.livingtechusa.reflexion.util.Constants.NULL
 import com.livingtechusa.reflexion.util.scopedStorageUtils.FileResource
 import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
 import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil.resource
@@ -433,7 +434,7 @@ class CustomListsViewModel @Inject constructor(
                     if (topic == EMPTY_PK || newList) {
                         if (itemPk != null) {
                             // Set the topic
-                            topic = getTopic(itemPk.toLong()) ?: itemPk.toLong()
+                            topic = getTopic(itemPk.toLong())
                             // Add the first list item
                             addItemToList(itemPk)
                             newList = false
@@ -486,27 +487,24 @@ class CustomListsViewModel @Inject constructor(
 
     fun selectParentItem(itemPk: String?) {
         // Ignore the empty Topic label
-        if (itemPk.isNullOrEmpty().not() && itemPk.equals(EMPTY_PK_STRING)
-                .not() && itemPk.equals("null").not()
+        if (itemPk != null && itemPk != EMPTY_STRING && (itemPk == EMPTY_PK_STRING).not() && (itemPk == NULL).not()
         ) {
             viewModelScope.launch() {
-                withContext(Dispatchers.IO) {
+                withContext(Dispatchers.Main) {
                     // First item selected in new topic in new list. Set Topic, and add selection and load topic lists
                     if (topic == EMPTY_PK || newList) {
-                        if (itemPk != null) {
                             // Set the topic
-                            topic = getTopic(itemPk.toLong()) ?: itemPk.toLong()
+                            topic = getTopic(itemPk.toLong())
                             // Add the first list item
                             setParent(itemPk)
                             newList = false
                             val newList =
                                 async { localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic) }
                             _listOfLists.value = newList.await()
-                        }
 
                         // A new topic item has been selected, create new list with selected first item, and load related lists.
-                    } else if (itemPk?.toLong()?.let { getTopic(it) } != topic) {
-                        topic = itemPk?.toLong()?.let { getTopic(it) } ?: EMPTY_PK
+                    } else if (getTopic(itemPk.toLong()) != topic) {
+                        topic = itemPk.toLong().let { getTopic(it) }
                         // Reset the UI with the new list item
                         withContext(Dispatchers.Main) { _customList.value = emptyRai }
                         setParent(itemPk)
@@ -523,23 +521,33 @@ class CustomListsViewModel @Inject constructor(
                         setParent(itemPk)
                     }
                 }
-                Toast.makeText(
-                    context,
-                    buildString {
-                        append(resource.getString(R.string.setting_as_the_new_parent))
-                        append(selectedParent.value.name)
-                    },
-                    Toast.LENGTH_SHORT
-                ).show()
             }
+        } else {
+            Toast.makeText(
+                context,
+               context.getString(R.string.an_error_occurred_please_try_again),
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
-    private fun setParent(itemPk: String?){
-        viewModelScope.launch {
-            val pk = itemPk?.toLong()
-            if (pk != null) {
-                _selectedParent.value = localServiceImpl.selectItem(itemPk.toLong()) ?: ReflexionItem()
+    private fun setParent(itemPk: String){
+        viewModelScope.launch(Dispatchers.Main) {
+            val selectedItem = localServiceImpl.selectItem(itemPk.toLong())
+            if (selectedItem != null) {
+                _selectedParent.value = selectedItem
+                val parent = selectedParent.value.name
+                    Toast.makeText(
+                    context,
+                   "Setting $parent as the new parent.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.an_error_occurred_please_try_again),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }

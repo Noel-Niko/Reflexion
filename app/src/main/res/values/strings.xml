@@ -92,4 +92,5 @@
     <string name="setting_as_the_new_parent">"Setting as the new parent: "</string>
     <string name="saving_as_the_new_parent">"Saving as the new parent: "</string>
     <string name="changing_an_item_s_parent_will_also_move_any_of_the_item_s_children">Changing an item\'s parent will also move any of the item\'s children.</string>
+    <string name="an_error_occurred_please_try_again">An Error occurred, please try again.</string>
 </resources>
