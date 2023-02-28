@@ -13,7 +13,7 @@ interface ILocalService {
     suspend fun updateReflexionItem(item: ReflexionItem)
     suspend fun getAllItems(): List<ReflexionItem?>
     suspend fun selectItem(autogenPK: Long): ReflexionItem?
-    suspend fun deleteReflexionItem(autogenPK: Long, name: String)
+    suspend fun deleteReflexionItem(autogenPK: Long, name: String, imagePk: Long?)
     suspend fun renameItem(autogenPK: Long, name: String, newName: String)
     suspend fun setItemParent(autogenPK: Long, name: String, newParent: Long)
     suspend fun selectReflexionItemByName(name: String): ReflexionItem
@@ -61,4 +61,5 @@ interface ILocalService {
     suspend fun searchBookmarksByTitle(text: String): List<Bookmarks?>
     suspend fun selectLevelBookMarks(): List<Bookmarks?>
     suspend fun selectBookmarkByLevelPK(levelPk: Long?): Bookmarks?
+    suspend fun setDecreaseImageUse(imagePk: Long?): Boolean
 }

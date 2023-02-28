@@ -59,6 +59,8 @@ class LocalServiceImpl @Inject constructor(
         var addedToExisting = false
         if (item.imagePk != null) {
             imagesDao.setDecreaseCount(item.imagePk!!)
+        } else {
+            imagesDao.deleteUnusedImages()
         }
         var imagePk = 0L
         if (item.image != null) {
@@ -67,10 +69,12 @@ class LocalServiceImpl @Inject constructor(
                 addedToExisting = true
                 imagePk = existingImage
             } else {
-                val _imagePk = CoroutineScope(Dispatchers.IO).async {
-                    imagesDao.insertImage(Image(imagePk = 0L, image = item.image, useCount = 1))
+                if (item.image != null) {
+                    val _imagePk = CoroutineScope(Dispatchers.IO).async {
+                        imagesDao.insertImage(Image(imagePk = 0L, image = item.image!!, useCount = 1))
+                    }
+                    imagePk = _imagePk.await()
                 }
-                imagePk = _imagePk.await()
             }
         }
 
@@ -129,8 +133,11 @@ class LocalServiceImpl @Inject constructor(
         return reflexionItemDao.selectReflexionItem(autogenPK)
     }
 
-    override suspend fun deleteReflexionItem(autogenPK: Long, name: String) {
-
+    override suspend fun deleteReflexionItem(autogenPK: Long, name: String, imagePk: Long?) {
+        if (imagePk != null) {
+            imagesDao.setDecreaseCount(imagePk = imagePk)
+        }
+        imagesDao.deleteUnusedImages()
         reflexionItemDao.deleteReflexionItem(autogenPK, name)
     }
 
@@ -279,6 +286,17 @@ class LocalServiceImpl @Inject constructor(
 
     override suspend fun selectBookmarkByLevelPK(levelPk: Long?): Bookmarks? {
         return bookMarksDao.selectBookmarkByLevelPK(levelPk)
+    }
+
+    override suspend fun setDecreaseImageUse(imagePk: Long?): Boolean {
+        if (imagePk != null) {
+            if(imagesDao.getUseCount(imagePk = imagePk) >= 1) {
+                imagesDao.setDecreaseCount(imagePk = imagePk)
+            } else {
+                imagesDao.deleteImage(imagePk = imagePk)
+            }
+        }
+        return true
     }
 
     override suspend fun deleteAllChildNodes(nodePk: Long) {

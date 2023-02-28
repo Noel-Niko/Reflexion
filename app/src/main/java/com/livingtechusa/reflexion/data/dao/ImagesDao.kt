@@ -29,4 +29,12 @@ interface ImagesDao {
 
     @Query("DELETE from Image WHERE imagePk = :imagePk AND useCount = 0")
     suspend fun setDeleteImageIfUnused(imagePk: Long)
+
+    @Query("DELETE from Image WHERE useCount = 0")
+    suspend fun deleteUnusedImages()
+    @Query("SELECT useCount from Image WHERE imagePk = :imagePk")
+    suspend fun getUseCount(imagePk: Long): Int
+
+    @Query("DELETE from Image WHERE imagePk =:imagePk")
+    suspend fun deleteImage(imagePk: Long)
 }

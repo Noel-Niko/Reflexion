@@ -87,7 +87,7 @@ fun BuildItemContent(
     val name by viewModel.name.collectAsState()
     val description by viewModel.description.collectAsState()
     val detailedDescription by viewModel.detailedDescription.collectAsState()
-    val image by viewModel.image.collectAsStateWithLifecycle()
+    val image by viewModel.image.collectAsState()
     val videoUri by viewModel.videoUri.collectAsState()
     val videoUrl by viewModel.videoUrl.collectAsState()
     val parent by viewModel.parent.collectAsState()
