@@ -54,6 +54,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.R
+import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.components.ImageCard
 import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
@@ -163,12 +164,8 @@ fun BuildItemContent(
     ) {
         targetImageUri?.let { uri ->
             targetImageUri = null
-            val newVal =
-                MediaStoreUtils.uriToByteArray(uri, context = context) ?: emptyArray<Byte>()
             viewModel.onTriggerEvent(
-                BuildEvent.UpdateDisplayedReflexionItem(
-                    subItem = IMAGE, newVal = newVal
-                )
+                BuildEvent.CreateThumbnailImage(uri)
             )
         }
     }

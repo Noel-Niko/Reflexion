@@ -236,11 +236,7 @@ class BuildItemViewModel @Inject constructor(
                             }
 
                             IMAGE -> {
-                                _image.value = event.newVal.let {
-                                    Converters().getBitmapFromByteArray(
-                                        it as ByteArray
-                                    )
-                                }
+                                _image.value = event.newVal as Bitmap
                             }
 
                             VIDEO_URI -> {
@@ -266,6 +262,7 @@ class BuildItemViewModel @Inject constructor(
                                     _reflexionItemState.value = _reflexionItem
 
                                 }
+
                                 DO_NOT_UPDATE -> {}
                                 else -> {
                                     _reflexionItem =

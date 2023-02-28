@@ -67,8 +67,10 @@ class LocalServiceImpl @Inject constructor(
                 addedToExisting = true
                 imagePk = existingImage
             } else {
-                imagePk =
-                    imagesDao.insertImage(Image(imagePk = 0L, image = item.image!!, useCount = 1))
+                val _imagePk = CoroutineScope(Dispatchers.IO).async {
+                    imagesDao.insertImage(Image(imagePk = 0L, image = item.image, useCount = 1))
+                }
+                imagePk = _imagePk.await()
             }
         }
 
