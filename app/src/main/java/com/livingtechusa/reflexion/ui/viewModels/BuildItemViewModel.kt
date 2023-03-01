@@ -146,9 +146,10 @@ class BuildItemViewModel @Inject constructor(
                                     videoUrl = videoUrl.value,
                                     parent = parent.value
                                 )
+                                val priorImagePk = _reflexionItem.imagePk
                                 _reflexionItem = updates
                                 _reflexionItemState.value = updates
-                                localServiceImpl.updateReflexionItem(updates)
+                                localServiceImpl.updateReflexionItem(updates, priorImagePk)
                             }
                         }
                     }
@@ -173,8 +174,13 @@ class BuildItemViewModel @Inject constructor(
                                 }
 
                                 IMAGE -> {
-                                    val _deleted = async { localServiceImpl.setDecreaseImageUse(_reflexionItem.imagePk) }
-                                    val deleted = _deleted.await()
+                                    val job = launch {
+                                        val _deleted = async {
+                                            localServiceImpl.setDecreaseImageUse(_reflexionItem.imagePk)
+                                        }
+                                        val deleted = _deleted.await()
+                                    }
+                                    job.join()
                                     updatedReflexionItem.image = null
                                     updatedReflexionItem.imagePk = null
                                         _image.value = null
@@ -197,7 +203,7 @@ class BuildItemViewModel @Inject constructor(
                             }
                             _reflexionItem = updatedReflexionItem
                             _reflexionItemState.value = updatedReflexionItem
-                            localServiceImpl.updateReflexionItem(reflexionItem)
+                            localServiceImpl.updateReflexionItem(reflexionItem, null)
                         }
                     }
 

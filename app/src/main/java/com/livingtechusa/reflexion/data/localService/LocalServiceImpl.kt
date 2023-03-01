@@ -55,7 +55,10 @@ class LocalServiceImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateReflexionItem(item: ReflexionItem) {
+    override suspend fun updateReflexionItem(item: ReflexionItem, priorImagePk: Long?) {
+        if(priorImagePk != null) {
+            imagesDao.setDecreaseCount(imagePk = priorImagePk)
+        }
         var addedToExisting = false
         if (item.imagePk != null) {
             imagesDao.setDecreaseCount(item.imagePk!!)

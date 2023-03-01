@@ -10,7 +10,7 @@ import com.livingtechusa.reflexion.data.models.ReflexionArrayItem
 interface ILocalService {
     // REFLEXION ITEMS
     suspend fun savedNewItem(item: ReflexionItem)
-    suspend fun updateReflexionItem(item: ReflexionItem)
+    suspend fun updateReflexionItem(item: ReflexionItem, priorImagePk: Long?)
     suspend fun getAllItems(): List<ReflexionItem?>
     suspend fun selectItem(autogenPK: Long): ReflexionItem?
     suspend fun deleteReflexionItem(autogenPK: Long, name: String, imagePk: Long?)
