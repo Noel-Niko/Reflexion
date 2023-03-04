@@ -1,6 +1,5 @@
 package com.livingtechusa.reflexion.ui.bookmarks
 
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -31,7 +30,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -41,7 +39,6 @@ import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.viewModels.BookmarksViewModel
 import com.livingtechusa.reflexion.util.Constants
-import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 
 
 @Composable
@@ -78,7 +75,7 @@ fun ReflexionItemListUIForBookmarks(
                     ReflexionItemsContent(
                         reflexionItems = reflexionItemList,
                         onTap = { reflexionItem ->
-                            navController.navigate(route = Screen.BuildItemScreen.route + "/" + reflexionItem.autogenPK) {
+                            navController.navigate(route = Screen.BuildItemScreen.route + "/" + reflexionItem.autogenPk) {
                                 launchSingleTop = true
                             }
                         },
@@ -156,8 +153,7 @@ fun ReflexionItemListUIForBookmarks(
                                         }
                                         androidx.compose.material3.Text(
                                             color = MaterialTheme.colorScheme.onPrimary,
-                                            text = listOfLists[index]?.title
-                                                ?: Constants.NO_LISTS,
+                                            text = listOfLists[index].title,
                                             modifier = Modifier
                                                 .padding(16.dp)
                                                 .fillMaxWidth(),
@@ -214,7 +210,7 @@ private fun ReflexionItemsContent(
                         .pointerInput(key1 = reflexionItem) {
                             detectTapGestures(
                                 onTap = { onTap(reflexionItem) },
-                                onDoubleTap = { onDoubleTap(reflexionItem.autogenPK) }
+                                onDoubleTap = { onDoubleTap(reflexionItem.autogenPk) }
                             )
                         },
                     elevation = 6.dp,

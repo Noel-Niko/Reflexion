@@ -3,7 +3,6 @@ package com.livingtechusa.reflexion.data.entities
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import org.checkerframework.common.aliasing.qual.Unique
 
 @Entity(
     tableName = "Image",

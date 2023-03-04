@@ -5,7 +5,8 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "ItemImageAssociativeData"
+    tableName = "ItemImageAssociativeData",
+    indices = [Index(value = ["imagePk"])],
 )
 data class ItemImageAssociativeData(
     @PrimaryKey

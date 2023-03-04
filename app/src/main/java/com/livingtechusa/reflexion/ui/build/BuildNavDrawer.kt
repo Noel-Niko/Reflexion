@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun drawerNavContent(
+fun DrawerNavContent(
     navHostController: NavHostController,
     viewModel: BuildItemViewModel,
     reflexionItem: ReflexionItem,
@@ -73,7 +73,7 @@ fun drawerNavContent(
                         scope.launch {
                             val hasNoSiblings =
                                 viewModel.hasNoSiblings(
-                                    reflexionItem.autogenPK,
+                                    reflexionItem.autogenPk,
                                     reflexionItem.parent ?: 0L
                                 )
                             if (reflexionItem.parent != null || hasNoSiblings.not()) {
@@ -101,7 +101,7 @@ fun drawerNavContent(
                     modifier = Modifier.clickable(onClick = {
                         scope.launch {
                             val hasNoChildren =
-                                viewModel.hasNoChildren(reflexionItem.autogenPK)
+                                viewModel.hasNoChildren(reflexionItem.autogenPk)
                             if (hasNoChildren) {
                                 Toast.makeText(
                                     context,
@@ -110,7 +110,7 @@ fun drawerNavContent(
                                 ).show()
 
                             } else {
-                                navHostController.navigate(Screen.TopicScreen.route + "/" + reflexionItem.autogenPK) {
+                                navHostController.navigate(Screen.TopicScreen.route + "/" + reflexionItem.autogenPk) {
                                     popUpTo(navHostController.graph.findStartDestination().id) { }
                                     launchSingleTop = true
                                 }
@@ -149,7 +149,7 @@ fun drawerNavContent(
                 /* ADD CHILD */
                 Text(
                     modifier = Modifier.clickable(onClick = {
-                        val parent = reflexionItem.autogenPK
+                        val parent = reflexionItem.autogenPk
                         viewModel.onTriggerEvent(BuildEvent.ClearReflexionItem)
                         viewModel.onTriggerEvent(BuildEvent.SetParent(parent))
                         scope.launch {
@@ -166,7 +166,7 @@ fun drawerNavContent(
                     modifier = Modifier.clickable(onClick = {
                         scope.launch {
                             val noChildren =
-                                viewModel.hasNoChildren(reflexionItem.autogenPK)
+                                viewModel.hasNoChildren(reflexionItem.autogenPk)
                             if (noChildren) {
                                 viewModel.onTriggerEvent(BuildEvent.Delete)
                                 scaffoldState.drawerState.close()

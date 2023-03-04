@@ -27,7 +27,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -43,10 +42,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
+import com.livingtechusa.reflexion.data.models.ReflexionArrayItem
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.util.Constants.NO_LISTS
-import com.livingtechusa.reflexion.data.models.ReflexionArrayItem
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,10 +94,6 @@ fun CustomListContent(
                                     .fillMaxWidth(),
                                 textStyle = MaterialTheme.typography.headlineMedium,
                                 value = customList.itemName.toString(),
-                                colors = TextFieldDefaults.textFieldColors(
-                                    textColor = MaterialTheme.colorScheme.onPrimary,
-                                    containerColor = MaterialTheme.colorScheme.primary
-                                ),
                                 onValueChange = {
                                     viewModel.onTriggerEvent(
                                         CustomListEvent.UpdateListName(

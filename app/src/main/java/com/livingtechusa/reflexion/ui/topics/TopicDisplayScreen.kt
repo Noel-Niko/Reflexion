@@ -68,13 +68,13 @@ fun ReflexionItemListUI(
                     ReflexionItemsContent(
                         reflexionItems = reflexionItemList,
                         onTap = { reflexionItem ->
-                            navController.navigate(route = Screen.BuildItemScreen.route + "/" + reflexionItem.autogenPK) {
+                            navController.navigate(route = Screen.BuildItemScreen.route + "/" + reflexionItem.autogenPk) {
                                 launchSingleTop = true
                             }
                         },
                         onLongPress = { reflexionItem ->
                             CoroutineScope(Dispatchers.Main).launch {
-                                if (viewModel.hasNoChildren(reflexionItem.autogenPK)) {
+                                if (viewModel.hasNoChildren(reflexionItem.autogenPk)) {
                                     Toast.makeText(
                                         context,
                                         resource.getString(R.string.no_child_items_found),
@@ -84,7 +84,7 @@ fun ReflexionItemListUI(
                                 } else {
                                     viewModel.onTriggerEvent(
                                         TopicItemEvent.GetTopicItem(
-                                            reflexionItem.autogenPK
+                                            reflexionItem.autogenPk
                                         )
                                     )
                                 }
