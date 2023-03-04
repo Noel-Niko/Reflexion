@@ -2,7 +2,6 @@ package com.livingtechusa.reflexion.ui.components
 
 import android.widget.Toast
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,16 +21,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.twotone.Lan
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -57,7 +53,6 @@ import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
-import dagger.hilt.android.lifecycle.HiltViewModel
 
 const val SELECT_PARENT = "SelectParentDialog"
 
@@ -188,9 +183,6 @@ fun ParentSelectUI(
                             }
                         )
                     },
-                    colors = TextFieldDefaults.textFieldColors(
-                        textColor = MaterialTheme.colorScheme.primary
-                    )
                 )
             }
             Row(Modifier.fillMaxWidth()) {

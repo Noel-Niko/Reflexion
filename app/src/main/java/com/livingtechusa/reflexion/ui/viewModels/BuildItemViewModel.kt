@@ -132,7 +132,7 @@ class BuildItemViewModel @Inject constructor(
                         viewModelScope.launch() {
                             withContext(Dispatchers.IO) {
                                 val updates = ReflexionItem(
-                                    autogenPK = autogenPK.value,
+                                    autogenPk = autogenPK.value,
                                     name = name.value,
                                     description = description.value,
                                     detailedDescription = detailedDescription.value,
@@ -174,7 +174,7 @@ class BuildItemViewModel @Inject constructor(
 
                                 IMAGE -> {
                                     val job = launch {
-                                        reflexionItemState.value.imagePk?.let { imageKey -> localServiceImpl.deleteImageAndAssociation(imagePk = imageKey, itemPk = reflexionItem.autogenPK) }
+                                        reflexionItemState.value.imagePk?.let { imageKey -> localServiceImpl.deleteImageAndAssociation(imagePk = imageKey, itemPk = reflexionItem.autogenPk) }
                                     }
                                     job.join()
                                     updatedReflexionItem.image = null
@@ -206,7 +206,7 @@ class BuildItemViewModel @Inject constructor(
                     is BuildEvent.SaveNew -> {
                         viewModelScope.launch {
                             val newItem = ReflexionItem(
-                                autogenPK = autogenPK.value,
+                                autogenPk = autogenPK.value,
                                 name = name.value,
                                 description = description.value,
                                 detailedDescription = detailedDescription.value,
@@ -223,7 +223,7 @@ class BuildItemViewModel @Inject constructor(
 
                             _reflexionItem = localServiceImpl.selectItem(localServiceImpl.saveNewItem(newItem)) ?: ReflexionItem()
                             _reflexionItemState.value = _reflexionItem
-                            _autogenPK.value = _reflexionItem.autogenPK
+                            _autogenPK.value = _reflexionItem.autogenPk
                         }
                     }
 
@@ -284,7 +284,7 @@ class BuildItemViewModel @Inject constructor(
                     is BuildEvent.Delete -> {
                         viewModelScope.launch {
                             localServiceImpl.deleteReflexionItem(
-                                _reflexionItem.autogenPK,
+                                _reflexionItem.autogenPk,
                                 _reflexionItem.name,
                                 _reflexionItem.imagePk
                             )
@@ -304,7 +304,7 @@ class BuildItemViewModel @Inject constructor(
                     is BuildEvent.SetParent -> {
                         viewModelScope.launch {
                             val parent = localServiceImpl.selectItem(event.parent)
-                            val item = ReflexionItem(parent = parent?.autogenPK, imagePk = parent?.imagePk)
+                            val item = ReflexionItem(parent = parent?.autogenPk, imagePk = parent?.imagePk)
                             item.image = Converters().getByteArrayFromBitmap(parent?.imagePk?.let { parentImagePk ->
                                 localServiceImpl.selectImage(
                                     parentImagePk
@@ -319,7 +319,7 @@ class BuildItemViewModel @Inject constructor(
                     is BuildEvent.SetSelectedParent -> {
                         viewModelScope.launch {
                             val item = _reflexionItem
-                            item.parent = event.parent.autogenPK
+                            item.parent = event.parent.autogenPk
                             item.image = event.parent.image
                             _reflexionItem = item
                             _reflexionItemState.value = _reflexionItem
@@ -432,7 +432,7 @@ class BuildItemViewModel @Inject constructor(
     }
 
     private fun resetAllDisplayedSubItemsToDBVersion() {
-        _autogenPK.value = reflexionItem.autogenPK
+        _autogenPK.value = reflexionItem.autogenPk
         _name.value = reflexionItem.name
         _description.value = reflexionItem.description ?: EMPTY_STRING
         _detailedDescription.value = reflexionItem.detailedDescription ?: EMPTY_STRING

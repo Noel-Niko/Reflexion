@@ -2,9 +2,9 @@ package com.livingtechusa.reflexion.data
 
 import com.livingtechusa.reflexion.data.entities.ListNode
 import com.livingtechusa.reflexion.data.models.AbridgedReflexionItem
+import com.livingtechusa.reflexion.data.models.ReflexionArrayItem
 import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
-import com.livingtechusa.reflexion.data.models.ReflexionArrayItem
 
 fun ReflexionArrayItem.toListNode(topic: Long?, headNodePk: Long?): List<ListNode?> {
     val list = mutableListOf<ListNode>()
@@ -28,7 +28,7 @@ fun ReflexionArrayItem.toListNode(topic: Long?, headNodePk: Long?): List<ListNod
 
 fun ReflexionArrayItem.toAListNode(topic: Long?, parentPk: Long?): ListNode {
     var child: Long? = null
-    if(children.isNullOrEmpty().not() && children.get(0).itemPK != null) {
+    if(children.isEmpty().not() && children.get(0).itemPK != null) {
         child = children.get(0).itemPK
     }
     return ListNode(
@@ -43,8 +43,8 @@ fun ReflexionArrayItem.toAListNode(topic: Long?, parentPk: Long?): ListNode {
 
 fun AbridgedReflexionItem.toReflexionArrayItem() =
     ReflexionArrayItem(
-        itemPK = autogenPK ?: 0L,
-        itemName = name ?: Constants.EMPTY_STRING,
+        itemPK = autogenPk,
+        itemName = name,
         nodePk = 0L,
         children = mutableListOf()
     )

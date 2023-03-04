@@ -9,7 +9,6 @@ import androidx.lifecycle.viewModelScope
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.entities.Bookmarks
-import com.livingtechusa.reflexion.data.entities.TypeConverters
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.di.DefaultDispatcher
@@ -164,16 +163,16 @@ class TopicsViewModel @Inject constructor(
     fun bookmark() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val parent = localServiceImpl.selectParent(list.value[0].autogenPK)
+                val parent = localServiceImpl.selectParent(list.value[0].autogenPk)
                 val item = parent?.let { localServiceImpl.selectItem(it) }
-                val selectBkMkByLevelPK = localServiceImpl.selectBookmarkByLevelPK(item?.autogenPK)
+                val selectBkMkByLevelPK = localServiceImpl.selectBookmarkByLevelPK(item?.autogenPk)
                 if (selectBkMkByLevelPK == null) {
                     localServiceImpl.setBookMarks(
                         Bookmarks(
                             autoGenPk = 0L,
                             ITEM_PK = null,
                             LIST_PK = null,
-                            LEVEL_PK = item?.autogenPK,
+                            LEVEL_PK = item?.autogenPk,
                             title = item?.name ?: EMPTY_STRING
                         )
                     )

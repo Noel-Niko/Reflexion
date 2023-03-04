@@ -40,10 +40,10 @@ class LocalServiceImpl @Inject constructor(
         val itemPk = reflexionItemDao.setReflexionItem(item)
         var newImagePk: Long? = null
         if (item.imagePk == null || (item.image != null && item.image?.isNotEmpty() == true)) {
-            val itemWithPk = item.copy(autogenPK = itemPk)
+            val itemWithPk = item.copy(autogenPk = itemPk)
             newImagePk = linkSavedOrAddNewImageAndAssociation(itemWithPk)
         }
-        val saveItem = item.copy(autogenPK = itemPk, imagePk = newImagePk ?: item.imagePk, image = null)
+        val saveItem = item.copy(autogenPk = itemPk, imagePk = newImagePk ?: item.imagePk, image = null)
         return reflexionItemDao.setReflexionItem(saveItem)
     }
 
@@ -56,7 +56,7 @@ class LocalServiceImpl @Inject constructor(
                 if (existingImage != null) {
                      imagesDao.insertImageAssociation(
                         ItemImageAssociativeData(
-                            itemPk = item.autogenPK,
+                            itemPk = item.autogenPk,
                             imagePk = existingImage
                         )
                     )
@@ -68,19 +68,20 @@ class LocalServiceImpl @Inject constructor(
                         // Record Association
                         imagesDao.insertImageAssociation(
                             ItemImageAssociativeData(
-                                itemPk = item.autogenPK,
+                                itemPk = item.autogenPk,
                                 imagePk = newImage
                             )
                         )
                         pkofImage = newImage
                     }
                 }
+                imagesDao.deleteUnusedImages()
                 return@async pkofImage
             } else {
                 return@async null
             }
         }
-        return _imagePk.await() as Long?
+        return _imagePk.await()
     }
 
     override suspend fun updateReflexionItem(item: ReflexionItem, priorImagePk: Long?) {
@@ -97,7 +98,7 @@ class LocalServiceImpl @Inject constructor(
         }
 
         reflexionItemDao.updateReflexionItem(
-            item.autogenPK,
+            item.autogenPk,
             item.name,
             item.description,
             item.detailedDescription,
@@ -180,7 +181,7 @@ class LocalServiceImpl @Inject constructor(
             val result: MutableList<ReflexionArrayItem> = mutableListOf()
             reflexionItemDao.getAbridgedReflexionItemTopics().forEach() {
                 val Rai = ReflexionArrayItem(
-                    itemPK = it?.autogenPK ?: 0L,
+                    itemPK = it?.autogenPk ?: 0L,
                     itemName = it?.name ?: EMPTY_STRING,
                     nodePk = 0L,
                     children = mutableListOf()
@@ -193,7 +194,7 @@ class LocalServiceImpl @Inject constructor(
             reflexionItemDao.selectAbridgedReflexionItemDataByParentPk(pk).forEach() {
                 val Rai =
                     ReflexionArrayItem(
-                        itemPK = it?.autogenPK ?: 0L,
+                        itemPK = it?.autogenPk ?: 0L,
                         itemName = it?.name ?: EMPTY_STRING,
                         nodePk = 0L,
                         children = mutableListOf()

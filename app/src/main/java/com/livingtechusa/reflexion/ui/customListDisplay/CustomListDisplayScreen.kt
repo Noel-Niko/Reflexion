@@ -162,7 +162,7 @@ fun CustomListDisplayContent(
                         .padding(16.dp)
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                         .clickable {
-                                   navController.navigate(Screen.BuildItemScreen.route + "/" + children[childItemIndex].autogenPK)
+                                   navController.navigate(Screen.BuildItemScreen.route + "/" + children[childItemIndex].autogenPk)
                         },
 
                     elevation = 6.dp,
