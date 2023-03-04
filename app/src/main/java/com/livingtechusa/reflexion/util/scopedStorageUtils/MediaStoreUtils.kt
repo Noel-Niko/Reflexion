@@ -370,7 +370,7 @@ fun readAllBytes(inputStream: InputStream): ByteArray? {
 
 
     @Throws(Throwable::class)
-    fun retriveVideoFrameFromVideo(videoPath: String?): Bitmap? {
+    fun retrieveVideoFrameFromVideo(videoPath: String?): Bitmap? {
         var bitmap: Bitmap? = null
         var mediaMetadataRetriever: MediaMetadataRetriever? = null
         try {

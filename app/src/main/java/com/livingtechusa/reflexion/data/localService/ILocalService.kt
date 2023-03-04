@@ -9,11 +9,11 @@ import com.livingtechusa.reflexion.data.models.ReflexionArrayItem
 
 interface ILocalService {
     // REFLEXION ITEMS
-    suspend fun savedNewItem(item: ReflexionItem)
-    suspend fun updateReflexionItem(item: ReflexionItem)
+    suspend fun saveNewItem(item: ReflexionItem): Long
+    suspend fun updateReflexionItem(item: ReflexionItem, priorImagePk: Long?)
     suspend fun getAllItems(): List<ReflexionItem?>
     suspend fun selectItem(autogenPK: Long): ReflexionItem?
-    suspend fun deleteReflexionItem(autogenPK: Long, name: String)
+    suspend fun deleteReflexionItem(autogenPK: Long, name: String, imagePk: Long?)
     suspend fun renameItem(autogenPK: Long, name: String, newName: String)
     suspend fun setItemParent(autogenPK: Long, name: String, newParent: Long)
     suspend fun selectReflexionItemByName(name: String): ReflexionItem
@@ -26,6 +26,9 @@ interface ILocalService {
     suspend fun selectSiblings(pk: Long, parent: Long): List<ReflexionItem?>
     suspend fun selectAllSiblings(parent: Long): List<ReflexionItem?>
     suspend fun selectParent(pk: Long): Long?
+
+    // IMAGES AND ASSOCIATIONS
+    suspend fun deleteImageAndAssociation(imagePk: Long, itemPk: Long)
 
     // ABRIDGED REFLEXION ITEMS
     suspend fun selectAbridgedReflexionItemDataByParentPk(pk: Long?): List<AbridgedReflexionItem?>

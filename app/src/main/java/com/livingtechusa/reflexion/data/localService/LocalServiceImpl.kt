@@ -8,6 +8,7 @@ import com.livingtechusa.reflexion.data.dao.LinkedListDao
 import com.livingtechusa.reflexion.data.dao.ReflexionItemDao
 import com.livingtechusa.reflexion.data.entities.Bookmarks
 import com.livingtechusa.reflexion.data.entities.Image
+import com.livingtechusa.reflexion.data.entities.ItemImageAssociativeData
 import com.livingtechusa.reflexion.data.entities.ListNode
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.models.AbridgedReflexionItem
@@ -35,41 +36,64 @@ class LocalServiceImpl @Inject constructor(
     }
 
     private val scope = CoroutineScope(Dispatchers.IO)
-    override suspend fun savedNewItem(item: ReflexionItem) {
-        var addedToExisting = false
-        var imagePk = 0L
-        if (item.image != null) {
-            val existingImage = item.image.let { imagesDao.selectImagePKByByteArray(item.image!!) }
-            if (existingImage != null) {
-                addedToExisting = true
-                imagePk = existingImage
-            } else {
-                imagePk =
-                    imagesDao.insertImage(Image(imagePk = 0L, image = item.image!!, useCount = 1))
-            }
+    override suspend fun saveNewItem(item: ReflexionItem): Long {
+        val itemPk = reflexionItemDao.setReflexionItem(item)
+        var newImagePk: Long? = null
+        if (item.imagePk == null || (item.image != null && item.image?.isNotEmpty() == true)) {
+            val itemWithPk = item.copy(autogenPK = itemPk)
+            newImagePk = linkSavedOrAddNewImageAndAssociation(itemWithPk)
         }
-        val saveItem = item.copy(imagePk = imagePk, image = null)
-        reflexionItemDao.setReflexionItem(saveItem)
-        if (addedToExisting) {
-            imagesDao.setIncreaseCount(imagePk)
-        }
+        val saveItem = item.copy(autogenPK = itemPk, imagePk = newImagePk ?: item.imagePk, image = null)
+        return reflexionItemDao.setReflexionItem(saveItem)
     }
 
-    override suspend fun updateReflexionItem(item: ReflexionItem) {
-        var addedToExisting = false
-        if (item.imagePk != null) {
-            imagesDao.setDecreaseCount(item.imagePk!!)
-        }
-        var imagePk = 0L
-        if (item.image != null) {
-            val existingImage = item.image.let { imagesDao.selectImagePKByByteArray(item.image!!) }
-            if (existingImage != null) {
-                addedToExisting = true
-                imagePk = existingImage
+    private suspend fun linkSavedOrAddNewImageAndAssociation(item: ReflexionItem): Long? {
+        val _imagePk = CoroutineScope(Dispatchers.IO).async {
+            var pkofImage: Long? = null
+            if (item.image != null) {
+                val existingImage =
+                    item.image.let { imagesDao.selectImagePKByByteArray(item.image!!) }
+                if (existingImage != null) {
+                     imagesDao.insertImageAssociation(
+                        ItemImageAssociativeData(
+                            itemPk = item.autogenPK,
+                            imagePk = existingImage
+                        )
+                    )
+                    pkofImage = existingImage
+                } else {
+                    if (item.image != null) {
+                        // Add to Images
+                        val newImage = imagesDao.insertImage(Image(imagePk = 0L, image = item.image!!))
+                        // Record Association
+                        imagesDao.insertImageAssociation(
+                            ItemImageAssociativeData(
+                                itemPk = item.autogenPK,
+                                imagePk = newImage
+                            )
+                        )
+                        pkofImage = newImage
+                    }
+                }
+                return@async pkofImage
             } else {
-                imagePk =
-                    imagesDao.insertImage(Image(imagePk = 0L, image = item.image!!, useCount = 1))
+                return@async null
             }
+        }
+        return _imagePk.await() as Long?
+    }
+
+    override suspend fun updateReflexionItem(item: ReflexionItem, priorImagePk: Long?) {
+        // Remove old association data if applicable
+        if (priorImagePk != item.imagePk) {
+            if (priorImagePk != null) {
+                imagesDao.removeImageAssociation(itemPk = priorImagePk)
+            }
+        }
+        // generate a new imagePk if applicable
+        var newImagePk: Long? = null
+        if (item.imagePk == null && item.image != null && item.image?.isNotEmpty() == true) {
+            newImagePk = linkSavedOrAddNewImageAndAssociation(item)
         }
 
         reflexionItemDao.updateReflexionItem(
@@ -77,14 +101,11 @@ class LocalServiceImpl @Inject constructor(
             item.name,
             item.description,
             item.detailedDescription,
-            imagePk,
+            newImagePk ?: item.imagePk,
             item.videoUri,
             item.videoUrl,
             item.parent
         )
-        if (addedToExisting) {
-            imagesDao.setIncreaseCount(imagePk)
-        }
     }
 
     override suspend fun getAllItems(): List<ReflexionItem?> {
@@ -127,8 +148,15 @@ class LocalServiceImpl @Inject constructor(
         return reflexionItemDao.selectReflexionItem(autogenPK)
     }
 
-    override suspend fun deleteReflexionItem(autogenPK: Long, name: String) {
-
+    override suspend fun deleteReflexionItem(autogenPK: Long, name: String, imagePk: Long?) {
+        if (imagePk != null) {
+            imagesDao.removeImageAssociation(itemPk = autogenPK)
+        }
+        imagesDao.deleteUnusedAssociations()
+        val imageUses = imagePk?.let { imagesDao.countImagePkUses(imagePk = it) }
+        if(imageUses != null && imageUses <= 1) {
+            imagesDao.deleteImage(imagePk = imagePk)
+        }
         reflexionItemDao.deleteReflexionItem(autogenPK, name)
     }
 
@@ -185,6 +213,12 @@ class LocalServiceImpl @Inject constructor(
 
     override suspend fun selectParent(pk: Long): Long? {
         return reflexionItemDao.getParent(pk)
+    }
+
+    override suspend fun deleteImageAndAssociation(imagePk: Long, itemPk: Long) {
+        imagesDao.removeImageAssociation(itemPk)
+        val useCount = imagesDao.getAssociationUseCount(itemPk)
+        if(useCount < 1) imagesDao.deleteImage(imagePk = imagePk)
     }
 
     override suspend fun insertNewOrUpdateNodeList(

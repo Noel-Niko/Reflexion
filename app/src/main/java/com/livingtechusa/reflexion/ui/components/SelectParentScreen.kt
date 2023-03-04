@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.twotone.Lan
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -56,6 +57,7 @@ import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
+import dagger.hilt.android.lifecycle.HiltViewModel
 
 const val SELECT_PARENT = "SelectParentDialog"
 
@@ -261,7 +263,7 @@ fun ParentSelectUI(
                                         .fillMaxWidth()
                                         .padding(4.dp)
                                         .clickable {
-                                            viewModel.selectItem(filteringOptions[it].itemPK.toString())
+                                            viewModel.selectParentItem(filteringOptions[it].itemPK.toString())
                                             searchText = Constants.EMPTY_STRING
                                         }
                                         .align(Alignment.CenterHorizontally),
@@ -273,7 +275,8 @@ fun ParentSelectUI(
                                             ?: stringResource(R.string.no_match_found),
                                         style = MaterialTheme.typography.headlineLarge,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.padding(16.dp, 2.dp)
+                                        modifier = Modifier
+                                            .padding(16.dp, 2.dp)
                                             .clickable {
                                                 viewModel.selectParentItem(filteringOptions[it].itemPK.toString())
                                             }
@@ -300,7 +303,7 @@ fun getItems(
     ) {
         icon(Icons.TwoTone.Lan)
         reflexionArrayItem.children.forEach { reflexionArrayItem ->
-            getItems(reflexionArrayItem, this) //, list)
+            getItems(reflexionArrayItem, this)
         }
     }
     return newBuilder

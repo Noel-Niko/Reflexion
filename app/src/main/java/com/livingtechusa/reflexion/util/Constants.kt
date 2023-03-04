@@ -27,9 +27,11 @@ object Constants {
     const val DESCRIPTION = "description"
     const val DETAILED_DESCRIPTION = "detailedDescription"
     const val IMAGE = "image"
+    const val IMAGEPK = "imagePk"
     const val VIDEO_URI = "videoUri"
     const val VIDEO_URL = "videoUrl"
     const val PARENT = "parent"
+    const val NULL = "null"
 
     // APP ICONS
     const val EYE_1 = R.mipmap.ic_launcher
