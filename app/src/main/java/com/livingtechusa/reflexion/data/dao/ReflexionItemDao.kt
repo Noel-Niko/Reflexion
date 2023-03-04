@@ -10,7 +10,7 @@ import com.livingtechusa.reflexion.data.models.AbridgedReflexionItem
 @Dao
 interface ReflexionItemDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun setReflexionItem(item: ReflexionItem)
+    suspend fun setReflexionItem(item: ReflexionItem): Long
 
     @Query("UPDATE ReflexionItem SET name = :name, description = :description, detailedDescription = :detailedDescription, imagePk = :imagePk, videoUri = :videoUri, videoUrl = :videoUrl, parent = :parent WHERE autogenPK = :autogenPK")
     suspend fun updateReflexionItem(autogenPK: Long , name: String, description: String?, detailedDescription: String?, imagePk: Long?, videoUri: String?, videoUrl: String?, parent: Long?)
@@ -21,7 +21,7 @@ interface ReflexionItemDao {
     @Query("Select ReflexionItem.autogenPK, ReflexionItem.name, ReflexionItem.description, ReflexionItem.detailedDescription, ReflexionItem.imagePk, ReflexionItem.videoUri, ReflexionItem.videoUrl, ReflexionItem.parent, Image.image  FROM ReflexionItem LEFT JOIN Image ON ReflexionItem.imagePk = Image.imagePk WHERE parent IS NULL ORDER BY name ASC")
     suspend fun getReflexionItemTopics(): List<ReflexionItem?>
 
-    @Query("Select ReflexionItem.autogenPK, ReflexionItem.name, ReflexionItem.description, ReflexionItem.detailedDescription, ReflexionItem.imagePk, ReflexionItem.videoUri, ReflexionItem.videoUrl, ReflexionItem.parent, Image.image  FROM ReflexionItem LEFT JOIN Image ON ReflexionItem.imagePk = Image.imagePk WHERE autogenPK = :autogenPK")
+    @Query("Select ReflexionItem.autogenPK as autogenPK, ReflexionItem.name as name, ReflexionItem.description as description, ReflexionItem.detailedDescription as detailedDescription, ReflexionItem.imagePk as imagePk, ReflexionItem.videoUri as videoUri, ReflexionItem.videoUrl as videoUrl, ReflexionItem.parent as parent, Image.image as image FROM ReflexionItem LEFT JOIN Image ON ReflexionItem.imagePk = Image.imagePk WHERE autogenPK = :autogenPK")
     suspend fun selectReflexionItem(autogenPK: Long): ReflexionItem?
 
     @Query("Delete FROM ReflexionItem WHERE autogenPK = :autogenPK AND name = :name")

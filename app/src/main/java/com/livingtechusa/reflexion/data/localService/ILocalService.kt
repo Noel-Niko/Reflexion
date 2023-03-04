@@ -9,7 +9,7 @@ import com.livingtechusa.reflexion.data.models.ReflexionArrayItem
 
 interface ILocalService {
     // REFLEXION ITEMS
-    suspend fun savedNewItem(item: ReflexionItem)
+    suspend fun saveNewItem(item: ReflexionItem): Long
     suspend fun updateReflexionItem(item: ReflexionItem, priorImagePk: Long?)
     suspend fun getAllItems(): List<ReflexionItem?>
     suspend fun selectItem(autogenPK: Long): ReflexionItem?
@@ -26,6 +26,9 @@ interface ILocalService {
     suspend fun selectSiblings(pk: Long, parent: Long): List<ReflexionItem?>
     suspend fun selectAllSiblings(parent: Long): List<ReflexionItem?>
     suspend fun selectParent(pk: Long): Long?
+
+    // IMAGES AND ASSOCIATIONS
+    suspend fun deleteImageAndAssociation(imagePk: Long, itemPk: Long)
 
     // ABRIDGED REFLEXION ITEMS
     suspend fun selectAbridgedReflexionItemDataByParentPk(pk: Long?): List<AbridgedReflexionItem?>
@@ -61,5 +64,4 @@ interface ILocalService {
     suspend fun searchBookmarksByTitle(text: String): List<Bookmarks?>
     suspend fun selectLevelBookMarks(): List<Bookmarks?>
     suspend fun selectBookmarkByLevelPK(levelPk: Long?): Bookmarks?
-    suspend fun setDecreaseImageUse(imagePk: Long?): Boolean
 }

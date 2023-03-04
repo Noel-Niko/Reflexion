@@ -12,8 +12,7 @@ import org.checkerframework.common.aliasing.qual.Unique
 data class Image(
     @PrimaryKey(autoGenerate = true)
     val imagePk: Long,
-    var image: ByteArray = ByteArray(0),
-    var useCount: Int = 0
+    var image: ByteArray = ByteArray(0)
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

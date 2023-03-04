@@ -24,7 +24,6 @@ import com.livingtechusa.reflexion.util.Constants.DO_NOT_UPDATE
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.IMAGE
-import com.livingtechusa.reflexion.util.Constants.IMAGEPK
 import com.livingtechusa.reflexion.util.Constants.NAME
 import com.livingtechusa.reflexion.util.Constants.PARENT
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URI
@@ -175,10 +174,7 @@ class BuildItemViewModel @Inject constructor(
 
                                 IMAGE -> {
                                     val job = launch {
-                                        val _deleted = async {
-                                            localServiceImpl.setDecreaseImageUse(_reflexionItem.imagePk)
-                                        }
-                                        val deleted = _deleted.await()
+                                        reflexionItemState.value.imagePk?.let { imageKey -> localServiceImpl.deleteImageAndAssociation(imagePk = imageKey, itemPk = reflexionItem.autogenPK) }
                                     }
                                     job.join()
                                     updatedReflexionItem.image = null
@@ -214,6 +210,7 @@ class BuildItemViewModel @Inject constructor(
                                 name = name.value,
                                 description = description.value,
                                 detailedDescription = detailedDescription.value,
+                                imagePk = reflexionItem.imagePk,
                                 image = image.value?.let {
                                     Converters().getByteArrayFromBitmap(
                                         it
@@ -223,9 +220,8 @@ class BuildItemViewModel @Inject constructor(
                                 videoUrl = videoUrl.value,
                                 parent = parent.value
                             )
-                            localServiceImpl.savedNewItem(newItem)
-                            _reflexionItem =
-                                localServiceImpl.selectReflexionItemByName(name.value)
+
+                            _reflexionItem = localServiceImpl.selectItem(localServiceImpl.saveNewItem(newItem)) ?: ReflexionItem()
                             _reflexionItemState.value = _reflexionItem
                             _autogenPK.value = _reflexionItem.autogenPK
                         }
@@ -307,8 +303,13 @@ class BuildItemViewModel @Inject constructor(
 
                     is BuildEvent.SetParent -> {
                         viewModelScope.launch {
-                            val item = ReflexionItem(parent = event.parent)
-                            item.image = localServiceImpl.selectItem(event.parent)?.image
+                            val parent = localServiceImpl.selectItem(event.parent)
+                            val item = ReflexionItem(parent = parent?.autogenPK, imagePk = parent?.imagePk)
+                            item.image = Converters().getByteArrayFromBitmap(parent?.imagePk?.let { parentImagePk ->
+                                localServiceImpl.selectImage(
+                                    parentImagePk
+                                )
+                            })
                             _reflexionItem = item
                             _reflexionItemState.value = _reflexionItem
                             resetAllDisplayedSubItemsToDBVersion()
