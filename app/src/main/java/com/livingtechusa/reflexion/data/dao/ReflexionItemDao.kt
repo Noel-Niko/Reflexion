@@ -68,4 +68,6 @@ interface ReflexionItemDao {
     suspend fun getParent(itemPk: Long): Long?
     @Query("SELECT image FROM Image WHERE imagePk = :imagePk")
     suspend fun selectImage(imagePk: Long): ByteArray?
+    @Query("SELECT imagePk FROM ReflexionItem WHERE autogenPk = :autogenPK")
+    suspend fun selectImagePkForItem(autogenPK: Long): Long?
 }

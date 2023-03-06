@@ -13,6 +13,7 @@ interface ILocalService {
     suspend fun updateReflexionItem(item: ReflexionItem, priorImagePk: Long?)
     suspend fun getAllItems(): List<ReflexionItem?>
     suspend fun selectItem(autogenPK: Long): ReflexionItem?
+    suspend fun selectImagePkForItem(autogenPK: Long): Long?
     suspend fun deleteReflexionItem(autogenPK: Long, name: String, imagePk: Long?)
     suspend fun renameItem(autogenPK: Long, name: String, newName: String)
     suspend fun setItemParent(autogenPK: Long, name: String, newParent: Long)
