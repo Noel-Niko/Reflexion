@@ -155,7 +155,7 @@ fun CustomListDisplayContent(
                 .background(MaterialTheme.colorScheme.surfaceVariant),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(children.size - 1) { childItemIndex ->
+            items(children.size) { childItemIndex ->
                 Card(
                     modifier = Modifier
                         .fillParentMaxSize()

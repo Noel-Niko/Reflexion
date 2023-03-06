@@ -105,7 +105,7 @@ fun ReflexionItemListUIForBookmarks(
                             .padding(4.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        items(listOfLists.size -1) { index ->
+                        items(listOfLists.size) { index ->
                             Box {
                                 ElevatedCard(
                                     modifier = Modifier
