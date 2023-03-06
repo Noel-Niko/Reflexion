@@ -38,7 +38,6 @@ import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.viewModels.BookmarksViewModel
-import com.livingtechusa.reflexion.util.Constants
 
 
 @Composable
@@ -106,7 +105,7 @@ fun ReflexionItemListUIForBookmarks(
                             .padding(4.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        items(listOfLists.size) { index ->
+                        items(listOfLists.size -1) { index ->
                             Box {
                                 ElevatedCard(
                                     modifier = Modifier

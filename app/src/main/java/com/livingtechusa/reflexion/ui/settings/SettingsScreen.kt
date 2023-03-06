@@ -183,7 +183,7 @@ fun HorizontalScrollableIconRowComponent(
                 .background(MaterialTheme.colorScheme.primary),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(list.size) { listitemIndex ->
+            items(list.size - 1) { listitemIndex ->
                 if (list.isEmpty().not()) {
                     IconImageCard(
                         list[listitemIndex],
