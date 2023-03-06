@@ -80,7 +80,7 @@ fun MediaFilePreviewCard(resource: FileResource) {
 }
 
 @Composable
-fun DocumentFilePreviewCard(
+fun DocumentFilePreviewCardBuildView(
     resource: FileResource,
     navController: NavHostController,
     docType: String
@@ -132,8 +132,60 @@ fun DocumentFilePreviewCard(
     }
 }
 
+
 @Composable
-fun videoImagePreviewCard(urlString: String?, navController: NavHostController, docType: String) {
+fun DocumentFilePreviewCardListView(
+    resource: FileResource,
+    navController: NavHostController,
+    index: Int
+) {
+    val context = LocalContext.current
+    val thumbnail by produceState<Bitmap?>(null, resource.uri) {
+        value = SafeUtils.getThumbnail(context, resource.uri)
+    }
+
+    Card(
+        elevation = 0.dp,
+        border = BorderStroke(width = 1.dp, color = compositeBorderColor()),
+        modifier = Modifier
+            .pointerInput(key1 = resource) {
+                detectTapGestures(
+                    onTap = {
+                        val route = Screen.VideoViewCustomList.route + "/" + index
+                        navController.navigate(route)
+                    }
+                )
+            }
+            .padding(0.dp)
+    ) {
+        Column {
+            val colorStops: Array<out Pair<Float, Color>> =
+                arrayOf(Pair(10f, Color.Black), Pair(5f, Color.Red))
+            thumbnail?.let {
+                Image(
+                    modifier = Modifier
+                        .height(previewHeight)
+                        .width(previewWidth)
+                        .border(
+                            1.dp, Brush.verticalGradient(colorStops = colorStops),
+                            TextFieldDefaults.OutlinedTextFieldShape
+                        )
+                        .padding(2.dp),
+                    contentScale = ContentScale.Crop,
+                    bitmap = it.asImageBitmap(), contentDescription = null
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+fun videoImagePreviewCard(
+    urlString: String?,
+    navController: NavHostController,
+    docType: String
+) {
     val context = LocalContext.current
     val resource = ResourceProviderSingleton
     // get url thumbnail...
@@ -171,8 +223,82 @@ fun videoImagePreviewCard(urlString: String?, navController: NavHostController, 
                 detectTapGestures(
                     onLongPress = {
                         // Launch dialog
-                        navController.navigate(Screen.ConfirmDeleteSubItemScreen.route + "/" + docType)
+                       navController.navigate(Screen.ConfirmDeleteSubItemScreen.route + "/" + docType)
                     },
+                    onTap = {
+                        val intent = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse(urlString)
+                        )
+                        ContextCompat.startActivity(context, intent, null)
+                    }
+                )
+            }
+            .padding(0.dp)
+            .background(Color.Transparent)
+    ) {
+        Column {
+            val colorStops: Array<out Pair<Float, Color>> =
+                arrayOf(Pair(10f, Color.Black), Pair(5f, Color.Red))
+            Image(
+                painter = painter,
+                contentDescription = "Linked Video Preview Image",
+                modifier = Modifier
+                    .height(previewHeight)
+                    .width(previewWidth)
+                    .border(
+                        1.dp, Brush.verticalGradient(colorStops = colorStops),
+                        TextFieldDefaults.OutlinedTextFieldShape
+                    )
+                    .background(Color.Transparent),
+                contentScale = ContentScale.Crop
+            )
+        }
+    }
+}
+
+
+@Composable
+fun CustomListVideoImagePreviewCard(
+    urlString: String?,
+    navController: NavHostController,
+    docType: String
+) {
+    val context = LocalContext.current
+    val resource = ResourceProviderSingleton
+    // get url thumbnail...
+    // for Youtube
+    var imageUrl = urlString
+    try {
+        if (imageUrl?.contains("youtu") == true) {
+            val urlArray = imageUrl.split("//", "/").map { it.trim() }
+            imageUrl =
+                resource.getString(R.string.youtube_image_prepend) + urlArray[2] + resource.getString(
+                    R.string.youtube_image_postpend
+                )
+        } else {
+            Toast.makeText(
+                context,
+                resource.getString(R.string.unable_to_obtain_youtube_link_preview),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    } catch (e: Exception) {
+        Toast.makeText(
+            context,
+            stringResource(R.string.unable_to_preview_non_youtube_videos),
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    val painter = rememberImagePainter(data = imageUrl)
+
+    Card(
+        elevation = 0.dp,
+        border = BorderStroke(width = 1.dp, color = compositeBorderColor()),
+        modifier = Modifier
+            .pointerInput(key1 = urlString) {
+                detectTapGestures(
                     onTap = {
                         val intent = Intent(
                             Intent.ACTION_VIEW,
