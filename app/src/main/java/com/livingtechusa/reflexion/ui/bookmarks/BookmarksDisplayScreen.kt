@@ -38,7 +38,6 @@ import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.viewModels.BookmarksViewModel
-import com.livingtechusa.reflexion.util.Constants
 
 
 @Composable

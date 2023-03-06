@@ -207,7 +207,7 @@ private fun BookmarkItemsContent(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
     ) {
-        items(bookmarks.size) { bookmark ->
+        items(bookmarks.size -1) { bookmark ->
             val imagePainter = rememberAsyncImagePainter(
                 ImageRequest.Builder(LocalContext.current)
                     .data(
