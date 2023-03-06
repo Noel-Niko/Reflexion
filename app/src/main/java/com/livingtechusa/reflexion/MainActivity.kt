@@ -280,15 +280,21 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable(
-                        route = Screen.VideoViewCustomList.route + "/{Index}",
+                        route = Screen.VideoViewCustomList.route + "/{index}",
+                        arguments = listOf(
+                            navArgument(INDEX) {
+                                type = NavType.StringType
+                            }
+                        )
                     ) { navBackStackEntry ->
                         val parentEntry = remember(navBackStackEntry) {
-                            navController.getBackStackEntry(Screen.CustomLists.route)
+                            navController.getBackStackEntry(Screen.CustomListDisplay.route + "/{headNodePk}")
                         }
                         val parentViewModel: CustomListsViewModel = hiltViewModel(parentEntry)
                         VideoPlayer2CustomList(
-                            index = 0,
+                            index = navBackStackEntry.arguments?.getString(INDEX)?.toInt(),
                             viewModel = parentViewModel,
+                            navHostController = navController
                         )
                     }
                     composable(
@@ -310,7 +316,7 @@ class MainActivity : ComponentActivity() {
 
                     composable(
                         route = Screen.SelectParentScreen.route,
-                    ) {navBackStackEntry ->
+                    ) { navBackStackEntry ->
                         val parentEntry = remember(navBackStackEntry) {
                             navController.getBackStackEntry(Screen.HomeScreen.route)
                         }

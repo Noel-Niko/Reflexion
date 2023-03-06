@@ -51,10 +51,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.R
-import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.components.ImageCard
 import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
@@ -62,14 +60,12 @@ import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.Constants.DESCRIPTION
 import com.livingtechusa.reflexion.util.Constants.DETAILED_DESCRIPTION
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
-import com.livingtechusa.reflexion.util.Constants.IMAGE
 import com.livingtechusa.reflexion.util.Constants.NAME
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URI
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URL
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import com.livingtechusa.reflexion.util.Temporary
-import com.livingtechusa.reflexion.util.scopedStorageUtils.DocumentFilePreviewCard
-import com.livingtechusa.reflexion.util.scopedStorageUtils.MediaStoreUtils
+import com.livingtechusa.reflexion.util.scopedStorageUtils.DocumentFilePreviewCardBuildView
 import com.livingtechusa.reflexion.util.scopedStorageUtils.videoImagePreviewCard
 import kotlinx.coroutines.launch
 
@@ -430,13 +426,13 @@ fun BuildItemContent(
                                     navController.navigate(route)
                                 }
                             },
-                        text = AnnotatedString(stringResource(R.string.saved_video)),
+                        text = AnnotatedString(stringResource(R.string.stored_video)),
                         color = MaterialTheme.colorScheme.primary
                     )
                     if (videoUri.isNullOrEmpty().not()) {
                         viewModel.getSelectedFile()
                         if (selectedFile != null) {
-                            DocumentFilePreviewCard(
+                            DocumentFilePreviewCardBuildView(
                                 resource = selectedFile!!,
                                 navController = navController,
                                 VIDEO_URI
@@ -496,7 +492,7 @@ fun BuildItemContent(
                                 }
                             },
                         ),
-                    text = AnnotatedString(stringResource(R.string.video_link)),
+                    text = AnnotatedString(stringResource(R.string.linked_video)),
                     color = MaterialTheme.colorScheme.primary
                 )
                 if (videoUrl.isNullOrEmpty().not()) {

@@ -46,8 +46,8 @@ import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import com.livingtechusa.reflexion.util.extensions.findActivity
-import com.livingtechusa.reflexion.util.scopedStorageUtils.DocumentFilePreviewCard
-import com.livingtechusa.reflexion.util.scopedStorageUtils.videoImagePreviewCard
+import com.livingtechusa.reflexion.util.scopedStorageUtils.CustomListVideoImagePreviewCard
+import com.livingtechusa.reflexion.util.scopedStorageUtils.DocumentFilePreviewCardListView
 
 const val CUSTOM_LIST_DISPLAY = "customListDisplay"
 @Composable
@@ -288,21 +288,19 @@ fun CustomListDisplayContent(
                                                     )
                                                     .show()
                                             } else {
-                                                val route: String =
-                                                    Screen.VideoViewCustomList.route + "/" + childVideoUriList[childItemIndex]?.uri
-                                                navController.navigate(route)
+                                                navController.navigate(Screen.VideoViewCustomList.route + "/" + childItemIndex)
                                             }
                                         },
-                                    text = AnnotatedString(stringResource(R.string.saved_video)),
+                                    text = AnnotatedString(stringResource(R.string.stored_video)),
                                     color = MaterialTheme.colorScheme.primary
                                 )
                                 if (children[childItemIndex].videoUri.isNullOrEmpty().not()) {
                                     if (childVideoUriList.isEmpty().not() && childVideoUriList.size > childItemIndex) {
                                         if (childVideoUriList[childItemIndex] != null) {
-                                            DocumentFilePreviewCard(
+                                            DocumentFilePreviewCardListView(
                                                 resource = childVideoUriList[childItemIndex]!!,
                                                 navController = navController,
-                                                Constants.VIDEO_URI
+                                                index = childItemIndex
                                             )
                                         }
                                     }
@@ -342,11 +340,11 @@ fun CustomListDisplayContent(
                                                 }
                                             },
                                         ),
-                                    text = AnnotatedString(stringResource(R.string.video_link)),
+                                    text = AnnotatedString(stringResource(R.string.linked_video)),
                                     color = MaterialTheme.colorScheme.primary
                                 )
                                 if (children[childItemIndex].videoUrl.isNullOrEmpty().not()) {
-                                    videoImagePreviewCard(
+                                    CustomListVideoImagePreviewCard(
                                         urlString = children[childItemIndex].videoUrl,
                                         navController = navController,
                                         docType = Constants.VIDEO_URL
