@@ -264,7 +264,7 @@ class BuildItemViewModel @Inject constructor(
                             when (event.pk) {
                                 EMPTY_PK -> {
                                     _reflexionItem = ReflexionItem()
-                                    resetAllDisplayedSubItemsToDBVersion()
+                                    updateAllDisplayedSubItemsToViewModelVersion()
                                     _reflexionItemState.value = _reflexionItem
 
                                 }
@@ -274,7 +274,7 @@ class BuildItemViewModel @Inject constructor(
                                     _reflexionItem =
                                         event.pk?.let { localServiceImpl.selectItem(it) }
                                             ?: ReflexionItem()
-                                    resetAllDisplayedSubItemsToDBVersion()
+                                    updateAllDisplayedSubItemsToViewModelVersion()
                                     _reflexionItemState.value = _reflexionItem
                                 }
                             }
@@ -289,7 +289,7 @@ class BuildItemViewModel @Inject constructor(
                                 _reflexionItem.imagePk
                             )
                             _reflexionItem = ReflexionItem()
-                            resetAllDisplayedSubItemsToDBVersion()
+                            updateAllDisplayedSubItemsToViewModelVersion()
                             _reflexionItemState.value = _reflexionItem
                         }
                     }
@@ -297,7 +297,7 @@ class BuildItemViewModel @Inject constructor(
                     is BuildEvent.ClearReflexionItem -> {
                         _reflexionItem = ReflexionItem()
                         _reflexionItemState.value = _reflexionItem
-                        resetAllDisplayedSubItemsToDBVersion()
+                        updateAllDisplayedSubItemsToViewModelVersion()
                     }
 
 
@@ -312,7 +312,7 @@ class BuildItemViewModel @Inject constructor(
                             })
                             _reflexionItem = item
                             _reflexionItemState.value = _reflexionItem
-                            resetAllDisplayedSubItemsToDBVersion()
+                            updateAllDisplayedSubItemsToViewModelVersion()
                         }
                     }
 
@@ -321,9 +321,10 @@ class BuildItemViewModel @Inject constructor(
                             val item = _reflexionItem
                             item.parent = event.parent.autogenPk
                             item.image = event.parent.image
+                            item.imagePk = event.parent.imagePk
                             _reflexionItem = item
                             _reflexionItemState.value = _reflexionItem
-                            resetAllDisplayedSubItemsToDBVersion()
+                            updateAllDisplayedSubItemsToViewModelVersion()
                             this@BuildItemViewModel.onTriggerEvent(BuildEvent.Save)
                         }
                     }
@@ -404,7 +405,7 @@ class BuildItemViewModel @Inject constructor(
                                 localServiceImpl.selectItemByUri(event.uri)
                             }
                             val savedRI: ReflexionItem? = _savedRI.await()
-                            resetAllDisplayedSubItemsToDBVersion()
+                            updateAllDisplayedSubItemsToViewModelVersion()
                             if (savedRI != null) {
                                 _reflexionItem = savedRI
                                 _reflexionItemState.value = _reflexionItem
@@ -431,7 +432,7 @@ class BuildItemViewModel @Inject constructor(
         }
     }
 
-    private fun resetAllDisplayedSubItemsToDBVersion() {
+    private fun updateAllDisplayedSubItemsToViewModelVersion() {
         _autogenPK.value = reflexionItem.autogenPk
         _name.value = reflexionItem.name
         _description.value = reflexionItem.description ?: EMPTY_STRING

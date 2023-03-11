@@ -3,6 +3,7 @@ package com.livingtechusa.reflexion.ui.topics
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -32,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
@@ -151,6 +153,11 @@ private fun ReflexionItemsContent(
         items(reflexionItems) { reflexionItem ->
             val imagePainter = rememberAsyncImagePainter(
                 ImageRequest.Builder(LocalContext.current).data(data = reflexionItem.image)
+                    .listener(
+                        onError = { request, result ->
+                            Log.e("Image", result.throwable.toString())
+                        }
+                    )
                     .apply(block = fun ImageRequest.Builder.() {
                         allowHardware(false)
                     }).build()
@@ -207,13 +214,20 @@ private fun BookmarkItemsContent(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
     ) {
-        items(bookmarks.size -1) { bookmark ->
+        items(bookmarks.size) { bookmark ->
             val imagePainter = rememberAsyncImagePainter(
                 ImageRequest.Builder(LocalContext.current)
+                    .listener(
+                        onError = { request, result ->
+                            Log.e("Image", result.throwable.toString())
+                        }
+                    )
                     .data(
-                        data = if (images.isEmpty()
-                                .not()
-                        ) images[bookmark] else R.mipmap.ic_launcher
+                        data = if (images[bookmark] != null) {
+                            images[bookmark]
+                        } else {
+                            R.mipmap.ic_launcher
+                        }
                     )
                     .apply(block = fun ImageRequest.Builder.() {
                         allowHardware(false)
@@ -224,7 +238,6 @@ private fun BookmarkItemsContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(4.dp)
-                        //.background(MaterialTheme.colorScheme.surface)
                         .pointerInput(key1 = bookmark) {
                             detectTapGestures(
                                 onTap = { bookmarks[bookmark]?.LEVEL_PK?.let { pk -> onTap(pk) } },
@@ -247,12 +260,11 @@ private fun BookmarkItemsContent(
                     ) {
                         Image(
                             painter = imagePainter,
-                            contentDescription = "Your Image",
+                            contentDescription = stringResource(R.string.your_image),
                             contentScale = ContentScale.FillBounds,
                             modifier = Modifier
                                 .width(60.dp)
                                 .height(60.dp)
-
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         bookmarks[bookmark]?.title?.let { title ->

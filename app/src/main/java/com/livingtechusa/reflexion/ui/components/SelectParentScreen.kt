@@ -56,7 +56,6 @@ import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 
 const val SELECT_PARENT = "SelectParentDialog"
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectParentScreen(
     navController: NavHostController,

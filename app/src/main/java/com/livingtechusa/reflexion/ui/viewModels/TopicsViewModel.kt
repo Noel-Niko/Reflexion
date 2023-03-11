@@ -7,7 +7,6 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.livingtechusa.reflexion.R
-import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.entities.Bookmarks
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
@@ -44,6 +43,7 @@ class TopicsViewModel @Inject constructor(
 
     private val _bookmarks = MutableStateFlow(emptyList<Bookmarks?>())
     val bookmarks: StateFlow<List<Bookmarks?>> get() = _bookmarks
+
     private val _bookmarkImages = MutableStateFlow(emptyList<Bitmap?>())
     val bookmarkImages: StateFlow<List<Bitmap?>> get() = _bookmarkImages
 
@@ -133,15 +133,15 @@ class TopicsViewModel @Inject constructor(
             _bookmarks.value = bookmarkedLevels
             val _images: Deferred<MutableList<Bitmap>> = async {
                 val bitmaps = mutableListOf<Bitmap>()
-                 _bookmarks.value.forEach { bookmark ->
-                     bookmark?.LEVEL_PK?.let { bk ->
-                         localServiceImpl.selectItem(bk)?.image?.let {
-                                 bitmaps.add(Converters().getBitmapFromByteArray(it))
-                             }
-                         }
-                     }
+                _bookmarks.value.forEach { bookmark ->
+                    bookmark?.LEVEL_PK?.let { levelPk ->
+                        localServiceImpl.selectItem(levelPk)?.imagePk?.let { imagePk ->
+                            localServiceImpl.selectImage(imagePk)?.let { bitmaps.add(it) }
+                        }
+                    }
+                }
                 return@async bitmaps
-                 }
+            }
             val images = _images.await()
             _bookmarkImages.value = images
         }

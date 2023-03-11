@@ -149,6 +149,10 @@ class LocalServiceImpl @Inject constructor(
         return reflexionItemDao.selectReflexionItem(autogenPK)
     }
 
+    override suspend fun selectImagePkForItem(autogenPK: Long): Long? {
+        return reflexionItemDao.selectImagePkForItem(autogenPK)
+    }
+
     override suspend fun deleteReflexionItem(autogenPK: Long, name: String, imagePk: Long?) {
         if (imagePk != null) {
             imagesDao.removeImageAssociation(itemPk = autogenPK)
