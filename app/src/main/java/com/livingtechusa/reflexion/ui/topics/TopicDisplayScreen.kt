@@ -39,7 +39,6 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.livingtechusa.reflexion.R
-import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.entities.Bookmarks
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.navigation.Screen
@@ -223,7 +222,13 @@ private fun BookmarkItemsContent(
                             Log.e("Image", result.throwable.toString())
                         }
                     )
-                    .data(data = if (images.isEmpty().not()) Converters().getByteArrayFromBitmap(images[bookmark]) else R.mipmap.ic_launcher)
+                    .data(
+                        data = if (images[bookmark] != null) {
+                            images[bookmark]
+                        } else {
+                            R.mipmap.ic_launcher
+                        }
+                    )
                     .apply(block = fun ImageRequest.Builder.() {
                         allowHardware(false)
                     }).build()
@@ -258,8 +263,8 @@ private fun BookmarkItemsContent(
                             contentDescription = stringResource(R.string.your_image),
                             contentScale = ContentScale.FillBounds,
                             modifier = Modifier
-                                .fillMaxHeight()
-
+                                .width(60.dp)
+                                .height(60.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         bookmarks[bookmark]?.title?.let { title ->
