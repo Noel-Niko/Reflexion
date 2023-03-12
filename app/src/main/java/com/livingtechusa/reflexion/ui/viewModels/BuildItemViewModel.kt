@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -34,6 +35,7 @@ import com.livingtechusa.reflexion.util.scopedStorageUtils.ImageUtils
 import com.livingtechusa.reflexion.util.scopedStorageUtils.ImageUtils.rotateImage
 import com.livingtechusa.reflexion.util.scopedStorageUtils.MediaStoreUtils
 import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
+import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil.resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -174,12 +176,17 @@ class BuildItemViewModel @Inject constructor(
 
                                 IMAGE -> {
                                     val job = launch {
-                                        reflexionItemState.value.imagePk?.let { imageKey -> localServiceImpl.deleteImageAndAssociation(imagePk = imageKey, itemPk = reflexionItem.autogenPk) }
+                                        reflexionItemState.value.imagePk?.let { imageKey ->
+                                            localServiceImpl.deleteImageAndAssociation(
+                                                imagePk = imageKey,
+                                                itemPk = reflexionItem.autogenPk
+                                            )
+                                        }
                                     }
                                     job.join()
                                     updatedReflexionItem.image = null
                                     updatedReflexionItem.imagePk = null
-                                        _image.value = null
+                                    _image.value = null
                                 }
 
                                 VIDEO_URI -> {
@@ -221,7 +228,9 @@ class BuildItemViewModel @Inject constructor(
                                 parent = parent.value
                             )
 
-                            _reflexionItem = localServiceImpl.selectItem(localServiceImpl.saveNewItem(newItem)) ?: ReflexionItem()
+                            _reflexionItem =
+                                localServiceImpl.selectItem(localServiceImpl.saveNewItem(newItem))
+                                    ?: ReflexionItem()
                             _reflexionItemState.value = _reflexionItem
                             _autogenPK.value = _reflexionItem.autogenPk
                         }
@@ -304,12 +313,14 @@ class BuildItemViewModel @Inject constructor(
                     is BuildEvent.SetParent -> {
                         viewModelScope.launch {
                             val parent = localServiceImpl.selectItem(event.parent)
-                            val item = ReflexionItem(parent = parent?.autogenPk, imagePk = parent?.imagePk)
-                            item.image = Converters().getByteArrayFromBitmap(parent?.imagePk?.let { parentImagePk ->
-                                localServiceImpl.selectImage(
-                                    parentImagePk
-                                )
-                            })
+                            val item =
+                                ReflexionItem(parent = parent?.autogenPk, imagePk = parent?.imagePk)
+                            item.image =
+                                Converters().getByteArrayFromBitmap(parent?.imagePk?.let { parentImagePk ->
+                                    localServiceImpl.selectImage(
+                                        parentImagePk
+                                    )
+                                })
                             _reflexionItem = item
                             _reflexionItemState.value = _reflexionItem
                             updateAllDisplayedSubItemsToViewModelVersion()
@@ -330,28 +341,30 @@ class BuildItemViewModel @Inject constructor(
                     }
 
                     is BuildEvent.SendText -> {
+                        val shareIntent = Intent()
+                        shareIntent.type = "text/*"
                         val text =
                             context.getString(R.string.title) + name.value + "\n" + context.getString(
                                 R.string.description
                             ) + description.value +
                                     " \n" + context.getString(R.string.detailedDescription) + detailedDescription.value + "\n" + videoUrl.value + "\n\n" +
-                                    context.getString(R.string.sent_with_reflexion_from_the_google_play_store)
+                                    context.getString(R.string.sent_with_reflexion_from_the_google_play_store) + "\n" +
+                                    context.getString(R.string.reflexion_link)
+                        shareIntent.putExtra(Intent.EXTRA_TEXT, text)
+
                         val video = videoUri.value?.let {
                             Converters().convertStringToUri(
                                 it
                             )
                         }
-                        val shareIntent = Intent()
-                        shareIntent.action = Intent.ACTION_SEND
-                        shareIntent.type = "text/*"
-                        shareIntent.putExtra(Intent.EXTRA_TEXT, text)
-                        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        val resolver: ContentResolver = context.contentResolver
-                        shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
-                        shareIntent.type = "video/*"
-                        shareIntent.setDataAndType(video, video?.let { resolver.getType(it) })
-                        shareIntent.putExtra(Intent.EXTRA_STREAM, video)
-                        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        if (video != null && video.equals(EMPTY_STRING).not()) {
+                            val resolver: ContentResolver = context.contentResolver
+                            shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
+                            shareIntent.type = "video/*"
+                            shareIntent.setDataAndType(video, video.let { resolver.getType(it) })
+                            shareIntent.putExtra(Intent.EXTRA_STREAM, video)
+                            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
                         shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         shareIntent.action = Intent.ACTION_SEND
                         startActivity(context, shareIntent, null)
@@ -428,6 +441,7 @@ class BuildItemViewModel @Inject constructor(
                     TAG,
                     "Exception: ${e.message}  with cause: ${e.cause}"
                 )
+                Toast.makeText(context, resource.getString(R.string.an_error_occurred_please_try_again), Toast.LENGTH_SHORT).show()
             }
         }
     }
