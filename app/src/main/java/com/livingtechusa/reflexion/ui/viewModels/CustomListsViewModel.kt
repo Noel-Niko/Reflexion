@@ -26,7 +26,6 @@ import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.NULL
 import com.livingtechusa.reflexion.util.scopedStorageUtils.FileResource
 import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
-import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil.resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -341,6 +340,8 @@ class CustomListsViewModel @Inject constructor(
                 }
 
                 is CustomListEvent.SendText -> {
+                    val shareIntent = Intent()
+                    // Make Text
                     val title = customList.value.itemName + "\n"
                     var listItems = EMPTY_STRING
                     _children.value.forEach { reflexionItem ->
@@ -349,25 +350,41 @@ class CustomListsViewModel @Inject constructor(
                             R.string.detailedDescription
                         ) + reflexionItem.detailedDescription + "\n" + reflexionItem.videoUrl + "\n"
                     }
-                    val text = title + listItems
-                    val shareIntent = Intent()
+                    val sentWith = "\n\n" +
+                            context.getString(R.string.sent_with_reflexion_from_the_google_play_store) + "\n" +
+                            context.getString(R.string.reflexion_link)
+                    val text = title + listItems + sentWith
                     shareIntent.putExtra(EXTRA_TEXT, text)
                     shareIntent.type = "text/*"
-                    shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
-                    shareIntent.action = Intent.ACTION_SEND_MULTIPLE
-                    val uriList = mutableListOf<Uri>()
-                    _children.value.forEach { reflexionItem ->
-                        reflexionItem.videoUri?.let { uri ->
-                            Converters().convertStringToUri(
-                                uri
-                            )?.let { videoUri ->
-                                uriList.add(videoUri)
+
+                    // If applicable add video
+                    // Check for videoUri's
+                    var count = 0
+                    _children.value.forEach() {
+                        if (it.videoUri != null && it.videoUri.equals(EMPTY_STRING).not())
+                            count++
+                    }
+                    if (count > 0) {
+                        shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
+                        shareIntent.action = Intent.ACTION_SEND_MULTIPLE
+                        val uriList = mutableListOf<Uri>()
+                        _children.value.forEach { reflexionItem ->
+                            reflexionItem.videoUri?.let { uri ->
+                                Converters().convertStringToUri(
+                                    uri
+                                )?.let { videoUri ->
+                                    uriList.add(videoUri)
+                                }
                             }
                         }
+                        val parcelableUriList: ArrayList<Uri> = ArrayList(uriList)
+                        shareIntent.putParcelableArrayListExtra(EXTRA_STREAM, parcelableUriList)
+                        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+                    } else {
+                        shareIntent.action = Intent.ACTION_SEND
                     }
-                    val parcelableUriList: ArrayList<Uri> = ArrayList(uriList)
-                    shareIntent.putParcelableArrayListExtra(EXTRA_STREAM, parcelableUriList)
-                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
                     shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     startActivity(context, shareIntent, null)
                 }
@@ -493,14 +510,14 @@ class CustomListsViewModel @Inject constructor(
                 withContext(Dispatchers.Main) {
                     // First item selected in new topic in new list. Set Topic, and add selection and load topic lists
                     if (topic == EMPTY_PK || newList) {
-                            // Set the topic
-                            topic = getTopic(itemPk.toLong())
-                            // Add the first list item
-                            setParent(itemPk)
-                            newList = false
-                            val newList =
-                                async { localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic) }
-                            _listOfLists.value = newList.await()
+                        // Set the topic
+                        topic = getTopic(itemPk.toLong())
+                        // Add the first list item
+                        setParent(itemPk)
+                        newList = false
+                        val newList =
+                            async { localServiceImpl.selectNodeListsAsArrayItemsByTopic(topic) }
+                        _listOfLists.value = newList.await()
 
                         // A new topic item has been selected, create new list with selected first item, and load related lists.
                     } else if (getTopic(itemPk.toLong()) != topic) {
@@ -525,21 +542,21 @@ class CustomListsViewModel @Inject constructor(
         } else {
             Toast.makeText(
                 context,
-               context.getString(R.string.an_error_occurred_please_try_again),
+                context.getString(R.string.an_error_occurred_please_try_again),
                 Toast.LENGTH_SHORT
             ).show()
         }
     }
 
-    private fun setParent(itemPk: String){
+    private fun setParent(itemPk: String) {
         viewModelScope.launch(Dispatchers.Main) {
             val selectedItem = localServiceImpl.selectItem(itemPk.toLong())
             if (selectedItem != null) {
                 _selectedParent.value = selectedItem
                 val parent = selectedParent.value.name
-                    Toast.makeText(
+                Toast.makeText(
                     context,
-                   "Setting $parent as the new parent.",
+                    "Setting $parent as the new parent.",
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
@@ -551,8 +568,9 @@ class CustomListsViewModel @Inject constructor(
             }
         }
     }
+
     fun sendPKToBuildViewModel(parent: ReflexionItem, buildItemViewModel: BuildItemViewModel) {
-                buildItemViewModel.onTriggerEvent(BuildEvent.SetSelectedParent(parent))
+        buildItemViewModel.onTriggerEvent(BuildEvent.SetSelectedParent(parent))
     }
 
 }

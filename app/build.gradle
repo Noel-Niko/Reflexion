@@ -15,8 +15,8 @@ android {
         applicationId "com.livingtechusa.reflexion"
         minSdk 29
         targetSdk 33
-        versionCode 9
-        versionName "9.0"
+        versionCode 11
+        versionName "11.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
