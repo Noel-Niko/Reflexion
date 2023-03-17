@@ -103,7 +103,7 @@ fun BuildItemContent(
         // for sending analytics events
         val observer = LifecycleEventObserver { owner, event ->
             if (event == Lifecycle.Event.ON_CREATE) {
-                if(Temporary.useUri) {
+                if (Temporary.useUri) {
                     viewModel.onTriggerEvent(BuildEvent.SearchUri(Temporary.uri))
                 } else {
                     viewModel.onTriggerEvent(BuildEvent.GetSelectedReflexionItem(pk))
@@ -221,7 +221,15 @@ fun BuildItemContent(
             }
             Column(Modifier.weight(1f)) {
                 IconButton(onClick = {
-                    selectImage.launch(Constants.IMAGE_TYPE)
+                    try {
+                            selectImage.launch(Constants.IMAGE_TYPE)
+                    } catch (e: Exception) {
+                        Toast.makeText(
+                            context,
+                            R.string.error_grant_image_access_permission,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }) {
                     Icon(
                         painter = painterResource(R.drawable.baseline_video_library_24),
@@ -231,9 +239,17 @@ fun BuildItemContent(
                 }
                 IconButton(onClick = {
                     scope.launch {
-                        viewModel.createImageUri()?.let { uri ->
-                            targetImageUri = uri
-                            takeImage.launch(uri)
+                        try {
+                            viewModel.createImageUri()?.let { uri ->
+                                targetImageUri = uri
+                                takeImage.launch(uri)
+                            }
+                        } catch (e: Exception) {
+                            Toast.makeText(
+                                context,
+                                R.string.error_grant_camera_permission,
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 }) {
@@ -447,7 +463,15 @@ fun BuildItemContent(
                     .align(Alignment.CenterVertically)
             ) {
                 IconButton(onClick = {
-                    selectVideo.launch(arrayOf(Constants.VIDEO_TYPE))
+                    try {
+                        selectVideo.launch(arrayOf(Constants.VIDEO_TYPE))
+                    } catch (e: Exception) {
+                        Toast.makeText(
+                            context,
+                            R.string.error_grant_video_access_permission,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }) {
                     Icon(
                         painter = painterResource(R.drawable.baseline_video_library_24),
@@ -458,9 +482,17 @@ fun BuildItemContent(
 
                 IconButton(onClick = {
                     scope.launch {
-                        viewModel.createVideoUri()?.let { uri ->
-                            targetVideoUri = uri
-                            takeVideo.launch(uri)
+                        try {
+                            viewModel.createVideoUri()?.let { uri ->
+                                targetVideoUri = uri
+                                takeVideo.launch(uri)
+                            }
+                        } catch (e: Exception) {
+                            Toast.makeText(
+                                context,
+                                R.string.error_grant_camera_permission,
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 }) {
