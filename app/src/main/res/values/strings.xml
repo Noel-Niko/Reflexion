@@ -96,4 +96,7 @@
     <string name="video_could_not_be_found">Video could not be found.</string>
     <string name="your_image">Your Image</string>
     <string name="reflexion_link">https://play.google.com/store/apps/details?id=com.livingtechusa.reflexion</string>
+    <string name="error_grant_camera_permission">Error: Update settings to grant Camera Permission.</string>
+    <string name="error_grant_image_access_permission">Error: Update settings to grant image access permission.</string>
+    <string name="error_grant_video_access_permission">Error: Update settings to grant video access permission.</string>
 </resources>
