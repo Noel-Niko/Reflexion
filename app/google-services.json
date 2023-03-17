@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "236247454728",
+    "project_id": "livingtechusa-99c69",
+    "storage_bucket": "livingtechusa-99c69.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:236247454728:android:f90aa7bf210281269cadbd",
+        "android_client_info": {
+          "package_name": "com.livingtechusa.reflexion"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "236247454728-2e6sq69htna3dimetse5p8lipb574hrl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrEpeTL1Km0o-nnihLyvX7Lp8lwNSdDEQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "236247454728-2e6sq69htna3dimetse5p8lipb574hrl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
