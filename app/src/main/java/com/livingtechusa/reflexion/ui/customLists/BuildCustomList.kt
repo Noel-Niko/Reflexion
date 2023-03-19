@@ -200,7 +200,7 @@ fun CustomListsContent(
                                 .fillMaxSize()
                                 .padding(16.dp)
                         ) {
-                            items(filteringOptions.size- 1) {
+                            items(filteringOptions.size) {
                                 ElevatedCard(
                                     modifier = Modifier
                                         .fillMaxWidth()
