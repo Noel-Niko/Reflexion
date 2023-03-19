@@ -26,7 +26,7 @@
     <string name="changes_saved">Changes Saved</string>
     <string name="save">Save</string>
     <string name="close">Close</string>
-    <string name="paste_web_address_here">"Paste web address here: "</string>
+    <string name="paste_web_address_here">Paste web address here: </string>
     <string name="is_parent">This item cannot be deleted because it is parent to other items.</string>
     <string name="go_to_parent">Move Up To Parent</string>
     <string name="no_parent_found">No parent found.</string>
@@ -47,7 +47,7 @@
     <string name="custom_list_display">Custom List Display</string>
     <string name="did_you_add_a_video_link">Did you add a video link?</string>
     <string name="add_an_image_here">Add an image here.</string>
-    <string name="do_you_want_to_delete">"Do you want to delete %1s?"</string>
+    <string name="do_you_want_to_delete">Do you want to delete %1s?</string>
     <string name="empty_state">Empty State</string>
     <string name="youtube_image_prepend">https://i3.ytimg.com/vi/</string>
     <string name="youtube_image_postpend">/maxresdefault.jpg</string>

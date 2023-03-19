@@ -30,6 +30,8 @@ android {
                         "room.expandProjection": "true"]
             }
         }
+        resourceConfigurations += ["en", "es"]
+
     }
     buildTypes {
         release {
