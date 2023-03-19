@@ -6,7 +6,7 @@
     <string name="description"><b>Descripción: </b></string>
     <string name="detailedDescription"><i>Detalles: </i></string>
     <string name="stored_video">Vídeo Almacenado</string>
-    <string name="linked_video">Video de Internet</string>
+    <string name="linked_video">Vídeo de Internet</string>
     <string name="update"><i>Actualización</i></string>
     <string name="parent">Padre</string>
     <string name="siblings">Ver Hermanos</string>
@@ -73,7 +73,7 @@
     <string name="shared_prefs_current_mode_selected">shared_prefs_current_mode_selected</string>
     <string name="match_phone">Teléfono de Coincidencia</string>
     <string name="app_reset">Restablecimiento de la Aplicación</string>
-    <string name="apply_changes">Aplicar cambios</string>
+    <string name="apply_changes">Aplicar Cambios</string>
     <string name="subtopic_bookmarks">Subtema Marcadores</string>
     <string name="bookmarks">Marcadores</string>
     <string name="bookmarked">Marcado</string>
@@ -99,4 +99,12 @@
     <string name="error_grant_camera_permission">Error: Actualice la configuración para otorgar permiso de cámara.</string>
     <string name="error_grant_image_access_permission">Error: Actualice la configuración para otorgar permiso de acceso a la imagen.</string>
     <string name="error_grant_video_access_permission">Error: Actualice la configuración para otorgar permiso de acceso a video.</string>
+    <string name="home">Inicio</string>
+    <string name="bookmark_title_case">Marcador</string>
+    <string name="lists_title_case">Listas</string>
+    <string name="topics_title_case">Temas</string>
+    <string name="new_tab">Nuevo</string>
+    <string name="en" translatable="false">English</string>
+    <string name="es" translatable="false">Español</string>
+    <string name="language">Español</string>
 </resources>

@@ -212,7 +212,7 @@ fun MenuItemText(
     )
 }
 
-/*[MenuItem] DropdownMenuItem  wrapper to handle onclick and user interaction */
+/*[MenuItem] DropdownMenuItem wrapper to handle onclick and user interaction */
 @Composable
 fun CustomMenuItem(onClick: () -> Unit, content: @Composable RowScope.() -> Unit) {
     DropdownMenuItem(

@@ -99,4 +99,12 @@
     <string name="error_grant_camera_permission">Error: Update settings to grant Camera Permission.</string>
     <string name="error_grant_image_access_permission">Error: Update settings to grant image access permission.</string>
     <string name="error_grant_video_access_permission">Error: Update settings to grant video access permission.</string>
+    <string name="home">Home</string>
+    <string name="bookmark_title_case">Bookmark</string>
+    <string name="lists_title_case">Lists</string>
+    <string name="topics_title_case">Topics</string>
+    <string name="new_tab">New</string>
+    <string name="en" translatable="false">English</string>
+    <string name="es" translatable="false">Español</string>
+    <string name="language">English</string>
 </resources>
