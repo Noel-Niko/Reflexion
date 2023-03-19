@@ -44,8 +44,8 @@ fun HomeScreen(
             }
 
 //            WindowWidthSizeClass.MEDIUM -> {
-//                Landscape(navHostController, icons)
-//            }
+//            Landscape(navHostController, icons)
+//        }
 
 //            WindowWidthSizeClass.EXPANDED -> {
 //                ExpandedScreen(navHostController, icons)
