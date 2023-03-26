@@ -1,15 +1,20 @@
 package com.livingtechusa.reflexion.ui.viewModels
 
+import android.content.ClipData
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+import android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat.startActivity
+import androidx.core.content.FileProvider
+import androidx.core.content.FileProvider.getUriForFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.livingtechusa.reflexion.R
@@ -34,6 +39,7 @@ import com.livingtechusa.reflexion.util.scopedStorageUtils.FileResource
 import com.livingtechusa.reflexion.util.scopedStorageUtils.ImageUtils
 import com.livingtechusa.reflexion.util.scopedStorageUtils.ImageUtils.rotateImage
 import com.livingtechusa.reflexion.util.scopedStorageUtils.MediaStoreUtils
+import com.livingtechusa.reflexion.util.scopedStorageUtils.ReflexionJsonWriter
 import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
 import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil.resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -44,6 +50,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 import java.io.InputStream
 import javax.inject.Inject
 
@@ -363,11 +371,61 @@ class BuildItemViewModel @Inject constructor(
                             shareIntent.type = "video/*"
                             shareIntent.setDataAndType(video, video.let { resolver.getType(it) })
                             shareIntent.putExtra(Intent.EXTRA_STREAM, video)
-                            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            shareIntent.addFlags(FLAG_GRANT_READ_URI_PERMISSION)
                         }
-                        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        shareIntent.addFlags(FLAG_ACTIVITY_NEW_TASK)
                         shareIntent.action = Intent.ACTION_SEND
                         startActivity(context, shareIntent, null)
+                    }
+
+                    is BuildEvent.SendFile -> {
+                        viewModelScope.launch {
+                            withContext(Dispatchers.Main) {
+                                // create a json file
+                                val filename =
+                                    context.getString(R.string.app_name) + "${System.currentTimeMillis()}.json"
+                                val file = File(context.filesDir, filename)
+
+                                // save data to the file
+                                val outputStream: FileOutputStream = FileOutputStream(file)
+                                val reflexionItemList = mutableListOf(reflexionItemState.value)
+                                ReflexionJsonWriter().writeJsonStream(
+                                    outputStream,
+                                    reflexionItemList
+                                )
+
+                                // generate uri to the file with permissions
+//                            val filePath: File = File(context.filesDir, "json")
+//                            val newFile = File(filePath, file.absolutePath)
+                                val contentUri: Uri = FileProvider.getUriForFile(context.applicationContext, "com.livingtechusa.reflexion.fileprovider", file)
+                                context.grantUriPermission(
+                                    context.applicationContext.packageName,
+                                    contentUri,
+                                    FLAG_GRANT_READ_URI_PERMISSION or FLAG_GRANT_WRITE_URI_PERMISSION
+                                )
+
+                                val shareIntent = Intent()
+
+
+                                if (contentUri.equals(EMPTY_STRING).not()) {
+                                    val resolver: ContentResolver = context.contentResolver
+                                    shareIntent.type = "*/*"
+                                    shareIntent.putExtra(
+                                        Intent.EXTRA_SUBJECT,
+                                        "Sending: ${reflexionItemState.value.name}"
+                                    )
+                                    shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
+                                    shareIntent.setDataAndType(contentUri, contentUri.let { resolver.getType(it) })
+                                    shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
+                                    shareIntent.addFlags(FLAG_ACTIVITY_NEW_TASK or FLAG_GRANT_READ_URI_PERMISSION)
+                                }
+//                                shareIntent.clipData =
+//                                    ClipData.newRawUri(reflexionItemState.value.name, contentUri)
+//                                shareIntent.addFlags(FLAG_ACTIVITY_NEW_TASK or FLAG_GRANT_READ_URI_PERMISSION)
+                                shareIntent.action = Intent.ACTION_SEND
+                                startActivity(context, shareIntent, null)
+                            }
+                        }
                     }
 
                     is BuildEvent.Save -> {

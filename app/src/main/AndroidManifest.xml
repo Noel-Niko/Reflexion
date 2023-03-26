@@ -59,6 +59,19 @@
                <data android:mimeType="text/plain" />
                <data android:mimeType="video/*" />
            </intent-filter>
+           <intent-filter>
+               <action android:name="android.intent.action.SEND" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <data android:mimeType="video/*" />
+           </intent-filter>
+<!--           For opening json files created by the app-->
+           <intent-filter>
+               <action android:name="android.intent.action.VIEW" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <category android:name="android.intent.category.BROWSABLE" />
+               <data android:scheme="content" />
+               <data android:mimeType="application/json" />
+           </intent-filter>
        </activity>
        <activity-alias
            android:name=".MainActivityAlias0"
@@ -552,7 +565,7 @@
            android:exported="false">
            <meta-data
                android:name="android.support.FILE_PROVIDER_PATHS"
-               android:resource="@xml/filepaths" />
+               android:resource="@xml/file_paths" />
        </provider>
    </application>
 </manifest>

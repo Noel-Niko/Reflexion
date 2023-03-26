@@ -64,11 +64,6 @@ android {
 }
 
 dependencies {
-/* TODO: REPLACE COMPOSE INDIVIDUAL IMPORTS WITH BOM
-    Import the Compose BOM
-    implementation platform('androidx.compose:compose-bom:2022.11.00')
- */
-
     implementation "androidx.activity:activity-ktx:1.6.1"
     implementation "androidx.fragment:fragment-ktx:1.5.5"
     implementation 'androidx.core:core-ktx:1.9.0'
@@ -153,7 +148,6 @@ dependencies {
     // https://mvnrepository.com/artifact/androidx.compose.material3/material3
     implementation("androidx.compose.material3:material3:1.1.0-alpha07")
 
-
     implementation "androidx.activity:activity-compose:1.6.1"
 
     // Compose Add-On Libraries
@@ -219,4 +213,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.google.apis/google-api-services-youtube
     implementation("com.google.apis:google-api-services-youtube:v3-rev222-1.25.0")
+
+    // JSON
+    implementation("org.json:json:20230227")
 }

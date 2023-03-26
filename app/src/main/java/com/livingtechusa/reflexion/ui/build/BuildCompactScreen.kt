@@ -14,6 +14,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.rememberScaffoldState
@@ -32,6 +33,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -90,6 +92,16 @@ fun BuildItemCompactScreen(
                                 Icon(
                                     imageVector = Icons.Default.Send,
                                     contentDescription = "send",
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                )
+                            },
+                        )
+                        IconButton(
+                            onClick = { viewModel.onTriggerEvent(BuildEvent.SendFile) },
+                            content = {
+                                Icon(
+                                    imageVector = Icons.Default.FileUpload,
+                                    contentDescription = "send reflexion item file",
                                     tint = MaterialTheme.colorScheme.onSurface,
                                 )
                             },
