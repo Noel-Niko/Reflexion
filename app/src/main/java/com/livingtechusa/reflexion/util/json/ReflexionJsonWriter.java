@@ -1,4 +1,4 @@
-package com.livingtechusa.reflexion.util.scopedStorageUtils;
+package com.livingtechusa.reflexion.util.json;
 
 
 import android.util.JsonWriter;
@@ -27,14 +27,14 @@ public class ReflexionJsonWriter {
 
     public void writeReflexionItem(JsonWriter writer, ReflexionItem reflexionItem) throws IOException {
         writer.beginObject();
-        writer.name("autogenPk").value(0L);
+        writer.name("autogenPk").value(reflexionItem.getAutogenPk());
         writer.name("name").value(reflexionItem.getName());
         writer.name("description").value(reflexionItem.getDescription());
         writer.name("detailedDescription").value(reflexionItem.getDetailedDescription());
 //        writer.name("imageStream").value(reflexionItem.getImage().toString());
 //        writer.name("videoStream").value(reflexionItem.getVideoUri());
         writer.name("videoUrl").value(reflexionItem.getVideoUrl());
-        writer.name("parent").value("");
+        writer.name("parent").value(reflexionItem.getParent());
         writer.endObject();
     }
 }

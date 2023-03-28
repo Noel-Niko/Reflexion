@@ -33,13 +33,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.BarItem
+import com.livingtechusa.reflexion.ui.components.animation_utils.LoadingAnimation
 import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import kotlinx.coroutines.launch
@@ -56,6 +56,7 @@ fun BuildItemCompactScreen(
     val offsetX = remember { mutableStateOf(0f) }
     val offsetY = remember { mutableStateOf(0f) }
     val itemPk by viewModel.autogenPK.collectAsState()
+    val loading by viewModel.loading.collectAsState()
 
     Scaffold(
         scaffoldState = state,
@@ -136,7 +137,11 @@ fun BuildItemCompactScreen(
                 })
         },
         drawerContent = {
-            Text("Reflexion", modifier = Modifier.padding(16.dp), color = MaterialTheme.colorScheme.inverseOnSurface)
+            Text(
+                "Reflexion",
+                modifier = Modifier.padding(16.dp),
+                color = MaterialTheme.colorScheme.inverseOnSurface
+            )
             Divider()
             DrawerNavContent(
                 navController,
@@ -163,7 +168,11 @@ fun BuildItemCompactScreen(
                             tint = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     }, label = {
-                        Text(text = navItem.title, color = MaterialTheme.colorScheme.onSecondaryContainer, maxLines = 1)
+                        Text(
+                            text = navItem.title,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            maxLines = 1
+                        )
                     })
                 }
             }
@@ -198,6 +207,10 @@ fun BuildItemCompactScreen(
             }
         }
     ) { paddingValues ->
+        if (loading) {
+            LoadingAnimation(paddingValues = paddingValues)
+        } else {
             BuildItemContent(pk, navController, viewModel, paddingValues)
+        }
     }
 }

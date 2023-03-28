@@ -5,8 +5,9 @@ import com.livingtechusa.reflexion.ui.bookmarks.BOOKMARKS
 import com.livingtechusa.reflexion.ui.build.BuildRoute
 import com.livingtechusa.reflexion.ui.components.CONFIRM_DELETE_LIST
 import com.livingtechusa.reflexion.ui.components.CONFIRM_DELETE_SUB_ITEM
+import com.livingtechusa.reflexion.ui.components.CONFIRM_SAVE_FILE
 import com.livingtechusa.reflexion.ui.topics.ListRoute
-import com.livingtechusa.reflexion.ui.components.CONFIRM_SAVE
+import com.livingtechusa.reflexion.ui.components.CONFIRM_SAVE_URL
 import com.livingtechusa.reflexion.ui.components.PASTE_SAVE
 import com.livingtechusa.reflexion.ui.components.SELECT_PARENT
 import com.livingtechusa.reflexion.ui.components.VideoCustomListScreenRoute
@@ -25,7 +26,8 @@ sealed class Screen(val route: String) {
     object VideoView : Screen(VideoScreenRoute)
     object VideoViewCustomList : Screen(VideoCustomListScreenRoute)
     object MainActivity: Screen(Main_Activity)
-    object ConfirmSaveScreen: Screen(CONFIRM_SAVE)
+    object ConfirmSaveURLScreen: Screen(CONFIRM_SAVE_URL)
+    object ConfirmSaveFileScreen: Screen(CONFIRM_SAVE_FILE)
     object PasteAndSaveScreen: Screen(PASTE_SAVE)
     object ConfirmDeleteSubItemScreen: Screen(CONFIRM_DELETE_SUB_ITEM)
     object ConfirmDeleteListScreen: Screen(CONFIRM_DELETE_LIST)

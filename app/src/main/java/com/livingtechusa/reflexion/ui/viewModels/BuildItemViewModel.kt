@@ -1,6 +1,5 @@
 package com.livingtechusa.reflexion.ui.viewModels
 
-import android.content.ClipData
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
@@ -14,7 +13,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
-import androidx.core.content.FileProvider.getUriForFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.livingtechusa.reflexion.R
@@ -22,6 +20,8 @@ import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.entities.Bookmarks
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
+import com.livingtechusa.reflexion.data.models.ReflexionItemAsJson
+import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants.DESCRIPTION
@@ -32,14 +32,16 @@ import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.IMAGE
 import com.livingtechusa.reflexion.util.Constants.NAME
 import com.livingtechusa.reflexion.util.Constants.PARENT
+import com.livingtechusa.reflexion.util.Constants.USE_TOP_ITEM
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URI
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URL
 import com.livingtechusa.reflexion.util.Temporary
+import com.livingtechusa.reflexion.util.json.FileUtil
 import com.livingtechusa.reflexion.util.scopedStorageUtils.FileResource
 import com.livingtechusa.reflexion.util.scopedStorageUtils.ImageUtils
 import com.livingtechusa.reflexion.util.scopedStorageUtils.ImageUtils.rotateImage
 import com.livingtechusa.reflexion.util.scopedStorageUtils.MediaStoreUtils
-import com.livingtechusa.reflexion.util.scopedStorageUtils.ReflexionJsonWriter
+import com.livingtechusa.reflexion.util.json.ReflexionJsonWriter
 import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
 import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil.resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -67,6 +69,9 @@ class BuildItemViewModel @Inject constructor(
         private val TAG = this::class.java.simpleName
     }
 
+    private val _loading = MutableStateFlow(false)
+    val loading: StateFlow<Boolean> get() = _loading
+
     // Used in Nav Drawer to ensure the most up-to-date-state provided
     private var _reflexionItemState = MutableStateFlow(ReflexionItem())
     val reflexionItemState: StateFlow<ReflexionItem> get() = _reflexionItemState
@@ -90,7 +95,6 @@ class BuildItemViewModel @Inject constructor(
     private val _image = MutableStateFlow<Bitmap?>(null)
     val image: StateFlow<Bitmap?> get() = _image.asStateFlow()
 
-
     private val _videoUri = MutableStateFlow(EMPTY_STRING)
     val videoUri: StateFlow<String?> get() = _videoUri
 
@@ -106,6 +110,8 @@ class BuildItemViewModel @Inject constructor(
 
     private val _saveNowFromTopBar = MutableStateFlow(false)
     val saveNowFromTopBar: StateFlow<Boolean> get() = _saveNowFromTopBar
+
+    private var topItem: Long? = null
 
     suspend fun hasNoChildren(pk: Long): Boolean {
         return localServiceImpl.selectChildren(pk).isEmpty()
@@ -283,10 +289,17 @@ class BuildItemViewModel @Inject constructor(
                                     _reflexionItem = ReflexionItem()
                                     updateAllDisplayedSubItemsToViewModelVersion()
                                     _reflexionItemState.value = _reflexionItem
-
                                 }
 
                                 DO_NOT_UPDATE -> {}
+
+                                USE_TOP_ITEM -> {
+                                    _reflexionItem =
+                                        event.pk.let { localServiceImpl.selectItem(topItem ?: 1) }
+                                            ?: ReflexionItem()
+                                    updateAllDisplayedSubItemsToViewModelVersion()
+                                    _reflexionItemState.value = _reflexionItem
+                                }
                                 else -> {
                                     _reflexionItem =
                                         event.pk?.let { localServiceImpl.selectItem(it) }
@@ -381,50 +394,151 @@ class BuildItemViewModel @Inject constructor(
                     is BuildEvent.SendFile -> {
                         viewModelScope.launch {
                             withContext(Dispatchers.Main) {
-                                // create a json file
-                                val filename =
-                                    context.getString(R.string.app_name) + "${System.currentTimeMillis()}.json"
-                                val file = File(context.filesDir, filename)
+                                try {
+                                    // create a json file
+                                    val filename =
+                                        context.getString(R.string.app_name) + reflexionItemState.value.name + "${System.currentTimeMillis()}.json"
+                                    val file = File(context.filesDir, filename)
 
-                                // save data to the file
-                                val outputStream: FileOutputStream = FileOutputStream(file)
-                                val reflexionItemList = mutableListOf(reflexionItemState.value)
-                                ReflexionJsonWriter().writeJsonStream(
-                                    outputStream,
-                                    reflexionItemList
-                                )
-
-                                // generate uri to the file with permissions
-//                            val filePath: File = File(context.filesDir, "json")
-//                            val newFile = File(filePath, file.absolutePath)
-                                val contentUri: Uri = FileProvider.getUriForFile(context.applicationContext, "com.livingtechusa.reflexion.fileprovider", file)
-                                context.grantUriPermission(
-                                    context.applicationContext.packageName,
-                                    contentUri,
-                                    FLAG_GRANT_READ_URI_PERMISSION or FLAG_GRANT_WRITE_URI_PERMISSION
-                                )
-
-                                val shareIntent = Intent()
-
-
-                                if (contentUri.equals(EMPTY_STRING).not()) {
-                                    val resolver: ContentResolver = context.contentResolver
-                                    shareIntent.type = "*/*"
-                                    shareIntent.putExtra(
-                                        Intent.EXTRA_SUBJECT,
-                                        "Sending: ${reflexionItemState.value.name}"
+                                    // save data to the file
+                                    val outputStream: FileOutputStream = FileOutputStream(file)
+                                    val reflexionItemList = mutableListOf(reflexionItemState.value)
+                                    ReflexionJsonWriter()
+                                        .writeJsonStream(
+                                        outputStream,
+                                        reflexionItemList
                                     )
-                                    shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
-                                    shareIntent.setDataAndType(contentUri, contentUri.let { resolver.getType(it) })
-                                    shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
-                                    shareIntent.addFlags(FLAG_ACTIVITY_NEW_TASK or FLAG_GRANT_READ_URI_PERMISSION)
+
+                                    // generate uri to the file with permissions
+                                    val contentUri: Uri = FileProvider.getUriForFile(
+                                        context.applicationContext,
+                                        "com.livingtechusa.reflexion.fileprovider",
+                                        file
+                                    )
+                                    context.grantUriPermission(
+                                        context.applicationContext.packageName,
+                                        contentUri,
+                                        FLAG_GRANT_READ_URI_PERMISSION or FLAG_GRANT_WRITE_URI_PERMISSION
+                                    )
+                                    // Create intent
+                                    val shareIntent = Intent()
+                                    if (contentUri.equals(EMPTY_STRING).not()) {
+                                        val resolver: ContentResolver = context.contentResolver
+                                        shareIntent.type = "*/*"
+                                        shareIntent.putExtra(
+                                            Intent.EXTRA_SUBJECT,
+                                            "Sending: ${reflexionItemState.value.name}"
+                                        )
+                                        shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
+                                        shareIntent.setDataAndType(
+                                            contentUri,
+                                            contentUri.let { resolver.getType(it) })
+                                        shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
+                                        shareIntent.addFlags(FLAG_ACTIVITY_NEW_TASK or FLAG_GRANT_READ_URI_PERMISSION)
+
+                                        shareIntent.action = Intent.ACTION_SEND
+                                        startActivity(context, shareIntent, null)
+
+                                        // delete temp file
+                                        file.delete()
+                                    }
+                                } catch (e: Exception) {
+                                    Toast.makeText(
+                                        context,
+                                        R.string.an_error_occurred_please_try_again,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
-//                                shareIntent.clipData =
-//                                    ClipData.newRawUri(reflexionItemState.value.name, contentUri)
-//                                shareIntent.addFlags(FLAG_ACTIVITY_NEW_TASK or FLAG_GRANT_READ_URI_PERMISSION)
-                                shareIntent.action = Intent.ACTION_SEND
-                                startActivity(context, shareIntent, null)
                             }
+                        }
+                    }
+
+                    is BuildEvent.SaveAndDisplayedReflexionItemFile -> {
+                        // Show Loading
+                        _loading.value = true
+                        try {
+
+                            // read the json
+                            val reflexionFile: List<ReflexionItemAsJson>? = Temporary.file?.let {
+                                FileUtil(context).getObjectFromFile(it)
+                            }
+
+                            val itemsFromFile = mutableListOf<ReflexionItem>()
+
+
+                            reflexionFile?.forEach {
+                                itemsFromFile.add(it.toReflexionItem())
+                            }
+
+                            // Recursively save the children of the prior item
+                            suspend fun saveChildren(list: List<ReflexionItem>, newPk: Long) {
+                                list.forEachIndexed { index, parent ->
+                                    if (parent.parent == null) {
+                                        // remove parent from list
+                                        itemsFromFile.removeAt(index)
+                                        // find all children
+                                        itemsFromFile.filter { child ->
+                                            (child.parent == parent.autogenPk)
+                                        }.apply {
+                                            // Save each child of Topic
+                                            this.forEachIndexed() { index, child ->
+                                                val newChild = localServiceImpl.saveNewItem(
+                                                    child.copy(
+                                                        autogenPk = 0L,
+                                                        parent = newPk
+                                                    )
+                                                )
+                                                // make that child a parent
+                                                itemsFromFile[index] = child.copy(parent = null)
+                                                // send child through as parent with the new primary key
+                                                if(itemsFromFile.isNullOrEmpty().not()) {
+                                                    saveChildren(itemsFromFile, newChild)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            itemsFromFile.forEachIndexed { index, parent ->
+                                // Save topic / parent
+                                if (parent.parent == null) {
+                                    val newParent =
+                                        localServiceImpl.saveNewItem(parent.copy(autogenPk = 0L))
+                                    // save first for display at the end
+                                    if (topItem == null) {
+                                        topItem = newParent
+                                    }
+                                    // remove parent from list
+                                    itemsFromFile.removeAt(index)
+                                    // find all children
+                                    itemsFromFile.filter { child ->
+                                        (child.parent == parent.autogenPk)
+                                    }.apply {
+                                        // Save each child of Topic
+                                        this.forEachIndexed() { index, child ->
+                                            val newChild = localServiceImpl.saveNewItem(
+                                                child.copy(
+                                                    autogenPk = 0L,
+                                                    parent = newParent
+                                                )
+                                            )
+                                            // make that child a parent
+                                            itemsFromFile[index] = child.copy(parent = null)
+                                            // send child through as parent with the new primary key
+                                            if(itemsFromFile.isNullOrEmpty().not()) {
+                                                saveChildren(itemsFromFile, newChild)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            // End Loading
+                            BuildEvent.GetSelectedReflexionItem(topItem)
+                            _loading.value = false
+                        } catch (e: Exception) {
+                            _loading.value = false
+                            Toast.makeText(context, R.string.an_error_occurred_please_try_again, Toast.LENGTH_SHORT).show()
                         }
                     }
 
@@ -499,7 +613,11 @@ class BuildItemViewModel @Inject constructor(
                     TAG,
                     "Exception: ${e.message}  with cause: ${e.cause}"
                 )
-                Toast.makeText(context, resource.getString(R.string.an_error_occurred_please_try_again), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    resource.getString(R.string.an_error_occurred_please_try_again),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }

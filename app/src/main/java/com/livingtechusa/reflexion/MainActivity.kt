@@ -19,7 +19,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
-import androidx.navigation.NavType.Companion
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -33,7 +32,8 @@ import com.livingtechusa.reflexion.ui.bookmarks.BookmarksScreen
 import com.livingtechusa.reflexion.ui.build.BuildItemScreen
 import com.livingtechusa.reflexion.ui.components.ConfirmDeleteListDialog
 import com.livingtechusa.reflexion.ui.components.ConfirmDeleteSubItemDialog
-import com.livingtechusa.reflexion.ui.components.ConfirmSaveAlertDialog
+import com.livingtechusa.reflexion.ui.components.ConfirmSaveFileAlertDialog
+import com.livingtechusa.reflexion.ui.components.ConfirmSaveURLAlertDialog
 import com.livingtechusa.reflexion.ui.components.PasteAndSaveDialog
 import com.livingtechusa.reflexion.ui.components.SelectParentScreen
 import com.livingtechusa.reflexion.ui.components.VideoPlayer
@@ -44,10 +44,11 @@ import com.livingtechusa.reflexion.ui.home.HomeScreen
 import com.livingtechusa.reflexion.ui.settings.SettingsScreen
 import com.livingtechusa.reflexion.ui.theme.ReflexionDynamicTheme
 import com.livingtechusa.reflexion.ui.topics.ListDisplay
-import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
+import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
+import com.livingtechusa.reflexion.util.Constants.EMPTY_PK_STRING
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.HEAD_NODE_PK
 import com.livingtechusa.reflexion.util.Constants.INDEX
@@ -171,13 +172,26 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable(
-                        route = Screen.ConfirmSaveScreen.route,
+                        route = Screen.ConfirmSaveURLScreen.route,
                     ) { navBackStackEntry ->
                         val parentEntry = remember(navBackStackEntry) {
                             navController.getBackStackEntry(Screen.HomeScreen.route)
                         }
                         val parentViewModel: BuildItemViewModel = hiltViewModel(parentEntry)
-                        ConfirmSaveAlertDialog(
+                        ConfirmSaveURLAlertDialog(
+                            navController = navController,
+                            viewModel = parentViewModel
+                        )
+                    }
+
+                    composable(
+                        route = Screen.ConfirmSaveFileScreen.route,
+                    ) { navBackStackEntry ->
+                        val parentEntry = remember(navBackStackEntry) {
+                            navController.getBackStackEntry(Screen.HomeScreen.route)
+                        }
+                        val parentViewModel: BuildItemViewModel = hiltViewModel(parentEntry)
+                        ConfirmSaveFileAlertDialog(
                             navController = navController,
                             viewModel = parentViewModel
                         )
@@ -337,7 +351,7 @@ class MainActivity : ComponentActivity() {
                         ) {
                             val url = intent.clipData?.getItemAt(0)?.text
                             Temporary.url = url.toString()
-                            navigationController.navigate(Screen.ConfirmSaveScreen.route)
+                            navigationController.navigate(Screen.ConfirmSaveURLScreen.route)
                         }
                     }
                     addOnNewIntentListener(listener)
@@ -349,11 +363,20 @@ class MainActivity : ComponentActivity() {
                     Temporary.uri = uri
                     if (uri != EMPTY_STRING && uri != "null") {
                         Temporary.useUri = true
-                        navigationController.navigate(Screen.BuildItemScreen.route + "/-1")
+                        navigationController.navigate(Screen.BuildItemScreen.route + "/" + EMPTY_PK_STRING)
                     }
                     onDispose { }
                 }
-
+                // "Share" from media file
+                DisposableEffect(key1 = Intent()) {
+                    if (intent.type != EMPTY_STRING && intent.type == "application/json") {
+                        // Store Path
+                        Temporary.file = intent.data
+                        //  Confirm desire to save :
+                        navigationController.navigate(Screen.ConfirmSaveFileScreen.route)
+                    }
+                    onDispose { }
+                }
             }
         }
     }

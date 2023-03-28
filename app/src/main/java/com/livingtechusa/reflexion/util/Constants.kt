@@ -1,5 +1,6 @@
 package com.livingtechusa.reflexion.util
 
+import android.net.Uri
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 
@@ -13,10 +14,12 @@ object Constants {
     const val SEARCH_YOUTUBE = "https://www.youtube.com/results?search_query="
     const val SOURCE = "sourceType"
     const val REFLEXION_ITEM_PK = "reflexion_item_pk"
+    const val FILE_PATH = "filePath"
     const val EMPTY_ITEM = "Empty Item"
     const val EMPTY_PK = -1L
     const val EMPTY_PK_STRING = "-1"
     const val DO_NOT_UPDATE = -2L
+    const val USE_TOP_ITEM = -3L
     const val NO_LISTS = "No lists found for selected topic."
     const val INDEX = "index"
     const val LIST_NAME = "listName"
@@ -60,6 +63,7 @@ object Constants {
 }
 
 object Temporary {
+    var file: Uri? = null
     var useUri: Boolean = false
     var url = EMPTY_STRING
     var uri  = EMPTY_STRING

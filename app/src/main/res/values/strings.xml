@@ -107,4 +107,6 @@
     <string name="en" translatable="false">English</string>
     <string name="es" translatable="false">Español</string>
     <string name="language">English</string>
+    <string name="confirm_save_file">Confirm save File(s)</string>
+    <string name="do_you_want_to_save_the_contents_of">"Do you want to save the contents of: "</string>
 </resources>
