@@ -22,7 +22,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.window.core.layout.WindowWidthSizeClass
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.NavBarItems
 import com.livingtechusa.reflexion.util.extensions.findActivity
@@ -31,29 +30,13 @@ const val HOME = "home"
 
 @Composable
 fun HomeScreen(
-    navHostController: NavHostController,
-    windowSize: WindowWidthSizeClass
+    navHostController: NavHostController
 ) {
 
     val context = LocalContext.current
     val icons = NavBarItems.HomeBarItems
     if (context.findActivity() != null) {
-        when (windowSize) {
-            WindowWidthSizeClass.COMPACT -> {
-                CompactScreen(navHostController, icons)
-            }
-
-//            WindowWidthSizeClass.MEDIUM -> {
-//            Landscape(navHostController, icons)
-//        }
-
-//            WindowWidthSizeClass.EXPANDED -> {
-//                ExpandedScreen(navHostController, icons)
-//                viewModel.navigationType = ReflexionNavigationType.PERMANENT_NAVIGATION_DRAWER
-//            }
-
-            else -> CompactScreen(navHostController, icons)
-        }
+        CompactScreen(navHostController, icons)
     }
 }
 
@@ -62,7 +45,8 @@ fun HomeContent() {
     Row(
         Modifier
             .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.background)) {
+            .background(color = MaterialTheme.colorScheme.background)
+    ) {
         Box(
             modifier = Modifier
                 .align(Alignment.CenterVertically)

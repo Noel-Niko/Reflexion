@@ -11,14 +11,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -31,7 +33,7 @@ import kotlinx.coroutines.delay
 fun LoadingAnimation(
     modifier: Modifier = Modifier,
     circleSize: Dp = 25.dp,
-    circleColor: Color = MaterialTheme.colors.primary,
+    circleColor: Color = MaterialTheme.colorScheme.primary,
     spaceBetween: Dp = 10.dp,
     travelDistance: Dp = 20.dp,
     paddingValues: PaddingValues
@@ -64,15 +66,16 @@ fun LoadingAnimation(
     val circleValues = circles.map { it.value }
     val distance = with(LocalDensity.current) { travelDistance.toPx() }
     Column(modifier = modifier
-        .fillMaxSize()
+        .fillMaxWidth()
         .padding(paddingValues = paddingValues)) {
         Row(
-            modifier = modifier.fillMaxSize(),
+            modifier = modifier.fillMaxHeight()
+                .align(Alignment.CenterHorizontally),
             horizontalArrangement = Arrangement.spacedBy(spaceBetween)
         ) {
             circleValues.forEach { value ->
                 Box(
-                    modifier = Modifier
+                    modifier = Modifier.align(Alignment.CenterVertically)
                         .size(circleSize)
                         .graphicsLayer {
                             translationY = -value * distance
@@ -81,6 +84,7 @@ fun LoadingAnimation(
                             color = circleColor,
                             shape = CircleShape
                         )
+
                 )
             }
         }

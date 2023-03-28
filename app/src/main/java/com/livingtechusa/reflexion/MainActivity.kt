@@ -117,7 +117,7 @@ class MainActivity : ComponentActivity() {
                 )
                 val navController = rememberNavController()
                 navigationController = navController
-                val windowSize = calculateWindowSizeClass(this)
+//                val windowSize = calculateWindowSizeClass(this)
                 NavHost(
                     navController = navController,
                     startDestination = Screen.HomeScreen.route
@@ -128,7 +128,6 @@ class MainActivity : ComponentActivity() {
                     ) {
                         HomeScreen(
                             navHostController = navController,
-                            windowSize = windowSize
                         )
                     }
 
@@ -148,7 +147,6 @@ class MainActivity : ComponentActivity() {
                             pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK)
                                 ?: EMPTY_PK,
                             navHostController = navController,
-                            windowSize = windowSize,
                             viewModel = parentViewModel
                         )
                     }
@@ -221,8 +219,7 @@ class MainActivity : ComponentActivity() {
                         ListDisplay(
                             navHostController = navController,
                             pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK)
-                                ?: EMPTY_PK,
-                            windowSize = windowSize,
+                                ?: EMPTY_PK
                         )
                     }
 
@@ -230,8 +227,7 @@ class MainActivity : ComponentActivity() {
                         route = Screen.CustomLists.route,
                     ) {
                         BuildCustomListsScreen(
-                            navController = navController,
-                            windowSize = windowSize
+                            navController = navController
                         )
                     }
 
@@ -288,8 +284,7 @@ class MainActivity : ComponentActivity() {
                     ) { navBackStackEntry ->
                         CustomListDisplayScreen(
                             navController = navController,
-                            headNodePk = navBackStackEntry.arguments?.getLong(HEAD_NODE_PK) ?: -1,
-                            windowSize = windowSize
+                            headNodePk = navBackStackEntry.arguments?.getLong(HEAD_NODE_PK) ?: -1
                         )
                     }
 
@@ -315,16 +310,14 @@ class MainActivity : ComponentActivity() {
                         route = Screen.SettingsScreen.route,
                     ) {
                         SettingsScreen(
-                            navHostController = navController,
-                            windowSize = windowSize
+                            navHostController = navController
                         )
                     }
                     composable(
                         route = Screen.BookmarkScreen.route,
                     ) {
                         BookmarksScreen(
-                            navHostController = navController,
-                            windowSize = windowSize
+                            navHostController = navController
                         )
                     }
 
