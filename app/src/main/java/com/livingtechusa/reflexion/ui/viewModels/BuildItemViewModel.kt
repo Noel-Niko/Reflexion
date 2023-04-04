@@ -477,7 +477,6 @@ class BuildItemViewModel @Inject constructor(
                         // Show Loading
                         _loading.value = true
                         try {
-
                             // read the json
                             val reflexionFile: List<ReflexionItemAsJson>? = TemporarySingleton.file?.let {
                                 FileUtil(context).getObjectFromFile(it)
@@ -528,7 +527,9 @@ class BuildItemViewModel @Inject constructor(
                                     val newParent =
                                         localServiceImpl.saveNewItem(itemsFromFile[0].copy(autogenPk = 0L))
 //                                    // save first for display at the end
-//
+                                    if(topItem == null) {
+                                        topItem = newParent
+                                    }
                                     // remove parent from list
                                     itemsFromFile.removeAt(0)
                                     // find all children
