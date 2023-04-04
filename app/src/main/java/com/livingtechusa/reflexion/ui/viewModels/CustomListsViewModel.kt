@@ -440,7 +440,7 @@ class CustomListsViewModel @Inject constructor(
                                     val shareIntent = Intent()
                                     if (contentUri.equals(EMPTY_STRING).not()) {
                                         val resolver: ContentResolver = context.contentResolver
-                                        shareIntent.type = "*/*"
+                                        shareIntent.type = "plain/text"
                                         shareIntent.putExtra(
                                             Intent.EXTRA_SUBJECT,
                                             "Sending: ${customList.value.itemName}"
@@ -454,9 +454,9 @@ class CustomListsViewModel @Inject constructor(
 
                                         shareIntent.action = Intent.ACTION_SEND
                                         startActivity(context, shareIntent, null)
-                                       if (file != null) {
-                                           TemporarySingleton.sharedFileList.add(file!!)
-                                       }
+
+                                           TemporarySingleton.sharedFileList.add(contentUri)
+
                                         _loading.value = false
                                     }
                                 }

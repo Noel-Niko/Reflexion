@@ -14,8 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
-import androidx.core.content.FileProvider
-import androidx.core.net.toUri
 import androidx.core.util.Consumer
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -120,6 +118,37 @@ class MainActivity : ComponentActivity() {
                             if (event == Lifecycle.Event.ON_START) {
                                 permissionsState.launchMultiplePermissionRequest()
                                 MediaUtil().verifyStoragePermission(this@MainActivity)
+                                // manage file storage
+                                try {
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        UserPreferencesUtil.getFilesSaved(this@MainActivity)
+                                            ?.forEach { string ->
+                                                if (string != null) {
+                                                    val uri =
+                                                        Converters().convertStringToUri(string)
+                                                    if (uri != null) {
+//                                                        val file =
+//                                                            SafeUtils.getResourceByUriPersistently(
+//                                                                context = this@MainActivity,
+//                                                                uri = uri
+//                                                            )
+//                                                        deleteFile(file?.filename)
+                                                        val resolver =
+                                                            this@MainActivity.contentResolver
+                                                        resolver.delete(uri, null)
+                                                    }
+                                                }
+                                            }
+                                        // Clear stored file paths
+                                        UserPreferencesUtil.clearFilesSaved(this@MainActivity)
+                                        UserPreferencesUtil.setFilesSaved(this@MainActivity, mutableSetOf())
+                                    }
+                                } catch (e: Exception) {
+                                    Log.e(
+                                        TAG,
+                                        "Failure deleting file with message " + e.message + " with cause " + e.cause
+                                    )
+                                }
                             }
                         }
                         lifecycleOwner.lifecycle.addObserver(observer)

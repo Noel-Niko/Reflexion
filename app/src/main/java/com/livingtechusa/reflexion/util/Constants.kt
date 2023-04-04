@@ -70,6 +70,6 @@ object TemporarySingleton {
     var uri  = EMPTY_STRING
     var useParentPk: Boolean = false
     var parentPk: String = EMPTY_STRING
-    var sharedFileList = mutableListOf<File>()
+    var sharedFileList = mutableListOf<Uri>()
 }
 

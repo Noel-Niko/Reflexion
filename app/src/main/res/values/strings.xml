@@ -109,6 +109,6 @@
     <string name="language">English</string>
     <string name="confirm_save_file">Confirm save file(s)</string>
     <string name="do_you_want_to_save_the_contents_of">"Do you want to save the contents of: "</string>
-    <string name="has_the_share_file_been_fully_uploaded">"¿Se ha cargado completamente el archivo compartido?"</string>
-    <string name="shared_prefs_files_saved_list">"Preferencias compartidas Lista de archivos guardados"</string>
+    <string name="has_the_share_file_been_fully_uploaded">Has the share file been fully uploaded?</string>
+    <string name="shared_prefs_files_saved_list">shared prefs files saved list</string>
 </resources>

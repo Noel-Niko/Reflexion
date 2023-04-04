@@ -417,21 +417,6 @@ class BuildItemViewModel @Inject constructor(
                                         reflexionItemList
                                     )
 
-                                    // record file for later deletion
-                                    TemporarySingleton.sharedFileList.add(file)
-                                    val fileSet: MutableSet<String> = mutableSetOf()
-//                                    val resolver = context.contentResolver
-                                    TemporarySingleton.sharedFileList.mapTo(fileSet){ file ->
-                                        file.absolutePath.toUri().toString()
-
-//                                        FileProvider.getUriForFile(
-//                                            context.applicationContext,
-//                                            context.packageName,
-//                                            file
-//                                        ).toString()
-                                    }
-                                    UserPreferencesUtil.setFilesSaved(context, fileSet)
-
                                     // generate uri to the file with permissions
                                     val contentUri: Uri = FileProvider.getUriForFile(
                                         context.applicationContext,
@@ -443,6 +428,22 @@ class BuildItemViewModel @Inject constructor(
                                         contentUri,
                                         FLAG_GRANT_READ_URI_PERMISSION or FLAG_GRANT_WRITE_URI_PERMISSION
                                     )
+
+                                    TemporarySingleton.sharedFileList.add(contentUri)
+                                    // record file for later deletion
+                                    val fileSet: MutableSet<String> = mutableSetOf()
+//                                    val resolver = context.contentResolver
+                                    TemporarySingleton.sharedFileList.forEach{ uri ->
+                                        fileSet.add(Converters().convertUriToString(uri) ?: EMPTY_STRING)
+
+//                                        FileProvider.getUriForFile(
+//                                            context.applicationContext,
+//                                            context.packageName,
+//                                            file
+//                                        ).toString()
+                                    }
+//
+                                    UserPreferencesUtil.setFilesSaved(context, fileSet)
                                     // Create intent
                                     val shareIntent = Intent()
                                     if (contentUri.equals(EMPTY_STRING).not()) {
