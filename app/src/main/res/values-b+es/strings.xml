@@ -107,4 +107,8 @@
     <string name="en" translatable="false">English</string>
     <string name="es" translatable="false">Español</string>
     <string name="language">Español</string>
+    <string name="confirm_save_file">Confirmar guardar archivo(s)</string>
+    <string name="do_you_want_to_save_the_contents_of">"¿Desea guardar el contenido de: "</string>
+    <string name="has_the_share_file_been_fully_uploaded">Has the share file been fully uploaded?</string>
+    <string name="shared_prefs_files_saved_list">shared prefs files saved list</string>
 </resources>
