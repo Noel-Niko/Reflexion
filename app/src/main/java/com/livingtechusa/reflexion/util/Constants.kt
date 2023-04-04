@@ -3,6 +3,7 @@ package com.livingtechusa.reflexion.util
 import android.net.Uri
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
+import java.io.File
 
 object Constants {
     const val DATABASE_NAME: String = "Reflexion_Database"
@@ -62,12 +63,13 @@ object Constants {
         )
 }
 
-object Temporary {
+object TemporarySingleton {
     var file: Uri? = null
     var useUri: Boolean = false
     var url = EMPTY_STRING
     var uri  = EMPTY_STRING
     var useParentPk: Boolean = false
     var parentPk: String = EMPTY_STRING
+    var sharedFileList = mutableListOf<File>()
 }
 

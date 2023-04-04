@@ -24,7 +24,7 @@ data class ReflexionItemAsJson(
             imagePk = imagePk?.toLong(),
             videoUri = videoUri,
             videoUrl =videoUrl,
-            parent = null//parent?.toLong()
+            parent = try { parent?.toLong() } catch (e: Exception) { null }
         )
     }
 

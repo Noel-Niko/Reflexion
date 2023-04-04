@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -13,6 +14,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.core.util.Consumer
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -27,6 +30,7 @@ import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.bookmarks.BookmarksScreen
 import com.livingtechusa.reflexion.ui.build.BuildItemScreen
@@ -57,14 +61,23 @@ import com.livingtechusa.reflexion.util.Constants.REFLEXION_ITEM_PK
 import com.livingtechusa.reflexion.util.Constants.SOURCE
 import com.livingtechusa.reflexion.util.Constants.SUB_ITEM
 import com.livingtechusa.reflexion.util.MediaUtil
-import com.livingtechusa.reflexion.util.Temporary
+import com.livingtechusa.reflexion.util.TemporarySingleton
+import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
+import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 const val Main_Activity = "Main_Activity"
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    companion object {
+        const val TAG = "MainActivity"
+    }
 
     @Inject
     lateinit var app: BaseApplication
@@ -117,7 +130,6 @@ class MainActivity : ComponentActivity() {
                 )
                 val navController = rememberNavController()
                 navigationController = navController
-//                val windowSize = calculateWindowSizeClass(this)
                 NavHost(
                     navController = navController,
                     startDestination = Screen.HomeScreen.route
@@ -343,7 +355,7 @@ class MainActivity : ComponentActivity() {
                             )?.text != EMPTY_STRING
                         ) {
                             val url = intent.clipData?.getItemAt(0)?.text
-                            Temporary.url = url.toString()
+                            TemporarySingleton.url = url.toString()
                             navigationController.navigate(Screen.ConfirmSaveURLScreen.route)
                         }
                     }
@@ -353,9 +365,9 @@ class MainActivity : ComponentActivity() {
                 // "Share" from media file
                 DisposableEffect(key1 = Intent()) {
                     val uri: String = intent.clipData?.getItemAt(0)?.uri.toString()
-                    Temporary.uri = uri
+                    TemporarySingleton.uri = uri
                     if (uri != EMPTY_STRING && uri != "null") {
-                        Temporary.useUri = true
+                        TemporarySingleton.useUri = true
                         navigationController.navigate(Screen.BuildItemScreen.route + "/" + EMPTY_PK_STRING)
                     }
                     onDispose { }
@@ -364,7 +376,7 @@ class MainActivity : ComponentActivity() {
                 DisposableEffect(key1 = Intent()) {
                     if (intent.type != EMPTY_STRING && intent.type == "application/json") {
                         // Store Path
-                        Temporary.file = intent.data
+                        TemporarySingleton.file = intent.data
                         //  Confirm desire to save :
                         navigationController.navigate(Screen.ConfirmSaveFileScreen.route)
                     }

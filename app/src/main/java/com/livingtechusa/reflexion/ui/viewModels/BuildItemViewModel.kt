@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
 import android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -13,6 +14,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.livingtechusa.reflexion.R
@@ -21,7 +23,6 @@ import com.livingtechusa.reflexion.data.entities.Bookmarks
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.data.models.ReflexionItemAsJson
-import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants.DESCRIPTION
@@ -35,7 +36,7 @@ import com.livingtechusa.reflexion.util.Constants.PARENT
 import com.livingtechusa.reflexion.util.Constants.USE_TOP_ITEM
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URI
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URL
-import com.livingtechusa.reflexion.util.Temporary
+import com.livingtechusa.reflexion.util.TemporarySingleton
 import com.livingtechusa.reflexion.util.json.FileUtil
 import com.livingtechusa.reflexion.util.scopedStorageUtils.FileResource
 import com.livingtechusa.reflexion.util.scopedStorageUtils.ImageUtils
@@ -43,6 +44,7 @@ import com.livingtechusa.reflexion.util.scopedStorageUtils.ImageUtils.rotateImag
 import com.livingtechusa.reflexion.util.scopedStorageUtils.MediaStoreUtils
 import com.livingtechusa.reflexion.util.json.ReflexionJsonWriter
 import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
+import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil
 import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil.resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -396,9 +398,15 @@ class BuildItemViewModel @Inject constructor(
                             withContext(Dispatchers.Main) {
                                 try {
                                     // create a json file
+                                    val title = reflexionItemState.value.name.replace(" ", "_")
+
                                     val filename =
-                                        context.getString(R.string.app_name) + reflexionItemState.value.name + "${System.currentTimeMillis()}.json"
+                                        context.getString(R.string.app_name) + title + "${System.currentTimeMillis()}.json"
                                     val file = File(context.filesDir, filename)
+                                    file.setExecutable(true, false)
+                                    file.setReadable(true, false)
+                                    file.setWritable(true, false)
+
 
                                     // save data to the file
                                     val outputStream: FileOutputStream = FileOutputStream(file)
@@ -408,6 +416,21 @@ class BuildItemViewModel @Inject constructor(
                                         outputStream,
                                         reflexionItemList
                                     )
+
+                                    // record file for later deletion
+                                    TemporarySingleton.sharedFileList.add(file)
+                                    val fileSet: MutableSet<String> = mutableSetOf()
+//                                    val resolver = context.contentResolver
+                                    TemporarySingleton.sharedFileList.mapTo(fileSet){ file ->
+                                        file.absolutePath.toUri().toString()
+
+//                                        FileProvider.getUriForFile(
+//                                            context.applicationContext,
+//                                            context.packageName,
+//                                            file
+//                                        ).toString()
+                                    }
+                                    UserPreferencesUtil.setFilesSaved(context, fileSet)
 
                                     // generate uri to the file with permissions
                                     val contentUri: Uri = FileProvider.getUriForFile(
@@ -424,7 +447,7 @@ class BuildItemViewModel @Inject constructor(
                                     val shareIntent = Intent()
                                     if (contentUri.equals(EMPTY_STRING).not()) {
                                         val resolver: ContentResolver = context.contentResolver
-                                        shareIntent.type = "*/*"
+                                        shareIntent.type = "plain/text"
                                         shareIntent.putExtra(
                                             Intent.EXTRA_SUBJECT,
                                             "Sending: ${reflexionItemState.value.name}"
@@ -434,13 +457,9 @@ class BuildItemViewModel @Inject constructor(
                                             contentUri,
                                             contentUri.let { resolver.getType(it) })
                                         shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
-                                        shareIntent.addFlags(FLAG_ACTIVITY_NEW_TASK or FLAG_GRANT_READ_URI_PERMISSION)
-
+                                        shareIntent.flags = FLAG_ACTIVITY_NEW_TASK or FLAG_GRANT_READ_URI_PERMISSION
                                         shareIntent.action = Intent.ACTION_SEND
                                         startActivity(context, shareIntent, null)
-
-                                        // delete temp file
-                                        file.delete()
                                     }
                                 } catch (e: Exception) {
                                     Toast.makeText(
@@ -459,12 +478,11 @@ class BuildItemViewModel @Inject constructor(
                         try {
 
                             // read the json
-                            val reflexionFile: List<ReflexionItemAsJson>? = Temporary.file?.let {
+                            val reflexionFile: List<ReflexionItemAsJson>? = TemporarySingleton.file?.let {
                                 FileUtil(context).getObjectFromFile(it)
                             }
 
                             val itemsFromFile = mutableListOf<ReflexionItem>()
-
 
                             reflexionFile?.forEach {
                                 itemsFromFile.add(it.toReflexionItem())
@@ -491,7 +509,7 @@ class BuildItemViewModel @Inject constructor(
                                                 // make that child a parent
                                                 itemsFromFile[index] = child.copy(parent = null)
                                                 // send child through as parent with the new primary key
-                                                if(itemsFromFile.isNullOrEmpty().not()) {
+                                                if (itemsFromFile.isNullOrEmpty().not()) {
                                                     saveChildren(itemsFromFile, newChild)
                                                 }
                                             }
@@ -500,23 +518,27 @@ class BuildItemViewModel @Inject constructor(
                                 }
                             }
 
-                            itemsFromFile.forEachIndexed { index, parent ->
+                            suspend fun saveParent(itemsFromFile: MutableList<ReflexionItem>) {
+                                val hasParentInList = itemsFromFile.firstOrNull() { child ->
+                                    (child.parent == itemsFromFile[0].autogenPk)
+                                }
                                 // Save topic / parent
-                                if (parent.parent == null) {
+                                if (itemsFromFile[0].parent == null || hasParentInList == null) {
                                     val newParent =
-                                        localServiceImpl.saveNewItem(parent.copy(autogenPk = 0L))
-                                    // save first for display at the end
-                                    if (topItem == null) {
-                                        topItem = newParent
-                                    }
+                                        localServiceImpl.saveNewItem(itemsFromFile[0].copy(autogenPk = 0L))
+//                                    // save first for display at the end
+//
                                     // remove parent from list
-                                    itemsFromFile.removeAt(index)
+                                    itemsFromFile.removeAt(0)
                                     // find all children
-                                    itemsFromFile.filter { child ->
-                                        (child.parent == parent.autogenPk)
-                                    }.apply {
-                                        // Save each child of Topic
-                                        this.forEachIndexed() { index, child ->
+                                    val children = itemsFromFile.filter { child ->
+                                        (child.parent == itemsFromFile[0].autogenPk)
+                                    }
+                                    // Save each child of Topic
+                                    // why to we trip and error here? Becuase the itemsfromFile is not changed
+
+                                    if (children.isEmpty().not()) {
+                                        children.forEachIndexed() { index, child ->
                                             val newChild = localServiceImpl.saveNewItem(
                                                 child.copy(
                                                     autogenPk = 0L,
@@ -526,20 +548,28 @@ class BuildItemViewModel @Inject constructor(
                                             // make that child a parent
                                             itemsFromFile[index] = child.copy(parent = null)
                                             // send child through as parent with the new primary key
-                                            if(itemsFromFile.isNullOrEmpty().not()) {
+                                            if (itemsFromFile.isEmpty().not()) {
                                                 saveChildren(itemsFromFile, newChild)
+                                            } else {
+                                                _loading.value = false
                                             }
+                                        }
+                                    } else {
+                                        if (itemsFromFile.isEmpty().not()) {
+                                            saveParent(itemsFromFile)
+                                        } else {
+                                            _loading.value = false
                                         }
                                     }
                                 }
                             }
-                            // End Loading
-                            BuildEvent.GetSelectedReflexionItem(topItem)
-                            _loading.value = false
+                            saveParent(itemsFromFile)
+
                         } catch (e: Exception) {
                             _loading.value = false
                             Toast.makeText(context, R.string.an_error_occurred_please_try_again, Toast.LENGTH_SHORT).show()
                         }
+                        _loading.value = false
                     }
 
                     is BuildEvent.Save -> {
@@ -602,9 +632,9 @@ class BuildItemViewModel @Inject constructor(
                                     )
                                 )
                             }
-                            Temporary.url = EMPTY_STRING
-                            Temporary.uri = EMPTY_STRING
-                            Temporary.useUri = false
+                            TemporarySingleton.url = EMPTY_STRING
+                            TemporarySingleton.uri = EMPTY_STRING
+                            TemporarySingleton.useUri = false
                         }
                     }
                 }

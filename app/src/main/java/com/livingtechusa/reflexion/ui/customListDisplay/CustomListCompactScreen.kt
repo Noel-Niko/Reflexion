@@ -8,8 +8,8 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -25,12 +25,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.NavBarItems
+import com.livingtechusa.reflexion.ui.components.animation_utils.LoadingAnimation
 import com.livingtechusa.reflexion.ui.customLists.CustomListEvent
 import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomListDisplayCompactScreen(
     navController: NavHostController,
@@ -43,6 +42,7 @@ fun CustomListDisplayCompactScreen(
     val resource = ResourceProviderSingleton
     val icons = NavBarItems.CustomListsDisplayBarItems
     val selectedList by viewModel.customList.collectAsState()
+    val loading by viewModel.loading.collectAsState()
 
     Scaffold(
         topBar = {
@@ -69,6 +69,16 @@ fun CustomListDisplayCompactScreen(
                                 androidx.compose.material.Icon(
                                     imageVector = Icons.Default.Bookmark,
                                     contentDescription = "bookmark",
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                )
+                            },
+                        )
+                        IconButton(
+                            onClick = { viewModel.onTriggerEvent(CustomListEvent.SendFile) },
+                            content = {
+                                androidx.compose.material.Icon(
+                                    imageVector = Icons.Default.FileUpload,
+                                    contentDescription = "send reflexion item file",
                                     tint = MaterialTheme.colorScheme.onSurface,
                                 )
                             },
@@ -126,11 +136,15 @@ fun CustomListDisplayCompactScreen(
             }
         }
     ) { paddingValues ->
-        CustomListDisplayContent(
-            paddingValues = paddingValues,
-            navController = navController,
-            viewModel = viewModel
-        )
+        if (loading) {
+            LoadingAnimation(paddingValues = paddingValues)
+        } else {
+            CustomListDisplayContent(
+                paddingValues = paddingValues,
+                navController = navController,
+                viewModel = viewModel
+            )
+        }
     }
 }
 

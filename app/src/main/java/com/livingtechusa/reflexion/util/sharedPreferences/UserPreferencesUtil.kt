@@ -10,6 +10,7 @@ import com.livingtechusa.reflexion.R.string.shared_prefs_displayed_user_name
 import com.livingtechusa.reflexion.R.string.shared_prefs_encrypted_biometric_password
 import com.livingtechusa.reflexion.R.string.shared_prefs_encrypted_password
 import com.livingtechusa.reflexion.R.string.shared_prefs_encrypted_user_password
+import com.livingtechusa.reflexion.R.string.shared_prefs_files_saved_list
 import com.livingtechusa.reflexion.R.string.shared_prefs_logged_in_user_name
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 
@@ -168,5 +169,16 @@ object UserPreferencesUtil : SharedPreferencesUtil() {
     // -1 = nothing set, 1 = darkmode, 0 = lightMode
     fun setCurrentUserModeSelection(context: Context, selection: Int) {
         setInt(PREFERENCE_TYPE, context, shared_prefs_current_mode_selected, selection)
+    }
+
+    /*
+    * File Management
+     */
+    fun setFilesSaved(context: Context, fileList: Set<String>) {
+        setStringSet(PREFERENCE_TYPE, context, shared_prefs_files_saved_list, fileList)
+    }
+
+    fun getFilesSaved(context: Context): Set<String?>? {
+        return getStringSet(PREFERENCE_TYPE, context, shared_prefs_files_saved_list, emptySet())
     }
 }

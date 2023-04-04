@@ -16,9 +16,8 @@ import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
-import com.livingtechusa.reflexion.util.Constants.EMPTY_PK_STRING
 import com.livingtechusa.reflexion.util.Constants.USE_TOP_ITEM
-import com.livingtechusa.reflexion.util.Temporary
+import com.livingtechusa.reflexion.util.TemporarySingleton
 
 const val CONFIRM_SAVE_FILE = "ConfirmSaveFileAlertDialog"
 
@@ -27,7 +26,7 @@ fun ConfirmSaveFileAlertDialog(
     navController: NavHostController,
     viewModel: BuildItemViewModel = hiltViewModel()
 ) {
-    val filePath = Temporary.file
+    val filePath = TemporarySingleton.file
     MaterialTheme {
         Column {
             val openDialog = remember { mutableStateOf(true) }

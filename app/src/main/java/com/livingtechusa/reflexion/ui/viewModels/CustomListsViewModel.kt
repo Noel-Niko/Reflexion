@@ -1,5 +1,6 @@
 package com.livingtechusa.reflexion.ui.viewModels
 
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_STREAM
@@ -9,6 +10,7 @@ import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.livingtechusa.reflexion.R
@@ -24,6 +26,8 @@ import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK_STRING
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.NULL
+import com.livingtechusa.reflexion.util.TemporarySingleton
+import com.livingtechusa.reflexion.util.json.ReflexionJsonWriter
 import com.livingtechusa.reflexion.util.scopedStorageUtils.FileResource
 import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,6 +37,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 import javax.inject.Inject
 
 
@@ -83,9 +89,12 @@ class CustomListsViewModel @Inject constructor(
     private val _selectedParent = MutableStateFlow(ReflexionItem())
     val selectedParent: StateFlow<ReflexionItem> get() = _selectedParent
 
+    private val _loading = MutableStateFlow(false)
+    val loading: StateFlow<Boolean> get() = _loading
 
     private var newList = true
     private var topic: Long = EMPTY_PK
+    private var file: File? = null
 
     private suspend fun getTopic(pk: Long): Long {
         var childPk: Long? = pk
@@ -387,6 +396,80 @@ class CustomListsViewModel @Inject constructor(
 
                     shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     startActivity(context, shareIntent, null)
+                }
+
+                is CustomListEvent.SendFile -> {
+                    _loading.value = true
+                    viewModelScope.launch {
+                        withContext(Dispatchers.IO) {
+                            try {
+                                // create a json file
+                                val title = customList.value.itemName?.replace(" ", "_")
+                                val filename =
+                                    context.getString(R.string.app_name) + title + "${System.currentTimeMillis()}.json"
+                                file = File(context.filesDir, filename)
+
+                                // save data to the file
+                                val outputStream: FileOutputStream = FileOutputStream(file)
+                                val reflexionItemList = mutableListOf<ReflexionItem>()
+                                customList.value.children.forEach { item ->
+                                    item.itemPK?.let { pk ->
+                                        localServiceImpl.selectItem(pk)
+                                            ?.let { reflexionItem -> reflexionItemList.add(reflexionItem) }
+                                    }
+                                }
+                                ReflexionJsonWriter()
+                                    .writeJsonStream(
+                                        outputStream,
+                                        reflexionItemList
+                                    )
+
+                                // generate uri to the file with permissions
+                                if (file != null) {
+                                    val contentUri: Uri = FileProvider.getUriForFile(
+                                        context.applicationContext,
+                                        "com.livingtechusa.reflexion.fileprovider",
+                                        file!!
+                                    )
+                                    context.grantUriPermission(
+                                        context.applicationContext.packageName,
+                                        contentUri,
+                                        Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                                    )
+                                    // Create intent
+                                    val shareIntent = Intent()
+                                    if (contentUri.equals(EMPTY_STRING).not()) {
+                                        val resolver: ContentResolver = context.contentResolver
+                                        shareIntent.type = "*/*"
+                                        shareIntent.putExtra(
+                                            Intent.EXTRA_SUBJECT,
+                                            "Sending: ${customList.value.itemName}"
+                                        )
+                                        shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
+                                        shareIntent.setDataAndType(
+                                            contentUri,
+                                            contentUri.let { resolver.getType(it) })
+                                        shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
+                                        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+                                        shareIntent.action = Intent.ACTION_SEND
+                                        startActivity(context, shareIntent, null)
+                                       if (file != null) {
+                                           TemporarySingleton.sharedFileList.add(file!!)
+                                       }
+                                        _loading.value = false
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                _loading.value = false
+                                Toast.makeText(
+                                    context,
+                                    R.string.an_error_occurred_please_try_again,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    }
                 }
 
                 else -> {}

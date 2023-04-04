@@ -20,7 +20,7 @@ import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
 import com.livingtechusa.reflexion.util.Constants.DO_NOT_UPDATE
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URL
-import com.livingtechusa.reflexion.util.Temporary
+import com.livingtechusa.reflexion.util.TemporarySingleton
 
 const val CONFIRM_SAVE_URL = "ConfirmSaveURLAlertDialog"
 
@@ -29,7 +29,7 @@ fun ConfirmSaveURLAlertDialog(
     navController: NavHostController,
     viewModel: BuildItemViewModel = hiltViewModel()
 ) {
-    val url = Temporary.url
+    val url = TemporarySingleton.url
     MaterialTheme {
         Column {
             val openDialog = remember { mutableStateOf(true) }
@@ -56,8 +56,8 @@ fun ConfirmSaveURLAlertDialog(
                                 navController.navigate(Screen.BuildItemScreen.route + "/" + DO_NOT_UPDATE) {
                                     launchSingleTop = true
                                 }
-                                Temporary.url = EMPTY_STRING
-                                Temporary.uri = EMPTY_STRING
+                                TemporarySingleton.url = EMPTY_STRING
+                                TemporarySingleton.uri = EMPTY_STRING
                             },
                             colors = ButtonDefaults.buttonColors(backgroundColor =  androidx.compose.material3.MaterialTheme.colorScheme.primary, contentColor =  androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
                         ) {
@@ -71,8 +71,8 @@ fun ConfirmSaveURLAlertDialog(
                                 navController.navigate(Screen.BuildItemScreen.route + "/" + DO_NOT_UPDATE) {
                                     launchSingleTop = true
                                 }
-                                Temporary.url = EMPTY_STRING
-                                Temporary.uri = EMPTY_STRING
+                                TemporarySingleton.url = EMPTY_STRING
+                                TemporarySingleton.uri = EMPTY_STRING
                             },
                             colors = ButtonDefaults.buttonColors(backgroundColor =  androidx.compose.material3.MaterialTheme.colorScheme.primary, contentColor =  androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
                         ) {
