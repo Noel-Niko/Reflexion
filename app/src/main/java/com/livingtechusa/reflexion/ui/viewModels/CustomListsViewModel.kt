@@ -30,6 +30,7 @@ import com.livingtechusa.reflexion.util.TemporarySingleton
 import com.livingtechusa.reflexion.util.json.ReflexionJsonWriter
 import com.livingtechusa.reflexion.util.scopedStorageUtils.FileResource
 import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
+import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -94,7 +95,6 @@ class CustomListsViewModel @Inject constructor(
 
     private var newList = true
     private var topic: Long = EMPTY_PK
-    private var file: File? = null
 
     private suspend fun getTopic(pk: Long): Long {
         var childPk: Long? = pk
@@ -407,7 +407,10 @@ class CustomListsViewModel @Inject constructor(
                                 val title = customList.value.itemName?.replace(" ", "_")
                                 val filename =
                                     context.getString(R.string.app_name) + title + "${System.currentTimeMillis()}.json"
-                                file = File(context.filesDir, filename)
+                                val file = File(context.filesDir, filename)
+                                file.setExecutable(true, false)
+                                file.setReadable(true, false)
+                                file.setWritable(true, false)
 
                                 // save data to the file
                                 val outputStream: FileOutputStream = FileOutputStream(file)
@@ -436,6 +439,14 @@ class CustomListsViewModel @Inject constructor(
                                         contentUri,
                                         Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                                     )
+
+                                    TemporarySingleton.sharedFileList.add(contentUri)
+                                    val fileSet: MutableSet<String> = mutableSetOf()
+                                    TemporarySingleton.sharedFileList.forEach{ uri ->
+                                        fileSet.add(Converters().convertUriToString(uri) ?: EMPTY_STRING)
+                                    }
+                                    UserPreferencesUtil.setFilesSaved(context, fileSet)
+
                                     // Create intent
                                     val shareIntent = Intent()
                                     if (contentUri.equals(EMPTY_STRING).not()) {
@@ -454,9 +465,6 @@ class CustomListsViewModel @Inject constructor(
 
                                         shareIntent.action = Intent.ACTION_SEND
                                         startActivity(context, shareIntent, null)
-
-                                           TemporarySingleton.sharedFileList.add(contentUri)
-
                                         _loading.value = false
                                     }
                                 }

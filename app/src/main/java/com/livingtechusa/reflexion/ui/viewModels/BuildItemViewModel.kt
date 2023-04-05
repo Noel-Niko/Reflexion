@@ -115,6 +115,10 @@ class BuildItemViewModel @Inject constructor(
 
     private var topItem: Long? = null
 
+    fun setTopItem(pk: Long) {
+        topItem = pk
+    }
+
     suspend fun hasNoChildren(pk: Long): Boolean {
         return localServiceImpl.selectChildren(pk).isEmpty()
     }
@@ -432,17 +436,9 @@ class BuildItemViewModel @Inject constructor(
                                     TemporarySingleton.sharedFileList.add(contentUri)
                                     // record file for later deletion
                                     val fileSet: MutableSet<String> = mutableSetOf()
-//                                    val resolver = context.contentResolver
                                     TemporarySingleton.sharedFileList.forEach{ uri ->
                                         fileSet.add(Converters().convertUriToString(uri) ?: EMPTY_STRING)
-
-//                                        FileProvider.getUriForFile(
-//                                            context.applicationContext,
-//                                            context.packageName,
-//                                            file
-//                                        ).toString()
                                     }
-//
                                     UserPreferencesUtil.setFilesSaved(context, fileSet)
                                     // Create intent
                                     val shareIntent = Intent()
@@ -526,7 +522,7 @@ class BuildItemViewModel @Inject constructor(
                                 if (itemsFromFile[0].parent == null || hasParentInList == null) {
                                     val newParent =
                                         localServiceImpl.saveNewItem(itemsFromFile[0].copy(autogenPk = 0L))
-//                                    // save first for display at the end
+                                    // save first for display at the end
                                     if(topItem == null) {
                                         topItem = newParent
                                     }

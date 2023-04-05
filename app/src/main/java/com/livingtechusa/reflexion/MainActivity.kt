@@ -141,6 +141,7 @@ class MainActivity : ComponentActivity() {
                                             }
                                         // Clear stored file paths
                                         UserPreferencesUtil.clearFilesSaved(this@MainActivity)
+                                        TemporarySingleton.sharedFileList.clear()
                                         UserPreferencesUtil.setFilesSaved(this@MainActivity, mutableSetOf())
                                     }
                                 } catch (e: Exception) {
