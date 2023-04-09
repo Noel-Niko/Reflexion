@@ -493,7 +493,7 @@ class BuildItemViewModel @Inject constructor(
                                 itemsFromFile.add(it.toReflexionItem())
                             }
                             // itemsFromFile is global to the viewModel and processed in this function
-                            saveParent()
+                            saveItemFromFile(null, null, null, null)
 
                         } catch (e: Exception) {
                             _loading.value = false
@@ -630,145 +630,48 @@ class BuildItemViewModel @Inject constructor(
     }
 
     // Functions to Save File Contents
-    private suspend fun saveParent() {
-        val hasParentInList = itemsFromFile.firstOrNull() { child ->
-            (child.parent == itemsFromFile[0].autogenPk)
-        }
-        // Save topic / parent
-        if (itemsFromFile[0].parent == null || hasParentInList == null) {
-            val oldParentPk = itemsFromFile[0].autogenPk
-            val newParent =
-                localServiceImpl.saveNewItem(
+    private suspend fun saveItemFromFile(filePk: Long?, dbPk: Long?, fileGrandParentPk: Long?, DbGrandparentPk: Long?) {
+        var oldPrimaryKey: Long? = filePk
+        var newPrimaryKey: Long? = null
+        val newFileGrandParentPk = filePk
+        // if a child of saved item, save all in depthful way
+        itemsFromFile.forEach {
+            if (it.parent == filePk) {
+                oldPrimaryKey = it.autogenPk
+                newPrimaryKey = localServiceImpl.saveNewItem(
                     itemsFromFile[0].copy(
                         autogenPk = 0L,
-                        parent = null
+                        parent = dbPk
                     )
                 )
-            // save first for display at the end
-            if (topItem == null) {
-                topItem = newParent
+                itemsFromFile.remove(it)
+                saveItemFromFile(oldPrimaryKey, newPrimaryKey, newFileGrandParentPk, dbPk)
             }
-            // remove parent from list
-            itemsFromFile.removeAt(0)
-            // find all children
-            val children = itemsFromFile.filter { child ->
-                (child.parent == oldParentPk)
-            }
-            // Save each child of Topic
-            if (children.isEmpty().not()) {
-                children.forEachIndexed() { index, child ->
-                    // save child item
-                    val newChild = localServiceImpl.saveNewItem(
-                        child.copy(
-                            autogenPk = 0L,
-                            parent = newParent
-                        )
+        }
+        // sava all topics and orphaned parents at present level
+        itemsFromFile.forEach {
+            if (!hasParentInList(it.parent) && it.parent != filePk) {
+                oldPrimaryKey = it.autogenPk
+                // siblings share the "grandparent" as parentPk, orphans and topics have null as the parent
+                val dbParent  = if (it.parent == fileGrandParentPk) { DbGrandparentPk } else { null }
+                newPrimaryKey = localServiceImpl.saveNewItem(
+                    itemsFromFile[0].copy(
+                        autogenPk = 0L,
+                        parent = dbParent
                     )
-                    // make that child a parent
-                    itemsFromFile[index] = child.copy(parent = null)
-                    // send child through as parent with the new primary key
-                    if (itemsFromFile.isEmpty().not()) {
-                        saveChildren(itemsFromFile, newChild)
-                    } else {
-                        _loading.value = false
-                    }
-                }
-            } else {
-                if (itemsFromFile.isEmpty().not()) {
-                    saveParent()
-                } else {
-                    _loading.value = false
-                }
-            }
-        }
-    }
-
-    // Recursively save the children of the prior item
-    private suspend fun saveChildren(list: List<ReflexionItem>, parentPk: Long) {
-        var children: List<ReflexionItem> = emptyList()
-        var siblings: List<ReflexionItem> = emptyList()
-        list.forEachIndexed { index, parent ->
-            if (parent.parent == null) {
-                // remove parent from list
-                itemsFromFile.removeAt(index)
-                // find all children
-                itemsFromFile.filter { child ->
-                    (child.parent == parent.autogenPk)
-                }.apply {
-                    children = this
-                    processChildren(children, parentPk)
-                }
-                // find all siblings
-                itemsFromFile.filter { child ->
-                    (child.parent != parent.autogenPk)
-                }.apply {
-                    siblings = this
-                    this.forEach { sib ->
-                        // save the sibling
-                        val siblingPk = localServiceImpl.saveNewItem(
-                            sib.copy(
-                                autogenPk = 0L,
-                                parent = parentPk
-                            )
-                        )
-                        // save children of THAT sibling and their children
-                        val childrenItems: MutableList<ReflexionItem> = mutableListOf()
-
-                        this.forEach { potentialChild ->
-                            if (potentialChild.parent == sib.autogenPk || childrenItemsContains(
-                                    childrenItems,
-                                    potentialChild.parent
-                                )
-                            )
-                            // here we split the list
-                                itemsFromFile.remove(potentialChild)
-                            childrenItems.add(potentialChild)
-                        }
-                        // process children of sibling
-                        saveChildren(childrenItems, parentPk = siblingPk)
-                    }
-                }
-            }
-        }
-    }
-
-    private suspend fun processChildren(list: List<ReflexionItem>, parentPk: Long) {
-        // Save each child of Topic
-        list.forEachIndexed() { index, child ->
-            val newChild = localServiceImpl.saveNewItem(
-                child.copy(
-                    autogenPk = 0L,
-                    parent = parentPk
                 )
-            )
-            // make that child a parent
-            itemsFromFile[index] = child.copy(parent = null)
-            // send child through as parent with the new primary key
-            val childItems = mutableListOf<ReflexionItem>()
-            list.forEach { potentialChild ->
-                if (potentialChild.parent == child.autogenPk || childrenItemsContains(
-                        childItems,
-                        potentialChild.parent
-                    )
-                ) {
-                    // here we split the list
-                    itemsFromFile.remove(potentialChild)
-                    childItems.add(potentialChild)
-                }
+                itemsFromFile.remove(it)
             }
-            if (childItems.isEmpty().not()) {
-                saveChildren(childItems, newChild)
-            }
+            // restart to verify all items captured
+            saveItemFromFile(null, null, null, null)
         }
     }
 
-    private fun childrenItemsContains(childrenItems: MutableList<ReflexionItem>, parent: Long?): Boolean {
-        val contains = false
-        childrenItems.forEach {
-            if (it.parent == parent) {
-                return true
-            }
+    private fun hasParentInList(itemsParent: Long?): Boolean {
+        if (itemsParent == null) return false
+        val parent = itemsFromFile.firstOrNull() { itemInList ->
+            (itemInList.autogenPk == itemsParent)
         }
-        return contains
+        return parent != null
     }
 }
