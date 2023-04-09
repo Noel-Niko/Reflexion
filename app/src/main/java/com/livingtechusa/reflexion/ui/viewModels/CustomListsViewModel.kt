@@ -428,45 +428,43 @@ class CustomListsViewModel @Inject constructor(
                                     )
 
                                 // generate uri to the file with permissions
-                                if (file != null) {
-                                    val contentUri: Uri = FileProvider.getUriForFile(
-                                        context.applicationContext,
-                                        "com.livingtechusa.reflexion.fileprovider",
-                                        file!!
+                                val contentUri: Uri = FileProvider.getUriForFile(
+                                    context.applicationContext,
+                                    "com.livingtechusa.reflexion.fileprovider",
+                                    file
+                                )
+                                context.grantUriPermission(
+                                    context.applicationContext.packageName,
+                                    contentUri,
+                                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                                )
+
+                                TemporarySingleton.sharedFileList.add(contentUri)
+                                val fileSet: MutableSet<String> = mutableSetOf()
+                                TemporarySingleton.sharedFileList.forEach{ uri ->
+                                    fileSet.add(Converters().convertUriToString(uri) ?: EMPTY_STRING)
+                                }
+                                UserPreferencesUtil.setFilesSaved(context, fileSet)
+
+                                // Create intent
+                                val shareIntent = Intent()
+                                if (contentUri.equals(EMPTY_STRING).not()) {
+                                    val resolver: ContentResolver = context.contentResolver
+                                    shareIntent.type = "plain/text"
+                                    shareIntent.putExtra(
+                                        Intent.EXTRA_SUBJECT,
+                                        "Sending: ${customList.value.itemName}"
                                     )
-                                    context.grantUriPermission(
-                                        context.applicationContext.packageName,
+                                    shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
+                                    shareIntent.setDataAndType(
                                         contentUri,
-                                        Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                                    )
+                                        contentUri.let { resolver.getType(it) })
+                                    shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
+                                    shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
-                                    TemporarySingleton.sharedFileList.add(contentUri)
-                                    val fileSet: MutableSet<String> = mutableSetOf()
-                                    TemporarySingleton.sharedFileList.forEach{ uri ->
-                                        fileSet.add(Converters().convertUriToString(uri) ?: EMPTY_STRING)
-                                    }
-                                    UserPreferencesUtil.setFilesSaved(context, fileSet)
-
-                                    // Create intent
-                                    val shareIntent = Intent()
-                                    if (contentUri.equals(EMPTY_STRING).not()) {
-                                        val resolver: ContentResolver = context.contentResolver
-                                        shareIntent.type = "plain/text"
-                                        shareIntent.putExtra(
-                                            Intent.EXTRA_SUBJECT,
-                                            "Sending: ${customList.value.itemName}"
-                                        )
-                                        shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
-                                        shareIntent.setDataAndType(
-                                            contentUri,
-                                            contentUri.let { resolver.getType(it) })
-                                        shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
-                                        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION)
-
-                                        shareIntent.action = Intent.ACTION_SEND
-                                        startActivity(context, shareIntent, null)
-                                        _loading.value = false
-                                    }
+                                    shareIntent.action = Intent.ACTION_SEND
+                                    startActivity(context, shareIntent, null)
+                                    _loading.value = false
                                 }
                             } catch (e: Exception) {
                                 _loading.value = false

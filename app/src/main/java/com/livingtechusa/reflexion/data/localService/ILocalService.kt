@@ -40,7 +40,7 @@ interface ILocalService {
 
     // LINKED LIST NODES
     suspend fun deleteAllChildNodes(nodePk: Long)
-    suspend fun insertNewNode(listNode: ListNode)
+    suspend fun insertNewNode(listNode: ListNode): Long
     suspend fun selectListNode(nodePk: Long): ListNode?
     suspend fun selectNodeHeadsByTopic(topicPk: Long): List<ListNode?>
     suspend fun selectNodeTopic(itemPk: Long): Long?

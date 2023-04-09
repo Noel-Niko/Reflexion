@@ -331,8 +331,8 @@ class LocalServiceImpl @Inject constructor(
         } while (child != null)
     }
 
-    override suspend fun insertNewNode(listNode: ListNode) {
-        linkedListDao.insertNewNode(listNode = listNode)
+    override suspend fun insertNewNode(listNode: ListNode): Long {
+        return linkedListDao.insertNewNode(listNode = listNode)
     }
 
     override suspend fun selectListNode(nodePk: Long): ListNode? {

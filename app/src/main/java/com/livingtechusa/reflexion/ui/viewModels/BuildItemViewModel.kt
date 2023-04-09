@@ -18,9 +18,11 @@ import androidx.lifecycle.viewModelScope
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.entities.Bookmarks
+import com.livingtechusa.reflexion.data.entities.ListNode
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.localService.LocalServiceImpl
 import com.livingtechusa.reflexion.data.models.ReflexionItemAsJson
+import com.livingtechusa.reflexion.data.toAListNode
 import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants.DESCRIPTION
@@ -117,6 +119,8 @@ class BuildItemViewModel @Inject constructor(
         topItem = pk
     }
 
+    private val oldToNewPkTable = mutableMapOf<Long?, Long?>()
+
     suspend fun hasNoChildren(pk: Long): Boolean {
         return localServiceImpl.selectChildren(pk).isEmpty()
     }
@@ -130,6 +134,7 @@ class BuildItemViewModel @Inject constructor(
 
     private val itemsFromFile = mutableListOf<ReflexionItem>()
 
+    private var fileListTopic: Long? = null
     fun getSelectedFile() {
         try {
             val uri: Uri? =
@@ -493,6 +498,7 @@ class BuildItemViewModel @Inject constructor(
                                 itemsFromFile.add(it.toReflexionItem())
                             }
                             // itemsFromFile is global to the viewModel and processed in this function
+                            fileListTopic = itemsFromFile[0].autogenPk
                             saveItemFromFile(null, null, null, null)
 
                         } catch (e: Exception) {
@@ -630,10 +636,9 @@ class BuildItemViewModel @Inject constructor(
     }
 
     // Functions to Save File Contents
-    private suspend fun saveItemFromFile(filePk: Long?, dbPk: Long?, fileGrandParentPk: Long?, DbGrandparentPk: Long?) {
+    private suspend fun saveItemFromFile(filePk: Long?, dbPk: Long?, fileGrandParentPk: Long?, dbGrandparentPk: Long?) {
         var oldPrimaryKey: Long? = filePk
         var newPrimaryKey: Long? = null
-        val newFileGrandParentPk = filePk
         // if a child of saved item, save all in depthful way
         itemsFromFile.forEach {
             if (it.parent == filePk) {
@@ -645,7 +650,8 @@ class BuildItemViewModel @Inject constructor(
                     )
                 )
                 itemsFromFile.remove(it)
-                saveItemFromFile(oldPrimaryKey, newPrimaryKey, newFileGrandParentPk, dbPk)
+                oldToNewPkTable[it.autogenPk] = newPrimaryKey
+                saveItemFromFile(oldPrimaryKey, newPrimaryKey, filePk, dbPk)
             }
         }
         // sava all topics and orphaned parents at present level
@@ -653,17 +659,58 @@ class BuildItemViewModel @Inject constructor(
             if (!hasParentInList(it.parent) && it.parent != filePk) {
                 oldPrimaryKey = it.autogenPk
                 // siblings share the "grandparent" as parentPk, orphans and topics have null as the parent
-                val dbParent  = if (it.parent == fileGrandParentPk) { DbGrandparentPk } else { null }
+                var dbParent  = if (it.parent == fileGrandParentPk) { dbGrandparentPk } else { null }
+                // check if a child of a topic previously removed from the list
+                if (oldToNewPkTable.containsKey(it.parent)) {
+                    dbParent = oldToNewPkTable[it.parent]
+                }
                 newPrimaryKey = localServiceImpl.saveNewItem(
                     itemsFromFile[0].copy(
                         autogenPk = 0L,
                         parent = dbParent
                     )
                 )
+
                 itemsFromFile.remove(it)
+                oldToNewPkTable[it.autogenPk] = newPrimaryKey
+                saveItemFromFile(it.autogenPk, newPrimaryKey, null, null)
             }
-            // restart to verify all items captured
-            saveItemFromFile(null, null, null, null)
+        }
+        itemsFromFile.clear()
+        val job = viewModelScope.launch {  createList(oldToNewPkTable) }
+        job.join()
+    }
+
+    private suspend fun createList(oldToNewPkTable: MutableMap<Long?, Long?>) {
+        if(oldToNewPkTable.isEmpty().not()) {
+            val newList = mutableListOf<Long>()
+            // Add items from file to newList
+            oldToNewPkTable.forEach {
+                it.value?.let { newPk -> newList.add(newPk) }
+            }
+            val topicPk = oldToNewPkTable[fileListTopic]
+            oldToNewPkTable.clear()
+
+//            // Create topic for list
+//            val topicNode = ListNode(
+//                nodePk = 0L,
+//                topic = 0L,
+//                title = "Need to get the title",
+//                itemPK = -1L,
+//                parentPk = null,
+//                childPk = newList[0]
+//            )
+//            var topicPk = localServiceImpl.insertNewNode(topicNode)
+//            newList.add(0, topicPk)
+
+
+            // for each item in newList, convert to a linked ListNode and save
+            var parentPk: Long? = topicPk
+            newList.forEachIndexed { index, pk ->
+                val node = localServiceImpl.selectReflexionArrayItemByPk(pk)
+                    ?.toAListNode(topic = topicPk, parentPk = parentPk)
+                parentPk = node?.let { listNode -> localServiceImpl.insertNewNode(listNode) }
+            }
         }
     }
 
