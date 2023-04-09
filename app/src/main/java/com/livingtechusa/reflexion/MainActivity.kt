@@ -114,8 +114,7 @@ class MainActivity : ComponentActivity() {
                 DisposableEffect(
                     key1 = lifecycleOwner,
                     effect = {
-                        val observer = LifecycleEventObserver { _, event ->
-                            if (event == Lifecycle.Event.ON_START) {
+                        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_CREATE) {
                                 permissionsState.launchMultiplePermissionRequest()
                                 MediaUtil().verifyStoragePermission(this@MainActivity)
                                 // manage file storage

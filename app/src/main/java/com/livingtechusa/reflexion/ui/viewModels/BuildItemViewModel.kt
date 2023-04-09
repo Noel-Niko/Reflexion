@@ -117,6 +117,8 @@ class BuildItemViewModel @Inject constructor(
         topItem = pk
     }
 
+    private val topicsTable = mutableMapOf<Long?, Long?>()
+
     suspend fun hasNoChildren(pk: Long): Boolean {
         return localServiceImpl.selectChildren(pk).isEmpty()
     }
@@ -630,10 +632,9 @@ class BuildItemViewModel @Inject constructor(
     }
 
     // Functions to Save File Contents
-    private suspend fun saveItemFromFile(filePk: Long?, dbPk: Long?, fileGrandParentPk: Long?, DbGrandparentPk: Long?) {
+    private suspend fun saveItemFromFile(filePk: Long?, dbPk: Long?, fileGrandParentPk: Long?, dbGrandparentPk: Long?) {
         var oldPrimaryKey: Long? = filePk
         var newPrimaryKey: Long? = null
-        val newFileGrandParentPk = filePk
         // if a child of saved item, save all in depthful way
         itemsFromFile.forEach {
             if (it.parent == filePk) {
@@ -645,7 +646,11 @@ class BuildItemViewModel @Inject constructor(
                     )
                 )
                 itemsFromFile.remove(it)
-                saveItemFromFile(oldPrimaryKey, newPrimaryKey, newFileGrandParentPk, dbPk)
+                // save any topics to map
+                if (it.parent == null) {
+                    topicsTable[it.autogenPk] = newPrimaryKey
+                }
+                saveItemFromFile(oldPrimaryKey, newPrimaryKey, filePk, dbPk)
             }
         }
         // sava all topics and orphaned parents at present level
@@ -653,7 +658,10 @@ class BuildItemViewModel @Inject constructor(
             if (!hasParentInList(it.parent) && it.parent != filePk) {
                 oldPrimaryKey = it.autogenPk
                 // siblings share the "grandparent" as parentPk, orphans and topics have null as the parent
-                val dbParent  = if (it.parent == fileGrandParentPk) { DbGrandparentPk } else { null }
+                var dbParent  = if (it.parent == fileGrandParentPk) { dbGrandparentPk } else { null }
+                if (topicsTable.containsKey(it.parent)) {
+                    dbParent = topicsTable[it.parent]
+                }
                 newPrimaryKey = localServiceImpl.saveNewItem(
                     itemsFromFile[0].copy(
                         autogenPk = 0L,
@@ -661,6 +669,7 @@ class BuildItemViewModel @Inject constructor(
                     )
                 )
                 itemsFromFile.remove(it)
+                saveItemFromFile(it.autogenPk, newPrimaryKey, null, null)
             }
             // restart to verify all items captured
             saveItemFromFile(null, null, null, null)
