@@ -110,4 +110,5 @@
     <string name="confirm_save_file">Confirmar guardar archivo(s)</string>
     <string name="do_you_want_to_save_the_contents_of">"¿Desea guardar el contenido de: "</string>
     <string name="has_the_share_file_been_fully_uploaded">"¿Se ha cargado completamente el archivo compartido?"</string>
-    </resources>
+    <string name="this_file_was_sent_with_reflexion_and_requires_the_reflexion_app_to_open">Este archivo se envió con Reflexion y requiere que se abra la aplicación Reflexion.</string>
+</resources>

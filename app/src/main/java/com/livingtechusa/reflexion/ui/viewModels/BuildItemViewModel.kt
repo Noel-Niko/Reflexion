@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
 import android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -14,7 +13,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.livingtechusa.reflexion.R
@@ -38,11 +36,11 @@ import com.livingtechusa.reflexion.util.Constants.VIDEO_URI
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URL
 import com.livingtechusa.reflexion.util.TemporarySingleton
 import com.livingtechusa.reflexion.util.json.FileUtil
+import com.livingtechusa.reflexion.util.json.ReflexionJsonWriter
 import com.livingtechusa.reflexion.util.scopedStorageUtils.FileResource
 import com.livingtechusa.reflexion.util.scopedStorageUtils.ImageUtils
 import com.livingtechusa.reflexion.util.scopedStorageUtils.ImageUtils.rotateImage
 import com.livingtechusa.reflexion.util.scopedStorageUtils.MediaStoreUtils
-import com.livingtechusa.reflexion.util.json.ReflexionJsonWriter
 import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
 import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil
 import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil.resource
@@ -129,6 +127,8 @@ class BuildItemViewModel @Inject constructor(
 
     private val _selectedFile: MutableStateFlow<FileResource?> = MutableStateFlow(null)
     val selectedFile get() = _selectedFile
+
+    private val itemsFromFile = mutableListOf<ReflexionItem>()
 
     fun getSelectedFile() {
         try {
@@ -306,6 +306,7 @@ class BuildItemViewModel @Inject constructor(
                                     updateAllDisplayedSubItemsToViewModelVersion()
                                     _reflexionItemState.value = _reflexionItem
                                 }
+
                                 else -> {
                                     _reflexionItem =
                                         event.pk?.let { localServiceImpl.selectItem(it) }
@@ -417,9 +418,9 @@ class BuildItemViewModel @Inject constructor(
                                     val reflexionItemList = mutableListOf(reflexionItemState.value)
                                     ReflexionJsonWriter()
                                         .writeJsonStream(
-                                        outputStream,
-                                        reflexionItemList
-                                    )
+                                            outputStream,
+                                            reflexionItemList
+                                        )
 
                                     // generate uri to the file with permissions
                                     val contentUri: Uri = FileProvider.getUriForFile(
@@ -436,12 +437,20 @@ class BuildItemViewModel @Inject constructor(
                                     TemporarySingleton.sharedFileList.add(contentUri)
                                     // record file for later deletion
                                     val fileSet: MutableSet<String> = mutableSetOf()
-                                    TemporarySingleton.sharedFileList.forEach{ uri ->
-                                        fileSet.add(Converters().convertUriToString(uri) ?: EMPTY_STRING)
+                                    TemporarySingleton.sharedFileList.forEach { uri ->
+                                        fileSet.add(
+                                            Converters().convertUriToString(uri) ?: EMPTY_STRING
+                                        )
                                     }
                                     UserPreferencesUtil.setFilesSaved(context, fileSet)
                                     // Create intent
                                     val shareIntent = Intent()
+                                    val text =
+                                        context.getString(R.string.this_file_was_sent_with_reflexion_and_requires_the_reflexion_app_to_open) + "\n" + context.getString(
+                                            R.string.sent_with_reflexion_from_the_google_play_store
+                                        ) + "\n" + context.getString(R.string.reflexion_link)
+                                    shareIntent.putExtra(Intent.EXTRA_TEXT, text)
+
                                     if (contentUri.equals(EMPTY_STRING).not()) {
                                         val resolver: ContentResolver = context.contentResolver
                                         shareIntent.type = "plain/text"
@@ -454,7 +463,8 @@ class BuildItemViewModel @Inject constructor(
                                             contentUri,
                                             contentUri.let { resolver.getType(it) })
                                         shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
-                                        shareIntent.flags = FLAG_ACTIVITY_NEW_TASK or FLAG_GRANT_READ_URI_PERMISSION
+                                        shareIntent.flags =
+                                            FLAG_ACTIVITY_NEW_TASK or FLAG_GRANT_READ_URI_PERMISSION
                                         shareIntent.action = Intent.ACTION_SEND
                                         startActivity(context, shareIntent, null)
                                     }
@@ -474,98 +484,24 @@ class BuildItemViewModel @Inject constructor(
                         _loading.value = true
                         try {
                             // read the json
-                            val reflexionFile: List<ReflexionItemAsJson>? = TemporarySingleton.file?.let {
-                                FileUtil(context).getObjectFromFile(it)
-                            }
-
-                            val itemsFromFile = mutableListOf<ReflexionItem>()
+                            val reflexionFile: List<ReflexionItemAsJson>? =
+                                TemporarySingleton.file?.let {
+                                    FileUtil(context).getObjectFromFile(it)
+                                }
 
                             reflexionFile?.forEach {
                                 itemsFromFile.add(it.toReflexionItem())
                             }
-
-                            // Recursively save the children of the prior item
-                            suspend fun saveChildren(list: List<ReflexionItem>, newPk: Long) {
-                                list.forEachIndexed { index, parent ->
-                                    if (parent.parent == null) {
-                                        // remove parent from list
-                                        itemsFromFile.removeAt(index)
-                                        // find all children
-                                        itemsFromFile.filter { child ->
-                                            (child.parent == parent.autogenPk)
-                                        }.apply {
-                                            // Save each child of Topic
-                                            this.forEachIndexed() { index, child ->
-                                                val newChild = localServiceImpl.saveNewItem(
-                                                    child.copy(
-                                                        autogenPk = 0L,
-                                                        parent = newPk
-                                                    )
-                                                )
-                                                // make that child a parent
-                                                itemsFromFile[index] = child.copy(parent = null)
-                                                // send child through as parent with the new primary key
-                                                if (itemsFromFile.isNullOrEmpty().not()) {
-                                                    saveChildren(itemsFromFile, newChild)
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            suspend fun saveParent(itemsFromFile: MutableList<ReflexionItem>) {
-                                val hasParentInList = itemsFromFile.firstOrNull() { child ->
-                                    (child.parent == itemsFromFile[0].autogenPk)
-                                }
-                                // Save topic / parent
-                                if (itemsFromFile[0].parent == null || hasParentInList == null) {
-                                    val newParent =
-                                        localServiceImpl.saveNewItem(itemsFromFile[0].copy(autogenPk = 0L))
-                                    // save first for display at the end
-                                    if(topItem == null) {
-                                        topItem = newParent
-                                    }
-                                    // remove parent from list
-                                    itemsFromFile.removeAt(0)
-                                    // find all children
-                                    val children = itemsFromFile.filter { child ->
-                                        (child.parent == itemsFromFile[0].autogenPk)
-                                    }
-                                    // Save each child of Topic
-                                    // why to we trip and error here? Becuase the itemsfromFile is not changed
-
-                                    if (children.isEmpty().not()) {
-                                        children.forEachIndexed() { index, child ->
-                                            val newChild = localServiceImpl.saveNewItem(
-                                                child.copy(
-                                                    autogenPk = 0L,
-                                                    parent = newParent
-                                                )
-                                            )
-                                            // make that child a parent
-                                            itemsFromFile[index] = child.copy(parent = null)
-                                            // send child through as parent with the new primary key
-                                            if (itemsFromFile.isEmpty().not()) {
-                                                saveChildren(itemsFromFile, newChild)
-                                            } else {
-                                                _loading.value = false
-                                            }
-                                        }
-                                    } else {
-                                        if (itemsFromFile.isEmpty().not()) {
-                                            saveParent(itemsFromFile)
-                                        } else {
-                                            _loading.value = false
-                                        }
-                                    }
-                                }
-                            }
-                            saveParent(itemsFromFile)
+                            // itemsFromFile is global to the viewModel and processed in this function
+                            saveParent()
 
                         } catch (e: Exception) {
                             _loading.value = false
-                            Toast.makeText(context, R.string.an_error_occurred_please_try_again, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                R.string.an_error_occurred_please_try_again,
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                         _loading.value = false
                     }
@@ -691,5 +627,148 @@ class BuildItemViewModel @Inject constructor(
 
     fun setSaveNowFromTopBar(saveNow: Boolean) {
         _saveNowFromTopBar.value = saveNow
+    }
+
+    // Functions to Save File Contents
+    private suspend fun saveParent() {
+        val hasParentInList = itemsFromFile.firstOrNull() { child ->
+            (child.parent == itemsFromFile[0].autogenPk)
+        }
+        // Save topic / parent
+        if (itemsFromFile[0].parent == null || hasParentInList == null) {
+            val oldParentPk = itemsFromFile[0].autogenPk
+            val newParent =
+                localServiceImpl.saveNewItem(
+                    itemsFromFile[0].copy(
+                        autogenPk = 0L,
+                        parent = null
+                    )
+                )
+            // save first for display at the end
+            if (topItem == null) {
+                topItem = newParent
+            }
+            // remove parent from list
+            itemsFromFile.removeAt(0)
+            // find all children
+            val children = itemsFromFile.filter { child ->
+                (child.parent == oldParentPk)
+            }
+            // Save each child of Topic
+            if (children.isEmpty().not()) {
+                children.forEachIndexed() { index, child ->
+                    // save child item
+                    val newChild = localServiceImpl.saveNewItem(
+                        child.copy(
+                            autogenPk = 0L,
+                            parent = newParent
+                        )
+                    )
+                    // make that child a parent
+                    itemsFromFile[index] = child.copy(parent = null)
+                    // send child through as parent with the new primary key
+                    if (itemsFromFile.isEmpty().not()) {
+                        saveChildren(itemsFromFile, newChild)
+                    } else {
+                        _loading.value = false
+                    }
+                }
+            } else {
+                if (itemsFromFile.isEmpty().not()) {
+                    saveParent()
+                } else {
+                    _loading.value = false
+                }
+            }
+        }
+    }
+
+    // Recursively save the children of the prior item
+    private suspend fun saveChildren(list: List<ReflexionItem>, parentPk: Long) {
+        var children: List<ReflexionItem> = emptyList()
+        var siblings: List<ReflexionItem> = emptyList()
+        list.forEachIndexed { index, parent ->
+            if (parent.parent == null) {
+                // remove parent from list
+                itemsFromFile.removeAt(index)
+                // find all children
+                itemsFromFile.filter { child ->
+                    (child.parent == parent.autogenPk)
+                }.apply {
+                    children = this
+                    processChildren(children, parentPk)
+                }
+                // find all siblings
+                itemsFromFile.filter { child ->
+                    (child.parent != parent.autogenPk)
+                }.apply {
+                    siblings = this
+                    this.forEach { sib ->
+                        // save the sibling
+                        val siblingPk = localServiceImpl.saveNewItem(
+                            sib.copy(
+                                autogenPk = 0L,
+                                parent = parentPk
+                            )
+                        )
+                        // save children of THAT sibling and their children
+                        val childrenItems: MutableList<ReflexionItem> = mutableListOf()
+
+                        this.forEach { potentialChild ->
+                            if (potentialChild.parent == sib.autogenPk || childrenItemsContains(
+                                    childrenItems,
+                                    potentialChild.parent
+                                )
+                            )
+                            // here we split the list
+                                itemsFromFile.remove(potentialChild)
+                            childrenItems.add(potentialChild)
+                        }
+                        // process children of sibling
+                        saveChildren(childrenItems, parentPk = siblingPk)
+                    }
+                }
+            }
+        }
+    }
+
+    private suspend fun processChildren(list: List<ReflexionItem>, parentPk: Long) {
+        // Save each child of Topic
+        list.forEachIndexed() { index, child ->
+            val newChild = localServiceImpl.saveNewItem(
+                child.copy(
+                    autogenPk = 0L,
+                    parent = parentPk
+                )
+            )
+            // make that child a parent
+            itemsFromFile[index] = child.copy(parent = null)
+            // send child through as parent with the new primary key
+            val childItems = mutableListOf<ReflexionItem>()
+            list.forEach { potentialChild ->
+                if (potentialChild.parent == child.autogenPk || childrenItemsContains(
+                        childItems,
+                        potentialChild.parent
+                    )
+                ) {
+                    // here we split the list
+                    itemsFromFile.remove(potentialChild)
+                    childItems.add(potentialChild)
+                }
+            }
+            if (childItems.isEmpty().not()) {
+                saveChildren(childItems, newChild)
+            }
+        }
+    }
+
+    private fun childrenItemsContains(childrenItems: MutableList<ReflexionItem>, parent: Long?): Boolean {
+        val contains = false
+        childrenItems.forEach {
+            if (it.parent == parent) {
+                return true
+            }
+        }
+        return contains
     }
 }
