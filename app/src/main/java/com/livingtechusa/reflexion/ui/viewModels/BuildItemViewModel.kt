@@ -53,6 +53,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
@@ -119,8 +121,6 @@ class BuildItemViewModel @Inject constructor(
         topItem = pk
     }
 
-    private val oldToNewPkTable = mutableMapOf<Long?, Long?>()
-
     suspend fun hasNoChildren(pk: Long): Boolean {
         return localServiceImpl.selectChildren(pk).isEmpty()
     }
@@ -133,8 +133,10 @@ class BuildItemViewModel @Inject constructor(
     val selectedFile get() = _selectedFile
 
     private val itemsFromFile = mutableListOf<ReflexionItem>()
-
+    private val oldToNewPkTable = mutableMapOf<Long?, Long?>()
     private var fileListTopic: Long? = null
+    private val mutex = Mutex()
+
     fun getSelectedFile() {
         try {
             val uri: Uri? =
@@ -649,8 +651,8 @@ class BuildItemViewModel @Inject constructor(
                         parent = dbPk
                     )
                 )
-                itemsFromFile.remove(it)
-                oldToNewPkTable[it.autogenPk] = newPrimaryKey
+                mutex.withLock { itemsFromFile.remove(it) }
+                mutex.withLock { oldToNewPkTable[it.autogenPk] = newPrimaryKey }
                 saveItemFromFile(oldPrimaryKey, newPrimaryKey, filePk, dbPk)
             }
         }
@@ -670,15 +672,15 @@ class BuildItemViewModel @Inject constructor(
                         parent = dbParent
                     )
                 )
-
-                itemsFromFile.remove(it)
-                oldToNewPkTable[it.autogenPk] = newPrimaryKey
+                mutex.withLock { itemsFromFile.remove(it) }
+                mutex.withLock { oldToNewPkTable[it.autogenPk] = newPrimaryKey }
                 saveItemFromFile(it.autogenPk, newPrimaryKey, null, null)
             }
         }
-        itemsFromFile.clear()
+
         val job = viewModelScope.launch {  createList(oldToNewPkTable) }
         job.join()
+        mutex.withLock { itemsFromFile.clear() }
     }
 
     private suspend fun createList(oldToNewPkTable: MutableMap<Long?, Long?>) {
@@ -689,23 +691,10 @@ class BuildItemViewModel @Inject constructor(
                 it.value?.let { newPk -> newList.add(newPk) }
             }
             val topicPk = oldToNewPkTable[fileListTopic]
-            oldToNewPkTable.clear()
-
-//            // Create topic for list
-//            val topicNode = ListNode(
-//                nodePk = 0L,
-//                topic = 0L,
-//                title = "Need to get the title",
-//                itemPK = -1L,
-//                parentPk = null,
-//                childPk = newList[0]
-//            )
-//            var topicPk = localServiceImpl.insertNewNode(topicNode)
-//            newList.add(0, topicPk)
-
+            mutex.withLock { oldToNewPkTable.clear() }
 
             // for each item in newList, convert to a linked ListNode and save
-            var parentPk: Long? = topicPk
+            var parentPk: Long? = null
             newList.forEachIndexed { index, pk ->
                 val node = localServiceImpl.selectReflexionArrayItemByPk(pk)
                     ?.toAListNode(topic = topicPk, parentPk = parentPk)
