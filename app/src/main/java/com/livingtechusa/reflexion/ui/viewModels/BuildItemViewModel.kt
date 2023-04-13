@@ -649,24 +649,24 @@ class BuildItemViewModel @Inject constructor(
         // Loop over the copy of the list and create a list of elements to remove
         val itemsToRemove1 = mutableListOf<ReflexionItem>()
         // if a child of saved item, save all in depthful way
-        itemsCopy1.forEach {
-            if (it.parent == filePk) {
-                oldPrimaryKey = it.autogenPk
+        itemsCopy1.forEach { reflexionItem ->
+            if (reflexionItem.parent == filePk) {
+                oldPrimaryKey = reflexionItem.autogenPk
                 newPrimaryKey = localServiceImpl.saveNewItem(
                     itemsFromFile[0].copy(
                         autogenPk = 0L,
                         parent = dbPk
                     )
                 )
-                itemsToRemove1.add(reflexionItem)
-                val remainingItems: MutableList<ReflexionItem> = mutableListOf()
-                itemsFromFile.filterNot { pendingRemoval -> itemsToRemove1.contains(pendingRemoval) }.apply { remainingItems.addAll(this) }
-                oldToNewPkTable[it.autogenPk] = newPrimaryKey
-                saveItemFromFile(oldPrimaryKey, newPrimaryKey, filePk, dbPk, remainingItems)
+                itemsFromFile.removeIf { item -> item.autogenPk ==  reflexionItem.autogenPk }
+                //itemsToRemove1.add(reflexionItem)
+                //val remainingItems: MutableList<ReflexionItem> = mutableListOf()
+                //itemsFromFile.filterNot { pendingRemoval -> itemsToRemove1.contains(pendingRemoval) }.apply { remainingItems.addAll(this) }
+                oldToNewPkTable[reflexionItem.autogenPk] = newPrimaryKey
+                saveItemFromFile(oldPrimaryKey, newPrimaryKey, filePk, dbPk, itemsFromFile)
             }
         }
-        // Remove the elements from the original list outside of the loop
-        itemsFromFile.removeAll(itemsToRemove1)
+
 
         val itemsCopy2 = itemsFromFile.toList()
         // Loop over the copy of the list and create a list of elements to remove
@@ -691,15 +691,15 @@ class BuildItemViewModel @Inject constructor(
                         parent = dbParent
                     )
                 )
-                itemsToRemove2.add(reflexionItem)
-                val remainingItems: MutableList<ReflexionItem> = mutableListOf()
-                itemsFromFile.filterNot { pendingRemoval -> itemsToRemove2.contains(pendingRemoval) }.apply { remainingItems.addAll(this) }
+                println("Hello")
+                itemsFromFile.removeIf { it.autogenPk ==  reflexionItem.autogenPk && it.name == reflexionItem.name }
+//                itemsToRemove2.add(reflexionItem)
+//                val remainingItems: MutableList<ReflexionItem> = mutableListOf()
+//                itemsFromFile.filterNot { pendingRemoval -> itemsToRemove2.contains(pendingRemoval) }.apply { remainingItems.addAll(this) }
                 oldToNewPkTable[reflexionItem.autogenPk] = newPrimaryKey
-                saveItemFromFile(reflexionItem.autogenPk, newPrimaryKey, null, null, remainingItems)
+                saveItemFromFile(reflexionItem.autogenPk, newPrimaryKey, null, null, itemsFromFile)
             }
         }
-        // Remove the elements from the original list outside of the loop
-        itemsFromFile.removeAll(itemsToRemove1)
 
         val job = viewModelScope.launch { createList(oldToNewPkTable) }
         job.join()
@@ -707,7 +707,6 @@ class BuildItemViewModel @Inject constructor(
 
     private suspend fun createList(oldToNewPkTable: MutableMap<Long?, Long?>) {
         if(oldToNewPkTable.isEmpty().not()) {
-
             val newList = mutableListOf<Long>()
             // Add items from file to newList
             oldToNewPkTable.forEach {
@@ -716,11 +715,13 @@ class BuildItemViewModel @Inject constructor(
             val topicPk = oldToNewPkTable[fileListTopic]
             setTopItem(topicPk ?: 0)
             // for each item in newList, convert to a linked ListNode and save
-            var parentPk: Long? = null
-            newList.forEach{ pk ->
-                val node = localServiceImpl.selectReflexionArrayItemByPk(pk)
-                    ?.toAListNode(topic = topicPk, parentPk = parentPk)
-                parentPk = node?.let { listNode -> localServiceImpl.insertNewNode(listNode) }
+            if (newList.size >1) {
+                var parentPk: Long? = null
+                newList.forEach { pk ->
+                    val node = localServiceImpl.selectReflexionArrayItemByPk(pk)
+                        ?.toAListNode(topic = topicPk, parentPk = parentPk)
+                    parentPk = node?.let { listNode -> localServiceImpl.insertNewNode(listNode) }
+                }
             }
         }
     }
