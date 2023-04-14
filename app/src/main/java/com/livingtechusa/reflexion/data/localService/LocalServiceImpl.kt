@@ -432,12 +432,16 @@ class LocalServiceImpl @Inject constructor(
     override suspend fun updateListNode(
         nodePk: Long,
         title: String,
-        parentPK: Long,
-        childPk: Long
+        topicPk: Long,
+        itemPk: Long,
+        parentPK: Long?,
+        childPk: Long?
     ) {
         linkedListDao.updateListNode(
             nodePk = nodePk,
             title = title,
+            topicPk = topicPk,
+            itemPk = itemPk,
             parentPK = parentPK,
             childPk = childPk
         )

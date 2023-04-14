@@ -468,11 +468,13 @@ class CustomListsViewModel @Inject constructor(
                                 }
                             } catch (e: Exception) {
                                 _loading.value = false
-                                Toast.makeText(
-                                    context,
-                                    R.string.an_error_occurred_please_try_again,
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                viewModelScope.launch (Dispatchers.Main) {
+                                    Toast.makeText(
+                                        context,
+                                        R.string.an_error_occurred_please_try_again,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
                         }
                     }

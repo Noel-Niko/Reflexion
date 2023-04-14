@@ -13,7 +13,11 @@ public class ReflexionJsonWriter {
     public void writeJsonStream(OutputStream out, List<ReflexionItem> reflexionItems) throws IOException {
         JsonWriter writer = new JsonWriter(new OutputStreamWriter(out, "UTF-8"));
         writer.setIndent("  ");
+        writer.beginObject();
+        writer.name("List_Title").value("Here is a title");
+        writer.name("reflexionItems");
         writeReflexionItemArray(writer, reflexionItems);
+        writer.endObject();
         writer.close();
     }
 

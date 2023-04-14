@@ -48,7 +48,7 @@ interface ILocalService {
     suspend fun selectNodeListsAsArrayItemsByHeadNode(topicPk: Long?): ReflexionArrayItem?
     suspend fun selectChildNode(nodePk: Long): ListNode?
     suspend fun selectParentNode(parentPk: Long): ListNode?
-    suspend fun updateListNode(nodePk: Long, title: String, parentPK: Long, childPk: Long)
+    suspend fun updateListNode(nodePk: Long, title: String, topicPk: Long, itemPk: Long, parentPK: Long?, childPk: Long?)
     suspend fun getAllLinkedLists(): List<ListNode?>
     suspend fun deleteAllLinkedLists()
     suspend fun deleteSelectedNode(nodePk: Long)
