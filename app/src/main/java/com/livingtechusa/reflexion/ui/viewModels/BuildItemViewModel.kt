@@ -679,7 +679,7 @@ class BuildItemViewModel @Inject constructor(
                         )
                     }
                 itemsFromFile.removeIf { item -> item.autogenPk == reflexionItem.autogenPk }
-                if (newPrimaryKey != null ) {
+                if (newPrimaryKey != null) {
                     // null occurs when an item is in a list more than 1 x
                     oldToNewPkTable[reflexionItem.autogenPk] = newPrimaryKey
                     count++
@@ -721,7 +721,7 @@ class BuildItemViewModel @Inject constructor(
                     }
 
                 itemsFromFile.removeIf { it.autogenPk == reflexionItem.autogenPk }
-                if (newPrimaryKey != null ) {
+                if (newPrimaryKey != null) {
                     // null occurs when an item is in a list more than 1 x
                     oldToNewPkTable[reflexionItem.autogenPk] = newPrimaryKey
                     count++
@@ -762,9 +762,30 @@ class BuildItemViewModel @Inject constructor(
                     val node = localServiceImpl.selectReflexionArrayItemByPk(pk)
                         ?.toAListNode(topic = topicPk, parentPk = parentPk)
                     if (index == 0) {
-                        localServiceImpl.updateListNode(nodePk = title, title = listTitle.toString(), topicPk = topicPk ?: 0,  itemPk = -1L, parentPK = null, childPk = node?.nodePk)
+                        parentPk =
+                            node?.let { listNode -> localServiceImpl.insertNewNode(listNode) }
+                        // update adding the title and giving it the first item as its child
+                        localServiceImpl.updateListNode(
+                            nodePk = title,
+                            title = listTitle.toString(),
+                            topicPk = topicPk ?: 0,
+                            itemPk = -1L,
+                            parentPK = null,
+                            childPk = parentPk
+                        )
+                        // update the first child giving it the title as its parent
+                        localServiceImpl.updateListNode(
+                            nodePk = parentPk ?: 0,
+                            title = node?.title ?: EMPTY_STRING,
+                            topicPk = topicPk ?: 0,
+                            itemPk = node?.itemPK ?: 0,
+                            parentPK = title,
+                            childPk = null
+                        )
+                    } else {
+                        parentPk =
+                            node?.let { listNode -> localServiceImpl.insertNewNode(listNode) }
                     }
-                    parentPk = node?.let { listNode -> localServiceImpl.insertNewNode(listNode) }
                 }
             }
         }
