@@ -411,7 +411,6 @@ class BuildItemViewModel @Inject constructor(
                                 try {
                                     // create a json file
                                     val title = reflexionItemState.value.name.replace(" ", "_")
-
                                     val filename =
                                         context.getString(R.string.app_name) + title + "${System.currentTimeMillis()}.json"
                                     val file = File(context.filesDir, filename)

@@ -28,6 +28,7 @@ import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.NULL
 import com.livingtechusa.reflexion.util.TemporarySingleton
 import com.livingtechusa.reflexion.util.json.ReflexionJsonWriter
+import com.livingtechusa.reflexion.util.json.writeReflexionItemsToFile
 import com.livingtechusa.reflexion.util.scopedStorageUtils.FileResource
 import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
 import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil
@@ -407,32 +408,41 @@ class CustomListsViewModel @Inject constructor(
                                 val title = customList.value.itemName?.replace(" ", "_")
                                 val filename =
                                     context.getString(R.string.app_name) + title + "${System.currentTimeMillis()}.json"
-                                val file = File(context.filesDir, filename)
-                                file.setExecutable(true, false)
-                                file.setReadable(true, false)
-                                file.setWritable(true, false)
-
-                                // save data to the file
-                                val outputStream: FileOutputStream = FileOutputStream(file)
-                                val reflexionItemList = mutableListOf<ReflexionItem>()
-                                customList.value.children.forEach { item ->
-                                    item.itemPK?.let { pk ->
-                                        localServiceImpl.selectItem(pk)
-                                            ?.let { reflexionItem -> reflexionItemList.add(reflexionItem) }
+//                                val file = File(context.filesDir, filename)
+//                                file.setExecutable(true, false)
+//                                file.setReadable(true, false)
+//                                file.setWritable(true, false)
+//
+//                                // save data to the file
+//                                val outputStream: FileOutputStream = FileOutputStream(file)
+//                                val reflexionItemList = mutableListOf<ReflexionItem>()
+//                                customList.value.children.forEach { item ->
+//                                    item.itemPK?.let { pk ->
+//                                        localServiceImpl.selectItem(pk)
+//                                            ?.let { reflexionItem -> reflexionItemList.add(reflexionItem) }
+//                                    }
+//                                }
+//                                ReflexionJsonWriter()
+//                                    .writeJsonStream(
+//                                        outputStream,
+//                                        reflexionItemList
+//                                    )
+//
+//                                // generate uri to the file with permissions
+//                                val contentUri: Uri = FileProvider.getUriForFile(
+//                                    context.applicationContext,
+//                                    "com.livingtechusa.reflexion.fileprovider",
+//                                    file
+//                                )
+                                val itemlist: MutableList<ReflexionItem> = mutableListOf()
+                                customList.value.children.forEach {
+                                    it.itemPK?.let { it1 ->
+                                        localServiceImpl.selectItem(it1)
+                                            ?.let { it1 -> itemlist.add(it1) }
                                     }
                                 }
-                                ReflexionJsonWriter()
-                                    .writeJsonStream(
-                                        outputStream,
-                                        reflexionItemList
-                                    )
+                                val contentUri = writeReflexionItemsToFile(context, itemlist, customList.value.itemName.toString())
 
-                                // generate uri to the file with permissions
-                                val contentUri: Uri = FileProvider.getUriForFile(
-                                    context.applicationContext,
-                                    "com.livingtechusa.reflexion.fileprovider",
-                                    file
-                                )
                                 context.grantUriPermission(
                                     context.applicationContext.packageName,
                                     contentUri,
