@@ -57,6 +57,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
+import java.util.LinkedList
 import javax.inject.Inject
 
 
@@ -131,7 +132,8 @@ class BuildItemViewModel @Inject constructor(
     private val _selectedFile: MutableStateFlow<FileResource?> = MutableStateFlow(null)
     val selectedFile get() = _selectedFile
 
-    private val oldToNewPkTable = mutableMapOf<Long?, Long?>()
+    private val oldToNewPkList =  LinkedList<Pair<Long, Long?>>()
+
     private var fileListTopic: Long? = null
     private var listTitle: String? = EMPTY_STRING
 
@@ -516,7 +518,7 @@ class BuildItemViewModel @Inject constructor(
                                         )
                                     }
                                     job.join()
-                                    createList(oldToNewPkTable)
+                                    createList(oldToNewPkList)
                                 }
                             }
                         } catch (e: Exception) {
@@ -681,10 +683,12 @@ class BuildItemViewModel @Inject constructor(
                 itemsFromFile.removeIf { item -> item.autogenPk == reflexionItem.autogenPk }
                 if (newPrimaryKey != null) {
                     // null occurs when an item is in a list more than 1 x
-                    oldToNewPkTable[reflexionItem.autogenPk] = newPrimaryKey
-                    count++
+                    oldToNewPkList.add(Pair(reflexionItem.autogenPk, newPrimaryKey))
                 } else {
-                    oldToNewPkTable[Long.MAX_VALUE - count] = Long.MAX_VALUE - count
+                    val duplicatePK = oldToNewPkList.firstOrNull() { it.first == reflexionItem.autogenPk }
+                    if (duplicatePK != null) {
+                        oldToNewPkList.add(duplicatePK)
+                    }
                 }
                 saveItemFromFile(oldPrimaryKey, newPrimaryKey, filePk, dbPk, itemsFromFile)
             }
@@ -707,8 +711,8 @@ class BuildItemViewModel @Inject constructor(
                     null
                 }
                 // check if a child of a topic previously removed from the list
-                if (oldToNewPkTable.containsKey(reflexionItem.parent)) {
-                    dbParent = oldToNewPkTable[reflexionItem.parent]
+                if (oldToNewPkList.firstOrNull { it.first == reflexionItem.parent } != null) {
+                    dbParent = oldToNewPkList.firstOrNull { it.first == reflexionItem.parent }?.second
                 }
                 newPrimaryKey =
                     itemsFromFile.firstOrNull { it.autogenPk == reflexionItem.autogenPk }?.copy(
@@ -723,10 +727,12 @@ class BuildItemViewModel @Inject constructor(
                 itemsFromFile.removeIf { it.autogenPk == reflexionItem.autogenPk }
                 if (newPrimaryKey != null) {
                     // null occurs when an item is in a list more than 1 x
-                    oldToNewPkTable[reflexionItem.autogenPk] = newPrimaryKey
-                    count++
+                    oldToNewPkList.add(Pair(reflexionItem.autogenPk, newPrimaryKey))
                 } else {
-                    oldToNewPkTable[Long.MAX_VALUE - count] = Long.MAX_VALUE - count
+                    val duplicatePK = oldToNewPkList.firstOrNull() { it.first == reflexionItem.autogenPk }
+                    if (duplicatePK != null) {
+                        oldToNewPkList.add(duplicatePK)
+                    }
                 }
                 saveItemFromFile(reflexionItem.autogenPk, newPrimaryKey, null, null, itemsFromFile)
             }
@@ -734,58 +740,34 @@ class BuildItemViewModel @Inject constructor(
 
     }
 
-    private suspend fun createList(oldToNewPkTable: MutableMap<Long?, Long?>) {
-        val topicPk = oldToNewPkTable[fileListTopic]
+    private suspend fun createList(oldToNewPkList: LinkedList<Pair<Long, Long?>>) {
+        val topicPk = oldToNewPkList.firstOrNull { it.first ==  fileListTopic }?.second
         setTopItem(topicPk ?: 0)
-        if (oldToNewPkTable.isEmpty().not()) {
+        if (oldToNewPkList.isEmpty().not()) {
             val newList = mutableListOf<Long>()
             // Add items from file to newList
-            oldToNewPkTable.forEach {
-                it.value?.let { newPk -> newList.add(newPk) }
+            oldToNewPkList.forEach { pair ->
+                pair.second?.let { newPk -> newList.add(newPk) }
             }
-            val topicPk = topItem
             // create title node
             val title = localServiceImpl.insertNewNode(
                 ListNode(
                     nodePk = 0L,
-                    topic = 0L,
+                    topic = topicPk ?: 0L,
                     title = listTitle.toString(),
                     itemPK = -1L,
                     parentPk = null,
                     childPk = null
                 )
             )
-            // for each item in newList, convert to a linked ListNode and save
+            // for each item in newList save
             if (newList.size > 1) {
-                var parentPk: Long? = null
+                var parentPk: Long? = title
                 newList.forEachIndexed { index, pk ->
                     val node = localServiceImpl.selectReflexionArrayItemByPk(pk)
                         ?.toAListNode(topic = topicPk, parentPk = parentPk)
-                    if (index == 0) {
-                        parentPk =
-                            node?.let { listNode -> localServiceImpl.insertNewNode(listNode) }
-                        // update adding the title and giving it the first item as its child
-                        localServiceImpl.updateListNode(
-                            nodePk = title,
-                            title = listTitle.toString(),
-                            topicPk = topicPk ?: 0,
-                            itemPk = -1L,
-                            parentPK = null,
-                            childPk = parentPk
-                        )
-                        // update the first child giving it the title as its parent
-                        localServiceImpl.updateListNode(
-                            nodePk = parentPk ?: 0,
-                            title = node?.title ?: EMPTY_STRING,
-                            topicPk = topicPk ?: 0,
-                            itemPk = node?.itemPK ?: 0,
-                            parentPK = title,
-                            childPk = null
-                        )
-                    } else {
-                        parentPk =
-                            node?.let { listNode -> localServiceImpl.insertNewNode(listNode) }
-                    }
+                    parentPk =
+                        node?.let { listNode -> localServiceImpl.insertNewNode(listNode) }
                 }
             }
         }
