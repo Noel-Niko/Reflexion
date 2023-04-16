@@ -26,7 +26,7 @@ import com.livingtechusa.reflexion.util.Constants.EMPTY_PK_STRING
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.NULL
 import com.livingtechusa.reflexion.util.TemporarySingleton
-import com.livingtechusa.reflexion.util.json.writeReflexionItemsToFile
+import com.livingtechusa.reflexion.util.json.writeReflexionItemListToZipFile
 import com.livingtechusa.reflexion.util.scopedStorageUtils.FileResource
 import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
 import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil
@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import javax.inject.Inject
 
 
@@ -439,22 +440,41 @@ class CustomListsViewModel @Inject constructor(
 //                                )
 
 
-                                val itemlist: MutableList<ReflexionItem> = mutableListOf()
+                                val itemList: MutableList<ReflexionItem> = mutableListOf()
                                 customList.value.children.forEach {
                                     it.itemPK?.let { it1 ->
                                         localServiceImpl.selectItem(it1)
-                                            ?.let { it2 -> itemlist.add(it2) }
+                                            ?.let { it2 -> itemList.add(it2) }
                                     }
                                 }
                                 // create the files and get their URIs
-                                val fileUris = writeReflexionItemsToFile(
+                                val title = customList.value.itemName?.replace(" ", "_")
+                                val filename =
+                                    context.getString(R.string.app_name) + title + "${System.currentTimeMillis()}.zip"
+                                val file = File(context.filesDir, filename)
+                                file.setExecutable(true, false)
+                                file.setReadable(true, false)
+                                file.setWritable(true, false)
+                                val zipValues = writeReflexionItemListToZipFile(
                                     context,
-                                    itemlist,
-                                    customList.value.itemName.toString()
+                                    itemList,
+                                    customList.value.itemName.toString(),
+                                    file
                                 )
+
+                                // create list of files to remove next onCreate
+                                TemporarySingleton.sharedFileList.addAll(zipValues.uriList)
+                                val fileSet: MutableSet<String> = mutableSetOf()
+                                TemporarySingleton.sharedFileList.forEach { uri ->
+                                    fileSet.add(
+                                        Converters().convertUriToString(uri) ?: EMPTY_STRING
+                                    )
+                                }
+                                UserPreferencesUtil.setFilesSaved(context, fileSet)
+
                                 // create the share intent
                                 val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE)
-                                shareIntent.type = "*/*"
+                                shareIntent.type = "application/zip"
                                 shareIntent.putExtra(
                                     Intent.EXTRA_SUBJECT,
                                     "Sending: ${customList.value.itemName}"
@@ -477,22 +497,13 @@ class CustomListsViewModel @Inject constructor(
 //                                    Intent.EXTRA_STREAM,
 //                                    ArrayList(fileUris)
 //                                )
-                                fileUris.forEach {uri->
-                                shareIntent.setDataAndType(
-                                    uri,
-                                    uri.let { resolver.getType(it) })
-                                shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
-                            }
 
-                                // create list of files to remove next onCreate
-                                TemporarySingleton.sharedFileList.addAll(fileUris)
-                                val fileSet: MutableSet<String> = mutableSetOf()
-                                TemporarySingleton.sharedFileList.forEach { uri ->
-                                    fileSet.add(
-                                        Converters().convertUriToString(uri) ?: EMPTY_STRING
-                                    )
-                                }
-                                UserPreferencesUtil.setFilesSaved(context, fileSet)
+                                shareIntent.setDataAndType(
+                                    zipValues.zipUri,
+                                    zipValues.zipUri.let { resolver.getType(it) })
+                                shareIntent.putExtra(Intent.EXTRA_STREAM, zipValues.zipUri)
+
+
 
                                 shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                 shareIntent.action = Intent.ACTION_SEND

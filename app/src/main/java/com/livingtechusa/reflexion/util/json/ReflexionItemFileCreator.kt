@@ -4,47 +4,122 @@ import android.content.Context
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import androidx.core.content.FileProvider
-import androidx.core.net.toUri
 import com.google.gson.Gson
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
-import com.livingtechusa.reflexion.data.models.ReflexionItemAsJson
 import com.livingtechusa.reflexion.data.models.ReflexionList
 import com.livingtechusa.reflexion.data.models.toReflexionItemAsJson
-import java.io.*
-fun writeReflexionItemsToFile(context: Context, reflexionItems: List<ReflexionItem>, title: String): List<Uri> {
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
+
+fun writeReflexionItemListToZipFile(
+    context: Context,
+    reflexionItems: List<ReflexionItem>,
+    title: String,
+    outputZipFile: File
+): ZipValues {
     val fileUris = mutableListOf<Uri>()
+    val mediaFileList = mutableListOf<File>()
     val gson = Gson()
 
-    // create the reflexion list file
-    val reflexionListFile = File(context.filesDir, "reflexionList.json")
-    reflexionListFile.writeText(gson.toJson(
-        ReflexionList(
-            title,
-            reflexionItems.map { toReflexionItemAsJson(it) })))
+    // create the reflexion list Json file
+    val reflexionListFile = File(context.filesDir, "reflexionList_$title.json")
+    reflexionListFile.writeText(
+        gson.toJson(
+            ReflexionList(
+                title,
+                reflexionItems.map { toReflexionItemAsJson(it) })
+        )
+    )
 
-    fileUris.add(FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", reflexionListFile))
+    fileUris.add(
+        FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            reflexionListFile
+        )
+    )
 
     // create the files for the images and videos
     reflexionItems.forEachIndexed { index, reflexionItem ->
         reflexionItem.image?.let { image ->
             val imageFile = File(context.filesDir, "reflexion_${reflexionItem.autogenPk}_image.jpg")
             imageFile.writeBytes(image)
-            fileUris.add(FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", imageFile))
+            mediaFileList.add(imageFile)
+            fileUris.add(
+                FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    imageFile
+                )
+            )
         }
         reflexionItem.videoUri?.let { videoUri ->
-            val videoDescriptor = context.contentResolver.openFileDescriptor(Uri.parse(videoUri), "r")
+            val videoDescriptor =
+                context.contentResolver.openFileDescriptor(Uri.parse(videoUri), "r")
             val videoFile = File(context.filesDir, "video_${reflexionItem.autogenPk}.mp4")
             ParcelFileDescriptor.AutoCloseInputStream(videoDescriptor).use { input ->
                 FileOutputStream(videoFile).use { output ->
                     input.copyTo(output)
                 }
             }
-            fileUris.add(FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", videoFile))
+            mediaFileList.add(videoFile)
+            fileUris.add(
+                FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    videoFile
+                )
+            )
         }
     }
 
-    return fileUris
+    val zipFile = createZipFile(
+        jsonFile = reflexionListFile,
+        mediaFiles = mediaFileList,
+        outputZipFile = outputZipFile
+    )
+    val zipUri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", zipFile)
+
+    return ZipValues(zipFile, zipUri, fileUris)
 }
+
+fun createZipFile(jsonFile: File, mediaFiles: List<File>, outputZipFile: File): File {
+    val buffer = ByteArray(1024)
+    val out = ZipOutputStream(FileOutputStream(outputZipFile))
+
+    // add JSON file to ZIP file
+    val jsonEntry = ZipEntry(jsonFile.name)
+    out.putNextEntry(jsonEntry)
+    FileInputStream(jsonFile).use { input ->
+        var len = input.read(buffer)
+        while (len > 0) {
+            out.write(buffer, 0, len)
+            len = input.read(buffer)
+        }
+    }
+    out.closeEntry()
+
+    // add media files to ZIP file
+    for (mediaFile in mediaFiles) {
+        val mediaEntry = ZipEntry(mediaFile.name)
+        out.putNextEntry(mediaEntry)
+        FileInputStream(mediaFile).use { input ->
+            var len = input.read(buffer)
+            while (len > 0) {
+                out.write(buffer, 0, len)
+                len = input.read(buffer)
+            }
+        }
+        out.closeEntry()
+    }
+
+    out.close()
+    return outputZipFile
+}
+
 
 /*
 // Function to write a list of ReflexionItem objects and their media files to a JSON file
