@@ -63,3 +63,17 @@ data class ReflexionItemAsJson(
         return result
     }
 }
+
+fun toReflexionItemAsJson(reflexionItem: ReflexionItem): ReflexionItemAsJson {
+    return ReflexionItemAsJson(
+        autogenPk = reflexionItem.autogenPk.toString(),
+        name = reflexionItem.name,
+        description = reflexionItem.description,
+        detailedDescription = reflexionItem.detailedDescription,
+        image = reflexionItem.image?.toByteString()?.toByteArray(),
+//            imagePk = reflexionItem.imagePk?.toString(),
+//            videoUri = reflexionItem.videoUri,
+        videoUrl = reflexionItem.videoUrl,
+        parent = reflexionItem.parent.toString()
+    )
+}

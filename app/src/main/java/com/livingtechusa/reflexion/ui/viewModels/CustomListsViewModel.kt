@@ -10,7 +10,6 @@ import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
-import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.livingtechusa.reflexion.R
@@ -27,7 +26,6 @@ import com.livingtechusa.reflexion.util.Constants.EMPTY_PK_STRING
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.NULL
 import com.livingtechusa.reflexion.util.TemporarySingleton
-import com.livingtechusa.reflexion.util.json.ReflexionJsonWriter
 import com.livingtechusa.reflexion.util.json.writeReflexionItemsToFile
 import com.livingtechusa.reflexion.util.scopedStorageUtils.FileResource
 import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
@@ -39,8 +37,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.FileOutputStream
 import javax.inject.Inject
 
 
@@ -405,9 +401,9 @@ class CustomListsViewModel @Inject constructor(
                         withContext(Dispatchers.IO) {
                             try {
                                 // create a json file
-                                val title = customList.value.itemName?.replace(" ", "_")
-                                val filename =
-                                    context.getString(R.string.app_name) + title + "${System.currentTimeMillis()}.json"
+//                                val title = customList.value.itemName?.replace(" ", "_")
+//                                val filename =
+//                                    context.getString(R.string.app_name) + title + "${System.currentTimeMillis()}.json"
 //                                val file = File(context.filesDir, filename)
 //                                file.setExecutable(true, false)
 //                                file.setReadable(true, false)
@@ -434,51 +430,79 @@ class CustomListsViewModel @Inject constructor(
 //                                    "com.livingtechusa.reflexion.fileprovider",
 //                                    file
 //                                )
+
+
+//                                context.grantUriPermission(
+//                                    context.applicationContext.packageName,
+//                                    contentUri,
+//                                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+//                                )
+
+
                                 val itemlist: MutableList<ReflexionItem> = mutableListOf()
                                 customList.value.children.forEach {
                                     it.itemPK?.let { it1 ->
                                         localServiceImpl.selectItem(it1)
-                                            ?.let { it1 -> itemlist.add(it1) }
+                                            ?.let { it2 -> itemlist.add(it2) }
                                     }
                                 }
-                                val contentUri = writeReflexionItemsToFile(context, itemlist, customList.value.itemName.toString())
-
-                                context.grantUriPermission(
-                                    context.applicationContext.packageName,
-                                    contentUri,
-                                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                                // create the files and get their URIs
+                                val fileUris = writeReflexionItemsToFile(
+                                    context,
+                                    itemlist,
+                                    customList.value.itemName.toString()
                                 )
+                                // create the share intent
+                                val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE)
+                                shareIntent.type = "*/*"
+                                shareIntent.putExtra(
+                                    Intent.EXTRA_SUBJECT,
+                                    "Sending: ${customList.value.itemName}"
+                                )
+                                val text =
+                                    context.getString(R.string.this_file_was_sent_with_reflexion_and_requires_the_reflexion_app_to_open) + "\n" + context.getString(
+                                        R.string.sent_with_reflexion_from_the_google_play_store
+                                    ) + "\n" + context.getString(R.string.reflexion_link)
+                                shareIntent.putExtra(EXTRA_TEXT, text)
+                                // Attach the files
+                                val resolver: ContentResolver = context.contentResolver
+                                shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
+//                                fileUris.forEach { uri ->
+//                                    shareIntent.setDataAndType(
+//                                        uri,
+//                                        uri.let { resolver.getType(it) })
+//                                    shareIntent.putExtra(EXTRA_STREAM, uri)
+//                                }
+//                                shareIntent.putParcelableArrayListExtra(
+//                                    Intent.EXTRA_STREAM,
+//                                    ArrayList(fileUris)
+//                                )
+                                fileUris.forEach {uri->
+                                shareIntent.setDataAndType(
+                                    uri,
+                                    uri.let { resolver.getType(it) })
+                                shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
+                            }
 
-                                TemporarySingleton.sharedFileList.add(contentUri)
+                                // create list of files to remove next onCreate
+                                TemporarySingleton.sharedFileList.addAll(fileUris)
                                 val fileSet: MutableSet<String> = mutableSetOf()
-                                TemporarySingleton.sharedFileList.forEach{ uri ->
-                                    fileSet.add(Converters().convertUriToString(uri) ?: EMPTY_STRING)
+                                TemporarySingleton.sharedFileList.forEach { uri ->
+                                    fileSet.add(
+                                        Converters().convertUriToString(uri) ?: EMPTY_STRING
+                                    )
                                 }
                                 UserPreferencesUtil.setFilesSaved(context, fileSet)
 
-                                // Create intent
-                                val shareIntent = Intent()
-                                if (contentUri.equals(EMPTY_STRING).not()) {
-                                    val resolver: ContentResolver = context.contentResolver
-                                    shareIntent.type = "plain/text"
-                                    shareIntent.putExtra(
-                                        Intent.EXTRA_SUBJECT,
-                                        "Sending: ${customList.value.itemName}"
-                                    )
-                                    shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
-                                    shareIntent.setDataAndType(
-                                        contentUri,
-                                        contentUri.let { resolver.getType(it) })
-                                    shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
-                                    shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION)
-
-                                    shareIntent.action = Intent.ACTION_SEND
-                                    startActivity(context, shareIntent, null)
-                                    _loading.value = false
-                                }
-                            } catch (e: Exception) {
+                                shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                shareIntent.action = Intent.ACTION_SEND
+                                startActivity(context, shareIntent, null)
                                 _loading.value = false
-                                viewModelScope.launch (Dispatchers.Main) {
+
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Error " + e.message  + " with cause " + e.cause + " and Stack trace of: " + e.stackTrace )
+                                _loading.value = false
+                                viewModelScope.launch(Dispatchers.Main) {
                                     Toast.makeText(
                                         context,
                                         R.string.an_error_occurred_please_try_again,

@@ -4,12 +4,49 @@ import android.content.Context
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import com.google.gson.Gson
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
+import com.livingtechusa.reflexion.data.models.ReflexionItemAsJson
+import com.livingtechusa.reflexion.data.models.ReflexionList
+import com.livingtechusa.reflexion.data.models.toReflexionItemAsJson
 import java.io.*
+fun writeReflexionItemsToFile(context: Context, reflexionItems: List<ReflexionItem>, title: String): List<Uri> {
+    val fileUris = mutableListOf<Uri>()
+    val gson = Gson()
 
+    // create the reflexion list file
+    val reflexionListFile = File(context.filesDir, "reflexionList.json")
+    reflexionListFile.writeText(gson.toJson(
+        ReflexionList(
+            title,
+            reflexionItems.map { toReflexionItemAsJson(it) })))
+
+    fileUris.add(FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", reflexionListFile))
+
+    // create the files for the images and videos
+    reflexionItems.forEachIndexed { index, reflexionItem ->
+        reflexionItem.image?.let { image ->
+            val imageFile = File(context.filesDir, "reflexion_${reflexionItem.autogenPk}_image.jpg")
+            imageFile.writeBytes(image)
+            fileUris.add(FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", imageFile))
+        }
+        reflexionItem.videoUri?.let { videoUri ->
+            val videoDescriptor = context.contentResolver.openFileDescriptor(Uri.parse(videoUri), "r")
+            val videoFile = File(context.filesDir, "video_${reflexionItem.autogenPk}.mp4")
+            ParcelFileDescriptor.AutoCloseInputStream(videoDescriptor).use { input ->
+                FileOutputStream(videoFile).use { output ->
+                    input.copyTo(output)
+                }
+            }
+            fileUris.add(FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", videoFile))
+        }
+    }
+
+    return fileUris
+}
+
+/*
 // Function to write a list of ReflexionItem objects and their media files to a JSON file
 fun writeReflexionItemsToFile(context: Context, reflexionItems: List<ReflexionItem>, listTitle: String?): Uri {
     // Create a new JSON object
@@ -76,3 +113,4 @@ fun writeReflexionItemsToFile(context: Context, reflexionItems: List<ReflexionIt
     // Return a FileProvider URI for the file
     return FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
 }
+ */
