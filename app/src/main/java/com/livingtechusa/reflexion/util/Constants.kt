@@ -14,6 +14,8 @@ object Constants {
     const val URL = "Url"
     const val SEARCH_YOUTUBE = "https://www.youtube.com/results?search_query="
     const val SOURCE = "sourceType"
+    const val JSON = "json"
+    const val ZIP = "zip"
     const val REFLEXION_ITEM_PK = "reflexion_item_pk"
     const val FILE_PATH = "filePath"
     const val EMPTY_ITEM = "Empty Item"

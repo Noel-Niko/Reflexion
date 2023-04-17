@@ -1,6 +1,7 @@
 package com.livingtechusa.reflexion.data.localService
 
 import android.graphics.Bitmap
+import android.net.Uri
 import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.dao.BookMarksDao
 import com.livingtechusa.reflexion.data.dao.ImagesDao
@@ -84,7 +85,7 @@ class LocalServiceImpl @Inject constructor(
         return _imagePk.await()
     }
 
-    override suspend fun updateReflexionItem(item: ReflexionItem, priorImagePk: Long?) {
+    override suspend fun updateReflexionItemImage(item: ReflexionItem, priorImagePk: Long?) {
         // Remove old association data if applicable
         if (priorImagePk != item.imagePk) {
             if (priorImagePk != null) {
@@ -104,6 +105,19 @@ class LocalServiceImpl @Inject constructor(
             item.detailedDescription,
             newImagePk ?: item.imagePk,
             item.videoUri,
+            item.videoUrl,
+            item.parent
+        )
+    }
+
+    override suspend fun updateReflexionItemUri(item: ReflexionItem, newUri: Uri) {
+        reflexionItemDao.updateReflexionItem(
+            item.autogenPk,
+            item.name,
+            item.description,
+            item.detailedDescription,
+            item.imagePk,
+            Converters().convertUriToString(newUri),
             item.videoUrl,
             item.parent
         )
@@ -145,8 +159,8 @@ class LocalServiceImpl @Inject constructor(
         return reflexionItemDao.selectChildReflexionItems(pk)
     }
 
-    override suspend fun selectItem(autogenPK: Long): ReflexionItem? {
-        return reflexionItemDao.selectReflexionItem(autogenPK)
+    override suspend fun selectReflexionItemByPk(autogenPK: Long?): ReflexionItem? {
+        return autogenPK?.let { reflexionItemDao.selectReflexionItem(it) }
     }
 
     override suspend fun selectImagePkForItem(autogenPK: Long): Long? {

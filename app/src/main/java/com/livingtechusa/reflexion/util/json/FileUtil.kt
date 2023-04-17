@@ -8,6 +8,7 @@ import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 import java.io.BufferedReader
 import java.io.IOException
+import java.io.InputStream
 import java.io.InputStreamReader
 import java.lang.reflect.Type
 
@@ -27,6 +28,12 @@ class FileUtil(val context: Context) {
     @Throws(JsonSyntaxException::class)
     fun <T> getObjectFromFile(filePath: Uri, classOfT: Class<T>): T {
         val fileAsString = openFileAsString(filePath)
+        return gson.fromJson(fileAsString, classOfT)
+    }
+
+    @Throws(JsonSyntaxException::class)
+    fun <T> getObjectFromInputStream(inputStream: InputStream, classOfT: Class<T>): T {
+        val fileAsString = openInputStreamAsString(inputStream)
         return gson.fromJson(fileAsString, classOfT)
     }
 
@@ -59,4 +66,25 @@ class FileUtil(val context: Context) {
 
         return total.toString()
     }
+
+    private fun openInputStreamAsString(inputStream: InputStream): String {
+        val r = BufferedReader(InputStreamReader(inputStream))
+        val total = StringBuilder()
+        var line: String?
+
+        try {
+            line = r.readLine()
+
+            while (line != null) {
+                total.append(line).append('\n')
+                line = r.readLine()
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
+        return total.toString()
+    }
+
+
 }

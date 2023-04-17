@@ -1,6 +1,7 @@
 package com.livingtechusa.reflexion.data.localService
 
 import android.graphics.Bitmap
+import android.net.Uri
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.entities.Bookmarks
 import com.livingtechusa.reflexion.data.entities.ListNode
@@ -10,9 +11,10 @@ import com.livingtechusa.reflexion.data.models.ReflexionArrayItem
 interface ILocalService {
     // REFLEXION ITEMS
     suspend fun saveNewItem(item: ReflexionItem): Long
-    suspend fun updateReflexionItem(item: ReflexionItem, priorImagePk: Long?)
+    suspend fun updateReflexionItemImage(item: ReflexionItem, priorImagePk: Long?)
+    suspend fun updateReflexionItemUri(item: ReflexionItem, newUri: Uri)
     suspend fun getAllItems(): List<ReflexionItem?>
-    suspend fun selectItem(autogenPK: Long): ReflexionItem?
+    suspend fun selectReflexionItemByPk(autogenPK: Long?): ReflexionItem?
     suspend fun selectImagePkForItem(autogenPK: Long): Long?
     suspend fun deleteReflexionItem(autogenPK: Long, name: String, imagePk: Long?)
     suspend fun renameItem(autogenPK: Long, name: String, newName: String)

@@ -64,13 +64,21 @@
                <category android:name="android.intent.category.DEFAULT" />
                <data android:mimeType="video/*" />
            </intent-filter>
-<!--           For opening json files created by the app-->
+           <!--           For opening json files created by the app-->
            <intent-filter>
                <action android:name="android.intent.action.VIEW" />
                <category android:name="android.intent.category.DEFAULT" />
                <category android:name="android.intent.category.BROWSABLE" />
                <data android:scheme="content" />
                <data android:mimeType="application/json" />
+           </intent-filter>
+           <!--           For opening zip files created by the app-->
+           <intent-filter>
+               <action android:name="android.intent.action.VIEW" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <category android:name="android.intent.category.BROWSABLE" />
+               <data android:scheme="content" />
+               <data android:mimeType="application/zip" />
            </intent-filter>
        </activity>
        <activity-alias

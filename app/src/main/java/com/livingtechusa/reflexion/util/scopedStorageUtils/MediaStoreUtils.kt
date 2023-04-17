@@ -13,6 +13,7 @@ import android.media.MediaMetadataRetriever
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.provider.MediaStore
 import android.provider.MediaStore.MediaColumns.DATE_ADDED
 import android.util.Log
@@ -25,9 +26,11 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
+import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStream
+import java.io.OutputStream
 import kotlin.coroutines.resume
 
 
@@ -389,4 +392,35 @@ fun readAllBytes(inputStream: InputStream): ByteArray? {
         }
         return bitmap
     }
+
+    fun createMediaFile(inputStream: InputStream, mimeType: String, displayName: String, context: Context): Uri? {
+        val resolver = context.contentResolver
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, displayName)
+            put(MediaStore.MediaColumns.MIME_TYPE, mimeType)
+            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_MOVIES + File.separator + context.packageName)
+        }
+
+        var outputStream: OutputStream? = null
+        var uri: Uri? = null
+
+        try {
+            val collection = MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+            uri = resolver.insert(collection, contentValues)
+            uri?.let {
+                outputStream = resolver.openOutputStream(uri!!)
+                inputStream.copyTo(outputStream!!)
+            }
+        } catch (e: Exception) {
+            Log.e("createMediaFile", "Error creating media file", e)
+            resolver.delete(uri!!, null, null)
+            uri = null
+        } finally {
+            outputStream?.close()
+            inputStream.close()
+        }
+
+        return uri
+    }
+
 }

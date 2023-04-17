@@ -49,7 +49,7 @@ class BookmarksViewModel @Inject constructor(
             val bitmaps: MutableList<Bitmap> = mutableListOf()
             val job = async {
                 listBookmark.value.forEach { node ->
-                    localServiceImpl.selectItem(node.childPk ?: node.topic)?.imagePk?.let { imagePk ->
+                    localServiceImpl.selectReflexionItemByPk(node.childPk ?: node.topic)?.imagePk?.let { imagePk ->
                         localServiceImpl.selectImage(imagePk)
                             ?.let { bitmap -> bitmaps.add(bitmap) }
                     }
@@ -76,7 +76,7 @@ class BookmarksViewModel @Inject constructor(
                                 .forEach { bookMarks ->
                                     if (bookMarks != null) {
                                         if (bookMarks.ITEM_PK != null) {
-                                            localServiceImpl.selectItem(bookMarks.ITEM_PK)
+                                            localServiceImpl.selectReflexionItemByPk(bookMarks.ITEM_PK)
                                                 ?.let { reflexionItem -> items.add(reflexionItem) }
                                         } else if (bookMarks.LIST_PK != null) {
                                             localServiceImpl.selectListNode(bookMarks.LIST_PK)
@@ -153,7 +153,7 @@ class BookmarksViewModel @Inject constructor(
             localServiceImpl.getBookMarks().forEach { bookmarks ->
                 if (bookmarks != null) {
                     if (bookmarks.ITEM_PK != null) {
-                        localServiceImpl.selectItem(bookmarks.ITEM_PK)
+                        localServiceImpl.selectReflexionItemByPk(bookmarks.ITEM_PK)
                             ?.let { reflexionItem -> items.add(reflexionItem) }
                     } else if (bookmarks.LIST_PK != null) {
                         localServiceImpl.selectListNode(bookmarks.LIST_PK)

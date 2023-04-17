@@ -54,13 +54,14 @@ import com.livingtechusa.reflexion.util.Constants.EMPTY_PK_STRING
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.HEAD_NODE_PK
 import com.livingtechusa.reflexion.util.Constants.INDEX
+import com.livingtechusa.reflexion.util.Constants.JSON
 import com.livingtechusa.reflexion.util.Constants.LIST_NAME
 import com.livingtechusa.reflexion.util.Constants.REFLEXION_ITEM_PK
 import com.livingtechusa.reflexion.util.Constants.SOURCE
 import com.livingtechusa.reflexion.util.Constants.SUB_ITEM
+import com.livingtechusa.reflexion.util.Constants.ZIP
 import com.livingtechusa.reflexion.util.MediaUtil
 import com.livingtechusa.reflexion.util.TemporarySingleton
-import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
 import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -224,13 +225,19 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable(
-                        route = Screen.ConfirmSaveFileScreen.route,
+                        route = Screen.ConfirmSaveFileScreen.route + "/{sourceType}",
+                        arguments = listOf(
+                            navArgument(SOURCE) {
+                                type = NavType.StringType
+                            }
+                        )
                     ) { navBackStackEntry ->
                         val parentEntry = remember(navBackStackEntry) {
                             navController.getBackStackEntry(Screen.HomeScreen.route)
                         }
                         val parentViewModel: BuildItemViewModel = hiltViewModel(parentEntry)
                         ConfirmSaveFileAlertDialog(
+                            type = navBackStackEntry.arguments?.getString(SOURCE) ?: EMPTY_STRING,
                             navController = navController,
                             viewModel = parentViewModel
                         )
@@ -401,13 +408,23 @@ class MainActivity : ComponentActivity() {
                     }
                     onDispose { }
                 }
-                // "Share" from media file
+                // Open json file
                 DisposableEffect(key1 = Intent()) {
                     if (intent.type != EMPTY_STRING && intent.type == "application/json") {
                         // Store Path
                         TemporarySingleton.file = intent.data
                         //  Confirm desire to save :
-                        navigationController.navigate(Screen.ConfirmSaveFileScreen.route)
+                        navigationController.navigate(Screen.ConfirmSaveFileScreen.route + "/" + JSON)
+                    }
+                    onDispose { }
+                }
+                // Open zip file
+                DisposableEffect(key1 = Intent()) {
+                    if (intent.type != EMPTY_STRING && intent.type == "application/zip") {
+                        // Store Path
+                        TemporarySingleton.file = intent.data
+                        //  Confirm desire to save :
+                        navigationController.navigate(Screen.ConfirmSaveFileScreen.route + "/" + ZIP)
                     }
                     onDispose { }
                 }

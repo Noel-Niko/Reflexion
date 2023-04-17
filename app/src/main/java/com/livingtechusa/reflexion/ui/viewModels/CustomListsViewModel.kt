@@ -116,7 +116,7 @@ class CustomListsViewModel @Inject constructor(
             val job = async {
                 listOfLists.value.forEach { topicItem ->
                     topicItem?.children?.get(0)?.itemPK?.let { itemPk ->
-                        localServiceImpl.selectItem(itemPk)?.imagePk?.let { imagePk ->
+                        localServiceImpl.selectReflexionItemByPk(itemPk)?.imagePk?.let { imagePk ->
                             localServiceImpl.selectImage(imagePk)
                                 ?.let { bitmap -> bitmaps.add(bitmap) }
                         }
@@ -310,7 +310,7 @@ class CustomListsViewModel @Inject constructor(
                             val newReflexionItemList = mutableListOf<ReflexionItem>()
                             newListItem.children.forEach() { reflexionArrayItem ->
                                 reflexionArrayItem.itemPK?.let { pk ->
-                                    localServiceImpl.selectItem(pk)
+                                    localServiceImpl.selectReflexionItemByPk(pk)
                                         ?.let { reflexionItem ->
                                             newReflexionItemList.add(
                                                 reflexionItem
@@ -443,7 +443,7 @@ class CustomListsViewModel @Inject constructor(
                                 val itemList: MutableList<ReflexionItem> = mutableListOf()
                                 customList.value.children.forEach {
                                     it.itemPK?.let { it1 ->
-                                        localServiceImpl.selectItem(it1)
+                                        localServiceImpl.selectReflexionItemByPk(it1)
                                             ?.let { it2 -> itemList.add(it2) }
                                     }
                                 }
@@ -686,7 +686,7 @@ class CustomListsViewModel @Inject constructor(
 
     private fun setParent(itemPk: String) {
         viewModelScope.launch(Dispatchers.Main) {
-            val selectedItem = localServiceImpl.selectItem(itemPk.toLong())
+            val selectedItem = localServiceImpl.selectReflexionItemByPk(itemPk.toLong())
             if (selectedItem != null) {
                 _selectedParent.value = selectedItem
                 val parent = selectedParent.value.name

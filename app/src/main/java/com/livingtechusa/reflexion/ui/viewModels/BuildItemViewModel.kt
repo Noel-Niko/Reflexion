@@ -43,6 +43,7 @@ import com.livingtechusa.reflexion.util.scopedStorageUtils.FileResource
 import com.livingtechusa.reflexion.util.scopedStorageUtils.ImageUtils
 import com.livingtechusa.reflexion.util.scopedStorageUtils.ImageUtils.rotateImage
 import com.livingtechusa.reflexion.util.scopedStorageUtils.MediaStoreUtils
+import com.livingtechusa.reflexion.util.scopedStorageUtils.MediaStoreUtils.createMediaFile
 import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
 import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil
 import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil.resource
@@ -58,6 +59,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.util.LinkedList
+import java.util.zip.ZipFile
 import javax.inject.Inject
 
 
@@ -132,7 +134,7 @@ class BuildItemViewModel @Inject constructor(
     private val _selectedFile: MutableStateFlow<FileResource?> = MutableStateFlow(null)
     val selectedFile get() = _selectedFile
 
-    private val oldToNewPkList =  LinkedList<Pair<Long, Long?>>()
+    private val oldToNewPkList = LinkedList<Pair<Long, Long?>>()
 
     private var fileListTopic: Long? = null
     private var listTitle: String? = EMPTY_STRING
@@ -177,7 +179,7 @@ class BuildItemViewModel @Inject constructor(
                                 val priorImagePk = _reflexionItem.imagePk
                                 _reflexionItem = updates
                                 _reflexionItemState.value = updates
-                                localServiceImpl.updateReflexionItem(updates, priorImagePk)
+                                localServiceImpl.updateReflexionItemImage(updates, priorImagePk)
                             }
                         }
                     }
@@ -233,7 +235,7 @@ class BuildItemViewModel @Inject constructor(
                             }
                             _reflexionItem = updatedReflexionItem
                             _reflexionItemState.value = updatedReflexionItem
-                            localServiceImpl.updateReflexionItem(reflexionItem, null)
+                            localServiceImpl.updateReflexionItemImage(reflexionItem, null)
                         }
                     }
 
@@ -256,7 +258,7 @@ class BuildItemViewModel @Inject constructor(
                             )
 
                             _reflexionItem =
-                                localServiceImpl.selectItem(localServiceImpl.saveNewItem(newItem))
+                                localServiceImpl.selectReflexionItemByPk(localServiceImpl.saveNewItem(newItem))
                                     ?: ReflexionItem()
                             _reflexionItemState.value = _reflexionItem
                             _autogenPK.value = _reflexionItem.autogenPk
@@ -308,7 +310,7 @@ class BuildItemViewModel @Inject constructor(
 
                                 USE_TOP_ITEM -> {
                                     _reflexionItem =
-                                        event.pk.let { localServiceImpl.selectItem(topItem ?: 1) }
+                                        event.pk.let { localServiceImpl.selectReflexionItemByPk(topItem ?: 1) }
                                             ?: ReflexionItem()
                                     updateAllDisplayedSubItemsToViewModelVersion()
                                     _reflexionItemState.value = _reflexionItem
@@ -316,7 +318,7 @@ class BuildItemViewModel @Inject constructor(
 
                                 else -> {
                                     _reflexionItem =
-                                        event.pk?.let { localServiceImpl.selectItem(it) }
+                                        event.pk?.let { localServiceImpl.selectReflexionItemByPk(it) }
                                             ?: ReflexionItem()
                                     updateAllDisplayedSubItemsToViewModelVersion()
                                     _reflexionItemState.value = _reflexionItem
@@ -347,7 +349,7 @@ class BuildItemViewModel @Inject constructor(
 
                     is BuildEvent.SetParent -> {
                         viewModelScope.launch {
-                            val parent = localServiceImpl.selectItem(event.parent)
+                            val parent = localServiceImpl.selectReflexionItemByPk(event.parent)
                             val item =
                                 ReflexionItem(parent = parent?.autogenPk, imagePk = parent?.imagePk)
                             item.image =
@@ -485,49 +487,17 @@ class BuildItemViewModel @Inject constructor(
                         }
                     }
 
-                    is BuildEvent.SaveAndDisplayedReflexionItemFile -> {
+                    is BuildEvent.SaveAndDisplayZipFile -> {
                         // Show Loading
                         _loading.value = true
                         val itemsFromFile = mutableListOf<ReflexionItem>()
-                        try {
-                            // read the json
-                            val reflexionFile: ReflexionList? =
-                                TemporarySingleton.file?.let {
-                                    FileUtil(context).getObjectFromFile(
-                                        it,
-                                        ReflexionList::class.java
-                                    )
-                                }
+                        openZipFile(TemporarySingleton.file)
+                    }
 
-                            reflexionFile?.reflexionItems?.forEach {
-                                itemsFromFile.add(it.toReflexionItem())
-                            }
-
-                            listTitle = reflexionFile?.List_Title
-                            fileListTopic = itemsFromFile[0].autogenPk
-                            viewModelScope.launch {
-                                withContext(Dispatchers.IO) {
-                                    val job = launch {
-                                        saveItemFromFile(
-                                            null,
-                                            null,
-                                            null,
-                                            null,
-                                            itemsFromFile
-                                        )
-                                    }
-                                    job.join()
-                                    createList(oldToNewPkList)
-                                }
-                            }
-                        } catch (e: Exception) {
-                            _loading.value = false
-                            Toast.makeText(
-                                context,
-                                R.string.an_error_occurred_please_try_again,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+                    is BuildEvent.SaveAndDisplayReflexionItemFile -> {
+                        // Show Loading
+                        _loading.value = true
+                        processJsonFile(null)
                         _loading.value = false
                     }
 
@@ -611,6 +581,145 @@ class BuildItemViewModel @Inject constructor(
         }
     }
 
+    private fun processJsonFile(inputStream: InputStream?) {
+        val itemsFromFile = mutableListOf<ReflexionItem>()
+        // need a separate dialog that leads to a different event for .zip files from teh main ctivity
+        _loading.value = true
+        try {
+            val reflexionFile: ReflexionList? = if (inputStream == null) {
+                // read the json
+                TemporarySingleton.file?.let {
+                    FileUtil(context).getObjectFromFile(
+                        it,
+                        ReflexionList::class.java
+                    )
+                }
+            } else {
+                FileUtil(context).getObjectFromInputStream(
+                    inputStream = inputStream,
+                    ReflexionList::class.java
+                )
+            }
+
+            reflexionFile?.reflexionItems?.forEach {
+                itemsFromFile.add(it.toReflexionItem())
+            }
+
+            listTitle = reflexionFile?.List_Title
+            fileListTopic = itemsFromFile[0].autogenPk
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    val job = launch {
+                        saveItemsFromFile(
+                            null,
+                            null,
+                            null,
+                            null,
+                            itemsFromFile
+                        )
+                    }
+                    job.join()
+                    createList(oldToNewPkList)
+                }
+            }
+        } catch (e: Exception) {
+            _loading.value = false
+            Toast.makeText(
+                context,
+                R.string.an_error_occurred_please_try_again,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+        TemporarySingleton.file = null
+        _loading.value = false
+    }
+
+    private fun openZipFile(filePath: Uri?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                var reflexionItemsList = mutableListOf<ReflexionItem>()
+                if (filePath != null) {
+                    // Create a ZipFile object for the zip file
+                    val contentResolver = context.contentResolver
+                    val inputStream = contentResolver.openInputStream(filePath)
+                    val tempFile = File.createTempFile("temp", ".zip")
+                    val outputStream = FileOutputStream(tempFile)
+                    inputStream?.copyTo(outputStream)
+                    inputStream?.close()
+                    outputStream.close()
+                    val zipFile = ZipFile(tempFile)
+
+                    // Get the entries in the zip file
+                    val entries = zipFile.entries()
+                    // Loop through the entries
+                    while (entries.hasMoreElements()) {
+                        val entry = entries.nextElement()
+                        // If the entry is a file
+                        if (!entry.isDirectory) {
+                            // Get the input stream for the entry
+                            val inputStream = zipFile.getInputStream(entry)
+                            // Process the contents of the entry
+
+                            // For example, read the contents of a text file
+                            if (entry.name.endsWith(".txt")) {
+                                val contents = inputStream.bufferedReader().readText()
+                                println(contents)
+                            }
+                            // For example, read the bytes of an image file
+                            if (entry.name.endsWith(".png")) {
+                                val bytes = inputStream.readBytes()
+                                // Do something with the bytes
+                            }
+                            // read the .json reflexionItem values
+                            if (entry.name.endsWith(".json")) {
+                                val job = launch {
+                                    processJsonFile(inputStream)
+                                }
+                                job.join()
+                            }
+                            // save the video's, get the uri's, and save the uri's to the Reflexion items for the next step
+                            if (entry.name.endsWith(".mp4")) {
+                                val job = launch {
+                                    // Save the file to storage and the Uri to the associated reflexion item
+                                }
+                                job.join()
+                            }
+                            // save the image bytes to the Reflexion Items to process in teh next step
+                            if (entry.name.endsWith(".jpg")) {
+                                val job = launch {
+                                 // save item to file
+                                    val uri: Uri? = createMediaFile( // could be video/mp4
+                                        inputStream= inputStream, mimeType = "video/*", displayName = entry.name, context = context
+                                    )
+                                    val pattern = Regex("""\d+""")
+                                    val matchResult = pattern.find(entry.name)
+                                    val originalPk = matchResult?.value?.toLong()
+                                    val reflexionItem = localServiceImpl.selectReflexionItemByPk(oldToNewPkList.firstOrNull { it.first == originalPk }?.second)
+                                 // save uri to associated reflexion item
+                                    if (reflexionItem != null && uri != null) {
+                                            localServiceImpl.updateReflexionItemUri(reflexionItem, uri)
+                                    }
+                                }
+                                job.join()
+                            }
+                            // ...
+                            // Close the input stream
+                            inputStream.close()
+                        }
+                    }
+                    // Close the zip file
+                    zipFile.close()
+                }
+                TemporarySingleton.file = null
+            } catch (e: Exception) {
+                Log.e(
+                    TAG,
+                    "ERROR: " + e.message + " WITH CAUSE: " + e.cause + "STACK TRACE: " + e.stackTrace
+                )
+            }
+        }
+    }
+
     private fun updateAllDisplayedSubItemsToViewModelVersion() {
         _autogenPK.value = reflexionItem.autogenPk
         _name.value = reflexionItem.name
@@ -655,7 +764,7 @@ class BuildItemViewModel @Inject constructor(
     }
 
     // Functions to Save File Contents
-    private suspend fun saveItemFromFile(
+    private suspend fun saveItemsFromFile(
         filePk: Long?,
         dbPk: Long?,
         fileGrandParentPk: Long?,
@@ -684,12 +793,13 @@ class BuildItemViewModel @Inject constructor(
                     // null occurs when an item is in a list more than 1 x
                     oldToNewPkList.add(Pair(reflexionItem.autogenPk, newPrimaryKey))
                 } else {
-                    val duplicatePK = oldToNewPkList.firstOrNull() { it.first == reflexionItem.autogenPk }
+                    val duplicatePK =
+                        oldToNewPkList.firstOrNull() { it.first == reflexionItem.autogenPk }
                     if (duplicatePK != null) {
                         oldToNewPkList.add(duplicatePK)
                     }
                 }
-                saveItemFromFile(oldPrimaryKey, newPrimaryKey, filePk, dbPk, itemsFromFile)
+                saveItemsFromFile(oldPrimaryKey, newPrimaryKey, filePk, dbPk, itemsFromFile)
             }
         }
 
@@ -711,7 +821,8 @@ class BuildItemViewModel @Inject constructor(
                 }
                 // check if a child of a topic previously removed from the list
                 if (oldToNewPkList.firstOrNull { it.first == reflexionItem.parent } != null) {
-                    dbParent = oldToNewPkList.firstOrNull { it.first == reflexionItem.parent }?.second
+                    dbParent =
+                        oldToNewPkList.firstOrNull { it.first == reflexionItem.parent }?.second
                 }
                 newPrimaryKey =
                     itemsFromFile.firstOrNull { it.autogenPk == reflexionItem.autogenPk }?.copy(
@@ -728,19 +839,20 @@ class BuildItemViewModel @Inject constructor(
                     // null occurs when an item is in a list more than 1 x
                     oldToNewPkList.add(Pair(reflexionItem.autogenPk, newPrimaryKey))
                 } else {
-                    val duplicatePK = oldToNewPkList.firstOrNull() { it.first == reflexionItem.autogenPk }
+                    val duplicatePK =
+                        oldToNewPkList.firstOrNull() { it.first == reflexionItem.autogenPk }
                     if (duplicatePK != null) {
                         oldToNewPkList.add(duplicatePK)
                     }
                 }
-                saveItemFromFile(reflexionItem.autogenPk, newPrimaryKey, null, null, itemsFromFile)
+                saveItemsFromFile(reflexionItem.autogenPk, newPrimaryKey, null, null, itemsFromFile)
             }
         }
 
     }
 
     private suspend fun createList(oldToNewPkList: LinkedList<Pair<Long, Long?>>) {
-        val topicPk = oldToNewPkList.firstOrNull { it.first ==  fileListTopic }?.second
+        val topicPk = oldToNewPkList.firstOrNull { it.first == fileListTopic }?.second
         setTopItem(topicPk ?: 0)
         if (oldToNewPkList.isEmpty().not()) {
             val newList = mutableListOf<Long>()

@@ -16,13 +16,16 @@ import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
+import com.livingtechusa.reflexion.util.Constants.JSON
 import com.livingtechusa.reflexion.util.Constants.USE_TOP_ITEM
+import com.livingtechusa.reflexion.util.Constants.ZIP
 import com.livingtechusa.reflexion.util.TemporarySingleton
 
 const val CONFIRM_SAVE_FILE = "ConfirmSaveFileAlertDialog"
 
 @Composable
 fun ConfirmSaveFileAlertDialog(
+    type: String,
     navController: NavHostController,
     viewModel: BuildItemViewModel = hiltViewModel()
 ) {
@@ -49,7 +52,12 @@ fun ConfirmSaveFileAlertDialog(
                             onClick = {
                                 openDialog.value = false
                                 navController.navigate(Screen.BuildItemScreen.route + "/" + USE_TOP_ITEM)
-                                viewModel.onTriggerEvent(BuildEvent.SaveAndDisplayedReflexionItemFile)
+                                if (type == JSON) {
+                                    viewModel.onTriggerEvent(BuildEvent.SaveAndDisplayReflexionItemFile)
+                                }
+                                if (type == ZIP) {
+                                    viewModel.onTriggerEvent(BuildEvent.SaveAndDisplayZipFile)
+                                }
                             },
                             colors = ButtonDefaults.buttonColors(
                                 backgroundColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
