@@ -402,45 +402,6 @@ class CustomListsViewModel @Inject constructor(
                     viewModelScope.launch {
                         withContext(Dispatchers.IO) {
                             try {
-                                // create a json file
-//                                val title = customList.value.itemName?.replace(" ", "_")
-//                                val filename =
-//                                    context.getString(R.string.app_name) + title + "${System.currentTimeMillis()}.json"
-//                                val file = File(context.filesDir, filename)
-//                                file.setExecutable(true, false)
-//                                file.setReadable(true, false)
-//                                file.setWritable(true, false)
-//
-//                                // save data to the file
-//                                val outputStream: FileOutputStream = FileOutputStream(file)
-//                                val reflexionItemList = mutableListOf<ReflexionItem>()
-//                                customList.value.children.forEach { item ->
-//                                    item.itemPK?.let { pk ->
-//                                        localServiceImpl.selectItem(pk)
-//                                            ?.let { reflexionItem -> reflexionItemList.add(reflexionItem) }
-//                                    }
-//                                }
-//                                ReflexionJsonWriter()
-//                                    .writeJsonStream(
-//                                        outputStream,
-//                                        reflexionItemList
-//                                    )
-//
-//                                // generate uri to the file with permissions
-//                                val contentUri: Uri = FileProvider.getUriForFile(
-//                                    context.applicationContext,
-//                                    "com.livingtechusa.reflexion.fileprovider",
-//                                    file
-//                                )
-
-
-//                                context.grantUriPermission(
-//                                    context.applicationContext.packageName,
-//                                    contentUri,
-//                                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-//                                )
-
-
                                 val itemList: MutableList<ReflexionItem> = mutableListOf()
                                 customList.value.children.forEach {
                                     it.itemPK?.let { it1 ->
@@ -488,33 +449,20 @@ class CustomListsViewModel @Inject constructor(
                                 // Attach the files
                                 val resolver: ContentResolver = context.contentResolver
                                 shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
-//                                fileUris.forEach { uri ->
-//                                    shareIntent.setDataAndType(
-//                                        uri,
-//                                        uri.let { resolver.getType(it) })
-//                                    shareIntent.putExtra(EXTRA_STREAM, uri)
-//                                }
-//                                shareIntent.putParcelableArrayListExtra(
-//                                    Intent.EXTRA_STREAM,
-//                                    ArrayList(fileUris)
-//                                )
-
                                 shareIntent.setDataAndType(
                                     zipValues.zipUri,
                                     zipValues.zipUri.let { resolver.getType(it) })
                                 shareIntent.putExtra(EXTRA_STREAM, zipValues.zipUri)
-
-
-
                                 shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                 shareIntent.action = Intent.ACTION_SEND
+                                withContext(Dispatchers.Main) { _loading.value = false }
                                 startActivity(context, shareIntent, null)
-                                _loading.value = false
+
 
                             } catch (e: Exception) {
                                 Log.e(TAG, "Error " + e.message  + " with cause " + e.cause + " and Stack trace of: " + e.stackTrace )
-                                _loading.value = false
-                                viewModelScope.launch(Dispatchers.Main) {
+                                withContext(Dispatchers.Main) {
+                                    _loading.value = false
                                     Toast.makeText(
                                         context,
                                         R.string.an_error_occurred_please_try_again,
@@ -525,11 +473,11 @@ class CustomListsViewModel @Inject constructor(
                         }
                     }
                 }
-
                 else -> {}
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error: " + e.message + " with cause " + e.cause)
+            _loading.value = false
         }
     }
 
