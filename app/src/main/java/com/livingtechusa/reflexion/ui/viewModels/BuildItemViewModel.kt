@@ -408,8 +408,9 @@ class BuildItemViewModel @Inject constructor(
                     }
 
                     is BuildEvent.SendFile -> {
+                        _loading.value = true
                         viewModelScope.launch {
-                            withContext(Dispatchers.Main) {
+                            withContext(Dispatchers.IO) {
                                 try {
                                     // create a json file
                                     val title = reflexionItemState.value.name.replace(" ", "_")
@@ -474,14 +475,18 @@ class BuildItemViewModel @Inject constructor(
                                         shareIntent.flags =
                                             FLAG_ACTIVITY_NEW_TASK or FLAG_GRANT_READ_URI_PERMISSION
                                         shareIntent.action = Intent.ACTION_SEND
+                                        withContext(Dispatchers.Main) { _loading.value = false }
                                         startActivity(context, shareIntent, null)
                                     }
                                 } catch (e: Exception) {
-                                    Toast.makeText(
-                                        context,
-                                        R.string.an_error_occurred_please_try_again,
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    withContext(Dispatchers.Main) {
+                                        _loading.value = false
+                                        Toast.makeText(
+                                            context,
+                                            R.string.an_error_occurred_please_try_again,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                                 }
                             }
                         }
@@ -490,7 +495,6 @@ class BuildItemViewModel @Inject constructor(
                     is BuildEvent.SaveAndDisplayZipFile -> {
                         // Show Loading
                         _loading.value = true
-                        val itemsFromFile = mutableListOf<ReflexionItem>()
                         openZipFile(TemporarySingleton.file)
                     }
 
@@ -637,7 +641,6 @@ class BuildItemViewModel @Inject constructor(
     private fun openZipFile(filePath: Uri?) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                var reflexionItemsList = mutableListOf<ReflexionItem>()
                 if (filePath != null) {
                     // Create a ZipFile object for the zip file
                     val contentResolver = context.contentResolver
@@ -680,7 +683,18 @@ class BuildItemViewModel @Inject constructor(
                             // save the video's, get the uri's, and save the uri's to the Reflexion items for the next step
                             if (entry.name.endsWith(".mp4")) {
                                 val job = launch {
-                                    // Save the file to storage and the Uri to the associated reflexion item
+                                    // save item to file
+                                    val uri: Uri? = createMediaFile(
+                                        inputStream= inputStream, mimeType = "video", displayName = entry.name, context = context
+                                    )
+                                    val pattern = Regex("""\d+""")
+                                    val matchResult = pattern.find(entry.name)
+                                    val originalPk = matchResult?.value?.toLong()
+                                    val reflexionItem = localServiceImpl.selectReflexionItemByPk(oldToNewPkList.firstOrNull { it.first == originalPk }?.second)
+                                    // save image to associated reflexion item
+                                    if (reflexionItem != null && uri != null) {
+                                        localServiceImpl.updateReflexionItemVideoUri(reflexionItem, uri)
+                                    }
                                 }
                                 job.join()
                             }
@@ -688,16 +702,18 @@ class BuildItemViewModel @Inject constructor(
                             if (entry.name.endsWith(".jpg")) {
                                 val job = launch {
                                  // save item to file
-                                    val uri: Uri? = createMediaFile( // could be video/mp4
-                                        inputStream= inputStream, mimeType = "video/*", displayName = entry.name, context = context
+                                    val uri: Uri? = createMediaFile(
+                                        inputStream= inputStream, mimeType = "image", displayName = entry.name, context = context
                                     )
                                     val pattern = Regex("""\d+""")
                                     val matchResult = pattern.find(entry.name)
-                                    val originalPk = matchResult?.value?.toLong()
-                                    val reflexionItem = localServiceImpl.selectReflexionItemByPk(oldToNewPkList.firstOrNull { it.first == originalPk }?.second)
+                                    val pkFromFile = matchResult?.value?.toLong()
+                                    val reflexionItem = localServiceImpl.selectReflexionItemByPk(oldToNewPkList.firstOrNull { it.first == pkFromFile }?.second)
                                  // save uri to associated reflexion item
                                     if (reflexionItem != null && uri != null) {
-                                            localServiceImpl.updateReflexionItemUri(reflexionItem, uri)
+                                            val imageInBytes = MediaStoreUtils.uriToByteArray(uri, context)
+                                            val updatedReflexionItem = reflexionItem.copy(image = imageInBytes)
+                                            localServiceImpl.linkSavedOrAddNewImageAndAssociation(updatedReflexionItem)
                                     }
                                 }
                                 job.join()
@@ -711,11 +727,13 @@ class BuildItemViewModel @Inject constructor(
                     zipFile.close()
                 }
                 TemporarySingleton.file = null
+                withContext(Dispatchers.Main) { _loading.value = false }
             } catch (e: Exception) {
                 Log.e(
                     TAG,
                     "ERROR: " + e.message + " WITH CAUSE: " + e.cause + "STACK TRACE: " + e.stackTrace
                 )
+                withContext(Dispatchers.Main) { _loading.value = false }
             }
         }
     }

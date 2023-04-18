@@ -12,7 +12,7 @@ interface ILocalService {
     // REFLEXION ITEMS
     suspend fun saveNewItem(item: ReflexionItem): Long
     suspend fun updateReflexionItemImage(item: ReflexionItem, priorImagePk: Long?)
-    suspend fun updateReflexionItemUri(item: ReflexionItem, newUri: Uri)
+    suspend fun updateReflexionItemVideoUri(item: ReflexionItem, newUri: Uri)
     suspend fun getAllItems(): List<ReflexionItem?>
     suspend fun selectReflexionItemByPk(autogenPK: Long?): ReflexionItem?
     suspend fun selectImagePkForItem(autogenPK: Long): Long?

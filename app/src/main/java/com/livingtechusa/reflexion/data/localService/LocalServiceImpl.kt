@@ -48,7 +48,7 @@ class LocalServiceImpl @Inject constructor(
         return reflexionItemDao.setReflexionItem(saveItem)
     }
 
-    private suspend fun linkSavedOrAddNewImageAndAssociation(item: ReflexionItem): Long? {
+    suspend fun linkSavedOrAddNewImageAndAssociation(item: ReflexionItem): Long? {
         val _imagePk = CoroutineScope(Dispatchers.IO).async {
             var pkofImage: Long? = null
             if (item.image != null) {
@@ -110,7 +110,7 @@ class LocalServiceImpl @Inject constructor(
         )
     }
 
-    override suspend fun updateReflexionItemUri(item: ReflexionItem, newUri: Uri) {
+    override suspend fun updateReflexionItemVideoUri(item: ReflexionItem, newUri: Uri) {
         reflexionItemDao.updateReflexionItem(
             item.autogenPk,
             item.name,
