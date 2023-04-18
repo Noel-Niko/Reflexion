@@ -150,6 +150,7 @@ class CustomListsViewModel @Inject constructor(
             val job = async {
                 try {
                     _children.value.forEach { reflexionItem ->
+                        if (reflexionItem.videoUri.isNullOrEmpty()) { resources.add(FileResource()) }
                         reflexionItem.videoUri?.let { s ->
                             Converters().convertStringToUri(s)?.let { uri ->
                                 SafeUtils.getResourceByUriPersistently(context = context, uri = uri)
@@ -501,7 +502,7 @@ class CustomListsViewModel @Inject constructor(
                                 shareIntent.setDataAndType(
                                     zipValues.zipUri,
                                     zipValues.zipUri.let { resolver.getType(it) })
-                                shareIntent.putExtra(Intent.EXTRA_STREAM, zipValues.zipUri)
+                                shareIntent.putExtra(EXTRA_STREAM, zipValues.zipUri)
 
 
 

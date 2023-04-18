@@ -4,6 +4,7 @@ package com.livingtechusa.reflexion.util.scopedStorageUtils
 import android.net.Uri
 import android.os.Parcelable
 import android.provider.MediaStore.Files.FileColumns
+import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -17,13 +18,15 @@ import kotlinx.parcelize.Parcelize
  */
 @Parcelize
 data class FileResource(
-    val uri: Uri,
+    val uri: Uri?,
     val filename: String,
     val size: Long,
     val type: FileType,
     val mimeType: String,
     val path: String?,
-) : Parcelable
+) : Parcelable {
+    constructor() : this(null, EMPTY_STRING, 0L, FileType.NONE, EMPTY_STRING, null)
+}
 
 /**
  *  Media type enum class representing the [FileColumns.MEDIA_TYPE] column
