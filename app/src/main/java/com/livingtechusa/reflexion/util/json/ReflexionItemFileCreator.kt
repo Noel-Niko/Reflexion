@@ -8,6 +8,7 @@ import com.google.gson.Gson
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.models.ReflexionList
 import com.livingtechusa.reflexion.data.models.toReflexionItemAsJson
+import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -45,34 +46,46 @@ fun writeReflexionItemListToZipFile(
     // create the files for the images and videos
     reflexionItems.forEachIndexed { index, reflexionItem ->
         reflexionItem.image?.let { image ->
-            val imageFile = File(context.filesDir, "reflexion_${reflexionItem.autogenPk}_image.jpg")
-            imageFile.writeBytes(image)
-            mediaFileList.add(imageFile)
-            fileUris.add(
-                FileProvider.getUriForFile(
-                    context,
-                    "${context.packageName}.fileprovider",
-                    imageFile
+            val path = "reflexion_${reflexionItem.autogenPk}_image.jpg"
+            val alreadySaved: Boolean =
+                (mediaFileList.firstOrNull { it.path.contains(path) } != null)
+            val imageFile = File(context.filesDir, path)
+            if (alreadySaved.not()) {
+                imageFile.writeBytes(image)
+                mediaFileList.add(imageFile)
+                fileUris.add(
+                    FileProvider.getUriForFile(
+                        context,
+                        "${context.packageName}.fileprovider",
+                        imageFile
+                    )
                 )
-            )
+            }
         }
         reflexionItem.videoUri?.let { videoUri ->
-            val videoDescriptor =
-                context.contentResolver.openFileDescriptor(Uri.parse(videoUri), "r")
-            val videoFile = File(context.filesDir, "video_${reflexionItem.autogenPk}.mp4")
-            ParcelFileDescriptor.AutoCloseInputStream(videoDescriptor).use { input ->
-                FileOutputStream(videoFile).use { output ->
-                    input.copyTo(output)
+            if ((videoUri == EMPTY_STRING).not()) {
+                val videoDescriptor =
+                    context.contentResolver.openFileDescriptor(Uri.parse(videoUri), "r")
+                val path = "video_${reflexionItem.autogenPk}.mp4"
+                val alreadySaved: Boolean =
+                    (mediaFileList.firstOrNull { it.path.contains(path) } != null)
+                if (alreadySaved.not()) {
+                    val videoFile = File(context.filesDir, path)
+                    ParcelFileDescriptor.AutoCloseInputStream(videoDescriptor).use { input ->
+                        FileOutputStream(videoFile).use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+                    mediaFileList.add(videoFile)
+                    fileUris.add(
+                        FileProvider.getUriForFile(
+                            context,
+                            "${context.packageName}.fileprovider",
+                            videoFile
+                        )
+                    )
                 }
             }
-            mediaFileList.add(videoFile)
-            fileUris.add(
-                FileProvider.getUriForFile(
-                    context,
-                    "${context.packageName}.fileprovider",
-                    videoFile
-                )
-            )
         }
     }
 
