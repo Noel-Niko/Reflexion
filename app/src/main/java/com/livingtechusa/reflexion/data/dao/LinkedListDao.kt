@@ -26,8 +26,8 @@ interface LinkedListDao{
     @Query("Select * FROM LinkedList WHERE parentPk =:parentPk")
     suspend fun selectParentNode(parentPk: Long): ListNode?
 
-    @Query("UPDATE LinkedList SET title = :title, parentPk = :parentPK, childPk = :childPk WHERE nodePk = :nodePk")
-    suspend fun updateListNode(nodePk: Long, title: String, parentPK: Long, childPk: Long)
+    @Query("UPDATE LinkedList SET title = :title, topic = :topicPk  , parentPk = :parentPK, itemPk = :itemPk,  childPk = :childPk WHERE nodePk = :nodePk")
+    suspend fun updateListNode(nodePk: Long, title: String, topicPk: Long, itemPk: Long, parentPK: Long?, childPk: Long?)
 
     @Query("Select * FROM LinkedList WHERE parentPk IS NULL")
     suspend fun getAllLinkedLists(): List<ListNode?>

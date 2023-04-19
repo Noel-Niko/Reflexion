@@ -50,6 +50,28 @@ data class ReflexionItem(
 //        val SIBLINGS = "siblings"
 //    }
 
+    constructor(
+        autogenPk: String,
+        name: String,
+        description: String?,
+        detailedDescription: String?,
+        image: ByteArray?,
+        imagePk: Long?,
+        videoUri: String?,
+        videoUrl: String?,
+        parent: String?
+        ) : this(
+        autogenPk.toLong(),
+        name,
+        description,
+        detailedDescription,
+        image,
+        imagePk,
+        videoUri,
+        videoUrl,
+        parent?.toLong()
+        )
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

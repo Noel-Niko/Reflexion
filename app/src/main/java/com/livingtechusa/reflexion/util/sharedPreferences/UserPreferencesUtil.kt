@@ -1,6 +1,9 @@
 package com.livingtechusa.reflexion.util.sharedPreferences
 
+import android.R
 import android.content.Context
+import android.content.SharedPreferences
+import android.preference.PreferenceManager
 import com.livingtechusa.reflexion.R.string.shared_prefs_biometric_authentication_enabled
 import com.livingtechusa.reflexion.R.string.shared_prefs_biometric_authentication_opt_in
 import com.livingtechusa.reflexion.R.string.shared_prefs_biometric_should_use_manual_pw
@@ -10,8 +13,10 @@ import com.livingtechusa.reflexion.R.string.shared_prefs_displayed_user_name
 import com.livingtechusa.reflexion.R.string.shared_prefs_encrypted_biometric_password
 import com.livingtechusa.reflexion.R.string.shared_prefs_encrypted_password
 import com.livingtechusa.reflexion.R.string.shared_prefs_encrypted_user_password
+import com.livingtechusa.reflexion.R.string.shared_prefs_files_saved_list
 import com.livingtechusa.reflexion.R.string.shared_prefs_logged_in_user_name
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
+
 
 object UserPreferencesUtil : SharedPreferencesUtil() {
     private const val PREFERENCE_TYPE = "USER"
@@ -168,5 +173,23 @@ object UserPreferencesUtil : SharedPreferencesUtil() {
     // -1 = nothing set, 1 = darkmode, 0 = lightMode
     fun setCurrentUserModeSelection(context: Context, selection: Int) {
         setInt(PREFERENCE_TYPE, context, shared_prefs_current_mode_selected, selection)
+    }
+
+    /*
+    * File Management
+     */
+    fun setFilesSaved(context: Context, fileList: Set<String>) {
+        setStringSet(PREFERENCE_TYPE, context, shared_prefs_files_saved_list, fileList)
+    }
+
+    fun clearFilesSaved(context: Context) {
+        val editor: SharedPreferences.Editor =
+            PreferenceManager.getDefaultSharedPreferences(context).edit()
+        editor.remove(context.getString(shared_prefs_files_saved_list))
+        editor.apply()
+    }
+
+    fun getFilesSaved(context: Context): Set<String?>? {
+        return getStringSet(PREFERENCE_TYPE, context, shared_prefs_files_saved_list, emptySet())
     }
 }

@@ -40,7 +40,8 @@
        android:usesCleartextTraffic="true"
        android:theme="@style/Theme.Reflexion"
        tools:targetApi="31"
-       android:enableOnBackInvokedCallback="true">
+       android:enableOnBackInvokedCallback="true"
+       android:localeConfig="@xml/locales_config" >
        <activity
            android:name=".MainActivity"
            android:enabled="true"
@@ -57,6 +58,27 @@
                <category android:name="android.intent.category.DEFAULT" />
                <data android:mimeType="text/plain" />
                <data android:mimeType="video/*" />
+           </intent-filter>
+           <intent-filter>
+               <action android:name="android.intent.action.SEND" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <data android:mimeType="video/*" />
+           </intent-filter>
+           <!--           For opening json files created by the app-->
+           <intent-filter>
+               <action android:name="android.intent.action.VIEW" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <category android:name="android.intent.category.BROWSABLE" />
+               <data android:scheme="content" />
+               <data android:mimeType="application/json" />
+           </intent-filter>
+           <!--           For opening zip files created by the app-->
+           <intent-filter>
+               <action android:name="android.intent.action.VIEW" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <category android:name="android.intent.category.BROWSABLE" />
+               <data android:scheme="content" />
+               <data android:mimeType="application/zip" />
            </intent-filter>
        </activity>
        <activity-alias
@@ -84,6 +106,13 @@
                <category android:name="android.intent.category.DEFAULT" />
                <data android:mimeType="video/*" />
            </intent-filter>
+           <intent-filter>
+               <action android:name="android.intent.action.VIEW" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <category android:name="android.intent.category.BROWSABLE" />
+               <data android:scheme="content" />
+               <data android:mimeType="application/json" />
+           </intent-filter>
        </activity-alias>
        <activity-alias
            android:name=".MainActivityAlias1"
@@ -110,6 +139,13 @@
                <category android:name="android.intent.category.DEFAULT" />
                <data android:mimeType="video/*" />
            </intent-filter>
+           <intent-filter>
+               <action android:name="android.intent.action.VIEW" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <category android:name="android.intent.category.BROWSABLE" />
+               <data android:scheme="content" />
+               <data android:mimeType="application/json" />
+           </intent-filter>
        </activity-alias>
        <activity-alias
            android:name=".MainActivityAlias2"
@@ -134,6 +170,13 @@
                <action android:name="android.intent.action.SEND" />
                <category android:name="android.intent.category.DEFAULT" />
                <data android:mimeType="video/*" />
+           </intent-filter>
+           <intent-filter>
+               <action android:name="android.intent.action.VIEW" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <category android:name="android.intent.category.BROWSABLE" />
+               <data android:scheme="content" />
+               <data android:mimeType="application/json" />
            </intent-filter>
        </activity-alias>
        <activity-alias
@@ -160,6 +203,13 @@
                <category android:name="android.intent.category.DEFAULT" />
                <data android:mimeType="video/*" />
            </intent-filter>
+           <intent-filter>
+               <action android:name="android.intent.action.VIEW" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <category android:name="android.intent.category.BROWSABLE" />
+               <data android:scheme="content" />
+               <data android:mimeType="application/json" />
+           </intent-filter>
        </activity-alias>
        <activity-alias
            android:name=".MainActivityAlias4"
@@ -184,6 +234,13 @@
                <action android:name="android.intent.action.SEND" />
                <category android:name="android.intent.category.DEFAULT" />
                <data android:mimeType="video/*" />
+           </intent-filter>
+           <intent-filter>
+               <action android:name="android.intent.action.VIEW" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <category android:name="android.intent.category.BROWSABLE" />
+               <data android:scheme="content" />
+               <data android:mimeType="application/json" />
            </intent-filter>
        </activity-alias>
        <activity-alias
@@ -210,6 +267,13 @@
                <category android:name="android.intent.category.DEFAULT" />
                <data android:mimeType="video/*" />
            </intent-filter>
+           <intent-filter>
+               <action android:name="android.intent.action.VIEW" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <category android:name="android.intent.category.BROWSABLE" />
+               <data android:scheme="content" />
+               <data android:mimeType="application/json" />
+           </intent-filter>
        </activity-alias>
        <activity-alias
            android:name=".MainActivityAlias6"
@@ -234,6 +298,13 @@
                <action android:name="android.intent.action.SEND" />
                <category android:name="android.intent.category.DEFAULT" />
                <data android:mimeType="video/*" />
+           </intent-filter>
+           <intent-filter>
+               <action android:name="android.intent.action.VIEW" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <category android:name="android.intent.category.BROWSABLE" />
+               <data android:scheme="content" />
+               <data android:mimeType="application/json" />
            </intent-filter>
        </activity-alias>
        <activity-alias
@@ -260,6 +331,13 @@
                <category android:name="android.intent.category.DEFAULT" />
                <data android:mimeType="video/*" />
            </intent-filter>
+           <intent-filter>
+               <action android:name="android.intent.action.VIEW" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <category android:name="android.intent.category.BROWSABLE" />
+               <data android:scheme="content" />
+               <data android:mimeType="application/json" />
+           </intent-filter>
        </activity-alias>
        <activity-alias
            android:name=".MainActivityAlias8"
@@ -284,6 +362,13 @@
                <action android:name="android.intent.action.SEND" />
                <category android:name="android.intent.category.DEFAULT" />
                <data android:mimeType="video/*" />
+           </intent-filter>
+           <intent-filter>
+               <action android:name="android.intent.action.VIEW" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <category android:name="android.intent.category.BROWSABLE" />
+               <data android:scheme="content" />
+               <data android:mimeType="application/json" />
            </intent-filter>
        </activity-alias>
        <activity-alias
@@ -310,6 +395,13 @@
                <category android:name="android.intent.category.DEFAULT" />
                <data android:mimeType="video/*" />
            </intent-filter>
+           <intent-filter>
+               <action android:name="android.intent.action.VIEW" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <category android:name="android.intent.category.BROWSABLE" />
+               <data android:scheme="content" />
+               <data android:mimeType="application/json" />
+           </intent-filter>
        </activity-alias>
        <activity-alias
            android:name=".MainActivityAlias10"
@@ -334,6 +426,13 @@
                <action android:name="android.intent.action.SEND" />
                <category android:name="android.intent.category.DEFAULT" />
                <data android:mimeType="video/*" />
+           </intent-filter>
+           <intent-filter>
+               <action android:name="android.intent.action.VIEW" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <category android:name="android.intent.category.BROWSABLE" />
+               <data android:scheme="content" />
+               <data android:mimeType="application/json" />
            </intent-filter>
        </activity-alias>
        <activity-alias
@@ -360,6 +459,13 @@
                <category android:name="android.intent.category.DEFAULT" />
                <data android:mimeType="video/*" />
            </intent-filter>
+           <intent-filter>
+               <action android:name="android.intent.action.VIEW" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <category android:name="android.intent.category.BROWSABLE" />
+               <data android:scheme="content" />
+               <data android:mimeType="application/json" />
+           </intent-filter>
        </activity-alias>
        <activity-alias
            android:name=".MainActivityAlias12"
@@ -384,6 +490,13 @@
                <action android:name="android.intent.action.SEND" />
                <category android:name="android.intent.category.DEFAULT" />
                <data android:mimeType="video/*" />
+           </intent-filter>
+           <intent-filter>
+               <action android:name="android.intent.action.VIEW" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <category android:name="android.intent.category.BROWSABLE" />
+               <data android:scheme="content" />
+               <data android:mimeType="application/json" />
            </intent-filter>
        </activity-alias>
        <activity-alias
@@ -410,6 +523,13 @@
                <category android:name="android.intent.category.DEFAULT" />
                <data android:mimeType="video/*" />
            </intent-filter>
+           <intent-filter>
+               <action android:name="android.intent.action.VIEW" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <category android:name="android.intent.category.BROWSABLE" />
+               <data android:scheme="content" />
+               <data android:mimeType="application/json" />
+           </intent-filter>
        </activity-alias>
        <activity-alias
            android:name=".MainActivityAlias14"
@@ -434,6 +554,13 @@
                <action android:name="android.intent.action.SEND" />
                <category android:name="android.intent.category.DEFAULT" />
                <data android:mimeType="video/*" />
+           </intent-filter>
+           <intent-filter>
+               <action android:name="android.intent.action.VIEW" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <category android:name="android.intent.category.BROWSABLE" />
+               <data android:scheme="content" />
+               <data android:mimeType="application/json" />
            </intent-filter>
        </activity-alias>
        <activity-alias
@@ -460,6 +587,13 @@
                <category android:name="android.intent.category.DEFAULT" />
                <data android:mimeType="video/*" />
            </intent-filter>
+           <intent-filter>
+               <action android:name="android.intent.action.VIEW" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <category android:name="android.intent.category.BROWSABLE" />
+               <data android:scheme="content" />
+               <data android:mimeType="application/json" />
+           </intent-filter>
        </activity-alias>
        <activity-alias
            android:name=".MainActivityAlias16"
@@ -484,6 +618,13 @@
                <action android:name="android.intent.action.SEND" />
                <category android:name="android.intent.category.DEFAULT" />
                <data android:mimeType="video/*" />
+           </intent-filter>
+           <intent-filter>
+               <action android:name="android.intent.action.VIEW" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <category android:name="android.intent.category.BROWSABLE" />
+               <data android:scheme="content" />
+               <data android:mimeType="application/json" />
            </intent-filter>
        </activity-alias>
        <activity-alias
@@ -510,6 +651,13 @@
                <category android:name="android.intent.category.DEFAULT" />
                <data android:mimeType="video/*" />
            </intent-filter>
+           <intent-filter>
+               <action android:name="android.intent.action.VIEW" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <category android:name="android.intent.category.BROWSABLE" />
+               <data android:scheme="content" />
+               <data android:mimeType="application/json" />
+           </intent-filter>
        </activity-alias>
        <activity-alias
            android:name=".MainActivityAlias18"
@@ -535,8 +683,22 @@
                <category android:name="android.intent.category.DEFAULT" />
                <data android:mimeType="video/*" />
            </intent-filter>
+           <intent-filter>
+               <action android:name="android.intent.action.VIEW" />
+               <category android:name="android.intent.category.DEFAULT" />
+               <category android:name="android.intent.category.BROWSABLE" />
+               <data android:scheme="content" />
+               <data android:mimeType="application/json" />
+           </intent-filter>
        </activity-alias>
-
+       <service
+           android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+           android:enabled="false"
+           android:exported="false">
+           <meta-data
+               android:name="autoStoreLocales"
+               android:value="true" />
+       </service>
        <provider
            android:name="androidx.core.content.FileProvider"
            android:authorities="com.livingtechusa.reflexion.fileprovider"
@@ -544,7 +706,7 @@
            android:exported="false">
            <meta-data
                android:name="android.support.FILE_PROVIDER_PATHS"
-               android:resource="@xml/filepaths" />
+               android:resource="@xml/file_paths" />
        </provider>
    </application>
 </manifest>

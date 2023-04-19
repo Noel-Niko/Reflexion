@@ -11,7 +11,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
-import androidx.window.core.layout.WindowWidthSizeClass
 import com.livingtechusa.reflexion.navigation.NavBarItems
 import com.livingtechusa.reflexion.ui.viewModels.BookmarksViewModel
 import com.livingtechusa.reflexion.util.extensions.findActivity
@@ -21,7 +20,6 @@ const val BOOKMARKS = "bookmarks"
 @Composable
 fun BookmarksScreen(
     navHostController: NavHostController,
-    windowSize: WindowWidthSizeClass,
     viewModel: BookmarksViewModel = hiltViewModel()
 ) {
 
@@ -50,28 +48,7 @@ fun BookmarksScreen(
     val search by viewModel.search.collectAsState()
 
     if (context.findActivity() != null) {
-        when (windowSize) {
-            WindowWidthSizeClass.COMPACT -> {
-                BookmarksCompactScreen(navHostController, icons, viewModel, search, viewModel::searchEvent)
-            }
-
-//            WindowWidthSizeClass.MEDIUM -> {
-//                Landscape(navHostController, icons)
-//            }
-
-//            WindowWidthSizeClass.EXPANDED -> {
-//                ExpandedScreen(navHostController, icons)
-//                viewModel.navigationType = ReflexionNavigationType.PERMANENT_NAVIGATION_DRAWER
-//            }
-
-            else -> BookmarksCompactScreen(
-                navHostController,
-                icons,
-                viewModel,
-                search,
-                viewModel::searchEvent
-            )
-        }
+        BookmarksCompactScreen(navHostController, icons, viewModel, search, viewModel::searchEvent)
     }
 }
 

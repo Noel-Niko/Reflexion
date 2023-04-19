@@ -90,7 +90,7 @@ fun DocumentFilePreviewCardBuildView(
     val route: String =
         Screen.VideoView.route + "/" + URI
    val thumbnail by produceState<Bitmap?>(null, resource.uri) {
-        value = SafeUtils.getThumbnail(context, resource.uri)
+        value = resource.uri?.let { SafeUtils.getThumbnail(context, it) }
     }
 
     Card(
@@ -141,7 +141,7 @@ fun DocumentFilePreviewCardListView(
 ) {
     val context = LocalContext.current
     val thumbnail by produceState<Bitmap?>(null, resource.uri) {
-        value = SafeUtils.getThumbnail(context, resource.uri)
+        value = resource.uri?.let { SafeUtils.getThumbnail(context, it) }
     }
 
     Card(
@@ -181,7 +181,7 @@ fun DocumentFilePreviewCardListView(
 
 
 @Composable
-fun videoImagePreviewCard(
+fun VideoImagePreviewCard(
     urlString: String?,
     navController: NavHostController,
     docType: String
@@ -260,9 +260,7 @@ fun videoImagePreviewCard(
 
 @Composable
 fun CustomListVideoImagePreviewCard(
-    urlString: String?,
-    navController: NavHostController,
-    docType: String
+    urlString: String?
 ) {
     val context = LocalContext.current
     val resource = ResourceProviderSingleton

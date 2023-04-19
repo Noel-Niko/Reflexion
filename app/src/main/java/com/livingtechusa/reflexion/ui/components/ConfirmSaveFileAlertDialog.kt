@@ -1,6 +1,5 @@
 package com.livingtechusa.reflexion.ui.components
 
-
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
@@ -17,19 +16,20 @@ import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.build.BuildEvent
 import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
-import com.livingtechusa.reflexion.util.Constants.DO_NOT_UPDATE
-import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
-import com.livingtechusa.reflexion.util.Constants.VIDEO_URL
-import com.livingtechusa.reflexion.util.Temporary
+import com.livingtechusa.reflexion.util.Constants.JSON
+import com.livingtechusa.reflexion.util.Constants.USE_TOP_ITEM
+import com.livingtechusa.reflexion.util.Constants.ZIP
+import com.livingtechusa.reflexion.util.TemporarySingleton
 
-const val CONFIRM_SAVE = "ConfirmSaveAlertDialog"
+const val CONFIRM_SAVE_FILE = "ConfirmSaveFileAlertDialog"
 
 @Composable
-fun ConfirmSaveAlertDialog(
+fun ConfirmSaveFileAlertDialog(
+    type: String,
     navController: NavHostController,
     viewModel: BuildItemViewModel = hiltViewModel()
 ) {
-    val url = Temporary.url
+    val filePath = TemporarySingleton.file
     MaterialTheme {
         Column {
             val openDialog = remember { mutableStateOf(true) }
@@ -42,41 +42,51 @@ fun ConfirmSaveAlertDialog(
                         openDialog.value = false
                     },
                     title = {
-                        Text(text = stringResource(R.string.confirm_to_add_content_link))
+                        Text(text = stringResource(R.string.confirm_save_file))
                     },
                     text = {
-                        Text("Do you want to add: $url")
+                        Text(stringResource(R.string.do_you_want_to_save_the_contents_of) + filePath.toString())
                     },
                     confirmButton = {
                         Button(
                             onClick = {
-                                viewModel.onTriggerEvent(BuildEvent.UpdateDisplayedReflexionItem(
-                                    subItem = VIDEO_URL, newVal = url))
                                 openDialog.value = false
-                                navController.navigate(Screen.BuildItemScreen.route + "/" + DO_NOT_UPDATE) {
-                                    launchSingleTop = true
+                                navController.navigate(Screen.BuildItemScreen.route + "/" + USE_TOP_ITEM)
+                                if (type == JSON) {
+                                    viewModel.onTriggerEvent(BuildEvent.SaveAndDisplayReflexionItemFile)
                                 }
-                                Temporary.url = EMPTY_STRING
-                                Temporary.uri = EMPTY_STRING
+                                if (type == ZIP) {
+                                    viewModel.onTriggerEvent(BuildEvent.SaveAndDisplayZipFile)
+                                }
                             },
-                            colors = ButtonDefaults.buttonColors(backgroundColor =  androidx.compose.material3.MaterialTheme.colorScheme.primary, contentColor =  androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                                contentColor = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary
+                            )
                         ) {
-                            Text(stringResource(R.string.yes), color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
+                            Text(
+                                stringResource(R.string.yes),
+                                color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary
+                            )
                         }
                     },
                     dismissButton = {
                         Button(
                             onClick = {
                                 openDialog.value = false
-                                navController.navigate(Screen.BuildItemScreen.route + "/" + DO_NOT_UPDATE) {
+                                navController.navigate(Screen.HomeScreen.route) {
                                     launchSingleTop = true
                                 }
-                                Temporary.url = EMPTY_STRING
-                                Temporary.uri = EMPTY_STRING
                             },
-                            colors = ButtonDefaults.buttonColors(backgroundColor =  androidx.compose.material3.MaterialTheme.colorScheme.primary, contentColor =  androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                                contentColor = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary
+                            )
                         ) {
-                            Text(stringResource(R.string.no), color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
+                            Text(
+                                stringResource(R.string.no),
+                                color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary
+                            )
                         }
                     }
                 )

@@ -64,9 +64,9 @@ import com.livingtechusa.reflexion.util.Constants.NAME
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URI
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URL
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
-import com.livingtechusa.reflexion.util.Temporary
+import com.livingtechusa.reflexion.util.TemporarySingleton
 import com.livingtechusa.reflexion.util.scopedStorageUtils.DocumentFilePreviewCardBuildView
-import com.livingtechusa.reflexion.util.scopedStorageUtils.videoImagePreviewCard
+import com.livingtechusa.reflexion.util.scopedStorageUtils.VideoImagePreviewCard
 import kotlinx.coroutines.launch
 
 
@@ -103,8 +103,8 @@ fun BuildItemContent(
         // for sending analytics events
         val observer = LifecycleEventObserver { owner, event ->
             if (event == Lifecycle.Event.ON_CREATE) {
-                if (Temporary.useUri) {
-                    viewModel.onTriggerEvent(BuildEvent.SearchUri(Temporary.uri))
+                if (TemporarySingleton.useUri) {
+                    viewModel.onTriggerEvent(BuildEvent.SearchUri(TemporarySingleton.uri))
                 } else {
                     viewModel.onTriggerEvent(BuildEvent.GetSelectedReflexionItem(pk))
                 }
@@ -528,7 +528,7 @@ fun BuildItemContent(
                     color = MaterialTheme.colorScheme.primary
                 )
                 if (videoUrl.isNullOrEmpty().not()) {
-                    videoImagePreviewCard(
+                    VideoImagePreviewCard(
                         urlString = videoUrl, navController = navController, docType = VIDEO_URL
                     )
                 }

@@ -1,6 +1,7 @@
 package com.livingtechusa.reflexion.data.localService
 
 import android.graphics.Bitmap
+import android.net.Uri
 import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.dao.BookMarksDao
 import com.livingtechusa.reflexion.data.dao.ImagesDao
@@ -47,7 +48,7 @@ class LocalServiceImpl @Inject constructor(
         return reflexionItemDao.setReflexionItem(saveItem)
     }
 
-    private suspend fun linkSavedOrAddNewImageAndAssociation(item: ReflexionItem): Long? {
+    suspend fun linkSavedOrAddNewImageAndAssociation(item: ReflexionItem): Long? {
         val _imagePk = CoroutineScope(Dispatchers.IO).async {
             var pkofImage: Long? = null
             if (item.image != null) {
@@ -84,7 +85,7 @@ class LocalServiceImpl @Inject constructor(
         return _imagePk.await()
     }
 
-    override suspend fun updateReflexionItem(item: ReflexionItem, priorImagePk: Long?) {
+    override suspend fun updateReflexionItemImage(item: ReflexionItem, priorImagePk: Long?) {
         // Remove old association data if applicable
         if (priorImagePk != item.imagePk) {
             if (priorImagePk != null) {
@@ -104,6 +105,19 @@ class LocalServiceImpl @Inject constructor(
             item.detailedDescription,
             newImagePk ?: item.imagePk,
             item.videoUri,
+            item.videoUrl,
+            item.parent
+        )
+    }
+
+    override suspend fun updateReflexionItemVideoUri(item: ReflexionItem, newUri: Uri) {
+        reflexionItemDao.updateReflexionItem(
+            item.autogenPk,
+            item.name,
+            item.description,
+            item.detailedDescription,
+            item.imagePk,
+            Converters().convertUriToString(newUri),
             item.videoUrl,
             item.parent
         )
@@ -145,8 +159,8 @@ class LocalServiceImpl @Inject constructor(
         return reflexionItemDao.selectChildReflexionItems(pk)
     }
 
-    override suspend fun selectItem(autogenPK: Long): ReflexionItem? {
-        return reflexionItemDao.selectReflexionItem(autogenPK)
+    override suspend fun selectReflexionItemByPk(autogenPK: Long?): ReflexionItem? {
+        return autogenPK?.let { reflexionItemDao.selectReflexionItem(it) }
     }
 
     override suspend fun selectImagePkForItem(autogenPK: Long): Long? {
@@ -331,8 +345,8 @@ class LocalServiceImpl @Inject constructor(
         } while (child != null)
     }
 
-    override suspend fun insertNewNode(listNode: ListNode) {
-        linkedListDao.insertNewNode(listNode = listNode)
+    override suspend fun insertNewNode(listNode: ListNode): Long {
+        return linkedListDao.insertNewNode(listNode = listNode)
     }
 
     override suspend fun selectListNode(nodePk: Long): ListNode? {
@@ -432,12 +446,16 @@ class LocalServiceImpl @Inject constructor(
     override suspend fun updateListNode(
         nodePk: Long,
         title: String,
-        parentPK: Long,
-        childPk: Long
+        topicPk: Long,
+        itemPk: Long,
+        parentPK: Long?,
+        childPk: Long?
     ) {
         linkedListDao.updateListNode(
             nodePk = nodePk,
             title = title,
+            topicPk = topicPk,
+            itemPk = itemPk,
             parentPK = parentPK,
             childPk = childPk
         )

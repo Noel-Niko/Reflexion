@@ -10,7 +10,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
-import androidx.window.core.layout.WindowWidthSizeClass
 import com.livingtechusa.reflexion.navigation.NavBarItems
 import com.livingtechusa.reflexion.ui.viewModels.TopicsViewModel
 import com.livingtechusa.reflexion.util.extensions.findActivity
@@ -21,7 +20,6 @@ const val ListRoute = "list"
 fun ListDisplay(
     viewModel: TopicsViewModel = hiltViewModel(),
     navHostController: NavHostController,
-    windowSize: WindowWidthSizeClass,
     pk: Long?
 ) {
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
@@ -47,38 +45,15 @@ fun ListDisplay(
     val search by viewModel.search.collectAsState()
 
     if (context.findActivity() != null) {
-        when (windowSize) {
-            WindowWidthSizeClass.COMPACT -> {
-                CompactScreen(
-                    navHostController,
-                    icons,
-                    viewModel,
-                    search,
-                    viewModel::searchEvent,
-                    viewModel::onUp,
-                    viewModel::bookmark
-                )
-            }
-
-//            WindowWidthSizeClass.MEDIUM -> {
-//                MediumScreen(navHostController, icons, viewModel, search, viewModel::searchEvent, viewModel::onUp)
-//            }
-
-//            WindowWidthSizeClass.EXPANDED -> {
-//                ExpandedScreen(navHostController, icons, viewModel, pk)
-//                viewModel.navigationType = ReflexionNavigationType.PERMANENT_NAVIGATION_DRAWER
-//            }
-
-            else -> CompactScreen(
-                navHostController,
-                icons,
-                viewModel,
-                search,
-                viewModel::searchEvent,
-                viewModel::onUp,
-                viewModel::bookmark
-            )
-        }
+        CompactScreen(
+            navHostController,
+            icons,
+            viewModel,
+            search,
+            viewModel::searchEvent,
+            viewModel::onUp,
+            viewModel::bookmark
+        )
     }
 }
 

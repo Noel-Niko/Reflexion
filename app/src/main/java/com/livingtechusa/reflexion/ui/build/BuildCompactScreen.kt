@@ -14,6 +14,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.rememberScaffoldState
@@ -38,6 +39,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.BarItem
+import com.livingtechusa.reflexion.ui.components.animation_utils.LoadingAnimation
 import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import kotlinx.coroutines.launch
@@ -54,6 +56,7 @@ fun BuildItemCompactScreen(
     val offsetX = remember { mutableStateOf(0f) }
     val offsetY = remember { mutableStateOf(0f) }
     val itemPk by viewModel.autogenPK.collectAsState()
+    val loading by viewModel.loading.collectAsState()
 
     Scaffold(
         scaffoldState = state,
@@ -95,6 +98,16 @@ fun BuildItemCompactScreen(
                             },
                         )
                         IconButton(
+                            onClick = { viewModel.onTriggerEvent(BuildEvent.SendFile) },
+                            content = {
+                                Icon(
+                                    imageVector = Icons.Default.FileUpload,
+                                    contentDescription = "send reflexion item file",
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                )
+                            },
+                        )
+                        IconButton(
                             onClick = {
                                 viewModel.onTriggerEvent(BuildEvent.Save)
                             },
@@ -124,7 +137,11 @@ fun BuildItemCompactScreen(
                 })
         },
         drawerContent = {
-            Text("Reflexion", modifier = Modifier.padding(16.dp), color = MaterialTheme.colorScheme.inverseOnSurface)
+            Text(
+                "Reflexion",
+                modifier = Modifier.padding(16.dp),
+                color = MaterialTheme.colorScheme.inverseOnSurface
+            )
             Divider()
             DrawerNavContent(
                 navController,
@@ -151,7 +168,11 @@ fun BuildItemCompactScreen(
                             tint = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     }, label = {
-                        Text(text = navItem.title, color = MaterialTheme.colorScheme.onSecondaryContainer, maxLines = 1)
+                        Text(
+                            text = navItem.title,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            maxLines = 1
+                        )
                     })
                 }
             }
@@ -186,6 +207,10 @@ fun BuildItemCompactScreen(
             }
         }
     ) { paddingValues ->
+        if (loading) {
+            LoadingAnimation(paddingValues = paddingValues)
+        } else {
             BuildItemContent(pk, navController, viewModel, paddingValues)
+        }
     }
 }

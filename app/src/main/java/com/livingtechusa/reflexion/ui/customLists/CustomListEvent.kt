@@ -1,7 +1,5 @@
 package com.livingtechusa.reflexion.ui.customLists
 
-import com.livingtechusa.reflexion.ui.build.BuildEvent
-
 sealed class CustomListEvent {
 
     data class UpdateListName(
@@ -42,9 +40,8 @@ sealed class CustomListEvent {
     object ReSet : CustomListEvent()
 
     data class Bookmark(val nodePk: Long) : CustomListEvent()
+    object SendFile : CustomListEvent()
 
     // For Custom List Display Screen
     object SendText : CustomListEvent()
-
-
 }

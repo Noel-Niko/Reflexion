@@ -38,7 +38,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.window.core.layout.WindowWidthSizeClass
 import com.androidpoet.dropdown.DropDownMenuBuilder
 import com.androidpoet.dropdown.MenuItem
 import com.androidpoet.dropdown.dropDownMenu
@@ -56,37 +55,17 @@ const val BuildCustomList = "build_custom_lists"
 @Composable
 fun BuildCustomListsScreen(
     navController: NavHostController,
-    windowSize: WindowWidthSizeClass,
     viewModel: CustomListsViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val icons = NavBarItems.CustomListsBarItems
 
     if (context.findActivity() != null) {
-        when (windowSize) {
-            WindowWidthSizeClass.COMPACT -> {
-                CustomListCompactScreen(
-                    navController = navController,
-                    icons = icons,
-                    viewModel = viewModel,
-                )
-            }
-
-//            WindowWidthSizeClass.MEDIUM -> {
-//                // todo
-//            }
-
-//            WindowWidthSizeClass.EXPANDED -> {
-//                ExpandedScreen(navHostController, icons, viewModel)
-//                viewModel.navigationType = ReflexionNavigationType.PERMANENT_NAVIGATION_DRAWER
-//            }
-
-            else -> CustomListCompactScreen(
-                navController = navController,
-                icons = icons,
-                viewModel = viewModel,
-            )
-        }
+        CustomListCompactScreen(
+            navController = navController,
+            icons = icons,
+            viewModel = viewModel,
+        )
     }
 }
 
@@ -200,7 +179,7 @@ fun CustomListsContent(
                                 .fillMaxSize()
                                 .padding(16.dp)
                         ) {
-                            items(filteringOptions.size- 1) {
+                            items(filteringOptions.size) {
                                 ElevatedCard(
                                     modifier = Modifier
                                         .fillMaxWidth()

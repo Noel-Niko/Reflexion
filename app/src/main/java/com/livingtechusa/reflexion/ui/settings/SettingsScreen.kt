@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,6 +31,7 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -57,7 +57,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
-import androidx.window.core.layout.WindowWidthSizeClass
 import coil.compose.rememberImagePainter
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.NavBarItems
@@ -73,7 +72,6 @@ const val SETTINGS = "settings"
 @Composable
 fun SettingsScreen(
     navHostController: NavHostController,
-    windowSize: WindowWidthSizeClass,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
@@ -98,22 +96,7 @@ fun SettingsScreen(
     val context = LocalContext.current
     val icons = NavBarItems.SettingsBarItems
     if (context.findActivity() != null) {
-        when (windowSize) {
-            WindowWidthSizeClass.COMPACT -> {
-                CompactScreen(navHostController, icons, viewModel)
-            }
-
-//            WindowWidthSizeClass.MEDIUM -> {
-//                Landscape(navHostController, icons)
-//            }
-
-//            WindowWidthSizeClass.EXPANDED -> {
-//                ExpandedScreen(navHostController, icons)
-//                viewModel.navigationType = ReflexionNavigationType.PERMANENT_NAVIGATION_DRAWER
-//            }
-
-            else -> CompactScreen(navHostController, icons, viewModel)
-        }
+        CompactScreen(navHostController, icons, viewModel)
     }
 }
 
@@ -129,7 +112,11 @@ fun IconImageCard(
     val size = (512f / 2) / screenPixelDensity
     val selectedIconIndex by viewModel.iconSelected.collectAsState()
     val isSelected = (selectedIconIndex == iconNumber)
-    val outlineColor = if(isSelected) { MaterialTheme.colorScheme.surface } else { MaterialTheme.colorScheme.primary}
+    val outlineColor = if (isSelected) {
+        MaterialTheme.colorScheme.surface
+    } else {
+        MaterialTheme.colorScheme.primary
+    }
     val imagePainter = rememberImagePainter(
         data = image,
         builder = {
@@ -237,15 +224,16 @@ fun SettingsContent(
 ) {
     val apply by viewModel.apply.collectAsState()
     val bitmapList by viewModel.iconImages.collectAsState()
-    val startMode: Int = if(UserPreferencesUtil.getCurrentUserModeSelection(LocalContext.current) != -1) {
-        UserPreferencesUtil.getCurrentUserModeSelection(LocalContext.current)
-    } else {
-        if(isSystemInDarkTheme()) 1 else 0
-    }
+    val startMode: Int =
+        if (UserPreferencesUtil.getCurrentUserModeSelection(LocalContext.current) != -1) {
+            UserPreferencesUtil.getCurrentUserModeSelection(LocalContext.current)
+        } else {
+            if (isSystemInDarkTheme()) 1 else 0
+        }
     val context = LocalContext.current
     val resource = ResourceProviderSingleton
     Scaffold(Modifier.padding(paddingValues = paddingValues)) {
-        if(apply){
+        if (apply) {
             if (viewModel.mode && viewModel.isDarkMode != null) {
                 viewModel.ToggleLightDarkMode(viewModel.isDarkMode!!)
             }

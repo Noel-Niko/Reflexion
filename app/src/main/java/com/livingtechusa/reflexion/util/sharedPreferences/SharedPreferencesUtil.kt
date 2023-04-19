@@ -29,6 +29,31 @@ open class SharedPreferencesUtil {
         return ret
     }
 
+    fun setStringSet(preferenceType: String?, context: Context, stringId: Int, stringSet: Set<String>) {
+        val editor = context.getSharedPreferences(preferenceType, Context.MODE_PRIVATE).edit()
+        editor.putStringSet(context.getString(stringId), stringSet)
+        editor.apply()
+    }
+
+    fun getStringSet(
+        preferenceType: String?,
+        context: Context,
+        stringId: Int,
+        defaultValue: Set<String?>?
+    ): Set<String?>? {
+        var ret = defaultValue
+        val sharedPreferences = context.getSharedPreferences(preferenceType, Context.MODE_PRIVATE)
+        val preferenceId = context.getString(stringId)
+        try {
+            ret = sharedPreferences.getStringSet(preferenceId, defaultValue)
+        } catch (e: ClassCastException) {
+            val editor = sharedPreferences.edit()
+            editor.putStringSet(preferenceId, defaultValue)
+            editor.commit()
+        }
+        return ret
+    }
+
     fun setInt(preferenceType: String?, context: Context, stringId: Int, i: Int) {
         val editor = context.getSharedPreferences(preferenceType, Context.MODE_PRIVATE).edit()
         editor.putInt(context.getString(stringId), i)

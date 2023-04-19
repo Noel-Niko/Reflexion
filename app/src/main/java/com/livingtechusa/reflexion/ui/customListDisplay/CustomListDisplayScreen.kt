@@ -34,11 +34,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.extractor.text.webvtt.WebvttCssStyle.FontSizeUnit
 import androidx.navigation.NavHostController
-import androidx.window.core.layout.WindowWidthSizeClass
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.components.ImageCard
@@ -50,44 +51,21 @@ import com.livingtechusa.reflexion.util.scopedStorageUtils.CustomListVideoImageP
 import com.livingtechusa.reflexion.util.scopedStorageUtils.DocumentFilePreviewCardListView
 
 const val CUSTOM_LIST_DISPLAY = "customListDisplay"
+
 @Composable
 fun CustomListDisplayScreen(
     viewModel: CustomListsViewModel = hiltViewModel(),
     navController: NavHostController,
-    windowSize: WindowWidthSizeClass,
     headNodePk: Long
 ) {
 
     val context = LocalContext.current
     if (context.findActivity() != null) {
-        when (windowSize) {
-            WindowWidthSizeClass.COMPACT -> {
-                CustomListDisplayCompactScreen(
-                    navController = navController,
-                    headNodePk = headNodePk,
-                    viewModel = viewModel
-                )
-            }
-
-//            WindowWidthSizeClass.MEDIUM -> {
-//                Landscape(
-//                    navController = navController,
-//                    headNodePk = headNodePk,
-//                    viewModel = viewModel
-//                )
-//            }
-
-//            WindowWidthSizeClass.EXPANDED -> {
-//                ExpandedScreen(navHostController, icons)
-//                viewModel.navigationType = ReflexionNavigationType.PERMANENT_NAVIGATION_DRAWER
-//            }
-
-            else -> CustomListDisplayCompactScreen(
-                navController = navController,
-                headNodePk = headNodePk,
-                viewModel = viewModel
-            )
-        }
+        CustomListDisplayCompactScreen(
+            navController = navController,
+            headNodePk = headNodePk,
+            viewModel = viewModel
+        )
     }
 }
 
@@ -162,7 +140,7 @@ fun CustomListDisplayContent(
                         .padding(16.dp)
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                         .clickable {
-                                   navController.navigate(Screen.BuildItemScreen.route + "/" + children[childItemIndex].autogenPk)
+                            navController.navigate(Screen.BuildItemScreen.route + "/" + children[childItemIndex].autogenPk)
                         },
 
                     elevation = 6.dp,
@@ -200,9 +178,11 @@ fun CustomListDisplayContent(
                             }
                         }
                         /* TITLE */
-                        Row(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp), Arrangement.Center) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp), Arrangement.Center
+                        ) {
                             Text(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 style = MaterialTheme.typography.titleLarge,
@@ -213,7 +193,7 @@ fun CustomListDisplayContent(
                         /* DESCRIPTION */
                         Row(
                             modifier = Modifier
-                                .padding(12.dp)
+                                .padding(4.dp)
                                 .fillMaxWidth()
                         ) {
                             Column() {
@@ -236,11 +216,11 @@ fun CustomListDisplayContent(
                                 )
                             }
                         }
-                        Spacer(Modifier.height(12.dp))
+                        Spacer(Modifier.height(4.dp))
                         /* DETAILS */
                         Row(
                             modifier = Modifier
-                                .padding(12.dp)
+                                .padding(4.dp)
                                 .fillMaxWidth()
                         ) {
                             Column() {
@@ -263,20 +243,19 @@ fun CustomListDisplayContent(
                                 )
                             }
                         }
-                        Spacer(Modifier.height(12.dp))
+                        Spacer(Modifier.height(4.dp))
                         Row(
                             modifier = Modifier.padding(8.dp)
                         ) {
                             /* SAVED VIDEO */
                             Column(
                                 Modifier
-                                    .padding(12.dp)
+                                    .padding(4.dp)
                                     .weight(1f)
-
                             ) {
                                 Text(
                                     modifier = Modifier
-                                        .padding(12.dp)
+                                        .padding(4.dp)
                                         .fillMaxWidth()
                                         .clickable {
                                             if (children[childItemIndex].videoUri.isNullOrEmpty()) {
@@ -292,10 +271,13 @@ fun CustomListDisplayContent(
                                             }
                                         },
                                     text = AnnotatedString(stringResource(R.string.stored_video)),
+                                    style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.primary
                                 )
                                 if (children[childItemIndex].videoUri.isNullOrEmpty().not()) {
-                                    if (childVideoUriList.isEmpty().not() && childVideoUriList.size > childItemIndex) {
+                                    if (childVideoUriList.isEmpty().not() &&
+                                        childVideoUriList.size > childItemIndex
+                                    ) {
                                         if (childVideoUriList[childItemIndex] != null) {
                                             DocumentFilePreviewCardListView(
                                                 resource = childVideoUriList[childItemIndex]!!,
@@ -310,12 +292,12 @@ fun CustomListDisplayContent(
                             /* VIDEO URL */
                             Column(
                                 Modifier
-                                    .padding(12.dp)
+                                    .padding(4.dp)
                                     .weight(1f)
                             ) {
                                 Text(
                                     modifier = Modifier
-                                        .padding(12.dp)
+                                        .padding(4.dp)
                                         .fillMaxWidth()
                                         .clickable(
                                             onClick = {
@@ -341,13 +323,12 @@ fun CustomListDisplayContent(
                                             },
                                         ),
                                     text = AnnotatedString(stringResource(R.string.linked_video)),
+                                    style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.primary
                                 )
                                 if (children[childItemIndex].videoUrl.isNullOrEmpty().not()) {
                                     CustomListVideoImagePreviewCard(
-                                        urlString = children[childItemIndex].videoUrl,
-                                        navController = navController,
-                                        docType = Constants.VIDEO_URL
+                                        urlString = children[childItemIndex].videoUrl
                                     )
                                 }
                             }

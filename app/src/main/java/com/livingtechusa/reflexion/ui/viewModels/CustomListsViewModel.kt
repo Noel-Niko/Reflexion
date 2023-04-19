@@ -1,5 +1,6 @@
 package com.livingtechusa.reflexion.ui.viewModels
 
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_STREAM
@@ -24,8 +25,11 @@ import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK_STRING
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.NULL
+import com.livingtechusa.reflexion.util.TemporarySingleton
+import com.livingtechusa.reflexion.util.json.writeReflexionItemListToZipFile
 import com.livingtechusa.reflexion.util.scopedStorageUtils.FileResource
 import com.livingtechusa.reflexion.util.scopedStorageUtils.SafeUtils
+import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -33,6 +37,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import javax.inject.Inject
 
 
@@ -83,6 +88,8 @@ class CustomListsViewModel @Inject constructor(
     private val _selectedParent = MutableStateFlow(ReflexionItem())
     val selectedParent: StateFlow<ReflexionItem> get() = _selectedParent
 
+    private val _loading = MutableStateFlow(false)
+    val loading: StateFlow<Boolean> get() = _loading
 
     private var newList = true
     private var topic: Long = EMPTY_PK
@@ -109,7 +116,7 @@ class CustomListsViewModel @Inject constructor(
             val job = async {
                 listOfLists.value.forEach { topicItem ->
                     topicItem?.children?.get(0)?.itemPK?.let { itemPk ->
-                        localServiceImpl.selectItem(itemPk)?.imagePk?.let { imagePk ->
+                        localServiceImpl.selectReflexionItemByPk(itemPk)?.imagePk?.let { imagePk ->
                             localServiceImpl.selectImage(imagePk)
                                 ?.let { bitmap -> bitmaps.add(bitmap) }
                         }
@@ -143,6 +150,7 @@ class CustomListsViewModel @Inject constructor(
             val job = async {
                 try {
                     _children.value.forEach { reflexionItem ->
+                        if (reflexionItem.videoUri.isNullOrEmpty()) { resources.add(FileResource()) }
                         reflexionItem.videoUri?.let { s ->
                             Converters().convertStringToUri(s)?.let { uri ->
                                 SafeUtils.getResourceByUriPersistently(context = context, uri = uri)
@@ -303,7 +311,7 @@ class CustomListsViewModel @Inject constructor(
                             val newReflexionItemList = mutableListOf<ReflexionItem>()
                             newListItem.children.forEach() { reflexionArrayItem ->
                                 reflexionArrayItem.itemPK?.let { pk ->
-                                    localServiceImpl.selectItem(pk)
+                                    localServiceImpl.selectReflexionItemByPk(pk)
                                         ?.let { reflexionItem ->
                                             newReflexionItemList.add(
                                                 reflexionItem
@@ -389,10 +397,85 @@ class CustomListsViewModel @Inject constructor(
                     startActivity(context, shareIntent, null)
                 }
 
+                is CustomListEvent.SendFile -> {
+                    _loading.value = true
+                    viewModelScope.launch {
+                        withContext(Dispatchers.IO) {
+                            try {
+                                val itemList: MutableList<ReflexionItem> = mutableListOf()
+                                customList.value.children.forEach {
+                                    it.itemPK?.let { it1 ->
+                                        localServiceImpl.selectReflexionItemByPk(it1)
+                                            ?.let { it2 -> itemList.add(it2) }
+                                    }
+                                }
+                                // create the files and get their URIs
+                                val title = customList.value.itemName?.replace(" ", "_")
+                                val filename =
+                                    context.getString(R.string.app_name) + title + "${System.currentTimeMillis()}.zip"
+                                val file = File(context.filesDir, filename)
+                                file.setExecutable(true, false)
+                                file.setReadable(true, false)
+                                file.setWritable(true, false)
+                                val zipValues = writeReflexionItemListToZipFile(
+                                    context,
+                                    itemList,
+                                    customList.value.itemName.toString(),
+                                    file
+                                )
+
+                                // create list of files to remove next onCreate
+                                TemporarySingleton.sharedFileList.addAll(zipValues.uriList)
+                                val fileSet: MutableSet<String> = mutableSetOf()
+                                TemporarySingleton.sharedFileList.forEach { uri ->
+                                    fileSet.add(
+                                        Converters().convertUriToString(uri) ?: EMPTY_STRING
+                                    )
+                                }
+                                UserPreferencesUtil.setFilesSaved(context, fileSet)
+
+                                // create the share intent
+                                val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE)
+                                shareIntent.type = "application/zip"
+                                shareIntent.putExtra(
+                                    Intent.EXTRA_SUBJECT,
+                                    "Sending: ${customList.value.itemName}"
+                                )
+                                val text =
+                                    context.getString(R.string.this_file_was_sent_with_reflexion_and_requires_the_reflexion_app_to_open) + "\n" + context.getString(
+                                        R.string.sent_with_reflexion_from_the_google_play_store
+                                    ) + "\n" + context.getString(R.string.reflexion_link)
+                                shareIntent.putExtra(EXTRA_TEXT, text)
+                                // Attach the files
+                                val resolver: ContentResolver = context.contentResolver
+                                shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
+                                shareIntent.setDataAndType(
+                                    zipValues.zipUri,
+                                    zipValues.zipUri.let { resolver.getType(it) })
+                                shareIntent.putExtra(EXTRA_STREAM, zipValues.zipUri)
+                                shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                shareIntent.action = Intent.ACTION_SEND
+                                withContext(Dispatchers.Main) { _loading.value = false }
+                                startActivity(context, shareIntent, null)
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Error " + e.message  + " with cause " + e.cause + " and Stack trace of: " + e.stackTrace )
+                                withContext(Dispatchers.Main) {
+                                    _loading.value = false
+                                    Toast.makeText(
+                                        context,
+                                        R.string.an_error_occurred_please_try_again,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        }
+                    }
+                }
                 else -> {}
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error: " + e.message + " with cause " + e.cause)
+            _loading.value = false
         }
     }
 
@@ -550,7 +633,7 @@ class CustomListsViewModel @Inject constructor(
 
     private fun setParent(itemPk: String) {
         viewModelScope.launch(Dispatchers.Main) {
-            val selectedItem = localServiceImpl.selectItem(itemPk.toLong())
+            val selectedItem = localServiceImpl.selectReflexionItemByPk(itemPk.toLong())
             if (selectedItem != null) {
                 _selectedParent.value = selectedItem
                 val parent = selectedParent.value.name

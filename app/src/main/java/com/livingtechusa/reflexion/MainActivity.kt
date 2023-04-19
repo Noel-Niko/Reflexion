@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -19,7 +20,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
-import androidx.navigation.NavType.Companion
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -28,12 +28,14 @@ import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.bookmarks.BookmarksScreen
 import com.livingtechusa.reflexion.ui.build.BuildItemScreen
 import com.livingtechusa.reflexion.ui.components.ConfirmDeleteListDialog
 import com.livingtechusa.reflexion.ui.components.ConfirmDeleteSubItemDialog
-import com.livingtechusa.reflexion.ui.components.ConfirmSaveAlertDialog
+import com.livingtechusa.reflexion.ui.components.ConfirmSaveFileAlertDialog
+import com.livingtechusa.reflexion.ui.components.ConfirmSaveURLAlertDialog
 import com.livingtechusa.reflexion.ui.components.PasteAndSaveDialog
 import com.livingtechusa.reflexion.ui.components.SelectParentScreen
 import com.livingtechusa.reflexion.ui.components.VideoPlayer
@@ -44,26 +46,37 @@ import com.livingtechusa.reflexion.ui.home.HomeScreen
 import com.livingtechusa.reflexion.ui.settings.SettingsScreen
 import com.livingtechusa.reflexion.ui.theme.ReflexionDynamicTheme
 import com.livingtechusa.reflexion.ui.topics.ListDisplay
-import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
+import com.livingtechusa.reflexion.ui.viewModels.CustomListsViewModel
 import com.livingtechusa.reflexion.util.BaseApplication
 import com.livingtechusa.reflexion.util.Constants.EMPTY_PK
+import com.livingtechusa.reflexion.util.Constants.EMPTY_PK_STRING
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.HEAD_NODE_PK
 import com.livingtechusa.reflexion.util.Constants.INDEX
+import com.livingtechusa.reflexion.util.Constants.JSON
 import com.livingtechusa.reflexion.util.Constants.LIST_NAME
 import com.livingtechusa.reflexion.util.Constants.REFLEXION_ITEM_PK
 import com.livingtechusa.reflexion.util.Constants.SOURCE
 import com.livingtechusa.reflexion.util.Constants.SUB_ITEM
+import com.livingtechusa.reflexion.util.Constants.ZIP
 import com.livingtechusa.reflexion.util.MediaUtil
-import com.livingtechusa.reflexion.util.Temporary
+import com.livingtechusa.reflexion.util.TemporarySingleton
+import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 const val Main_Activity = "Main_Activity"
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    companion object {
+        const val TAG = "MainActivity"
+    }
 
     @Inject
     lateinit var app: BaseApplication
@@ -102,10 +115,41 @@ class MainActivity : ComponentActivity() {
                 DisposableEffect(
                     key1 = lifecycleOwner,
                     effect = {
-                        val observer = LifecycleEventObserver { _, event ->
-                            if (event == Lifecycle.Event.ON_START) {
+                        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_CREATE) {
                                 permissionsState.launchMultiplePermissionRequest()
                                 MediaUtil().verifyStoragePermission(this@MainActivity)
+                                // manage file storage
+                                try {
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        UserPreferencesUtil.getFilesSaved(this@MainActivity)
+                                            ?.forEach { string ->
+                                                if (string != null) {
+                                                    val uri =
+                                                        Converters().convertStringToUri(string)
+                                                    if (uri != null) {
+//                                                        val file =
+//                                                            SafeUtils.getResourceByUriPersistently(
+//                                                                context = this@MainActivity,
+//                                                                uri = uri
+//                                                            )
+//                                                        deleteFile(file?.filename)
+                                                        val resolver =
+                                                            this@MainActivity.contentResolver
+                                                        resolver.delete(uri, null)
+                                                    }
+                                                }
+                                            }
+                                        // Clear stored file paths
+                                        UserPreferencesUtil.clearFilesSaved(this@MainActivity)
+                                        TemporarySingleton.sharedFileList.clear()
+                                        UserPreferencesUtil.setFilesSaved(this@MainActivity, mutableSetOf())
+                                    }
+                                } catch (e: Exception) {
+                                    Log.e(
+                                        TAG,
+                                        "Failure deleting file with message " + e.message + " with cause " + e.cause
+                                    )
+                                }
                             }
                         }
                         lifecycleOwner.lifecycle.addObserver(observer)
@@ -116,7 +160,6 @@ class MainActivity : ComponentActivity() {
                 )
                 val navController = rememberNavController()
                 navigationController = navController
-                val windowSize = calculateWindowSizeClass(this)
                 NavHost(
                     navController = navController,
                     startDestination = Screen.HomeScreen.route
@@ -127,7 +170,6 @@ class MainActivity : ComponentActivity() {
                     ) {
                         HomeScreen(
                             navHostController = navController,
-                            windowSize = windowSize
                         )
                     }
 
@@ -147,7 +189,6 @@ class MainActivity : ComponentActivity() {
                             pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK)
                                 ?: EMPTY_PK,
                             navHostController = navController,
-                            windowSize = windowSize,
                             viewModel = parentViewModel
                         )
                     }
@@ -171,13 +212,32 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable(
-                        route = Screen.ConfirmSaveScreen.route,
+                        route = Screen.ConfirmSaveURLScreen.route,
                     ) { navBackStackEntry ->
                         val parentEntry = remember(navBackStackEntry) {
                             navController.getBackStackEntry(Screen.HomeScreen.route)
                         }
                         val parentViewModel: BuildItemViewModel = hiltViewModel(parentEntry)
-                        ConfirmSaveAlertDialog(
+                        ConfirmSaveURLAlertDialog(
+                            navController = navController,
+                            viewModel = parentViewModel
+                        )
+                    }
+
+                    composable(
+                        route = Screen.ConfirmSaveFileScreen.route + "/{sourceType}",
+                        arguments = listOf(
+                            navArgument(SOURCE) {
+                                type = NavType.StringType
+                            }
+                        )
+                    ) { navBackStackEntry ->
+                        val parentEntry = remember(navBackStackEntry) {
+                            navController.getBackStackEntry(Screen.HomeScreen.route)
+                        }
+                        val parentViewModel: BuildItemViewModel = hiltViewModel(parentEntry)
+                        ConfirmSaveFileAlertDialog(
+                            type = navBackStackEntry.arguments?.getString(SOURCE) ?: EMPTY_STRING,
                             navController = navController,
                             viewModel = parentViewModel
                         )
@@ -207,8 +267,7 @@ class MainActivity : ComponentActivity() {
                         ListDisplay(
                             navHostController = navController,
                             pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK)
-                                ?: EMPTY_PK,
-                            windowSize = windowSize,
+                                ?: EMPTY_PK
                         )
                     }
 
@@ -216,8 +275,7 @@ class MainActivity : ComponentActivity() {
                         route = Screen.CustomLists.route,
                     ) {
                         BuildCustomListsScreen(
-                            navController = navController,
-                            windowSize = windowSize
+                            navController = navController
                         )
                     }
 
@@ -274,8 +332,7 @@ class MainActivity : ComponentActivity() {
                     ) { navBackStackEntry ->
                         CustomListDisplayScreen(
                             navController = navController,
-                            headNodePk = navBackStackEntry.arguments?.getLong(HEAD_NODE_PK) ?: -1,
-                            windowSize = windowSize
+                            headNodePk = navBackStackEntry.arguments?.getLong(HEAD_NODE_PK) ?: -1
                         )
                     }
 
@@ -301,16 +358,14 @@ class MainActivity : ComponentActivity() {
                         route = Screen.SettingsScreen.route,
                     ) {
                         SettingsScreen(
-                            navHostController = navController,
-                            windowSize = windowSize
+                            navHostController = navController
                         )
                     }
                     composable(
                         route = Screen.BookmarkScreen.route,
                     ) {
                         BookmarksScreen(
-                            navHostController = navController,
-                            windowSize = windowSize
+                            navHostController = navController
                         )
                     }
 
@@ -336,8 +391,8 @@ class MainActivity : ComponentActivity() {
                             )?.text != EMPTY_STRING
                         ) {
                             val url = intent.clipData?.getItemAt(0)?.text
-                            Temporary.url = url.toString()
-                            navigationController.navigate(Screen.ConfirmSaveScreen.route)
+                            TemporarySingleton.url = url.toString()
+                            navigationController.navigate(Screen.ConfirmSaveURLScreen.route)
                         }
                     }
                     addOnNewIntentListener(listener)
@@ -346,14 +401,33 @@ class MainActivity : ComponentActivity() {
                 // "Share" from media file
                 DisposableEffect(key1 = Intent()) {
                     val uri: String = intent.clipData?.getItemAt(0)?.uri.toString()
-                    Temporary.uri = uri
+                    TemporarySingleton.uri = uri
                     if (uri != EMPTY_STRING && uri != "null") {
-                        Temporary.useUri = true
-                        navigationController.navigate(Screen.BuildItemScreen.route + "/-1")
+                        TemporarySingleton.useUri = true
+                        navigationController.navigate(Screen.BuildItemScreen.route + "/" + EMPTY_PK_STRING)
                     }
                     onDispose { }
                 }
-
+                // Open json file
+                DisposableEffect(key1 = Intent()) {
+                    if (intent.type != EMPTY_STRING && intent.type == "application/json") {
+                        // Store Path
+                        TemporarySingleton.file = intent.data
+                        //  Confirm desire to save :
+                        navigationController.navigate(Screen.ConfirmSaveFileScreen.route + "/" + JSON)
+                    }
+                    onDispose { }
+                }
+                // Open zip file
+                DisposableEffect(key1 = Intent()) {
+                    if (intent.type != EMPTY_STRING && intent.type == "application/zip") {
+                        // Store Path
+                        TemporarySingleton.file = intent.data
+                        //  Confirm desire to save :
+                        navigationController.navigate(Screen.ConfirmSaveFileScreen.route + "/" + ZIP)
+                    }
+                    onDispose { }
+                }
             }
         }
     }

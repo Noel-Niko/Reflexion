@@ -1,6 +1,7 @@
 package com.livingtechusa.reflexion.data.localService
 
 import android.graphics.Bitmap
+import android.net.Uri
 import com.livingtechusa.reflexion.data.entities.ReflexionItem
 import com.livingtechusa.reflexion.data.entities.Bookmarks
 import com.livingtechusa.reflexion.data.entities.ListNode
@@ -10,9 +11,10 @@ import com.livingtechusa.reflexion.data.models.ReflexionArrayItem
 interface ILocalService {
     // REFLEXION ITEMS
     suspend fun saveNewItem(item: ReflexionItem): Long
-    suspend fun updateReflexionItem(item: ReflexionItem, priorImagePk: Long?)
+    suspend fun updateReflexionItemImage(item: ReflexionItem, priorImagePk: Long?)
+    suspend fun updateReflexionItemVideoUri(item: ReflexionItem, newUri: Uri)
     suspend fun getAllItems(): List<ReflexionItem?>
-    suspend fun selectItem(autogenPK: Long): ReflexionItem?
+    suspend fun selectReflexionItemByPk(autogenPK: Long?): ReflexionItem?
     suspend fun selectImagePkForItem(autogenPK: Long): Long?
     suspend fun deleteReflexionItem(autogenPK: Long, name: String, imagePk: Long?)
     suspend fun renameItem(autogenPK: Long, name: String, newName: String)
@@ -40,7 +42,7 @@ interface ILocalService {
 
     // LINKED LIST NODES
     suspend fun deleteAllChildNodes(nodePk: Long)
-    suspend fun insertNewNode(listNode: ListNode)
+    suspend fun insertNewNode(listNode: ListNode): Long
     suspend fun selectListNode(nodePk: Long): ListNode?
     suspend fun selectNodeHeadsByTopic(topicPk: Long): List<ListNode?>
     suspend fun selectNodeTopic(itemPk: Long): Long?
@@ -48,7 +50,7 @@ interface ILocalService {
     suspend fun selectNodeListsAsArrayItemsByHeadNode(topicPk: Long?): ReflexionArrayItem?
     suspend fun selectChildNode(nodePk: Long): ListNode?
     suspend fun selectParentNode(parentPk: Long): ListNode?
-    suspend fun updateListNode(nodePk: Long, title: String, parentPK: Long, childPk: Long)
+    suspend fun updateListNode(nodePk: Long, title: String, topicPk: Long, itemPk: Long, parentPK: Long?, childPk: Long?)
     suspend fun getAllLinkedLists(): List<ListNode?>
     suspend fun deleteAllLinkedLists()
     suspend fun deleteSelectedNode(nodePk: Long)

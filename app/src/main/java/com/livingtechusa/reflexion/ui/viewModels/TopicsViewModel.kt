@@ -135,7 +135,7 @@ class TopicsViewModel @Inject constructor(
                 val bitmaps = mutableListOf<Bitmap>()
                 _bookmarks.value.forEach { bookmark ->
                     bookmark?.LEVEL_PK?.let { levelPk ->
-                        localServiceImpl.selectItem(levelPk)?.imagePk?.let { imagePk ->
+                        localServiceImpl.selectReflexionItemByPk(levelPk)?.imagePk?.let { imagePk ->
                             localServiceImpl.selectImage(imagePk)?.let { bitmaps.add(it) }
                         }
                     }
@@ -164,7 +164,7 @@ class TopicsViewModel @Inject constructor(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val parent = localServiceImpl.selectParent(list.value[0].autogenPk)
-                val item = parent?.let { localServiceImpl.selectItem(it) }
+                val item = parent?.let { localServiceImpl.selectReflexionItemByPk(it) }
                 val selectBkMkByLevelPK = localServiceImpl.selectBookmarkByLevelPK(item?.autogenPk)
                 if (selectBkMkByLevelPK == null) {
                     localServiceImpl.setBookMarks(

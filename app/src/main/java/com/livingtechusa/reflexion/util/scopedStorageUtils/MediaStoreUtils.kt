@@ -1,4 +1,3 @@
-
 package com.livingtechusa.reflexion.util.scopedStorageUtils
 
 
@@ -13,21 +12,21 @@ import android.media.MediaMetadataRetriever
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.provider.MediaStore
 import android.provider.MediaStore.MediaColumns.DATE_ADDED
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat.checkSelfPermission
-import androidx.core.net.toFile
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
-import java.io.DataInputStream
-import java.io.FileInputStream
+import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import java.io.OutputStream
 import kotlin.coroutines.resume
 
 
@@ -135,11 +134,11 @@ object MediaStoreUtils {
             var volumeName = EMPTY_STRING
             try {
                 volumeName = MediaStore.getVolumeName(uri)
-            } catch(e: Exception) {
+            } catch (e: Exception) {
                 Log.e(TAG, "Error " + e.message + " with cause : " + e.cause)
             }
-            if(volumeName.isEmpty()) volumeName = "external"
-            MediaStore.Files.getContentUri( volumeName, entryId.toLong())
+            if (volumeName.isEmpty()) volumeName = "external"
+            MediaStore.Files.getContentUri(volumeName, entryId.toLong())
         } else {
             MediaStore.Files.getContentUri(uri.pathSegments[0], entryId.toLong())
         }
@@ -309,64 +308,64 @@ object MediaStoreUtils {
 
     @Throws(IOException::class)
     fun uriToByteArray(uri: Uri, context: Context): ByteArray? {
-    // Creating an object of FileInputStream to
-    // read from a file
+        // Creating an object of FileInputStream to
+        // read from a file
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        val inputStream = context.contentResolver.openInputStream(uri)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val inputStream = context.contentResolver.openInputStream(uri)
 
-        if (inputStream != null) {
-            // Now creating byte array of same length as file
-            val arr = inputStream.readAllBytes()
+            if (inputStream != null) {
+                // Now creating byte array of same length as file
+                val arr = inputStream.readAllBytes()
 
 
-            // Reading file content to byte array
-            // using standard read() method
+                // Reading file content to byte array
+                // using standard read() method
 
-            // lastly closing an instance of file input stream
-            // to avoid memory leakage
-            inputStream.close()
+                // lastly closing an instance of file input stream
+                // to avoid memory leakage
+                inputStream.close()
 
-            // Returning above byte array
-            return arr
+                // Returning above byte array
+                return arr
+            } else {
+                return null
+            }
         } else {
-            return null
-        }
-    } else {
-        val inputStream = context.contentResolver.openInputStream(uri)
-        return if (inputStream != null) {
-            readAllBytes(inputStream)
-        } else {
-            null
+            val inputStream = context.contentResolver.openInputStream(uri)
+            return if (inputStream != null) {
+                readAllBytes(inputStream)
+            } else {
+                null
+            }
         }
     }
-}
 
-@Throws(IOException::class)
-fun readAllBytes(inputStream: InputStream): ByteArray? {
-    val bufLen = 1024
-    val buf = ByteArray(bufLen)
-    var readLen: Int
-    var exception: IOException? = null
-    return try {
-        val outputStream = ByteArrayOutputStream()
-        while (inputStream.read(buf, 0, bufLen).also { readLen = it } != -1) outputStream.write(
-            buf,
-            0,
-            readLen
-        )
-        outputStream.toByteArray()
-    } catch (e: IOException) {
-        exception = e
-        throw e
-    } finally {
-        if (exception == null) inputStream.close() else try {
-            inputStream.close()
+    @Throws(IOException::class)
+    fun readAllBytes(inputStream: InputStream): ByteArray? {
+        val bufLen = 1024
+        val buf = ByteArray(bufLen)
+        var readLen: Int
+        var exception: IOException? = null
+        return try {
+            val outputStream = ByteArrayOutputStream()
+            while (inputStream.read(buf, 0, bufLen).also { readLen = it } != -1) outputStream.write(
+                buf,
+                0,
+                readLen
+            )
+            outputStream.toByteArray()
         } catch (e: IOException) {
-            exception.addSuppressed(e)
+            exception = e
+            throw e
+        } finally {
+            if (exception == null) inputStream.close() else try {
+                inputStream.close()
+            } catch (e: IOException) {
+                exception.addSuppressed(e)
+            }
         }
     }
-}
 
 
     @Throws(Throwable::class)
@@ -389,4 +388,50 @@ fun readAllBytes(inputStream: InputStream): ByteArray? {
         }
         return bitmap
     }
+
+    fun createMediaFile(
+        inputStream: InputStream,
+        mimeType: String,
+        displayName: String,
+        context: Context
+    ): Uri? {
+        val resolver = context.contentResolver
+        val directory = if (mimeType.contains("video")) { Environment.DIRECTORY_MOVIES } else {  Environment.DIRECTORY_PICTURES }
+            val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, displayName)
+            put(MediaStore.MediaColumns.MIME_TYPE, mimeType)
+            put(
+                MediaStore.MediaColumns.RELATIVE_PATH,
+                directory + File.separator + context.packageName
+            )
+        }
+
+        var outputStream: OutputStream? = null
+        var uri: Uri? = null
+
+        try {
+            val collection = if (mimeType.contains("video")) {
+                MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+            } else {
+                MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+            }
+            uri = resolver.insert(collection, contentValues)
+            uri?.let {
+                outputStream = resolver.openOutputStream(uri!!)
+                inputStream.copyTo(outputStream!!)
+            }
+        } catch (e: Exception) {
+            Log.e("createMediaFile", "Error creating media file", e)
+            if (uri != null) {
+                resolver.delete(uri, null, null)
+            }
+            uri = null
+        } finally {
+            outputStream?.close()
+            inputStream.close()
+        }
+
+        return uri
+    }
+
 }
