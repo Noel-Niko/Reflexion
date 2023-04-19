@@ -457,8 +457,6 @@ class CustomListsViewModel @Inject constructor(
                                 shareIntent.action = Intent.ACTION_SEND
                                 withContext(Dispatchers.Main) { _loading.value = false }
                                 startActivity(context, shareIntent, null)
-
-
                             } catch (e: Exception) {
                                 Log.e(TAG, "Error " + e.message  + " with cause " + e.cause + " and Stack trace of: " + e.stackTrace )
                                 withContext(Dispatchers.Main) {

@@ -34,9 +34,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.extractor.text.webvtt.WebvttCssStyle.FontSizeUnit
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.Screen
@@ -191,7 +193,7 @@ fun CustomListDisplayContent(
                         /* DESCRIPTION */
                         Row(
                             modifier = Modifier
-                                .padding(12.dp)
+                                .padding(4.dp)
                                 .fillMaxWidth()
                         ) {
                             Column() {
@@ -214,11 +216,11 @@ fun CustomListDisplayContent(
                                 )
                             }
                         }
-                        Spacer(Modifier.height(12.dp))
+                        Spacer(Modifier.height(4.dp))
                         /* DETAILS */
                         Row(
                             modifier = Modifier
-                                .padding(12.dp)
+                                .padding(4.dp)
                                 .fillMaxWidth()
                         ) {
                             Column() {
@@ -241,20 +243,19 @@ fun CustomListDisplayContent(
                                 )
                             }
                         }
-                        Spacer(Modifier.height(12.dp))
+                        Spacer(Modifier.height(4.dp))
                         Row(
                             modifier = Modifier.padding(8.dp)
                         ) {
                             /* SAVED VIDEO */
                             Column(
                                 Modifier
-                                    .padding(12.dp)
+                                    .padding(4.dp)
                                     .weight(1f)
-
                             ) {
                                 Text(
                                     modifier = Modifier
-                                        .padding(12.dp)
+                                        .padding(4.dp)
                                         .fillMaxWidth()
                                         .clickable {
                                             if (children[childItemIndex].videoUri.isNullOrEmpty()) {
@@ -270,6 +271,7 @@ fun CustomListDisplayContent(
                                             }
                                         },
                                     text = AnnotatedString(stringResource(R.string.stored_video)),
+                                    style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.primary
                                 )
                                 if (children[childItemIndex].videoUri.isNullOrEmpty().not()) {
@@ -290,12 +292,12 @@ fun CustomListDisplayContent(
                             /* VIDEO URL */
                             Column(
                                 Modifier
-                                    .padding(12.dp)
+                                    .padding(4.dp)
                                     .weight(1f)
                             ) {
                                 Text(
                                     modifier = Modifier
-                                        .padding(12.dp)
+                                        .padding(4.dp)
                                         .fillMaxWidth()
                                         .clickable(
                                             onClick = {
@@ -321,6 +323,7 @@ fun CustomListDisplayContent(
                                             },
                                         ),
                                     text = AnnotatedString(stringResource(R.string.linked_video)),
+                                    style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.primary
                                 )
                                 if (children[childItemIndex].videoUrl.isNullOrEmpty().not()) {
