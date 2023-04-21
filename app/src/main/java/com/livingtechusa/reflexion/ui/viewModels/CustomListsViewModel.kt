@@ -426,6 +426,7 @@ class CustomListsViewModel @Inject constructor(
 
                                 // create list of files to remove next onCreate
                                 TemporarySingleton.sharedFileList.addAll(zipValues.uriList)
+                                TemporarySingleton.sharedFileList.add(zipValues.zipUri)
                                 val fileSet: MutableSet<String> = mutableSetOf()
                                 TemporarySingleton.sharedFileList.forEach { uri ->
                                     fileSet.add(

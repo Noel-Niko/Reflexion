@@ -394,7 +394,7 @@ class BuildItemViewModel @Inject constructor(
                                 it
                             )
                         }
-                        if (video != null && video.equals(EMPTY_STRING).not()) {
+                        if (video != null && video.path != "") {
                             val resolver: ContentResolver = context.contentResolver
                             shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
                             shareIntent.type = "video/*"
@@ -501,7 +501,8 @@ class BuildItemViewModel @Inject constructor(
                     is BuildEvent.SaveAndDisplayReflexionItemFile -> {
                         // Show Loading
                         _loading.value = true
-                        processJsonFile(null)
+                        openZipFile(TemporarySingleton.file)
+                        //processJsonFile(null)
                         _loading.value = false
                     }
 
@@ -640,12 +641,12 @@ class BuildItemViewModel @Inject constructor(
 
     private fun openZipFile(filePath: Uri?) {
         viewModelScope.launch(Dispatchers.IO) {
+            val tempFile = File.createTempFile("temp", ".zip")
             try {
                 if (filePath != null) {
                     // Create a ZipFile object for the zip file
                     val contentResolver = context.contentResolver
                     val inputStream = contentResolver.openInputStream(filePath)
-                    val tempFile = File.createTempFile("temp", ".zip")
                     val outputStream = FileOutputStream(tempFile)
                     inputStream?.copyTo(outputStream)
                     inputStream?.close()
@@ -727,6 +728,17 @@ class BuildItemViewModel @Inject constructor(
                     zipFile.close()
                 }
                 TemporarySingleton.file = null
+                // create list of files to remove next onCreate
+                if (filePath != null) {
+                    TemporarySingleton.sharedFileList.add(filePath)
+                    val fileSet= mutableSetOf<String>()
+                    TemporarySingleton.sharedFileList.forEach { uri ->
+                        fileSet.add(
+                            Converters().convertUriToString(uri) ?: EMPTY_STRING
+                        )
+                    }
+                    UserPreferencesUtil.setFilesSaved(context, fileSet)
+                }
                 withContext(Dispatchers.Main) { _loading.value = false }
             } catch (e: Exception) {
                 Log.e(
@@ -734,6 +746,15 @@ class BuildItemViewModel @Inject constructor(
                     "ERROR: " + e.message + " WITH CAUSE: " + e.cause + "STACK TRACE: " + e.stackTrace
                 )
                 withContext(Dispatchers.Main) { _loading.value = false }
+            } finally {
+                try {
+                    tempFile.delete()
+                } catch (e: Exception) {
+                    Log.e(
+                        TAG,
+                        "ERROR: " + e.message + " WITH CAUSE: " + e.cause + "STACK TRACE: " + e.stackTrace
+                    )
+                }
             }
         }
     }

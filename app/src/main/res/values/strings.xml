@@ -112,4 +112,6 @@
     <string name="has_the_share_file_been_fully_uploaded">Has the share file been fully uploaded?</string>
     <string name="shared_prefs_files_saved_list" translatable="false">shared prefs files saved list</string>
     <string name="this_file_was_sent_with_reflexion_and_requires_the_reflexion_app_to_open">This file was sent with Reflexion and requires the Reflexion app to open.</string>
+    <string name="import_directions">Import Directions</string>
+    <string name="https_sites_google_com_view_reflexionapp_home">https://sites.google.com/view/reflexionapp/home</string>
 </resources>

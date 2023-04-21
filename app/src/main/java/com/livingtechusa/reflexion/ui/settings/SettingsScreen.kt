@@ -2,8 +2,10 @@ package com.livingtechusa.reflexion.ui.settings
 
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -52,6 +55,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -258,6 +262,61 @@ fun SettingsContent(
             val screenPixelDensity = context.resources.displayMetrics.density
             val height = (768f / 2) / screenPixelDensity
             Row(
+                Modifier
+                    .fillMaxHeight(.15f)
+                    .fillMaxWidth()
+                    .background(color = MaterialTheme.colorScheme.background),
+                verticalAlignment = Alignment.Top
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .background(color = MaterialTheme.colorScheme.background)
+                            .fillMaxSize()
+                    ) {
+                        // TODO:
+                        //  make URL/WebSite/ all in  language specific versions
+                        // display it as an attractive button
+                        val url: String = stringResource(R.string.https_sites_google_com_view_reflexionapp_home)
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(0.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            ElevatedCard(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                                    .align(Alignment.Center),
+                                colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.primary),
+                                shape = MaterialTheme.shapes.large,
+                                elevation = CardDefaults.elevatedCardElevation(4.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.import_directions),
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .clickable(onClick = {
+                                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                                            startActivity(context, intent, null)
+                                        })
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(height.dp)
@@ -456,7 +515,7 @@ fun SettingsContent(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(0.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     ElevatedCard(
@@ -516,7 +575,7 @@ fun SettingsContent(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(0.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     ElevatedCard(

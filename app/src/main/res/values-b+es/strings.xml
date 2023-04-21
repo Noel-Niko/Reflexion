@@ -111,4 +111,7 @@
     <string name="do_you_want_to_save_the_contents_of">"¿Desea guardar el contenido de: "</string>
     <string name="has_the_share_file_been_fully_uploaded">"¿Se ha cargado completamente el archivo compartido?"</string>
     <string name="this_file_was_sent_with_reflexion_and_requires_the_reflexion_app_to_open">Este archivo se envió con Reflexion y requiere que se abra la aplicación Reflexion.</string>
+    <string name="import_directions">Descargar guía de aplicaciones</string>
+    <string name="https_sites_google_com_view_reflexionapp_home">https://sites.google.com/view/reflexionapp/casa</string>
 </resources>
+

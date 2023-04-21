@@ -75,21 +75,9 @@ fun CustomListCompactScreen(
                         )
                     }
                 },
-
                 backgroundColor = MaterialTheme.colorScheme.surface,
-                elevation = 6.dp,
-                navigationIcon = {
-                    androidx.compose.material.Icon(
-                        painter = painterResource(R.drawable.baseline_menu_24),
-                        contentDescription = "Toggle Drawer",
-                        modifier = Modifier.clickable(onClick = {
-                            scope.launch {
-                                if (state.drawerState.isClosed) state.drawerState.open() else state.drawerState.close()
-                            }
-                        }),
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
-                })
+                elevation = 6.dp
+            )
         },
         bottomBar = {
             val backStackEntry by navController.currentBackStackEntryAsState()

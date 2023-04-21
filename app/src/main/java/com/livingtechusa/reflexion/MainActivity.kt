@@ -127,15 +127,13 @@ class MainActivity : ComponentActivity() {
                                                     val uri =
                                                         Converters().convertStringToUri(string)
                                                     if (uri != null) {
-//                                                        val file =
-//                                                            SafeUtils.getResourceByUriPersistently(
-//                                                                context = this@MainActivity,
-//                                                                uri = uri
-//                                                            )
-//                                                        deleteFile(file?.filename)
-                                                        val resolver =
-                                                            this@MainActivity.contentResolver
-                                                        resolver.delete(uri, null)
+                                                        try {
+                                                            val resolver =
+                                                                this@MainActivity.contentResolver
+                                                            resolver.delete(uri, null)
+                                                        } catch (e: Exception) {
+                                                            Log.e(TAG, "Error: " + e.message + " with Cause: " + e.cause + "\n" + e.stackTrace)
+                                                        }
                                                     }
                                                 }
                                             }
