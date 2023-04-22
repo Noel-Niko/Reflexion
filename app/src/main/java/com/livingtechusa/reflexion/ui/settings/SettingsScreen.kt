@@ -280,7 +280,7 @@ fun SettingsContent(
                         // TODO:
                         //  make URL/WebSite/ all in  language specific versions
                         // display it as an attractive button
-                        val url: String = stringResource(R.string.https_sites_google_com_view_reflexionapp_home)
+                        val url: String = stringResource(R.string.https_sites_google_com_view_reflexionweb_home)
 
                         Box(
                             modifier = Modifier

@@ -19,7 +19,7 @@ import com.livingtechusa.reflexion.data.entities.ReflexionItem
         ListNode::class,
         Image::class,
         ItemImageAssociativeData::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 
