@@ -52,9 +52,6 @@ fun ConfirmSaveFileAlertDialog(
                             onClick = {
                                 openDialog.value = false
                                 navController.navigate(Screen.BuildItemScreen.route + "/" + USE_TOP_ITEM)
-                                if (type == JSON) {
-                                    viewModel.onTriggerEvent(BuildEvent.SaveAndDisplayReflexionItemFile)
-                                }
                                 if (type == ZIP) {
                                     viewModel.onTriggerEvent(BuildEvent.SaveAndDisplayZipFile)
                                 }

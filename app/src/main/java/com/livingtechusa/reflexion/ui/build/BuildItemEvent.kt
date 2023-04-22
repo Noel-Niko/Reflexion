@@ -32,6 +32,6 @@ sealed class BuildEvent {
     object Save : BuildEvent()
     data class SearchUri(val uri: String): BuildEvent ()
     object SendFile : BuildEvent()
-    object SaveAndDisplayReflexionItemFile : BuildEvent()
+//    object SaveAndDisplayReflexionItemFile : BuildEvent()
     object SaveAndDisplayZipFile : BuildEvent()
 }
