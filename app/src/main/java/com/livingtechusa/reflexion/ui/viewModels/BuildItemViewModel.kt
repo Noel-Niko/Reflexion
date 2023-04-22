@@ -48,6 +48,7 @@ import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil.re
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -148,7 +149,6 @@ class BuildItemViewModel @Inject constructor(
                         SafeUtils.getResourceByUriPersistently(context = context, uri = uri)
                 }
             }
-
         } catch (e: java.lang.Exception) {
             Log.e(TAG, "Unable to get File Resource")
         }
@@ -571,158 +571,161 @@ class BuildItemViewModel @Inject constructor(
         }
     }
 
-    private fun processJsonFile(inputStream: InputStream?) {
+    private suspend fun processJsonFile(inputStream: InputStream?): Boolean {
         val itemsFromFile = mutableListOf<ReflexionItem>()
         _loading.value = true
-        try {
-            viewModelScope.launch {
-                withContext(Dispatchers.IO) {
-                    val reflexionFile: ReflexionList? = if (inputStream == null) {
-                        // read the json
-                        TemporarySingleton.file?.let {
-                            FileUtil(context).getObjectFromFile(
-                                it,
+        val job = viewModelScope.async {
+            try {
+                val job = viewModelScope.async {
+                    withContext(Dispatchers.IO) {
+                        val reflexionFile: ReflexionList? = if (inputStream == null) {
+                            // read the json
+                            TemporarySingleton.file?.let {
+                                FileUtil(context).getObjectFromFile(
+                                    it,
+                                    ReflexionList::class.java
+                                )
+                            }
+                        } else {
+                            FileUtil(context).getObjectFromInputStream(
+                                inputStream = inputStream,
                                 ReflexionList::class.java
                             )
                         }
-                    } else {
-                        FileUtil(context).getObjectFromInputStream(
-                            inputStream = inputStream,
-                            ReflexionList::class.java
-                        )
-                    }
 
-                    reflexionFile?.reflexionItems?.forEach {
-                        it?.toReflexionItem()?.let { it1 -> itemsFromFile.add(it1) }
-                    }
+                        reflexionFile?.reflexionItems?.forEach {
+                            it?.toReflexionItem()?.let { it1 -> itemsFromFile.add(it1) }
+                        }
 
-                    listTitle = reflexionFile?.List_Title
-                    fileListTopic = itemsFromFile[0].autogenPk
-                    viewModelScope.launch {
-                        withContext(Dispatchers.IO) {
-                            val job = launch {
-                                saveItemsFromFile(
-                                    null,
-                                    null,
-                                    null,
-                                    null,
-                                    itemsFromFile
-                                )
+                        listTitle = reflexionFile?.List_Title
+                        fileListTopic = itemsFromFile[0].autogenPk
+                        viewModelScope.launch {
+                            withContext(Dispatchers.IO) {
+                                val job = launch {
+                                    saveItemsFromFile(
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        itemsFromFile
+                                    )
+                                }
+                                job.join()
+                                createList(oldToNewPkList)
                             }
-                            job.join()
-                            createList(oldToNewPkList)
                         }
                     }
                 }
+                job.await()
+            } catch (e: Exception) {
+                _loading.value = false
+                Toast.makeText(
+                    context,
+                    R.string.an_error_occurred_please_try_again,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
-        } catch (e: Exception) {
-            _loading.value = false
-            Toast.makeText(
-                context,
-                R.string.an_error_occurred_please_try_again,
-                Toast.LENGTH_SHORT
-            ).show()
         }
+        job.await()
         TemporarySingleton.file = null
         _loading.value = false
+        return true
     }
 
-    private fun openZipFile(filePath: Uri?) {
-        viewModelScope.launch(Dispatchers.IO) {
-            withContext(Dispatchers.IO) {
-                val tempFile = File.createTempFile("temp", ".zip")
+    private suspend fun openZipFile(filePath: Uri?) {
+        withContext(Dispatchers.IO) {
+            val tempFile = File.createTempFile("temp", ".zip")
+            try {
+                if (filePath != null) {
+                    // Create a ZipFile object for the zip file
+                    val contentResolver = context.contentResolver
+                    val inputStream = contentResolver.openInputStream(filePath)
+                    val outputStream = FileOutputStream(tempFile)
+                    inputStream?.copyTo(outputStream)
+                    inputStream?.close()
+                    outputStream.close()
+                    val zipFile = ZipFile(tempFile)
+
+                    // Get the entries in the zip file
+                    val entries = zipFile.entries()
+                    val jsonEntries = mutableListOf<ZipEntry>()
+                    val mp4Entries = mutableListOf<ZipEntry>()
+
+                    // Categorize entries as JSON or MP4 files
+                    while (entries.hasMoreElements()) {
+                        val entry = entries.nextElement()
+                        if (!entry.isDirectory) {
+                            if (entry.name.endsWith(".json")) {
+                                jsonEntries.add(entry)
+                            } else if (entry.name.endsWith(".mp4")) {
+                                mp4Entries.add(entry)
+                            }
+                        }
+                    }
+
+                    // Process the JSON files first
+                    val jsonJobs = jsonEntries.map { entry ->
+                        async(Dispatchers.IO) {
+                            val stream = zipFile.getInputStream(entry)
+                            // Process the contents of the JSON file
+                            val job = async(Dispatchers.IO) { processJsonFile(stream) }
+                            job.await()
+                            stream.close()
+                        }
+                    }
+                    jsonJobs.awaitAll()
+
+                    // Process the MP4 files next
+                    val mp4Jobs = mp4Entries.map { entry ->
+                        async(Dispatchers.IO) {
+                            val inputStream = zipFile.getInputStream(entry)
+                            // Save item to file
+                            val uri: Uri? = createMediaFile(
+                                inputStream = inputStream,
+                                mimeType = "video",
+                                displayName = entry.name,
+                                context = context
+                            )
+                            val pattern = Regex("""\d+""")
+                            val matchResult = pattern.find(entry.name)
+                            val originalPk = matchResult?.value?.toLong()
+                            val reflexionItem = localServiceImpl.selectReflexionItemByPk(
+                                oldToNewPkList.firstOrNull { it.first == originalPk }?.second
+                            )
+                            // Save video uri to associated reflexion item
+                            if (reflexionItem != null && uri != null) {
+                                localServiceImpl.updateReflexionItemVideoUri(reflexionItem, uri)
+                            }
+                            inputStream.close()
+                        }
+                    }
+                    mp4Jobs.awaitAll()
+
+                    // Close the zip file
+                    zipFile.close()
+                }
+                TemporarySingleton.file = null
+                // Create list of files to remove next onCreate
+                if (filePath != null) {
+                    TemporarySingleton.sharedFileList.add(filePath)
+                    val fileSet = mutableSetOf<String>()
+                    TemporarySingleton.sharedFileList.forEach { uri ->
+                        fileSet.add(Converters().convertUriToString(uri) ?: EMPTY_STRING)
+                    }
+                    UserPreferencesUtil.setFilesSaved(context, fileSet)
+                }
+                withContext(Dispatchers.Main) { _loading.value = false }
+            } catch (e: Exception) {
+                Log.e(
+                    TAG,
+                    "ERROR: " + e.message + " WITH CAUSE: " + e.cause + "STACK TRACE: " + e.stackTrace
+                )
+                withContext(Dispatchers.Main) { _loading.value = false }
+            } finally {
                 try {
-                    if (filePath != null) {
-                        // Create a ZipFile object for the zip file
-                        val contentResolver = context.contentResolver
-                        val inputStream = contentResolver.openInputStream(filePath)
-                        val outputStream = FileOutputStream(tempFile)
-                        inputStream?.copyTo(outputStream)
-                        inputStream?.close()
-                        outputStream.close()
-                        val zipFile = ZipFile(tempFile)
-
-                        // Get the entries in the zip file
-                        val entries = zipFile.entries()
-                        val jsonEntries = mutableListOf<ZipEntry>()
-                        val mp4Entries = mutableListOf<ZipEntry>()
-
-                        // Categorize entries as JSON or MP4 files
-                        while (entries.hasMoreElements()) {
-                            val entry = entries.nextElement()
-                            if (!entry.isDirectory) {
-                                if (entry.name.endsWith(".json")) {
-                                    jsonEntries.add(entry)
-                                } else if (entry.name.endsWith(".mp4")) {
-                                    mp4Entries.add(entry)
-                                }
-                            }
-                        }
-
-                        // Process the JSON files first
-                        for (entry in jsonEntries) {
-                            withContext(Dispatchers.IO) {
-                                val inputStream = zipFile.getInputStream(entry)
-                                // Process the contents of the JSON file - MAKE ASYNC AND WAIT TO CLOSE
-                                processJsonFile(inputStream)
-                                inputStream.close()
-                            }
-                        }
-
-                        // Process the MP4 files next
-                        for (entry in mp4Entries) {
-                            withContext(Dispatchers.IO) {
-                                val inputStream = zipFile.getInputStream(entry)
-                                val job = launch {
-                                    // Save item to file
-                                    val uri: Uri? = createMediaFile(
-                                        inputStream = inputStream,
-                                        mimeType = "video",
-                                        displayName = entry.name,
-                                        context = context
-                                    )
-                                    val pattern = Regex("""\d+""")
-                                    val matchResult = pattern.find(entry.name)
-                                    val originalPk = matchResult?.value?.toLong()
-                                    val reflexionItem = localServiceImpl.selectReflexionItemByPk(
-                                        oldToNewPkList.firstOrNull { it.first == originalPk }?.second
-                                    )
-                                    // Save video uri to associated reflexion item
-                                    if (reflexionItem != null && uri != null) {
-                                        localServiceImpl.updateReflexionItemVideoUri(reflexionItem, uri)
-                                    }
-                                }
-                                job.join()
-                                inputStream.close()
-                            }
-                        }
-
-                        // Close the zip file
-                        zipFile.close()
-                    }
-                    TemporarySingleton.file = null
-                    // Create list of files to remove next onCreate
-                    if (filePath != null) {
-                        TemporarySingleton.sharedFileList.add(filePath)
-                        val fileSet = mutableSetOf<String>()
-                        TemporarySingleton.sharedFileList.forEach { uri ->
-                            fileSet.add(Converters().convertUriToString(uri) ?: EMPTY_STRING)
-                        }
-                        UserPreferencesUtil.setFilesSaved(context, fileSet)
-                    }
-                    withContext(Dispatchers.Main) { _loading.value = false }
+                    tempFile.delete()
                 } catch (e: Exception) {
-                    Log.e(
-                        TAG,
-                        "ERROR: " + e.message + " WITH CAUSE: " + e.cause + "STACK TRACE: " + e.stackTrace
-                    )
-                    withContext(Dispatchers.Main) { _loading.value = false }
-                } finally {
-                    try {
-                        tempFile.delete()
-                    } catch (e: Exception) {
-                        Log.e(TAG, "ERROR: " + e.message + " WITH CAUSE: " + e.cause)
-                    }
+                    Log.e(TAG, "ERROR: " + e.message + " WITH CAUSE: " + e.cause)
                 }
             }
         }
