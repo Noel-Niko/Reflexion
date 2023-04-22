@@ -115,8 +115,15 @@ class CustomListsViewModel @Inject constructor(
             val bitmaps: MutableList<Bitmap> = mutableListOf()
             val job = async {
                 listOfLists.value.forEach { topicItem ->
-                    topicItem?.children?.get(0)?.itemPK?.let { itemPk ->
-                        localServiceImpl.selectReflexionItemByPk(itemPk)?.imagePk?.let { imagePk ->
+                    if(topicItem?.children?.isNotEmpty() == true) {
+                        topicItem.children[0].itemPK?.let { itemPk ->
+                            localServiceImpl.selectReflexionItemByPk(itemPk)?.imagePk?.let { imagePk ->
+                                localServiceImpl.selectImage(imagePk)
+                                    ?.let { bitmap -> bitmaps.add(bitmap) }
+                            }
+                        }
+                    } else {
+                        localServiceImpl.selectReflexionItemByPk(topicItem?.itemPK)?.imagePk?.let { imagePk ->
                             localServiceImpl.selectImage(imagePk)
                                 ?.let { bitmap -> bitmaps.add(bitmap) }
                         }

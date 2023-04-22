@@ -462,7 +462,7 @@ class BuildItemViewModel @Inject constructor(
                                         zipValues.zipUri,
                                         zipValues.zipUri.let { resolver.getType(it) })
                                     shareIntent.putExtra(Intent.EXTRA_STREAM, zipValues.zipUri)
-                                    shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                    shareIntent.addFlags(FLAG_ACTIVITY_NEW_TASK or FLAG_GRANT_READ_URI_PERMISSION)
                                     shareIntent.action = Intent.ACTION_SEND
                                     withContext(Dispatchers.Main) { _loading.value = false }
                                     startActivity(context, shareIntent, null)
@@ -556,6 +556,10 @@ class BuildItemViewModel @Inject constructor(
                             TemporarySingleton.useUri = false
                         }
                     }
+
+                    BuildEvent.RemoveListNodesForDeletedItems -> {
+                        withContext(Dispatchers.IO) { localServiceImpl.removeLinkNodesForDeletedItems() }
+                    }
                 }
             } catch (e: Exception) {
                 Log.e(
@@ -599,9 +603,9 @@ class BuildItemViewModel @Inject constructor(
 
                         listTitle = reflexionFile?.List_Title
                         fileListTopic = itemsFromFile[0].autogenPk
-                        viewModelScope.launch {
+                        val job = viewModelScope.async {
                             withContext(Dispatchers.IO) {
-                                val job = launch {
+                                val job = async {
                                     saveItemsFromFile(
                                         null,
                                         null,
@@ -610,10 +614,13 @@ class BuildItemViewModel @Inject constructor(
                                         itemsFromFile
                                     )
                                 }
-                                job.join()
-                                createList(oldToNewPkList)
+                                job.await()
+                                if(oldToNewPkList.size > 1) {
+                                    createList(oldToNewPkList)
+                                }
                             }
                         }
+                        job.await()
                     }
                 }
                 job.await()
@@ -859,7 +866,6 @@ class BuildItemViewModel @Inject constructor(
                 saveItemsFromFile(reflexionItem.autogenPk, newPrimaryKey, null, null, itemsFromFile)
             }
         }
-
     }
 
     private suspend fun createList(oldToNewPkList: LinkedList<Pair<Long, Long?>>) {

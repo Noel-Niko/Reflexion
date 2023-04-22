@@ -56,6 +56,8 @@ interface ILocalService {
     suspend fun deleteSelectedNode(nodePk: Long)
     suspend fun insertNewOrUpdateNodeList(arrayItem: ReflexionArrayItem, topic: Long): Long?
 
+    suspend fun removeLinkNodesForDeletedItems()
+
     // BOOKMARKS
     suspend fun setBookMarks(bookMark: Bookmarks)
     suspend fun getBookMarks(): List<Bookmarks?>

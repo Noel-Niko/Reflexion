@@ -39,10 +39,11 @@ import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.BarItem
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.components.text.GenerateHyperlink
+import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
 
 
 @Composable
-fun CompactScreen(navController: NavHostController, icons: List<BarItem>) {
+fun CompactScreen(navController: NavHostController, icons: List<BarItem>, viewModel: BuildItemViewModel) {
     val state = rememberScaffoldState()
     Scaffold(
         scaffoldState = state,
@@ -105,6 +106,6 @@ fun CompactScreen(navController: NavHostController, icons: List<BarItem>) {
             }
         }
     ) {
-        HomeContent(it)
+        HomeContent(it, viewModel = viewModel)
     }
 }

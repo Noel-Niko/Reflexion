@@ -23,6 +23,9 @@ interface LinkedListDao{
     @Query("Select * FROM LinkedList WHERE parentPk =:nodePk")
     suspend fun selectChildNode(nodePk: Long): ListNode?
 
+    @Query("Select * FROM LinkedList WHERE parentPk =:nodePk")
+    suspend fun selectAllChildNodesByParentPk(nodePk: Long): List<ListNode?>?
+
     @Query("Select * FROM LinkedList WHERE parentPk =:parentPk")
     suspend fun selectParentNode(parentPk: Long): ListNode?
 
@@ -30,7 +33,7 @@ interface LinkedListDao{
     suspend fun updateListNode(nodePk: Long, title: String, topicPk: Long, itemPk: Long, parentPK: Long?, childPk: Long?)
 
     @Query("Select * FROM LinkedList WHERE parentPk IS NULL")
-    suspend fun getAllLinkedLists(): List<ListNode?>
+    suspend fun getAllLinkedListHeadNodes(): List<ListNode?>
 
     @Query("Delete FROM LinkedList")
     suspend fun deleteAllLinkedLists()
