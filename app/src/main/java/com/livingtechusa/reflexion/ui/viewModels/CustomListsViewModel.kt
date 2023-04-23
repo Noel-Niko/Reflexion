@@ -422,7 +422,6 @@ class CustomListsViewModel @Inject constructor(
                                 val file = File(context.filesDir, filename)
                                 file.setExecutable(true, false)
                                 file.setReadable(true, false)
-//                                file.setWritable(true, false)
                                 val zipValues = writeReflexionItemListToZipFile(
                                     context,
                                     itemList,

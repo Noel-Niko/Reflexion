@@ -13,7 +13,6 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.common.graph.MutableValueGraph
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.entities.Bookmarks
@@ -424,7 +423,6 @@ class BuildItemViewModel @Inject constructor(
                                     val file = File(context.filesDir, filename)
                                     file.setExecutable(true, false)
                                     file.setReadable(true, false)
-//                                    file.setWritable(true, false)
                                     val zipValues = writeReflexionItemListToZipFile(
                                         context,
                                         listOf(reflexionItemState.value),
@@ -818,13 +816,6 @@ class BuildItemViewModel @Inject constructor(
                         }
                     }
                 }
-//                else {
-//                    val duplicatePK =
-//                        oldToNewPkList.firstOrNull() { it.originalPk == reflexionItem.autogenPk }
-//                    if (duplicatePK != null) {
-//                        oldToNewPkList.add(duplicatePK)
-//                    }
-//                }
                 saveItemsFromFile(oldPrimaryKey, newPrimaryKey, filePk, dbPk, itemsFromFile)
             }
         }
@@ -869,13 +860,6 @@ class BuildItemViewModel @Inject constructor(
                         }
                     }
                 }
-//                else {
-//                    val duplicatePK =
-//                        oldToNewPkList.firstOrNull() { it.first == reflexionItem.autogenPk }
-//                    if (duplicatePK != null) {
-//                        oldToNewPkList.add(duplicatePK)
-//                    }
-//                }
                 saveItemsFromFile(reflexionItem.autogenPk, newPrimaryKey, null, null, itemsFromFile)
             }
         }

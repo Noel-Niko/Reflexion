@@ -479,7 +479,6 @@ fun BuildItemContent(
                         tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
-
                 IconButton(onClick = {
                     scope.launch {
                         try {
@@ -539,6 +538,7 @@ fun BuildItemContent(
                     .align(Alignment.CenterVertically)
             ) {
                 IconButton(onClick = {
+                    viewModel.onTriggerEvent(BuildEvent.UpdateReflexionItem)
                     val query = Constants.SEARCH_YOUTUBE + name
                     val intent = Intent(
                         Intent.ACTION_VIEW, Uri.parse(query)
