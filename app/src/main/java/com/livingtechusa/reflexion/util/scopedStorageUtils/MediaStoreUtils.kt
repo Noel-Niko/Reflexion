@@ -417,8 +417,8 @@ object MediaStoreUtils {
             }
             uri = resolver.insert(collection, contentValues)
             uri?.let {
-                outputStream = resolver.openOutputStream(uri!!)
-                inputStream.copyTo(outputStream!!)
+                outputStream = resolver.openOutputStream(it)
+                outputStream?.let { stream -> inputStream.copyTo(stream) }
             }
         } catch (e: Exception) {
             Log.e("createMediaFile", "Error creating media file", e)

@@ -208,7 +208,7 @@ fun BuildItemContent(
                         .align(Alignment.End)
                 ) {
                     if (image != null) {
-                        ShowImage(image!!, navController)
+                       image?.let { ShowImage(it, navController)}
                     } else {
                         Text(
                             modifier = Modifier.padding(12.dp),
@@ -448,11 +448,13 @@ fun BuildItemContent(
                     if (videoUri.isNullOrEmpty().not()) {
                         viewModel.getSelectedFile()
                         if (selectedFile != null) {
-                            DocumentFilePreviewCardBuildView(
-                                resource = selectedFile!!,
-                                navController = navController,
-                                VIDEO_URI
-                            )
+                            selectedFile?.let {
+                                DocumentFilePreviewCardBuildView(
+                                    resource = it,
+                                    navController = navController,
+                                    VIDEO_URI
+                                )
+                            }
                         }
                     }
                 }

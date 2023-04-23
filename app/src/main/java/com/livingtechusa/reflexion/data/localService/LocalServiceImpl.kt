@@ -54,7 +54,7 @@ class LocalServiceImpl @Inject constructor(
             var pkofImage: Long? = null
             if (item.image != null) {
                 val existingImage =
-                    item.image.let { imagesDao.selectImagePKByByteArray(item.image!!) }
+                    item.image?.let { imagesDao.selectImagePKByByteArray(it) }
                 if (existingImage != null) {
                     imagesDao.insertImageAssociation(
                         ItemImageAssociativeData(
@@ -67,7 +67,7 @@ class LocalServiceImpl @Inject constructor(
                     if (item.image != null) {
                         // Add to Images
                         val newImage =
-                            imagesDao.insertImage(Image(imagePk = 0L, image = item.image!!))
+                            imagesDao.insertImage(Image(imagePk = 0L, image = item.image ?: ByteArray(0)))
                         // Record Association
                         imagesDao.insertImageAssociation(
                             ItemImageAssociativeData(
@@ -463,7 +463,7 @@ class LocalServiceImpl @Inject constructor(
                 }
                 // recursively get all the children for each head node
                 while (parent?.nodePk != null) {
-                    getChild(parent?.nodePk!!)
+                    parent?.nodePk?.let { getChild(it) }
                 }
                 val nodeRAI = node?.toReflexionArrayItem()
                 children.forEach { childNodes ->

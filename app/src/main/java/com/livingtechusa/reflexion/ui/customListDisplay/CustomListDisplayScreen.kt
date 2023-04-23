@@ -34,11 +34,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.media3.extractor.text.webvtt.WebvttCssStyle.FontSizeUnit
 import androidx.navigation.NavHostController
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.Screen
@@ -169,10 +167,8 @@ fun CustomListDisplayContent(
                                         )
                                         .align(Alignment.End)
                                 ) {
-                                    if (childImageList.isEmpty()
-                                            .not() && childImageList[childItemIndex] != null
-                                    ) {
-                                        ImageCard(childImageList[childItemIndex]!!, navController)
+                                    if (childImageList.isEmpty().not() && childImageList.size > childItemIndex && childImageList[childItemIndex] != null) {
+                                        childImageList[childItemIndex]?.let { ImageCard(it, navController) }
                                     }
                                 }
                             }
@@ -278,12 +274,14 @@ fun CustomListDisplayContent(
                                     if (childVideoUriList.isEmpty().not() &&
                                         childVideoUriList.size > childItemIndex
                                     ) {
-                                        if (childVideoUriList[childItemIndex] != null) {
-                                            DocumentFilePreviewCardListView(
-                                                resource = childVideoUriList[childItemIndex]!!,
-                                                navController = navController,
-                                                index = childItemIndex
-                                            )
+                                        if (childVideoUriList.size > childItemIndex && childVideoUriList[childItemIndex] != null) {
+                                            childVideoUriList[childItemIndex]?.let {
+                                                DocumentFilePreviewCardListView(
+                                                    resource = it,
+                                                    navController = navController,
+                                                    index = childItemIndex
+                                                )
+                                            }
                                         }
                                     }
                                 }
