@@ -117,7 +117,6 @@ class BuildItemViewModel @Inject constructor(
     val saveNowFromTopBar: StateFlow<Boolean> get() = _saveNowFromTopBar
 
     private var topItem: Long? = null
-    private var count: Int = 1
 
     fun setTopItem(pk: Long) {
         topItem = pk
@@ -424,7 +423,7 @@ class BuildItemViewModel @Inject constructor(
                                     val file = File(context.filesDir, filename)
                                     file.setExecutable(true, false)
                                     file.setReadable(true, false)
-                                    file.setWritable(true, false)
+//                                    file.setWritable(true, false)
                                     val zipValues = writeReflexionItemListToZipFile(
                                         context,
                                         listOf(reflexionItemState.value),
@@ -558,7 +557,7 @@ class BuildItemViewModel @Inject constructor(
                     }
 
                     BuildEvent.RemoveListNodesForDeletedItems -> {
-                        withContext(Dispatchers.IO) { localServiceImpl.removeLinkNodesForDeletedItems() }
+                        withContext(Dispatchers.IO) { localServiceImpl.removeLinkNodesForDeletedLists() }
                     }
                 }
             } catch (e: Exception) {
@@ -790,7 +789,7 @@ class BuildItemViewModel @Inject constructor(
         itemsFromFile: MutableList<ReflexionItem>
     ) {
         var oldPrimaryKey: Long? = filePk
-        var newPrimaryKey: Long? = null
+        var newPrimaryKey: Long?
         // Create a copy of the list before iterating over it
         val itemsCopy1 = itemsFromFile.toList()
         // if a child of saved item, save all in depthful way

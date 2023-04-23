@@ -112,26 +112,25 @@ class CustomListsViewModel @Inject constructor(
 
     private fun getListImages() {
         viewModelScope.launch {
-            val bitmaps: MutableList<Bitmap> = mutableListOf()
-            val job = async {
-                listOfLists.value.forEach { topicItem ->
-                    if(topicItem?.children?.isNotEmpty() == true) {
-                        topicItem.children[0].itemPK?.let { itemPk ->
-                            localServiceImpl.selectReflexionItemByPk(itemPk)?.imagePk?.let { imagePk ->
-                                localServiceImpl.selectImage(imagePk)
-                                    ?.let { bitmap -> bitmaps.add(bitmap) }
+            try {
+                val bitmaps: MutableList<Bitmap> = mutableListOf()
+                val job = launch(Dispatchers.Main) {
+                    listOfLists.value.forEach { topicItem ->
+                        if (topicItem?.children?.isNotEmpty() == true) {
+                            topicItem.children[0].itemPK?.let { itemPk ->
+                                localServiceImpl.selectReflexionItemByPk(itemPk)?.imagePk?.let { imagePk ->
+                                    localServiceImpl.selectImage(imagePk)
+                                        ?.let { bitmap -> bitmaps.add(bitmap) }
+                                }
                             }
-                        }
-                    } else {
-                        localServiceImpl.selectReflexionItemByPk(topicItem?.itemPK)?.imagePk?.let { imagePk ->
-                            localServiceImpl.selectImage(imagePk)
-                                ?.let { bitmap -> bitmaps.add(bitmap) }
                         }
                     }
                 }
+                job.join()
+                _listImages.value = bitmaps
+            } catch (e: Exception) {
+                Log.e(TAG, "Error: " + e.message + " with cause: " + e.cause)
             }
-            job.join()
-            _listImages.value = bitmaps
         }
     }
 
@@ -423,7 +422,7 @@ class CustomListsViewModel @Inject constructor(
                                 val file = File(context.filesDir, filename)
                                 file.setExecutable(true, false)
                                 file.setReadable(true, false)
-                                file.setWritable(true, false)
+//                                file.setWritable(true, false)
                                 val zipValues = writeReflexionItemListToZipFile(
                                     context,
                                     itemList,

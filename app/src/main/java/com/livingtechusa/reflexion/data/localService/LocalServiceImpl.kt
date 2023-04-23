@@ -278,25 +278,19 @@ class LocalServiceImpl @Inject constructor(
         return pkList
     }
 
-    override suspend fun removeLinkNodesForDeletedItems() {
+    override suspend fun removeLinkNodesForDeletedLists() {
         val nodesToDelete = mutableListOf<Long>()
         // get head nodes for deleted items
         val job = CoroutineScope(Dispatchers.IO).async {
-            linkedListDao.getAllLinkedListHeadNodes().filter { listNode ->
-                listNode?.itemPK?.let { itemPk -> reflexionItemDao.selectReflexionItem(itemPk) } == null
-            }.apply {
-                // for these head nodes without items
-                this.forEach { headNode ->
-                    headNode?.nodePk?.let { nodePk ->
-                        nodesToDelete.add(
-                            nodePk
-                        )
-                    }
-                    // Recursively get all the children by selecting for nodes with above as parent and going down the list
-                    val children: List<Long>? =
-                        headNode?.nodePk?.let { nodePk -> getAllChildren(nodePk) }
-                    if (children != null) {
-                        nodesToDelete.addAll(children)
+            linkedListDao.getAllLinkedListHeadNodes().onEach { headNode ->
+                val children: List<Long>? =
+                    headNode?.nodePk?.let { nodePk -> getAllChildren(nodePk) }
+                if (reflexionItemDao.selectReflexionItem(children?.get(0) ?: -1) == null) {
+                    headNode?.nodePk?.let { nodesToDelete.add(it) }
+                    children?.forEachIndexed { index, child ->
+                        if (reflexionItemDao.selectReflexionItem(children[index]) == null) {
+                            nodesToDelete.add(child)
+                        }
                     }
                 }
             }
