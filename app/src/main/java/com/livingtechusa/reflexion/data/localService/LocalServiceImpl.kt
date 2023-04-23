@@ -44,7 +44,8 @@ class LocalServiceImpl @Inject constructor(
             val itemWithPk = item.copy(autogenPk = itemPk)
             newImagePk = linkSavedOrAddNewImageAndAssociation(itemWithPk)
         }
-        val saveItem = item.copy(autogenPk = itemPk, imagePk = newImagePk ?: item.imagePk, image = null)
+        val saveItem =
+            item.copy(autogenPk = itemPk, imagePk = newImagePk ?: item.imagePk, image = null)
         return reflexionItemDao.setReflexionItem(saveItem)
     }
 
@@ -55,7 +56,7 @@ class LocalServiceImpl @Inject constructor(
                 val existingImage =
                     item.image.let { imagesDao.selectImagePKByByteArray(item.image!!) }
                 if (existingImage != null) {
-                     imagesDao.insertImageAssociation(
+                    imagesDao.insertImageAssociation(
                         ItemImageAssociativeData(
                             itemPk = item.autogenPk,
                             imagePk = existingImage
@@ -65,7 +66,8 @@ class LocalServiceImpl @Inject constructor(
                 } else {
                     if (item.image != null) {
                         // Add to Images
-                        val newImage = imagesDao.insertImage(Image(imagePk = 0L, image = item.image!!))
+                        val newImage =
+                            imagesDao.insertImage(Image(imagePk = 0L, image = item.image!!))
                         // Record Association
                         imagesDao.insertImageAssociation(
                             ItemImageAssociativeData(
@@ -173,7 +175,7 @@ class LocalServiceImpl @Inject constructor(
         }
         imagesDao.deleteUnusedAssociations()
         val imageUses = imagePk?.let { imagesDao.countImagePkUses(imagePk = it) }
-        if(imageUses != null && imageUses <= 1) {
+        if (imageUses != null && imageUses <= 1) {
             imagesDao.deleteImage(imagePk = imagePk)
         }
         reflexionItemDao.deleteReflexionItem(autogenPK, name)
@@ -237,7 +239,7 @@ class LocalServiceImpl @Inject constructor(
     override suspend fun deleteImageAndAssociation(imagePk: Long, itemPk: Long) {
         imagesDao.removeImageAssociation(itemPk)
         val useCount = imagesDao.getAssociationUseCount(itemPk)
-        if(useCount < 1) imagesDao.deleteImage(imagePk = imagePk)
+        if (useCount < 1) imagesDao.deleteImage(imagePk = imagePk)
     }
 
     override suspend fun insertNewOrUpdateNodeList(
@@ -263,6 +265,51 @@ class LocalServiceImpl @Inject constructor(
             }
         }
         return headNodePk
+    }
+
+    private suspend fun getAllChildren(pk: Long): List<Long> {
+        val pkList = mutableListOf<Long>()
+        linkedListDao.selectAllChildNodesByParentPk(pk)?.forEach { listNode ->
+            listNode?.nodePk?.apply {
+                pkList.add(this)
+                pkList.addAll(getAllChildren(this))
+            }
+        }
+        return pkList
+    }
+
+    override suspend fun removeLinkNodesForDeletedItems() {
+        val nodesToDelete = mutableListOf<Long>()
+        // get head nodes for deleted items
+        val job = CoroutineScope(Dispatchers.IO).async {
+            linkedListDao.getAllLinkedListHeadNodes().filter { listNode ->
+                listNode?.itemPK?.let { itemPk -> reflexionItemDao.selectReflexionItem(itemPk) } == null
+            }.apply {
+                // for these head nodes without items
+                this.forEach { headNode ->
+                    headNode?.nodePk?.let { nodePk ->
+                        nodesToDelete.add(
+                            nodePk
+                        )
+                    }
+                    // Recursively get all the children by selecting for nodes with above as parent and going down the list
+                    val children: List<Long>? =
+                        headNode?.nodePk?.let { nodePk -> getAllChildren(nodePk) }
+                    if (children != null) {
+                        nodesToDelete.addAll(children)
+                    }
+                }
+            }
+        }
+        job.await()
+        val job2 = CoroutineScope(Dispatchers.IO).async {
+            nodesToDelete.forEach {
+                if (reflexionItemDao.selectReflexionItem(it) == null) {
+                    linkedListDao.deleteSelectedNode(it)
+                }
+            }
+        }
+        job2.await()
     }
 
     override suspend fun selectImage(imagePk: Long): Bitmap? {
@@ -380,7 +427,7 @@ class LocalServiceImpl @Inject constructor(
 
             // recursive function
             fun getChild(itemPk: Long): ListNode? {
-                return nodeList.filter { it?.parentPk == itemPk }.firstOrNull()
+                return nodeList.firstOrNull { it?.parentPk == itemPk }
             }
             // get the children for each head node
             headNodeList.forEach() { headNode ->
@@ -462,7 +509,7 @@ class LocalServiceImpl @Inject constructor(
     }
 
     override suspend fun getAllLinkedLists(): List<ListNode?> {
-        return linkedListDao.getAllLinkedLists()
+        return linkedListDao.getAllLinkedListHeadNodes()
     }
 
     override suspend fun deleteAllLinkedLists() {

@@ -66,6 +66,7 @@ import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -115,7 +116,8 @@ class MainActivity : ComponentActivity() {
                 DisposableEffect(
                     key1 = lifecycleOwner,
                     effect = {
-                        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_CREATE) {
+                        val observer = LifecycleEventObserver { _, event ->
+                            if (event == Lifecycle.Event.ON_CREATE) {
                                 permissionsState.launchMultiplePermissionRequest()
                                 MediaUtil().verifyStoragePermission(this@MainActivity)
                                 // manage file storage
@@ -127,15 +129,13 @@ class MainActivity : ComponentActivity() {
                                                     val uri =
                                                         Converters().convertStringToUri(string)
                                                     if (uri != null) {
-//                                                        val file =
-//                                                            SafeUtils.getResourceByUriPersistently(
-//                                                                context = this@MainActivity,
-//                                                                uri = uri
-//                                                            )
-//                                                        deleteFile(file?.filename)
-                                                        val resolver =
-                                                            this@MainActivity.contentResolver
-                                                        resolver.delete(uri, null)
+                                                        try {
+                                                            val resolver =
+                                                                this@MainActivity.contentResolver
+                                                            resolver.delete(uri, null)
+                                                        } catch (e: Exception) {
+                                                            Log.e(TAG, "Error: " + e.message + " with Cause: " + e.cause + "\n" + e.stackTrace)
+                                                        }
                                                     }
                                                 }
                                             }
@@ -145,10 +145,7 @@ class MainActivity : ComponentActivity() {
                                         UserPreferencesUtil.setFilesSaved(this@MainActivity, mutableSetOf())
                                     }
                                 } catch (e: Exception) {
-                                    Log.e(
-                                        TAG,
-                                        "Failure deleting file with message " + e.message + " with cause " + e.cause
-                                    )
+                                    Log.e(TAG, "Failure deleting file with message " + e.message + " with cause " + e.cause)
                                 }
                             }
                         }
@@ -168,8 +165,10 @@ class MainActivity : ComponentActivity() {
                     composable(
                         route = Screen.HomeScreen.route,
                     ) {
+                        val buildItemViewModel: BuildItemViewModel = hiltViewModel()
                         HomeScreen(
                             navHostController = navController,
+                            viewModel = buildItemViewModel
                         )
                     }
 
@@ -405,16 +404,6 @@ class MainActivity : ComponentActivity() {
                     if (uri != EMPTY_STRING && uri != "null") {
                         TemporarySingleton.useUri = true
                         navigationController.navigate(Screen.BuildItemScreen.route + "/" + EMPTY_PK_STRING)
-                    }
-                    onDispose { }
-                }
-                // Open json file
-                DisposableEffect(key1 = Intent()) {
-                    if (intent.type != EMPTY_STRING && intent.type == "application/json") {
-                        // Store Path
-                        TemporarySingleton.file = intent.data
-                        //  Confirm desire to save :
-                        navigationController.navigate(Screen.ConfirmSaveFileScreen.route + "/" + JSON)
                     }
                     onDispose { }
                 }

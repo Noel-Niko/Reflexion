@@ -16,7 +16,7 @@ const val BuildRoute = "build"
 fun BuildItemScreen(
     pk: Long,
     navHostController: NavHostController,
-    viewModel: BuildItemViewModel,
+    viewModel: BuildItemViewModel
 ) {
     val context = LocalContext.current
     val icons = NavBarItems.BuildBarItems

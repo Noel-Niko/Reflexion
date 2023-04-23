@@ -115,8 +115,15 @@ class CustomListsViewModel @Inject constructor(
             val bitmaps: MutableList<Bitmap> = mutableListOf()
             val job = async {
                 listOfLists.value.forEach { topicItem ->
-                    topicItem?.children?.get(0)?.itemPK?.let { itemPk ->
-                        localServiceImpl.selectReflexionItemByPk(itemPk)?.imagePk?.let { imagePk ->
+                    if(topicItem?.children?.isNotEmpty() == true) {
+                        topicItem.children[0].itemPK?.let { itemPk ->
+                            localServiceImpl.selectReflexionItemByPk(itemPk)?.imagePk?.let { imagePk ->
+                                localServiceImpl.selectImage(imagePk)
+                                    ?.let { bitmap -> bitmaps.add(bitmap) }
+                            }
+                        }
+                    } else {
+                        localServiceImpl.selectReflexionItemByPk(topicItem?.itemPK)?.imagePk?.let { imagePk ->
                             localServiceImpl.selectImage(imagePk)
                                 ?.let { bitmap -> bitmaps.add(bitmap) }
                         }
@@ -426,6 +433,7 @@ class CustomListsViewModel @Inject constructor(
 
                                 // create list of files to remove next onCreate
                                 TemporarySingleton.sharedFileList.addAll(zipValues.uriList)
+                                TemporarySingleton.sharedFileList.add(zipValues.zipUri)
                                 val fileSet: MutableSet<String> = mutableSetOf()
                                 TemporarySingleton.sharedFileList.forEach { uri ->
                                     fileSet.add(

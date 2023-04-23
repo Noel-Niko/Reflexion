@@ -35,20 +35,9 @@ data class ReflexionItem(
     var imagePk: Long? = null,
     var videoUri: String? = EMPTY_STRING,
     var videoUrl: String? = EMPTY_STRING,
+    var audioUri: String? = EMPTY_STRING,
     var parent: Long? = null
 ) : Parcelable {
-//    companion object {
-//        val AUTOGEN_PK = "autogenPk"
-//        val NAME = "name"
-//        val DESCRIPTION = "description"
-//        val DETAILED_DESCRIPTION = "detailedDescription"
-//        val IMAGE = "image"
-//        val IMAGEPK = "imagePk"
-//        val VIDEO_URI = "videoUri"
-//        val VIDEO_URL = "videoUrl"
-//        val PARENT = "parent"
-//        val SIBLINGS = "siblings"
-//    }
 
     constructor(
         autogenPk: String,
@@ -59,6 +48,7 @@ data class ReflexionItem(
         imagePk: Long?,
         videoUri: String?,
         videoUrl: String?,
+        audioUri: String?,
         parent: String?
         ) : this(
         autogenPk.toLong(),
@@ -69,6 +59,7 @@ data class ReflexionItem(
         imagePk,
         videoUri,
         videoUrl,
+        audioUri,
         parent?.toLong()
         )
 

@@ -5,14 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
-import android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
-import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.livingtechusa.reflexion.R
@@ -38,7 +36,7 @@ import com.livingtechusa.reflexion.util.Constants.VIDEO_URI
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URL
 import com.livingtechusa.reflexion.util.TemporarySingleton
 import com.livingtechusa.reflexion.util.json.FileUtil
-import com.livingtechusa.reflexion.util.json.ReflexionJsonWriter
+import com.livingtechusa.reflexion.util.json.writeReflexionItemListToZipFile
 import com.livingtechusa.reflexion.util.scopedStorageUtils.FileResource
 import com.livingtechusa.reflexion.util.scopedStorageUtils.ImageUtils
 import com.livingtechusa.reflexion.util.scopedStorageUtils.ImageUtils.rotateImage
@@ -50,6 +48,7 @@ import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil.re
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -59,6 +58,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.util.LinkedList
+import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import javax.inject.Inject
 
@@ -149,7 +149,6 @@ class BuildItemViewModel @Inject constructor(
                         SafeUtils.getResourceByUriPersistently(context = context, uri = uri)
                 }
             }
-
         } catch (e: java.lang.Exception) {
             Log.e(TAG, "Unable to get File Resource")
         }
@@ -258,7 +257,11 @@ class BuildItemViewModel @Inject constructor(
                             )
 
                             _reflexionItem =
-                                localServiceImpl.selectReflexionItemByPk(localServiceImpl.saveNewItem(newItem))
+                                localServiceImpl.selectReflexionItemByPk(
+                                    localServiceImpl.saveNewItem(
+                                        newItem
+                                    )
+                                )
                                     ?: ReflexionItem()
                             _reflexionItemState.value = _reflexionItem
                             _autogenPK.value = _reflexionItem.autogenPk
@@ -310,7 +313,11 @@ class BuildItemViewModel @Inject constructor(
 
                                 USE_TOP_ITEM -> {
                                     _reflexionItem =
-                                        event.pk.let { localServiceImpl.selectReflexionItemByPk(topItem ?: 1) }
+                                        event.pk.let {
+                                            localServiceImpl.selectReflexionItemByPk(
+                                                topItem ?: 1
+                                            )
+                                        }
                                             ?: ReflexionItem()
                                     updateAllDisplayedSubItemsToViewModelVersion()
                                     _reflexionItemState.value = _reflexionItem
@@ -394,7 +401,7 @@ class BuildItemViewModel @Inject constructor(
                                 it
                             )
                         }
-                        if (video != null && video.equals(EMPTY_STRING).not()) {
+                        if (video != null && video.path != "") {
                             val resolver: ContentResolver = context.contentResolver
                             shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
                             shareIntent.type = "video/*"
@@ -412,39 +419,22 @@ class BuildItemViewModel @Inject constructor(
                         viewModelScope.launch {
                             withContext(Dispatchers.IO) {
                                 try {
-                                    // create a json file
-                                    val title = reflexionItemState.value.name.replace(" ", "_")
                                     val filename =
-                                        context.getString(R.string.app_name) + title + "${System.currentTimeMillis()}.json"
+                                        context.getString(R.string.app_name) + reflexionItemState.value.name + "${System.currentTimeMillis()}.zip"
                                     val file = File(context.filesDir, filename)
                                     file.setExecutable(true, false)
                                     file.setReadable(true, false)
                                     file.setWritable(true, false)
-
-
-                                    // save data to the file
-                                    val outputStream: FileOutputStream = FileOutputStream(file)
-                                    val reflexionItemList = mutableListOf(reflexionItemState.value)
-                                    ReflexionJsonWriter()
-                                        .writeJsonStream(
-                                            outputStream,
-                                            reflexionItemList
-                                        )
-
-                                    // generate uri to the file with permissions
-                                    val contentUri: Uri = FileProvider.getUriForFile(
-                                        context.applicationContext,
-                                        "com.livingtechusa.reflexion.fileprovider",
+                                    val zipValues = writeReflexionItemListToZipFile(
+                                        context,
+                                        listOf(reflexionItemState.value),
+                                        reflexionItemState.value.name,
                                         file
                                     )
-                                    context.grantUriPermission(
-                                        context.applicationContext.packageName,
-                                        contentUri,
-                                        FLAG_GRANT_READ_URI_PERMISSION or FLAG_GRANT_WRITE_URI_PERMISSION
-                                    )
 
-                                    TemporarySingleton.sharedFileList.add(contentUri)
-                                    // record file for later deletion
+                                    // create list of files to remove next onCreate
+                                    TemporarySingleton.sharedFileList.addAll(zipValues.uriList)
+                                    TemporarySingleton.sharedFileList.add(zipValues.zipUri)
                                     val fileSet: MutableSet<String> = mutableSetOf()
                                     TemporarySingleton.sharedFileList.forEach { uri ->
                                         fileSet.add(
@@ -452,33 +442,35 @@ class BuildItemViewModel @Inject constructor(
                                         )
                                     }
                                     UserPreferencesUtil.setFilesSaved(context, fileSet)
-                                    // Create intent
-                                    val shareIntent = Intent()
+
+                                    // create the share intent
+                                    val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE)
+                                    shareIntent.type = "application/zip"
+                                    shareIntent.putExtra(
+                                        Intent.EXTRA_SUBJECT,
+                                        "Sending: ${reflexionItemState.value.name}"
+                                    )
                                     val text =
                                         context.getString(R.string.this_file_was_sent_with_reflexion_and_requires_the_reflexion_app_to_open) + "\n" + context.getString(
                                             R.string.sent_with_reflexion_from_the_google_play_store
                                         ) + "\n" + context.getString(R.string.reflexion_link)
                                     shareIntent.putExtra(Intent.EXTRA_TEXT, text)
-
-                                    if (contentUri.equals(EMPTY_STRING).not()) {
-                                        val resolver: ContentResolver = context.contentResolver
-                                        shareIntent.type = "plain/text"
-                                        shareIntent.putExtra(
-                                            Intent.EXTRA_SUBJECT,
-                                            "Sending: ${reflexionItemState.value.name}"
-                                        )
-                                        shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
-                                        shareIntent.setDataAndType(
-                                            contentUri,
-                                            contentUri.let { resolver.getType(it) })
-                                        shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
-                                        shareIntent.flags =
-                                            FLAG_ACTIVITY_NEW_TASK or FLAG_GRANT_READ_URI_PERMISSION
-                                        shareIntent.action = Intent.ACTION_SEND
-                                        withContext(Dispatchers.Main) { _loading.value = false }
-                                        startActivity(context, shareIntent, null)
-                                    }
+                                    // Attach the files
+                                    val resolver: ContentResolver = context.contentResolver
+                                    shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
+                                    shareIntent.setDataAndType(
+                                        zipValues.zipUri,
+                                        zipValues.zipUri.let { resolver.getType(it) })
+                                    shareIntent.putExtra(Intent.EXTRA_STREAM, zipValues.zipUri)
+                                    shareIntent.addFlags(FLAG_ACTIVITY_NEW_TASK or FLAG_GRANT_READ_URI_PERMISSION)
+                                    shareIntent.action = Intent.ACTION_SEND
+                                    withContext(Dispatchers.Main) { _loading.value = false }
+                                    startActivity(context, shareIntent, null)
                                 } catch (e: Exception) {
+                                    Log.e(
+                                        TAG,
+                                        "Error " + e.message + " with cause " + e.cause + " and Stack trace of: " + e.stackTrace
+                                    )
                                     withContext(Dispatchers.Main) {
                                         _loading.value = false
                                         Toast.makeText(
@@ -490,19 +482,13 @@ class BuildItemViewModel @Inject constructor(
                                 }
                             }
                         }
+
                     }
 
                     is BuildEvent.SaveAndDisplayZipFile -> {
                         // Show Loading
                         _loading.value = true
                         openZipFile(TemporarySingleton.file)
-                    }
-
-                    is BuildEvent.SaveAndDisplayReflexionItemFile -> {
-                        // Show Loading
-                        _loading.value = true
-                        processJsonFile(null)
-                        _loading.value = false
                     }
 
                     is BuildEvent.Save -> {
@@ -570,6 +556,10 @@ class BuildItemViewModel @Inject constructor(
                             TemporarySingleton.useUri = false
                         }
                     }
+
+                    BuildEvent.RemoveListNodesForDeletedItems -> {
+                        withContext(Dispatchers.IO) { localServiceImpl.removeLinkNodesForDeletedItems() }
+                    }
                 }
             } catch (e: Exception) {
                 Log.e(
@@ -585,67 +575,78 @@ class BuildItemViewModel @Inject constructor(
         }
     }
 
-    private fun processJsonFile(inputStream: InputStream?) {
+    private suspend fun processJsonFile(inputStream: InputStream?): Boolean {
         val itemsFromFile = mutableListOf<ReflexionItem>()
-        // need a separate dialog that leads to a different event for .zip files from teh main ctivity
         _loading.value = true
-        try {
-            val reflexionFile: ReflexionList? = if (inputStream == null) {
-                // read the json
-                TemporarySingleton.file?.let {
-                    FileUtil(context).getObjectFromFile(
-                        it,
-                        ReflexionList::class.java
-                    )
-                }
-            } else {
-                FileUtil(context).getObjectFromInputStream(
-                    inputStream = inputStream,
-                    ReflexionList::class.java
-                )
-            }
+        val job = viewModelScope.async {
+            try {
+                val job = viewModelScope.async {
+                    withContext(Dispatchers.IO) {
+                        val reflexionFile: ReflexionList? = if (inputStream == null) {
+                            // read the json
+                            TemporarySingleton.file?.let {
+                                FileUtil(context).getObjectFromFile(
+                                    it,
+                                    ReflexionList::class.java
+                                )
+                            }
+                        } else {
+                            FileUtil(context).getObjectFromInputStream(
+                                inputStream = inputStream,
+                                ReflexionList::class.java
+                            )
+                        }
 
-            reflexionFile?.reflexionItems?.forEach {
-                itemsFromFile.add(it.toReflexionItem())
-            }
+                        reflexionFile?.reflexionItems?.forEach {
+                            it?.toReflexionItem()?.let { it1 -> itemsFromFile.add(it1) }
+                        }
 
-            listTitle = reflexionFile?.List_Title
-            fileListTopic = itemsFromFile[0].autogenPk
-            viewModelScope.launch {
-                withContext(Dispatchers.IO) {
-                    val job = launch {
-                        saveItemsFromFile(
-                            null,
-                            null,
-                            null,
-                            null,
-                            itemsFromFile
-                        )
+                        listTitle = reflexionFile?.List_Title
+                        fileListTopic = itemsFromFile[0].autogenPk
+                        val job = viewModelScope.async {
+                            withContext(Dispatchers.IO) {
+                                val job = async {
+                                    saveItemsFromFile(
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        itemsFromFile
+                                    )
+                                }
+                                job.await()
+                                if(oldToNewPkList.size > 1) {
+                                    createList(oldToNewPkList)
+                                }
+                            }
+                        }
+                        job.await()
                     }
-                    job.join()
-                    createList(oldToNewPkList)
                 }
+                job.await()
+            } catch (e: Exception) {
+                _loading.value = false
+                Toast.makeText(
+                    context,
+                    R.string.an_error_occurred_please_try_again,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
-        } catch (e: Exception) {
-            _loading.value = false
-            Toast.makeText(
-                context,
-                R.string.an_error_occurred_please_try_again,
-                Toast.LENGTH_SHORT
-            ).show()
         }
+        job.await()
         TemporarySingleton.file = null
         _loading.value = false
+        return true
     }
 
-    private fun openZipFile(filePath: Uri?) {
-        viewModelScope.launch(Dispatchers.IO) {
+    private suspend fun openZipFile(filePath: Uri?) {
+        withContext(Dispatchers.IO) {
+            val tempFile = File.createTempFile("temp", ".zip")
             try {
                 if (filePath != null) {
                     // Create a ZipFile object for the zip file
                     val contentResolver = context.contentResolver
                     val inputStream = contentResolver.openInputStream(filePath)
-                    val tempFile = File.createTempFile("temp", ".zip")
                     val outputStream = FileOutputStream(tempFile)
                     inputStream?.copyTo(outputStream)
                     inputStream?.close()
@@ -654,79 +655,72 @@ class BuildItemViewModel @Inject constructor(
 
                     // Get the entries in the zip file
                     val entries = zipFile.entries()
-                    // Loop through the entries
+                    val jsonEntries = mutableListOf<ZipEntry>()
+                    val mp4Entries = mutableListOf<ZipEntry>()
+
+                    // Categorize entries as JSON or MP4 files
                     while (entries.hasMoreElements()) {
                         val entry = entries.nextElement()
-                        // If the entry is a file
                         if (!entry.isDirectory) {
-                            // Get the input stream for the entry
-                            val inputStream = zipFile.getInputStream(entry)
-                            // Process the contents of the entry
-
-                            // For example, read the contents of a text file
-                            if (entry.name.endsWith(".txt")) {
-                                val contents = inputStream.bufferedReader().readText()
-                                println(contents)
-                            }
-                            // For example, read the bytes of an image file
-                            if (entry.name.endsWith(".png")) {
-                                val bytes = inputStream.readBytes()
-                                // Do something with the bytes
-                            }
-                            // read the .json reflexionItem values
                             if (entry.name.endsWith(".json")) {
-                                val job = launch {
-                                    processJsonFile(inputStream)
-                                }
-                                job.join()
+                                jsonEntries.add(entry)
+                            } else if (entry.name.endsWith(".mp4")) {
+                                mp4Entries.add(entry)
                             }
-                            // save the video's, get the uri's, and save the uri's to the Reflexion items for the next step
-                            if (entry.name.endsWith(".mp4")) {
-                                val job = launch {
-                                    // save item to file
-                                    val uri: Uri? = createMediaFile(
-                                        inputStream= inputStream, mimeType = "video", displayName = entry.name, context = context
-                                    )
-                                    val pattern = Regex("""\d+""")
-                                    val matchResult = pattern.find(entry.name)
-                                    val originalPk = matchResult?.value?.toLong()
-                                    val reflexionItem = localServiceImpl.selectReflexionItemByPk(oldToNewPkList.firstOrNull { it.first == originalPk }?.second)
-                                    // save image to associated reflexion item
-                                    if (reflexionItem != null && uri != null) {
-                                        localServiceImpl.updateReflexionItemVideoUri(reflexionItem, uri)
-                                    }
-                                }
-                                job.join()
+                        }
+                    }
+
+                    // Process the JSON files first
+                    val jsonJobs = jsonEntries.map { entry ->
+                        async(Dispatchers.IO) {
+                            val stream = zipFile.getInputStream(entry)
+                            // Process the contents of the JSON file
+                            val job = async(Dispatchers.IO) { processJsonFile(stream) }
+                            job.await()
+                            stream.close()
+                        }
+                    }
+                    jsonJobs.awaitAll()
+
+                    // Process the MP4 files next
+                    val mp4Jobs = mp4Entries.map { entry ->
+                        async(Dispatchers.IO) {
+                            val inputStream = zipFile.getInputStream(entry)
+                            // Save item to file
+                            val uri: Uri? = createMediaFile(
+                                inputStream = inputStream,
+                                mimeType = "video",
+                                displayName = entry.name,
+                                context = context
+                            )
+                            val pattern = Regex("""\d+""")
+                            val matchResult = pattern.find(entry.name)
+                            val originalPk = matchResult?.value?.toLong()
+                            val reflexionItem = localServiceImpl.selectReflexionItemByPk(
+                                oldToNewPkList.firstOrNull { it.first == originalPk }?.second
+                            )
+                            // Save video uri to associated reflexion item
+                            if (reflexionItem != null && uri != null) {
+                                localServiceImpl.updateReflexionItemVideoUri(reflexionItem, uri)
                             }
-                            // save the image bytes to the Reflexion Items to process in teh next step
-                            if (entry.name.endsWith(".jpg")) {
-                                val job = launch {
-                                 // save item to file
-                                    val uri: Uri? = createMediaFile(
-                                        inputStream= inputStream, mimeType = "image", displayName = entry.name, context = context
-                                    )
-                                    val pattern = Regex("""\d+""")
-                                    val matchResult = pattern.find(entry.name)
-                                    val pkFromFile = matchResult?.value?.toLong()
-                                    val reflexionItem = localServiceImpl.selectReflexionItemByPk(oldToNewPkList.firstOrNull { it.first == pkFromFile }?.second)
-                                 // save uri to associated reflexion item
-                                    if (reflexionItem != null && uri != null) {
-                                            val imageInBytes = MediaStoreUtils.uriToByteArray(uri, context)
-                                            val updatedReflexionItem = reflexionItem.copy(image = imageInBytes)
-                                            localServiceImpl.linkSavedOrAddNewImageAndAssociation(updatedReflexionItem)
-                                    }
-                                }
-                                job.join()
-                            }
-                            // ...
-                            // Close the input stream
                             inputStream.close()
                         }
                     }
+                    mp4Jobs.awaitAll()
+
                     // Close the zip file
                     zipFile.close()
                 }
                 TemporarySingleton.file = null
+                // Create list of files to remove next onCreate
+                if (filePath != null) {
+                    TemporarySingleton.sharedFileList.add(filePath)
+                    val fileSet = mutableSetOf<String>()
+                    TemporarySingleton.sharedFileList.forEach { uri ->
+                        fileSet.add(Converters().convertUriToString(uri) ?: EMPTY_STRING)
+                    }
+                    UserPreferencesUtil.setFilesSaved(context, fileSet)
+                }
                 withContext(Dispatchers.Main) { _loading.value = false }
             } catch (e: Exception) {
                 Log.e(
@@ -734,6 +728,12 @@ class BuildItemViewModel @Inject constructor(
                     "ERROR: " + e.message + " WITH CAUSE: " + e.cause + "STACK TRACE: " + e.stackTrace
                 )
                 withContext(Dispatchers.Main) { _loading.value = false }
+            } finally {
+                try {
+                    tempFile.delete()
+                } catch (e: Exception) {
+                    Log.e(TAG, "ERROR: " + e.message + " WITH CAUSE: " + e.cause)
+                }
             }
         }
     }
@@ -866,7 +866,6 @@ class BuildItemViewModel @Inject constructor(
                 saveItemsFromFile(reflexionItem.autogenPk, newPrimaryKey, null, null, itemsFromFile)
             }
         }
-
     }
 
     private suspend fun createList(oldToNewPkList: LinkedList<Pair<Long, Long?>>) {
