@@ -223,7 +223,7 @@ private fun BookmarkItemsContent(
                         }
                     )
                     .data(
-                        data = if (images[bookmark] != null) {
+                        data =  if (images.size > bookmark && images[bookmark] != null) {
                             images[bookmark]
                         } else {
                             R.mipmap.ic_launcher
