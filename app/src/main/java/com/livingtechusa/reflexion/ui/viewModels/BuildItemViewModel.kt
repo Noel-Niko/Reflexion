@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.common.graph.MutableValueGraph
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.data.Converters
 import com.livingtechusa.reflexion.data.entities.Bookmarks
@@ -133,7 +134,7 @@ class BuildItemViewModel @Inject constructor(
     private val _selectedFile: MutableStateFlow<FileResource?> = MutableStateFlow(null)
     val selectedFile get() = _selectedFile
 
-    private val oldToNewPkList = LinkedList<Pair<Long, Long?>>()
+    private val oldToNewPkList = LinkedList<PkPairs>()
 
     private var fileListTopic: Long? = null
     private var listTitle: String? = EMPTY_STRING
@@ -602,6 +603,9 @@ class BuildItemViewModel @Inject constructor(
 
                         listTitle = reflexionFile?.List_Title
                         fileListTopic = itemsFromFile[0].autogenPk
+                        itemsFromFile.forEach {
+                            oldToNewPkList.add(PkPairs(it.autogenPk, null))
+                        }
                         val job = viewModelScope.async {
                             withContext(Dispatchers.IO) {
                                 val job = async {
@@ -696,7 +700,7 @@ class BuildItemViewModel @Inject constructor(
                             val matchResult = pattern.find(entry.name)
                             val originalPk = matchResult?.value?.toLong()
                             val reflexionItem = localServiceImpl.selectReflexionItemByPk(
-                                oldToNewPkList.firstOrNull { it.first == originalPk }?.second
+                                oldToNewPkList.firstOrNull { it.originalPk == originalPk }?.newPk
                             )
                             // Save video uri to associated reflexion item
                             if (reflexionItem != null && uri != null) {
@@ -808,14 +812,19 @@ class BuildItemViewModel @Inject constructor(
                 itemsFromFile.removeIf { item -> item.autogenPk == reflexionItem.autogenPk }
                 if (newPrimaryKey != null) {
                     // null occurs when an item is in a list more than 1 x
-                    oldToNewPkList.add(Pair(reflexionItem.autogenPk, newPrimaryKey))
-                } else {
-                    val duplicatePK =
-                        oldToNewPkList.firstOrNull() { it.first == reflexionItem.autogenPk }
-                    if (duplicatePK != null) {
-                        oldToNewPkList.add(duplicatePK)
+                    oldToNewPkList.forEach { PkPairs ->
+                        if (PkPairs.originalPk == reflexionItem.autogenPk) {
+                            PkPairs.newPk = newPrimaryKey
+                        }
                     }
                 }
+//                else {
+//                    val duplicatePK =
+//                        oldToNewPkList.firstOrNull() { it.originalPk == reflexionItem.autogenPk }
+//                    if (duplicatePK != null) {
+//                        oldToNewPkList.add(duplicatePK)
+//                    }
+//                }
                 saveItemsFromFile(oldPrimaryKey, newPrimaryKey, filePk, dbPk, itemsFromFile)
             }
         }
@@ -837,9 +846,9 @@ class BuildItemViewModel @Inject constructor(
                     null
                 }
                 // check if a child of a topic previously removed from the list
-                if (oldToNewPkList.firstOrNull { it.first == reflexionItem.parent } != null) {
+                if (oldToNewPkList.firstOrNull { it.originalPk == reflexionItem.parent } != null) {
                     dbParent =
-                        oldToNewPkList.firstOrNull { it.first == reflexionItem.parent }?.second
+                        oldToNewPkList.firstOrNull { it.originalPk == reflexionItem.parent }?.newPk
                 }
                 newPrimaryKey =
                     itemsFromFile.firstOrNull { it.autogenPk == reflexionItem.autogenPk }?.copy(
@@ -854,27 +863,32 @@ class BuildItemViewModel @Inject constructor(
                 itemsFromFile.removeIf { it.autogenPk == reflexionItem.autogenPk }
                 if (newPrimaryKey != null) {
                     // null occurs when an item is in a list more than 1 x
-                    oldToNewPkList.add(Pair(reflexionItem.autogenPk, newPrimaryKey))
-                } else {
-                    val duplicatePK =
-                        oldToNewPkList.firstOrNull() { it.first == reflexionItem.autogenPk }
-                    if (duplicatePK != null) {
-                        oldToNewPkList.add(duplicatePK)
+                    oldToNewPkList.forEach { PkPairs ->
+                        if (PkPairs.originalPk == reflexionItem.autogenPk) {
+                            PkPairs.newPk = newPrimaryKey
+                        }
                     }
                 }
+//                else {
+//                    val duplicatePK =
+//                        oldToNewPkList.firstOrNull() { it.first == reflexionItem.autogenPk }
+//                    if (duplicatePK != null) {
+//                        oldToNewPkList.add(duplicatePK)
+//                    }
+//                }
                 saveItemsFromFile(reflexionItem.autogenPk, newPrimaryKey, null, null, itemsFromFile)
             }
         }
     }
 
-    private suspend fun createList(oldToNewPkList: LinkedList<Pair<Long, Long?>>) {
-        val topicPk = oldToNewPkList.firstOrNull { it.first == fileListTopic }?.second
+    private suspend fun createList(oldToNewPkList: LinkedList<PkPairs>) {
+        val topicPk = oldToNewPkList.firstOrNull { it.originalPk == fileListTopic }?.newPk
         setTopItem(topicPk ?: 0)
         if (oldToNewPkList.isEmpty().not()) {
             val newList = mutableListOf<Long>()
             // Add items from file to newList
-            oldToNewPkList.forEach { pair ->
-                pair.second?.let { newPk -> newList.add(newPk) }
+            oldToNewPkList.forEach { PkPairs ->
+                PkPairs.newPk?.let { newPk -> newList.add(newPk) }
             }
             // create title node
             val title = localServiceImpl.insertNewNode(
@@ -890,7 +904,7 @@ class BuildItemViewModel @Inject constructor(
             // for each item in newList save
             if (newList.size > 1) {
                 var parentPk: Long? = title
-                newList.forEachIndexed { index, pk ->
+                newList.forEach { pk ->
                     val node = localServiceImpl.selectReflexionArrayItemByPk(pk)
                         ?.toAListNode(topic = topicPk, parentPk = parentPk)
                     parentPk =
