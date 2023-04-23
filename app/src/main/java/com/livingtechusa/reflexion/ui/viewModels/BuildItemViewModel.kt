@@ -374,8 +374,10 @@ class BuildItemViewModel @Inject constructor(
                         viewModelScope.launch {
                             val item = _reflexionItem
                             item.parent = event.parent.autogenPk
-                            item.image = event.parent.image
-                            item.imagePk = event.parent.imagePk
+                            if(item.image == null) {
+                                item.image = event.parent.image
+                                item.imagePk = event.parent.imagePk
+                            }
                             _reflexionItem = item
                             _reflexionItemState.value = _reflexionItem
                             updateAllDisplayedSubItemsToViewModelVersion()

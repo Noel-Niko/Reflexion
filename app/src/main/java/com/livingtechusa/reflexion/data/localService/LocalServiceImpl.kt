@@ -239,7 +239,7 @@ class LocalServiceImpl @Inject constructor(
     override suspend fun deleteImageAndAssociation(imagePk: Long, itemPk: Long) {
         imagesDao.removeImageAssociation(itemPk)
         val useCount = imagesDao.getAssociationUseCount(itemPk)
-        if (useCount < 1) imagesDao.deleteImage(imagePk = imagePk)
+        if (useCount < 0) imagesDao.deleteImage(imagePk = imagePk)
     }
 
     override suspend fun insertNewOrUpdateNodeList(
