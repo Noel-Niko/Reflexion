@@ -175,7 +175,7 @@ class LocalServiceImpl @Inject constructor(
         }
         imagesDao.deleteUnusedAssociations()
         val imageUses = imagePk?.let { imagesDao.countImagePkUses(imagePk = it) }
-        if (imageUses != null && imageUses <= 1) {
+        if (imageUses != null && imageUses == 0) {
             imagesDao.deleteImage(imagePk = imagePk)
         }
         reflexionItemDao.deleteReflexionItem(autogenPK, name)
