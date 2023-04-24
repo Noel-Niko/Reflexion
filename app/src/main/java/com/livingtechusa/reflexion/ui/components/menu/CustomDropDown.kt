@@ -59,7 +59,7 @@ public fun <T : Any> isNavigatingBack(
     currentMenu: MenuItem<T>,
     nextMenu: MenuItem<T>
 ): Boolean {
-    return currentMenu.hasParent() && nextMenu == currentMenu.parent!!
+    return currentMenu.hasParent() && nextMenu == currentMenu.parent
 }
 
 /*[Dropdown]  DropdownMenu wrapper claas to add cascade effect and animations . */
@@ -139,16 +139,17 @@ public fun <T : Any> DropdownContent(
                 title = targetMenu.title,
                 contentColor = colors.contentColor
             ) {
-                state.currentMenuItem = targetMenu.parent!!
+               targetMenu.parent?.let { state.currentMenuItem = it }
             }
         }
         if (targetMenu.hasChildren()) {
-            for (item in targetMenu.children!!) {
-                if (item.hasChildren()) {
+
+           targetMenu.children?.forEach { menuItem ->
+                if (menuItem.hasChildren()) {
                     ParentItem(
-                        id = item.id,
-                        title = item.title,
-                        icon = item.icon,
+                        id = menuItem.id,
+                        title = menuItem.title,
+                        icon = menuItem.icon,
                         contentColor = colors.contentColor,
                         onClickText = onClickText
                     ) {  id ->
@@ -161,9 +162,9 @@ public fun <T : Any> DropdownContent(
                     }
                 } else {
                     ChildItem(
-                        id = item.id,
-                        title = item.title,
-                        icon =  item.icon,
+                        id = menuItem.id,
+                        title = menuItem.title,
+                        icon =  menuItem.icon,
                         contentColor =  colors.contentColor,
                         onClick = onClickText
                     )

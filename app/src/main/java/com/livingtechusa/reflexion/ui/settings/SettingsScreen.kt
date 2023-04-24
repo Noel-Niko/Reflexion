@@ -61,7 +61,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.NavBarItems
 import com.livingtechusa.reflexion.ui.components.MaterialRadioButtonGroupComponent
@@ -121,11 +123,10 @@ fun IconImageCard(
     } else {
         MaterialTheme.colorScheme.primary
     }
-    val imagePainter = rememberImagePainter(
-        data = image,
-        builder = {
+    val imagePainter = rememberAsyncImagePainter(
+        ImageRequest.Builder(LocalContext.current).data(data = image).apply(block = fun ImageRequest.Builder.() {
             allowHardware(false)
-        }
+        }).build()
     )
     OutlinedCard(
         shape = MaterialTheme.shapes.medium,
@@ -239,7 +240,7 @@ fun SettingsContent(
     Scaffold(Modifier.padding(paddingValues = paddingValues)) {
         if (apply) {
             if (viewModel.mode && viewModel.isDarkMode != null) {
-                viewModel.ToggleLightDarkMode(viewModel.isDarkMode!!)
+                viewModel.isDarkMode?.let { isDark -> viewModel.ToggleLightDarkMode(isDark) }
             }
             viewModel.icon = false
             viewModel.iconNumber = null
@@ -538,18 +539,24 @@ fun SettingsContent(
                                 .padding(8.dp)
                                 .clickable {
                                     if (viewModel.icon && (viewModel.iconNumber != null) && (viewModel.totalIndices != null)) {
-                                        showNewIconImage(
-                                            context = context,
-                                            int = viewModel.iconNumber!!,
-                                            totalIndices = viewModel.totalIndices!!
-                                        )
+                                        viewModel.iconNumber?.let { iconNum ->
+                                            viewModel.totalIndices?.let { index ->
+                                                showNewIconImage(
+                                                    context = context,
+                                                    int = iconNum,
+                                                    totalIndices = index
+                                                )
+                                            }
+                                        }
                                     }
                                     // Toggle for light/dark mode Set when collecting Apply State
                                     if (viewModel.theme && (viewModel.themeNumber != null)) {
-                                        UserPreferencesUtil.setCurrentUserThemeSelection(
-                                            context,
-                                            viewModel.themeNumber!!
-                                        )
+                                        viewModel.themeNumber?.let { theme ->
+                                            UserPreferencesUtil.setCurrentUserThemeSelection(
+                                                context,
+                                                theme
+                                                )
+                                        }
                                     }
                                     viewModel.setApply(true)
                                     Toast
@@ -588,7 +595,7 @@ fun SettingsContent(
                         elevation = CardDefaults.elevatedCardElevation(4.dp)
                     ) {
                         Text(
-                            text = "Reset Settings",
+                            text = stringResource(R.string.app_reset),
                             color = MaterialTheme.colorScheme.onPrimary,
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.headlineSmall,

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Reflexion</string>
+    <string name="app_name">Reflexión</string>
     <string name="delete">Borrar</string>
     <string name="topic"><b><i>Tema: </i></b></string>
     <string name="title"><b><i>Título: </i></b></string>
@@ -31,7 +31,7 @@
     <string name="go_to_parent">Subir a Padre</string>
     <string name="no_parent_found">No se encontró ningún padre.</string>
     <string name="no_items_found">No se encontraron elementos.</string>
-    <string name="welcome_to_reflexion">Bienvenidos a Reflexion</string>
+    <string name="welcome_to_reflexion">Bienvenidos a Reflexión</string>
     <string name="no_parent">Este elemento no tiene un padre.</string>
     <string name="no_siblings_found">No se encontraron hermanos.</string>
     <string name="no_children_found">No se encontraron niños.</string>
@@ -79,7 +79,7 @@
     <string name="bookmarked">Marcado</string>
     <string name="items">Elementos</string>
     <string name="applying_changes_and_restarting">Aplicación de cambios y reinicio</string>
-    <string name="sent_with_reflexion_from_the_google_play_store">Enviado con Reflexion desde Google Play Store</string>
+    <string name="sent_with_reflexion_from_the_google_play_store">Enviado con Reflexión desde Google Play Store</string>
     <string name="clear_search">Borrar búsqueda</string>
     <string name="search_by_topic">Buscar por tema</string>
     <string name="bookmark">marcar</string>
@@ -95,7 +95,7 @@
     <string name="an_error_occurred_please_try_again">Se ha producido un error, inténtelo de nuevo.</string>
     <string name="video_could_not_be_found">No se pudo encontrar el video.</string>
     <string name="your_image">Tu imagen</string>
-    <string name="reflexion_link">https://play.google.com/store/apps/details?id=com.livingtechusa.reflexion</string>
+    <string name="reflexion_link">https://play.google.com/store/apps/details?id=com.livingtechusa.Reflexión</string>
     <string name="error_grant_camera_permission">Error: Actualice la configuración para otorgar permiso de cámara.</string>
     <string name="error_grant_image_access_permission">Error: Actualice la configuración para otorgar permiso de acceso a la imagen.</string>
     <string name="error_grant_video_access_permission">Error: Actualice la configuración para otorgar permiso de acceso a video.</string>
@@ -110,7 +110,7 @@
     <string name="confirm_save_file">Confirmar guardar archivo(s)</string>
     <string name="do_you_want_to_save_the_contents_of">"¿Desea guardar el contenido de: "</string>
     <string name="has_the_share_file_been_fully_uploaded">"¿Se ha cargado completamente el archivo compartido?"</string>
-    <string name="this_file_was_sent_with_reflexion_and_requires_the_reflexion_app_to_open">Este archivo se envió con Reflexion y requiere que se abra la aplicación Reflexion.</string>
+    <string name="this_file_was_sent_with_reflexion_and_requires_the_reflexion_app_to_open">Este archivo se envió con Reflexión y requiere que se abra la aplicación Reflexión.</string>
     <string name="import_directions">Descargar guía de aplicaciones</string>
     <string name="https_sites_google_com_view_reflexionweb_home">https://sites.google.com/view/reflexion-direcciones/home</string>
 </resources>

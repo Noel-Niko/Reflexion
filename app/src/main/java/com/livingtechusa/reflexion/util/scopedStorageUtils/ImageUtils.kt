@@ -54,13 +54,13 @@ object ImageUtils {
      */
     @Deprecated("")
     private fun transform(
-        scaler: Matrix,
+        scalerMatrix: Matrix,
         source: Bitmap,
         targetWidth: Int,
         targetHeight: Int,
         options: Int
     ): Bitmap? {
-        var scaler: Matrix? = scaler
+        var scaler: Matrix? = scalerMatrix
         val scaleUp = options and OPTIONS_SCALE_UP != 0
         val recycle = options and OPTIONS_RECYCLE_INPUT != 0
         val deltaX = source.width - targetWidth
@@ -107,14 +107,14 @@ object ImageUtils {
         if (bitmapAspect > viewAspect) {
             val scale = targetHeight / bitmapHeightF
             if (scale < .9f || scale > 1f) {
-                scaler!!.setScale(scale, scale)
+                scaler?.setScale(scale, scale)
             } else {
                 scaler = null
             }
         } else {
             val scale = targetWidth / bitmapWidthF
             if (scale < .9f || scale > 1f) {
-                scaler!!.setScale(scale, scale)
+                scaler?.setScale(scale, scale)
             } else {
                 scaler = null
             }

@@ -54,7 +54,7 @@ class LocalServiceImpl @Inject constructor(
             var pkofImage: Long? = null
             if (item.image != null) {
                 val existingImage =
-                    item.image.let { imagesDao.selectImagePKByByteArray(item.image!!) }
+                    item.image?.let { imagesDao.selectImagePKByByteArray(it) }
                 if (existingImage != null) {
                     imagesDao.insertImageAssociation(
                         ItemImageAssociativeData(
@@ -67,7 +67,7 @@ class LocalServiceImpl @Inject constructor(
                     if (item.image != null) {
                         // Add to Images
                         val newImage =
-                            imagesDao.insertImage(Image(imagePk = 0L, image = item.image!!))
+                            imagesDao.insertImage(Image(imagePk = 0L, image = item.image ?: ByteArray(0)))
                         // Record Association
                         imagesDao.insertImageAssociation(
                             ItemImageAssociativeData(
@@ -91,7 +91,7 @@ class LocalServiceImpl @Inject constructor(
         // Remove old association data if applicable
         if (priorImagePk != item.imagePk) {
             if (priorImagePk != null) {
-                imagesDao.removeImageAssociation(itemPk = priorImagePk)
+                imagesDao.removeImageAssociation(imagePk = priorImagePk, itemPk = item.autogenPk)
             }
         }
         // generate a new imagePk if applicable
@@ -171,11 +171,11 @@ class LocalServiceImpl @Inject constructor(
 
     override suspend fun deleteReflexionItem(autogenPK: Long, name: String, imagePk: Long?) {
         if (imagePk != null) {
-            imagesDao.removeImageAssociation(itemPk = autogenPK)
+            imagesDao.removeImageAssociation(imagePk = imagePk, itemPk = autogenPK)
         }
         imagesDao.deleteUnusedAssociations()
-        val imageUses = imagePk?.let { imagesDao.countImagePkUses(imagePk = it) }
-        if (imageUses != null && imageUses <= 1) {
+        val imageUses = imagePk?.let { imagesDao.getAssociationUseCount(imagePk = it) }
+        if (imageUses != null && imageUses == 0) {
             imagesDao.deleteImage(imagePk = imagePk)
         }
         reflexionItemDao.deleteReflexionItem(autogenPK, name)
@@ -237,9 +237,9 @@ class LocalServiceImpl @Inject constructor(
     }
 
     override suspend fun deleteImageAndAssociation(imagePk: Long, itemPk: Long) {
-        imagesDao.removeImageAssociation(itemPk)
+        imagesDao.removeImageAssociation(itemPk = itemPk, imagePk = imagePk)
         val useCount = imagesDao.getAssociationUseCount(itemPk)
-        if (useCount < 1) imagesDao.deleteImage(imagePk = imagePk)
+        if (useCount < 0) imagesDao.deleteImage(imagePk = imagePk)
     }
 
     override suspend fun insertNewOrUpdateNodeList(
@@ -278,25 +278,19 @@ class LocalServiceImpl @Inject constructor(
         return pkList
     }
 
-    override suspend fun removeLinkNodesForDeletedItems() {
+    override suspend fun removeLinkNodesForDeletedLists() {
         val nodesToDelete = mutableListOf<Long>()
         // get head nodes for deleted items
         val job = CoroutineScope(Dispatchers.IO).async {
-            linkedListDao.getAllLinkedListHeadNodes().filter { listNode ->
-                listNode?.itemPK?.let { itemPk -> reflexionItemDao.selectReflexionItem(itemPk) } == null
-            }.apply {
-                // for these head nodes without items
-                this.forEach { headNode ->
-                    headNode?.nodePk?.let { nodePk ->
-                        nodesToDelete.add(
-                            nodePk
-                        )
-                    }
-                    // Recursively get all the children by selecting for nodes with above as parent and going down the list
-                    val children: List<Long>? =
-                        headNode?.nodePk?.let { nodePk -> getAllChildren(nodePk) }
-                    if (children != null) {
-                        nodesToDelete.addAll(children)
+            linkedListDao.getAllLinkedListHeadNodes().onEach { headNode ->
+                val children: List<Long>? =
+                    headNode?.nodePk?.let { nodePk -> getAllChildren(nodePk) }
+                if (reflexionItemDao.selectReflexionItem(children?.get(0) ?: -1) == null) {
+                    headNode?.nodePk?.let { nodesToDelete.add(it) }
+                    children?.forEachIndexed { index, child ->
+                        if (reflexionItemDao.selectReflexionItem(children[index]) == null) {
+                            nodesToDelete.add(child)
+                        }
                     }
                 }
             }
@@ -469,7 +463,7 @@ class LocalServiceImpl @Inject constructor(
                 }
                 // recursively get all the children for each head node
                 while (parent?.nodePk != null) {
-                    getChild(parent?.nodePk!!)
+                    parent?.nodePk?.let { getChild(it) }
                 }
                 val nodeRAI = node?.toReflexionArrayItem()
                 children.forEach { childNodes ->
