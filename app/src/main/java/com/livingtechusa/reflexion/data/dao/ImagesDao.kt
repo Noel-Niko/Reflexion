@@ -38,8 +38,8 @@ interface ImagesDao {
     @Query("DELETE from ItemImageAssociativeData WHERE itemPk IS NULL")
     suspend fun deleteUnusedAssociations()
 
-    @Query("DELETE from ItemImageAssociativeData WHERE itemPk = :itemPk")
-    suspend fun removeImageAssociation(itemPk: Long)
+    @Query("DELETE from ItemImageAssociativeData WHERE itemPk = :itemPk AND imagePk = :imagePk")
+    suspend fun removeImageAssociation(itemPk: Long, imagePk: Long)
 
     @Query("DELETE FROM Image WHERE Image.imagePk NOT IN (SELECT imagePk FROM ItemImageAssociativeData)")
     suspend fun deleteUnusedImages()

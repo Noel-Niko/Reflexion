@@ -91,7 +91,7 @@ class LocalServiceImpl @Inject constructor(
         // Remove old association data if applicable
         if (priorImagePk != item.imagePk) {
             if (priorImagePk != null) {
-                imagesDao.removeImageAssociation(itemPk = priorImagePk)
+                imagesDao.removeImageAssociation(imagePk = priorImagePk, itemPk = item.autogenPk)
             }
         }
         // generate a new imagePk if applicable
@@ -171,10 +171,10 @@ class LocalServiceImpl @Inject constructor(
 
     override suspend fun deleteReflexionItem(autogenPK: Long, name: String, imagePk: Long?) {
         if (imagePk != null) {
-            imagesDao.removeImageAssociation(itemPk = autogenPK)
+            imagesDao.removeImageAssociation(imagePk = imagePk, itemPk = autogenPK)
         }
         imagesDao.deleteUnusedAssociations()
-        val imageUses = imagePk?.let { imagesDao.countImagePkUses(imagePk = it) }
+        val imageUses = imagePk?.let { imagesDao.getAssociationUseCount(imagePk = it) }
         if (imageUses != null && imageUses == 0) {
             imagesDao.deleteImage(imagePk = imagePk)
         }
@@ -237,7 +237,7 @@ class LocalServiceImpl @Inject constructor(
     }
 
     override suspend fun deleteImageAndAssociation(imagePk: Long, itemPk: Long) {
-        imagesDao.removeImageAssociation(itemPk)
+        imagesDao.removeImageAssociation(itemPk = itemPk, imagePk = imagePk)
         val useCount = imagesDao.getAssociationUseCount(itemPk)
         if (useCount < 0) imagesDao.deleteImage(imagePk = imagePk)
     }
