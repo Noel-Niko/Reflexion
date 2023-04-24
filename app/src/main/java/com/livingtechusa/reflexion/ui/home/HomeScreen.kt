@@ -53,25 +53,25 @@ fun HomeScreen(
 @Composable
 fun HomeContent(paddingValues: PaddingValues, viewModel: BuildItemViewModel) {
 
-    val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
-    // If `lifecycleOwner` changes, dispose and reset the effect
-    DisposableEffect(lifecycleOwner) {
-        // Create an observer that triggers our remembered callbacks
-        // for sending analytics events
-        val observer = LifecycleEventObserver { owner, event ->
-            if (event == Lifecycle.Event.ON_CREATE) {
-                    viewModel.onTriggerEvent(BuildEvent.RemoveListNodesForDeletedItems)
-            }
-        }
-
-        // Add the observer to the lifecycle
-        lifecycleOwner.lifecycle.addObserver(observer)
-
-        // When the effect leaves the Composition, remove the observer
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
+//    val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
+//    // If `lifecycleOwner` changes, dispose and reset the effect
+//    DisposableEffect(lifecycleOwner) {
+//        // Create an observer that triggers our remembered callbacks
+//        // for sending analytics events
+//        val observer = LifecycleEventObserver { owner, event ->
+//            if (event == Lifecycle.Event.ON_CREATE) {
+//                    viewModel.onTriggerEvent(BuildEvent.RemoveListNodesForDeletedItems)
+//            }
+//        }
+//
+//        // Add the observer to the lifecycle
+//        lifecycleOwner.lifecycle.addObserver(observer)
+//
+//        // When the effect leaves the Composition, remove the observer
+//        onDispose {
+//            lifecycleOwner.lifecycle.removeObserver(observer)
+//        }
+//    }
 
 
     Column(

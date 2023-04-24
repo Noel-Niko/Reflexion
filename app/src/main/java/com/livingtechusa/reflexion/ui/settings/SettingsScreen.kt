@@ -595,7 +595,7 @@ fun SettingsContent(
                         elevation = CardDefaults.elevatedCardElevation(4.dp)
                     ) {
                         Text(
-                            text = "Reset Settings",
+                            text = stringResource(R.string.app_reset),
                             color = MaterialTheme.colorScheme.onPrimary,
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.headlineSmall,
