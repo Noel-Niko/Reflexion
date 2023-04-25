@@ -113,5 +113,8 @@
     <string name="this_file_was_sent_with_reflexion_and_requires_the_reflexion_app_to_open">Este archivo se envió con Reflexión y requiere que se abra la aplicación Reflexión.</string>
     <string name="import_directions">Descargar guía de aplicaciones</string>
     <string name="https_sites_google_com_view_reflexionweb_home">https://sites.google.com/view/reflexion-direcciones/home</string>
+    <string name="how_to_use_reflexion">Cómo usar Reflexión?</string>
+    <string name="click_settings_download_the_app_guide"><![CDATA[Haga clic en Configuración y descargue la guía de la aplicación. ]]></string>
+    <string name="do_not_show_again">No volver a mostrar.</string>
 </resources>
 

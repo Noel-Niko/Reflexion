@@ -1,9 +1,8 @@
 package com.livingtechusa.reflexion.util.sharedPreferences
 
-import android.R
 import android.content.Context
 import android.content.SharedPreferences
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import com.livingtechusa.reflexion.R.string.shared_prefs_biometric_authentication_enabled
 import com.livingtechusa.reflexion.R.string.shared_prefs_biometric_authentication_opt_in
 import com.livingtechusa.reflexion.R.string.shared_prefs_biometric_should_use_manual_pw
@@ -19,7 +18,7 @@ import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 
 
 object UserPreferencesUtil : SharedPreferencesUtil() {
-    private const val PREFERENCE_TYPE = "USER"
+    const val PREFERENCE_TYPE = "USER"
     val resource = ResourceProviderSingleton
 
     /*
