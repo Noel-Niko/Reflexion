@@ -277,10 +277,7 @@ fun SettingsContent(
                         modifier = Modifier
                             .background(color = MaterialTheme.colorScheme.background)
                             .fillMaxSize()
-                    ) {
-                        // TODO:
-                        //  make URL/WebSite/ all in  language specific versions
-                        // display it as an attractive button
+                    ) {"Didi"
                         val url: String = stringResource(R.string.https_sites_google_com_view_reflexionweb_home)
 
                         Box(
@@ -308,7 +305,15 @@ fun SettingsContent(
                                         .fillMaxSize()
                                         .clickable(onClick = {
                                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                                            startActivity(context, intent, null)
+                                            try {
+                                                startActivity(context, intent, null)
+                                            } catch (e: Exception) {
+                                                Toast.makeText(
+                                                    context,
+                                                    R.string.error_did_you_grant_internet_access_permission,
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
                                         })
                                 )
                             }

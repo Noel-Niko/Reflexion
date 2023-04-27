@@ -517,11 +517,18 @@ fun BuildItemContent(
                                 if (videoUrl == EMPTY_STRING) {
                                     navController.navigate(Screen.PasteAndSaveScreen.route)
                                 } else {
-
                                     val intent = Intent(
                                         Intent.ACTION_VIEW, Uri.parse(videoUrl)
                                     )
-                                    ContextCompat.startActivity(context, intent, null)
+                                    try {
+                                        ContextCompat.startActivity(context, intent, null)
+                                    } catch (e: Exception) {
+                                        Toast.makeText(
+                                            context,
+                                            R.string.error_grant_video_access_permission,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                                 }
                             },
                         ),
@@ -545,7 +552,15 @@ fun BuildItemContent(
                     val intent = Intent(
                         Intent.ACTION_VIEW, Uri.parse(query)
                     )
-                    ContextCompat.startActivity(context, intent, null)
+                    try {
+                        ContextCompat.startActivity(context, intent, null)
+                    } catch (e: Exception) {
+                        Toast.makeText(
+                            context,
+                            R.string.error_grant_video_access_permission,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }) {
                     Icon(
                         painter = painterResource(R.drawable.baseline_youtube_searched_for_24),

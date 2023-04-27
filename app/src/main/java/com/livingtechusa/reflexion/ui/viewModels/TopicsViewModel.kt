@@ -127,13 +127,12 @@ class TopicsViewModel @Inject constructor(
 
     private fun setBookmarks() {
         viewModelScope.launch(Dispatchers.IO) {
-            val _bookmarkedLevels: Deferred<List<Bookmarks?>> =
-                async { localServiceImpl.selectLevelBookMarks() }
+            val _bookmarkedLevels: Deferred<List<Bookmarks?>> = async { localServiceImpl.selectLevelBookMarks() }
             val bookmarkedLevels = _bookmarkedLevels.await()
             _bookmarks.value = bookmarkedLevels
             val _images: Deferred<MutableList<Bitmap>> = async {
                 val bitmaps = mutableListOf<Bitmap>()
-                _bookmarks.value.forEach { bookmark ->
+                _bookmarks.value?.forEach { bookmark ->
                     bookmark?.LEVEL_PK?.let { levelPk ->
                         localServiceImpl.selectReflexionItemByPk(levelPk)?.imagePk?.let { imagePk ->
                             localServiceImpl.selectImage(imagePk)?.let { bitmaps.add(it) }

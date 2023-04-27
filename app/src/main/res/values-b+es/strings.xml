@@ -116,5 +116,6 @@
     <string name="how_to_use_reflexion">Cómo usar Reflexión?</string>
     <string name="click_settings_download_the_app_guide"><![CDATA[Haga clic en Configuración y descargue la guía de la aplicación. ]]></string>
     <string name="do_not_show_again">No volver a mostrar.</string>
+    <string name="error_did_you_grant_internet_access_permission">Error: ¿Concediste permiso de acceso a Internet?</string>
 </resources>
 
