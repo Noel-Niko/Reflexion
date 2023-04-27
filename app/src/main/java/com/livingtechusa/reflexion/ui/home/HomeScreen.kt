@@ -43,6 +43,7 @@ import com.livingtechusa.reflexion.navigation.NavBarItems
 import com.livingtechusa.reflexion.ui.viewModels.BuildItemViewModel
 import com.livingtechusa.reflexion.util.Constants
 import com.livingtechusa.reflexion.util.extensions.findActivity
+import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil
 import com.livingtechusa.reflexion.util.sharedPreferences.UserPreferencesUtil.PREFERENCE_TYPE
 
 
@@ -63,8 +64,7 @@ fun HomeScreen(
 @Composable
 fun HomeContent(paddingValues: PaddingValues, viewModel: BuildItemViewModel) {
     val context = LocalContext.current
-    val prefs = context.getSharedPreferences(PREFERENCE_TYPE, Context.MODE_PRIVATE)
-    val launchCount = prefs.getInt("LaunchCount", 0)
+    val launchCount = UserPreferencesUtil.getPopUpViews(context)
     val showAlertDialog = launchCount < 4
     val openDialog = remember { mutableStateOf(true) }
 
@@ -76,7 +76,7 @@ fun HomeContent(paddingValues: PaddingValues, viewModel: BuildItemViewModel) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_CREATE) {
                 // Increment launch count and save to SharedPreferences
-                prefs.edit().putInt("LaunchCount", launchCount + 1).apply()
+                UserPreferencesUtil.setPopUpViews(context, launchCount + 1)
             }
         }
         // Add the observer to the lifecycle
@@ -117,7 +117,7 @@ fun HomeContent(paddingValues: PaddingValues, viewModel: BuildItemViewModel) {
                         confirmButton = {
                             Button(
                                 onClick = {
-                                    prefs.edit().putInt(Constants.LAUNCH_COUNT, 5).apply()
+                                    UserPreferencesUtil.setPopUpViews(context, 5)
                                     openDialog.value = false
                                 },
                                 colors = ButtonDefaults.buttonColors(

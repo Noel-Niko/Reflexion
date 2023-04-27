@@ -14,6 +14,7 @@ import com.livingtechusa.reflexion.R.string.shared_prefs_encrypted_password
 import com.livingtechusa.reflexion.R.string.shared_prefs_encrypted_user_password
 import com.livingtechusa.reflexion.R.string.shared_prefs_files_saved_list
 import com.livingtechusa.reflexion.R.string.shared_prefs_logged_in_user_name
+import com.livingtechusa.reflexion.R.string.shared_prefs_pop_up_views
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 
 
@@ -190,5 +191,14 @@ object UserPreferencesUtil : SharedPreferencesUtil() {
 
     fun getFilesSaved(context: Context): Set<String?>? {
         return getStringSet(PREFERENCE_TYPE, context, shared_prefs_files_saved_list, emptySet())
+    }
+
+    // PopUp Notice
+    fun getPopUpViews(context: Context): Int {
+        return getInt(PREFERENCE_TYPE, context, shared_prefs_pop_up_views, 0)
+    }
+
+    fun setPopUpViews(context: Context, count: Int) {
+        setInt(PREFERENCE_TYPE, context, shared_prefs_pop_up_views, count)
     }
 }
