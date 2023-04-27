@@ -115,17 +115,19 @@ fun HomeContent(paddingValues: PaddingValues, viewModel: BuildItemViewModel) {
                         title = { Text(stringResource(R.string.how_to_use_reflexion)) },
                         text = { Text(text = stringResource(R.string.click_settings_download_the_app_guide)) },
                         confirmButton = {
-                            Button(
-                                onClick = {
-                                    UserPreferencesUtil.setPopUpViews(context, 5)
-                                    openDialog.value = false
-                                },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.primary,
-                                    contentColor = MaterialTheme.colorScheme.onPrimary
-                                )
-                            ) {
-                                Text(stringResource(R.string.do_not_show_again))
+                            if (launchCount >= 2) {
+                                Button(
+                                    onClick = {
+                                        UserPreferencesUtil.setPopUpViews(context, 5)
+                                        openDialog.value = false
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.primary,
+                                        contentColor = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                ) {
+                                    Text(stringResource(R.string.do_not_show_again))
+                                }
                             }
                         }
                     )
