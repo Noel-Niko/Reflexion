@@ -3,6 +3,7 @@ package com.livingtechusa.reflexion.ui.build
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -52,6 +53,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptions
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.ui.components.ImageCard
@@ -61,6 +63,7 @@ import com.livingtechusa.reflexion.util.Constants.DESCRIPTION
 import com.livingtechusa.reflexion.util.Constants.DETAILED_DESCRIPTION
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
 import com.livingtechusa.reflexion.util.Constants.NAME
+import com.livingtechusa.reflexion.util.Constants.REFLEXION_ITEM_PK
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URI
 import com.livingtechusa.reflexion.util.Constants.VIDEO_URL
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
@@ -108,6 +111,12 @@ fun BuildItemContent(
                 } else {
                     viewModel.onTriggerEvent(BuildEvent.GetSelectedReflexionItem(pk))
                 }
+            }
+            if (event == Lifecycle.Event.ON_PAUSE) {
+                // On screen rotation, updates the PK passed in the main activity to ensure the current state is not overridden
+                val navBackStackEntry = navController.getBackStackEntry(Screen.BuildItemScreen.route + "/{reflexion_item_pk}")
+                val updatedArguments = navBackStackEntry.arguments
+                updatedArguments?.putLong(REFLEXION_ITEM_PK, -2L)
             }
         }
 
@@ -208,7 +217,7 @@ fun BuildItemContent(
                         .align(Alignment.End)
                 ) {
                     if (image != null) {
-                       image?.let { ShowImage(it, navController)}
+                        image?.let { ShowImage(it, navController) }
                     } else {
                         Text(
                             modifier = Modifier.padding(12.dp),
@@ -222,7 +231,7 @@ fun BuildItemContent(
             Column(Modifier.weight(1f)) {
                 IconButton(onClick = {
                     try {
-                            selectImage.launch(Constants.IMAGE_TYPE)
+                        selectImage.launch(Constants.IMAGE_TYPE)
                     } catch (e: Exception) {
                         Toast.makeText(
                             context,
@@ -523,11 +532,13 @@ fun BuildItemContent(
                                     try {
                                         ContextCompat.startActivity(context, intent, null)
                                     } catch (e: Exception) {
-                                        Toast.makeText(
-                                            context,
-                                            R.string.error_grant_video_access_permission,
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                R.string.error_grant_video_access_permission,
+                                                Toast.LENGTH_SHORT
+                                            )
+                                            .show()
                                     }
                                 }
                             },
