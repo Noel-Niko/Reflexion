@@ -71,7 +71,7 @@
     <string name="light_theme">Light Theme</string>
     <string name="dark_theme">Dark Theme</string>
     <string name="shared_prefs_current_mode_selected">shared_prefs_current_mode_selected</string>
-    <string name="shared_prefs_pop_up_views" translatable="false">shared_prefs_pop_up_views</string>
+    <string name="shared_prefs_home_page_views" translatable="false">shared_prefs_pop_up_views</string>
     <string name="match_phone">Match Phone</string>
     <string name="app_reset">App Reset</string>
     <string name="apply_changes">Apply Changes</string>
