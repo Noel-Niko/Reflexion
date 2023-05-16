@@ -308,15 +308,23 @@ fun CustomListDisplayContent(
                                                         )
                                                         .show()
                                                 } else {
-                                                    val intent = Intent(
-                                                        Intent.ACTION_VIEW,
-                                                        Uri.parse(children[childItemIndex].videoUrl)
-                                                    )
-                                                    ContextCompat.startActivity(
-                                                        context,
-                                                        intent,
-                                                        null
-                                                    )
+                                                    try {
+                                                        val intent = Intent(
+                                                            Intent.ACTION_VIEW,
+                                                            Uri.parse(children[childItemIndex].videoUrl)
+                                                        )
+                                                        ContextCompat.startActivity(
+                                                            context,
+                                                            intent,
+                                                            null
+                                                        )
+                                                    } catch (e: Exception) {
+                                                        Toast.makeText(
+                                                            context,
+                                                            R.string.error_grant_video_access_permission,
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                    }
                                                 }
                                             },
                                         ),

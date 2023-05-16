@@ -133,8 +133,8 @@ class MainActivity : ComponentActivity() {
                                                             val resolver =
                                                                 this@MainActivity.contentResolver
                                                             resolver.delete(uri, null)
-                                                        } catch (e: Exception) {
-                                                            Log.e(TAG, "Error: " + e.message + " with Cause: " + e.cause + "\n" + e.stackTrace)
+                                                        } catch (e: Throwable) {
+                                                            Log.e(TAG, "Throwable Error: " + e.message + " with Cause: " + e.cause + "\n" + e.stackTrace)
                                                         }
                                                     }
                                                 }
@@ -183,7 +183,7 @@ class MainActivity : ComponentActivity() {
                         val parentEntry = remember(navBackStackEntry) {
                             navController.getBackStackEntry(Screen.HomeScreen.route)
                         }
-                        val parentViewModel: BuildItemViewModel = hiltViewModel(parentEntry)
+                       val parentViewModel: BuildItemViewModel = hiltViewModel(parentEntry)
                         BuildItemScreen(
                             pk = navBackStackEntry.arguments?.getLong(REFLEXION_ITEM_PK)
                                 ?: EMPTY_PK,

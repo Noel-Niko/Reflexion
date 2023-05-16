@@ -3,9 +3,9 @@ package com.livingtechusa.reflexion.util
 import android.net.Uri
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.util.Constants.EMPTY_STRING
-import java.io.File
 
 object Constants {
+    const val LAUNCH_COUNT = "Launch Count"
     const val DATABASE_NAME: String = "Reflexion_Database"
     const val EMPTY_STRING: String = ""
     const val VIDEO_TYPE = "video/*"

@@ -41,7 +41,6 @@ import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
-import java.lang.Exception
 
 
 val previewHeight = 210.dp
@@ -89,7 +88,7 @@ fun DocumentFilePreviewCardBuildView(
     val URI = "Uri"
     val route: String =
         Screen.VideoView.route + "/" + URI
-   val thumbnail by produceState<Bitmap?>(null, resource.uri) {
+    val thumbnail by produceState<Bitmap?>(null, resource.uri) {
         value = resource.uri?.let { SafeUtils.getThumbnail(context, it) }
     }
 
@@ -223,14 +222,24 @@ fun VideoImagePreviewCard(
                 detectTapGestures(
                     onLongPress = {
                         // Launch dialog
-                       navController.navigate(Screen.ConfirmDeleteSubItemScreen.route + "/" + docType)
+                        navController.navigate(Screen.ConfirmDeleteSubItemScreen.route + "/" + docType)
                     },
                     onTap = {
                         val intent = Intent(
                             Intent.ACTION_VIEW,
                             Uri.parse(urlString)
                         )
-                        ContextCompat.startActivity(context, intent, null)
+                        try {
+                            ContextCompat.startActivity(context, intent, null)
+                        } catch (e: Exception) {
+                            Toast
+                                .makeText(
+                                    context,
+                                    R.string.error_grant_video_access_permission,
+                                    Toast.LENGTH_SHORT
+                                )
+                                .show()
+                        }
                     }
                 )
             }
@@ -302,7 +311,17 @@ fun CustomListVideoImagePreviewCard(
                             Intent.ACTION_VIEW,
                             Uri.parse(urlString)
                         )
-                        ContextCompat.startActivity(context, intent, null)
+                        try {
+                            ContextCompat.startActivity(context, intent, null)
+                        } catch (e: Exception) {
+                            Toast
+                                .makeText(
+                                    context,
+                                    R.string.error_did_you_grant_internet_access_permission,
+                                    Toast.LENGTH_SHORT
+                                )
+                                .show()
+                        }
                     }
                 )
             }
