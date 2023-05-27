@@ -52,6 +52,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import com.livingtechusa.reflexion.R
@@ -112,11 +113,15 @@ fun BuildItemContent(
                     viewModel.onTriggerEvent(BuildEvent.GetSelectedReflexionItem(pk))
                 }
             }
-            if (event == Lifecycle.Event.ON_PAUSE) {
-                // On screen rotation, updates the PK passed in the main activity to ensure the current state is not overridden
-                val navBackStackEntry = navController.getBackStackEntry(Screen.BuildItemScreen.route + "/{reflexion_item_pk}")
-                val updatedArguments = navBackStackEntry.arguments
-                updatedArguments?.putLong(REFLEXION_ITEM_PK, -2L)
+            try {
+                if (event == Lifecycle.Event.ON_PAUSE) {
+                    // On screen rotation, updates the PK passed in the main activity to ensure the current state is not overridden
+                    val navBackStackEntry = navController.getBackStackEntry(Screen.BuildItemScreen.route + "/{reflexion_item_pk}")
+                    val updatedArguments = navBackStackEntry.arguments
+                    updatedArguments?.putLong(REFLEXION_ITEM_PK, -2L)
+                }
+            } catch (e: Exception) {
+                // nothing
             }
         }
 
