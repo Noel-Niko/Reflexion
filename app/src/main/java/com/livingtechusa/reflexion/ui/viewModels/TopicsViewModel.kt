@@ -162,7 +162,7 @@ class TopicsViewModel @Inject constructor(
     fun bookmark() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val parent = localServiceImpl.selectParent(list.value[0].autogenPk)
+                val parent = list.value[0]?.autogenPk?.let { localServiceImpl.selectParent(it) }
                 val item = parent?.let { localServiceImpl.selectReflexionItemByPk(it) }
                 val selectBkMkByLevelPK = localServiceImpl.selectBookmarkByLevelPK(item?.autogenPk)
                 if (selectBkMkByLevelPK == null) {
