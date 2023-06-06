@@ -119,4 +119,5 @@
     <string name="click_settings_download_the_app_guide"><![CDATA[Click Settings & download the app guide.]]></string>
     <string name="do_not_show_again">Do not show again.</string>
     <string name="error_did_you_grant_internet_access_permission">Error: Did you grant internet access permission?</string>
+    <string name="no_parent_item_available_to_bookmark_this_level">No parent item available to bookmark this level</string>
 </resources>

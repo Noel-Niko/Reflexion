@@ -126,13 +126,14 @@ class TopicsViewModel @Inject constructor(
     }
 
     private fun setBookmarks() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val _bookmarkedLevels: Deferred<List<Bookmarks?>> = async { localServiceImpl.selectLevelBookMarks() }
+        viewModelScope.launch(Dispatchers.Main) {
+            val _bookmarkedLevels: Deferred<List<Bookmarks?>> =
+                async { localServiceImpl.selectLevelBookMarks() }
             val bookmarkedLevels = _bookmarkedLevels.await()
             _bookmarks.value = bookmarkedLevels
             val _images: Deferred<MutableList<Bitmap>> = async {
                 val bitmaps = mutableListOf<Bitmap>()
-                _bookmarks.value?.forEach { bookmark ->
+                _bookmarks.value.forEach { bookmark ->
                     bookmark?.LEVEL_PK?.let { levelPk ->
                         localServiceImpl.selectReflexionItemByPk(levelPk)?.imagePk?.let { imagePk ->
                             localServiceImpl.selectImage(imagePk)?.let { bitmaps.add(it) }
@@ -162,57 +163,79 @@ class TopicsViewModel @Inject constructor(
     fun bookmark() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val parent = localServiceImpl.selectParent(list.value[0].autogenPk)
-                val item = parent?.let { localServiceImpl.selectReflexionItemByPk(it) }
-                val selectBkMkByLevelPK = localServiceImpl.selectBookmarkByLevelPK(item?.autogenPk)
-                if (selectBkMkByLevelPK == null) {
-                    localServiceImpl.setBookMarks(
-                        Bookmarks(
-                            autoGenPk = 0L,
-                            ITEM_PK = null,
-                            LIST_PK = null,
-                            LEVEL_PK = item?.autogenPk,
-                            title = item?.name ?: EMPTY_STRING
-                        )
-                    )
+                // if no items exist in the DB yet, disable and provide toast
+                if (list.value.isEmpty()) {
                     viewModelScope.launch(Dispatchers.Main) {
                         Toast.makeText(
                             context,
-                            context.getString(R.string.bookmarked),
+                            context.getString(R.string.no_parent_item_available_to_bookmark_this_level),
                             Toast.LENGTH_SHORT
                         ).show()
                     }
-                    setBookmarks()
                 } else {
-                    viewModelScope.launch(Dispatchers.Main) {
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.already_bookmarked),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                    val parent = list.value[0].autogenPk.let { localServiceImpl.selectParent(it) }
+                    if (parent != null) {
+                        val item = parent.let { localServiceImpl.selectReflexionItemByPk(it) }
+                        val selectBkMkByLevelPK =
+                            localServiceImpl.selectBookmarkByLevelPK(item?.autogenPk)
+                        if (selectBkMkByLevelPK == null) {
+                            localServiceImpl.setBookMarks(
+                                Bookmarks(
+                                    autoGenPk = 0L,
+                                    ITEM_PK = null,
+                                    LIST_PK = null,
+                                    LEVEL_PK = item?.autogenPk,
+                                    title = item?.name ?: EMPTY_STRING
+                                )
+                            )
+                            viewModelScope.launch(Dispatchers.Main) {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.bookmarked),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                            setBookmarks()
+                        } else {
+                            viewModelScope.launch(Dispatchers.Main) {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.already_bookmarked),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    } else {
+                        viewModelScope.launch(Dispatchers.Main) {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.no_parent_item_available_to_bookmark_this_level),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
             }
         }
     }
 
-    fun selectLevel(parentPk: Long) {
-        this@TopicsViewModel.onTriggerEvent(TopicItemEvent.GetTopicItem(parentPk))
-    }
+        fun selectLevel(parentPk: Long) {
+            this@TopicsViewModel.onTriggerEvent(TopicItemEvent.GetTopicItem(parentPk))
+        }
 
-    fun deleteBookmark(autogenPk: Long) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                localServiceImpl.deleteBookmark(autogenPk)
-                viewModelScope.launch(Dispatchers.Main) {
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.removed),
-                        Toast.LENGTH_SHORT
-                    ).show()
+        fun deleteBookmark(autogenPk: Long) {
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    localServiceImpl.deleteBookmark(autogenPk)
+                    viewModelScope.launch(Dispatchers.Main) {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.removed),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
                 setBookmarks()
             }
         }
     }
-}
