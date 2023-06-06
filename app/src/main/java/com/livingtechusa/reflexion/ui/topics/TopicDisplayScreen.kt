@@ -112,10 +112,9 @@ fun ReflexionItemListUI(
                         Spacer(modifier = Modifier.height(4.dp))
                         Row(modifier = Modifier.fillMaxWidth()) {
                             BookmarkItemsContent(
-                                bookmarks = bookmarksList,
+                                viewModel = viewModel,
                                 onTap = viewModel::selectLevel,
-                                onDoubleTap = viewModel::deleteBookmark,
-                                images = bookmarkImages
+                                onDoubleTap = viewModel::deleteBookmark
                             )
                         }
                     }
@@ -204,17 +203,18 @@ private fun ReflexionItemsContent(
 
 @Composable
 private fun BookmarkItemsContent(
-    bookmarks: List<Bookmarks?>,
+    viewModel: TopicsViewModel,
     onTap: (Long) -> Unit,
-    onDoubleTap: (Long) -> Unit,
-    images: List<Bitmap?>
+    onDoubleTap: (Long) -> Unit
 ) {
+    val bookmarksList by viewModel.bookmarks.collectAsState()
+    val bookmarkImages by viewModel.bookmarkImages.collectAsState()
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
     ) {
-        items(bookmarks.size) { bookmark ->
+        items(bookmarksList.size) { bookmark ->
             val imagePainter = rememberAsyncImagePainter(
                 ImageRequest.Builder(LocalContext.current)
                     .listener(
@@ -223,8 +223,8 @@ private fun BookmarkItemsContent(
                         }
                     )
                     .data(
-                        data =  if (images.size > bookmark && images[bookmark] != null) {
-                            images[bookmark]
+                        data =  if (bookmarkImages.size > bookmark && bookmarkImages[bookmark] != null) {
+                            bookmarkImages[bookmark]
                         } else {
                             R.mipmap.ic_launcher
                         }
@@ -240,9 +240,9 @@ private fun BookmarkItemsContent(
                         .padding(4.dp)
                         .pointerInput(key1 = bookmark) {
                             detectTapGestures(
-                                onTap = { bookmarks[bookmark]?.LEVEL_PK?.let { pk -> onTap(pk) } },
+                                onTap = { bookmarksList[bookmark]?.LEVEL_PK?.let { pk -> onTap(pk) } },
                                 onDoubleTap = {
-                                    bookmarks[bookmark]?.autoGenPk?.let { itemPk ->
+                                    bookmarksList[bookmark]?.autoGenPk?.let { itemPk ->
                                         onDoubleTap(
                                             itemPk
                                         )
@@ -267,7 +267,7 @@ private fun BookmarkItemsContent(
                                 .height(60.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        bookmarks[bookmark]?.title?.let { title ->
+                        bookmarksList[bookmark]?.title?.let { title ->
                             Text(
                                 modifier = Modifier.padding(16.dp),
                                 text = title,
