@@ -374,7 +374,7 @@ class BuildItemViewModel @Inject constructor(
                         viewModelScope.launch {
                             val item = _reflexionItem
                             item.parent = event.parent.autogenPk
-                            if(item.image == null) {
+                            if (item.image == null) {
                                 item.image = event.parent.image
                                 item.imagePk = event.parent.imagePk
                             }
@@ -497,14 +497,29 @@ class BuildItemViewModel @Inject constructor(
 
                     is BuildEvent.Bookmark -> {
                         viewModelScope.launch {
-                            val bookMark = Bookmarks(
-                                autoGenPk = autogenPK.value,
-                                ITEM_PK = event.itemPk,
-                                LIST_PK = null,
-                                LEVEL_PK = null,
-                                title = name.value
-                            )
-                            localServiceImpl.setBookMarks(bookMark)
+                            if (localServiceImpl.selectReflexionItemByPk(autogenPK.value) != null) {
+                                val bookMark = Bookmarks(
+                                    autoGenPk = autogenPK.value,
+                                    ITEM_PK = event.itemPk,
+                                    LIST_PK = null,
+                                    LEVEL_PK = null,
+                                    title = name.value
+                                )
+                                localServiceImpl.setBookMarks(bookMark)
+                                viewModelScope.launch(Dispatchers.Main) {
+                                    Toast.makeText(
+                                        context,
+                                        resource.getString(R.string.bookmarked),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.you_must_save_the_item_before_it_can_be_bookmarked),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
                     }
 
@@ -618,7 +633,7 @@ class BuildItemViewModel @Inject constructor(
                                     )
                                 }
                                 job.await()
-                                if(oldToNewPkList.size > 1) {
+                                if (oldToNewPkList.size > 1) {
                                     createList(oldToNewPkList)
                                 }
                             }

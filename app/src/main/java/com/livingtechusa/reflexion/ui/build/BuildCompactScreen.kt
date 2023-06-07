@@ -73,11 +73,6 @@ fun BuildItemCompactScreen(
                         IconButton(
                             onClick = {
                                 viewModel.onTriggerEvent(BuildEvent.Bookmark(itemPk))
-                                Toast.makeText(
-                                    context,
-                                    resource.getString(R.string.bookmarked),
-                                    Toast.LENGTH_SHORT
-                                ).show()
                             },
                             content = {
                                 Icon(
