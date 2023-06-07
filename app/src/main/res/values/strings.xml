@@ -120,4 +120,5 @@
     <string name="do_not_show_again">Do not show again.</string>
     <string name="error_did_you_grant_internet_access_permission">Error: Did you grant internet access permission?</string>
     <string name="no_parent_item_available_to_bookmark_this_level">No parent item available to bookmark this level</string>
+    <string name="you_must_save_the_item_before_it_can_be_bookmarked">Debes guardar el elemento antes de que pueda ser marcado.</string>
 </resources>
