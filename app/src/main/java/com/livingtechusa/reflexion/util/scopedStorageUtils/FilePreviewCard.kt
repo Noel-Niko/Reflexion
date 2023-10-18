@@ -192,29 +192,32 @@ fun VideoImagePreviewCard(
     // get url thumbnail...
     // for Youtube
     var imageUrl = urlString
+    var imageFromYoutubeGenerated = false
     try {
-        if (imageUrl?.contains("youtu") == true) {
-            val urlArray = imageUrl.split("//", "/").map { it.trim() }
-            imageUrl =
-                resource.getString(R.string.youtube_image_prepend) + urlArray[2] + resource.getString(
-                    R.string.youtube_image_postpend
-                )
+        if (imageUrl?.contains("youtu.be") == true) {
+            val videoId = imageUrl.split("youtu.be/")[1].split("?")[0]
+            imageUrl = "https://img.youtube.com/vi/$videoId/0.jpg"
+            imageFromYoutubeGenerated = true
         }
     } catch (e: Exception) {
+        imageFromYoutubeGenerated = false
         Toast.makeText(
             context,
             stringResource(R.string.unable_to_preview_non_youtube_videos),
             Toast.LENGTH_SHORT
         ).show()
     }
+    var painter = rememberImagePainter(data = imageUrl)
 
-    val imageLoader = ImageLoader.Builder(context)
-        .components {
-            add(VideoFrameDecoder.Factory())
-        }
-        .build()
+    if (!imageFromYoutubeGenerated)  {
+        val imageLoader = ImageLoader.Builder(context)
+            .components {
+                add(VideoFrameDecoder.Factory())
+            }
+            .build()
 
-    val painter = rememberImagePainter(data = imageUrl, imageLoader = imageLoader)
+        painter = rememberImagePainter(data = imageUrl, imageLoader = imageLoader)
+    }
 
     Card(
         elevation = 0.dp,
