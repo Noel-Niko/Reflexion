@@ -35,7 +35,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
+import coil.ImageLoader
 import coil.compose.rememberImagePainter
+import coil.decode.VideoFrameDecoder
 import com.livingtechusa.reflexion.R
 import com.livingtechusa.reflexion.navigation.Screen
 import com.livingtechusa.reflexion.util.ResourceProviderSingleton
@@ -197,12 +199,6 @@ fun VideoImagePreviewCard(
                 resource.getString(R.string.youtube_image_prepend) + urlArray[2] + resource.getString(
                     R.string.youtube_image_postpend
                 )
-        } else {
-            Toast.makeText(
-                context,
-                resource.getString(R.string.unable_to_obtain_youtube_link_preview),
-                Toast.LENGTH_SHORT
-            ).show()
         }
     } catch (e: Exception) {
         Toast.makeText(
@@ -212,7 +208,13 @@ fun VideoImagePreviewCard(
         ).show()
     }
 
-    val painter = rememberImagePainter(data = imageUrl)
+    val imageLoader = ImageLoader.Builder(context)
+        .components {
+            add(VideoFrameDecoder.Factory())
+        }
+        .build()
+
+    val painter = rememberImagePainter(data = imageUrl, imageLoader = imageLoader)
 
     Card(
         elevation = 0.dp,
